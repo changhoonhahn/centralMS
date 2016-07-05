@@ -8,6 +8,7 @@ import numpy as np
 
 # --- local --- 
 import util as UT
+import sfrs 
 
 
 class CentralMS(object):
@@ -23,6 +24,7 @@ class CentralMS(object):
         self.mass = None
         self.sfr = None
         self.ssfr = None 
+        self.sfr_genesis = None
 
     def _Read_CenQue(self):  
         ''' Read in SF and Quenching galaixes generated from 
@@ -53,6 +55,10 @@ class CentralMS(object):
                 continue 
             else: 
                 setattr(self, col, grp[col][:])
+
+        for key in grp.attrs.keys(): 
+            setattr(self, key+'_attr', grp.attrs[key])
+
         f.close() 
         return None 
 
@@ -64,26 +70,29 @@ def AssignSFR0(cms):
     if 'tsnap_genesis' not in cms.__dict__.keys(): 
         # Most likely you did not read in CenQue catalog!
         raise ValueError
+    
+    z_genesis = UT.z_from_t(cms.tsnap_genesis) 
 
     # Assign SFR to star-forming galaxies 
-    sfr_class[starforming] = 'star-forming'
-    mu_sf_sfr = AverageLogSFR_sfms(
-            mass[starforming], 
-            redshift[starforming], 
-            sfms_prop=sfms_dict)
-    sigma_sf_sfr = ScatterLogSFR_sfms(
-            mass[starforming], 
-            redshift[starforming],
-            sfms_prop=sfms_dict)
-    avg_sfr[starforming] = mu_sf_sfr
-    delta_sfr[starforming] = sigma_sf_sfr * np.random.randn(ngal_sf)
-    sfr[starforming] = mu_sf_sfr + delta_sfr[starforming]
-    ssfr[starforming] = sfr[starforming] - mass[starforming]
+    sfms_dict = {}
+    for keyind in cms.sfms_attr.split(','): 
+        try: 
+            sfms_dict[keyind.split(':')[0]] = float(keyind.split(':')[1])
+        except ValueError:
+            sfms_dict[keyind.split(':')[0]] = keyind.split(':')[1]
 
+    mu_logsfr = sfrs.AverageLogSFR_sfms(cms.mass_genesis, z_genesis, sfms_dict=sfms_dict)
+    sigma_logsfr = sfrs.ScatterLogSFR_sfms(cms.mass_genesis, z_genesis, sfms_dict=sfms_dict)
 
+    sfr_genesis = mu_logsfr + sigma_logsfr
+    cms.sfr_genesis = sfr_genesis
 
+    return cms 
 
 
 if __name__=='__main__': 
     cms = CentralMS()
     cms._Read_CenQue()
+
+    blah = AssignSFR0(cms)
+    print blah.sfr_genesis
