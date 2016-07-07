@@ -91,29 +91,29 @@ def integSFR(logsfr, mass0, t0, tf, mass_dict=None):
     f_retain = mass_dict['f_retain']    # Retain fraction 
     delt = mass_dict['t_step']          # maximum t resolution of the integral 
 
-    niter = int(np.round( (tf.max()-t0.min())/delt ))+1
+    niter = int(np.ceil( (tf.max()-t0.min())/delt ))
+    niters = np.ceil( (tf - t0) / delt).astype('int')  
     
     t_n_1 = t0 
+    t_n = t_n_1 
     logSFR_n_1 = logsfr(mass0, t0)
     logM_n_1 = mass0
-    
+    #print niter, ' ', type, ' iterations'
+    #print 'f_reatin = ', f_retain
     if niter > 0: 
-        print niter, ' ', type, ' iterations'
-        print 'f_reatin = ', f_retain
-
         for i in xrange(niter): 
             iter_time = time.time()
-            t_n = t_n_1 + delt
-            print tf.max() 
-            keep = np.where(tf > t_n) 
-
-            if len(keep[0]) == 0: 
-                continue
+            keep = np.where(niters > i) 
+            t_n[keep] = t_n_1[keep] + delt
                 
-            if type == 'rk4': 
+            if type == 'euler':         # Forward Euler Method
+                logM_n_1[keep] = np.log10(
+                        (10. ** logM_n_1[keep]) + 
+                        delt * 10.**9. * f_retain * (10.** logSFR_n_1[keep])
+                        )
+            elif type == 'rk4':         # Runge Kutta 
                 k1 = (10.0 ** logSFR_n_1)
-    
-                print len(logM_n_1), len(t_n_1)
+
                 k2_sfr = logsfr(
                         np.log10(10.0**logM_n_1 + (10**9 * delt)/2.0 * k1), 
                         t_n_1 + delt/2.0)
@@ -131,8 +131,6 @@ def integSFR(logsfr, mass0, t0, tf, mass_dict=None):
 
                 logM_n_1[keep] = np.log10(10.0 ** logM_n_1[keep] + f_retain/6.0 * (delt * 10**9) * (k1[keep] + 2.0*k2[keep] + 2.0*k3[keep] + k4[keep])) 
 
-            elif type == 'euler': 
-                logM_n_1[keep] = np.log10((10. ** logM_n_1[keep]) + delt * 10.**9. * f_retain * (10.** logSFR_n_1[keep]))
             else: 
                 raise NotImplementedError
             
@@ -156,7 +154,6 @@ def integSFR(logsfr, mass0, t0, tf, mass_dict=None):
 def SFRt_MS_nothing(mstar, t, dsfr, sfms_dict=None):
     ''' log SFR(t) for the `nothing` scenario
     '''
-    print t.max()
     mu_logsfr = AverageLogSFR_sfms(mstar, UT.z_from_t(t), sfms_dict=sfms_dict)
     return mu_logsfr + dsfr
 
@@ -170,9 +167,10 @@ def SFRt_Q_nothing(MQ, t, dsfr, tQ=None, sfms_dict=None, tau_dict=None):
 
     tauQ = getTauQ(MQ, tau_dict=tau_dict)
     
-    dlogsfrq = np.log10( np.exp( (tq - t) / tauQ ) ) 
+    dlogsfrq = np.log10( np.exp( (tQ - t) / tauQ ) ) 
     
     return mu_logsfr + dsfr + dlogsfrq  
+
 
 def getTauQ(mstar, tau_dict=None): 
     ''' Return quenching efold based on stellar mass of galaxy, Tau(M*).
@@ -206,7 +204,7 @@ def getTauQ(mstar, tau_dict=None):
     elif type == 'line': 
         # param will give slope and yint of pivoted tau line 
         
-        tau = tau_prop['slope'] * (mstar - tau_prop['fid_mass']) + tau_prop['yint']
+        tau = tau_dict['slope'] * (mstar - tau_dict['fid_mass']) + tau_dict['yint']
         
         try: 
             if np.min(tau) < 0.001: 
@@ -229,4 +227,3 @@ def getTauQ(mstar, tau_dict=None):
         raise NotImplementedError('asdf')
 
     return tau 
-

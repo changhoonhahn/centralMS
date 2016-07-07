@@ -20,6 +20,12 @@ def dat_dir():
     return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'dat/'
 
 
+def fig_dir(): 
+    ''' dat directory is symlinked to a local path where the data files are located
+    '''
+    return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'fig/'
+
+
 def z_from_t(tcosmic): 
     ''' Given cosmic time return redshift using spline interpolation of snapshot table 
 
@@ -59,4 +65,3 @@ def t_from_z(redshift):
     t_of_z = interpolate.interp1d(z, t, kind='cubic') 
 
     return t_of_z(redshift) 
-
