@@ -24,10 +24,9 @@ def plotCMS_SMF(evol_dict=None):
     cq = CMS.CentralQuenched()  # quenched population
     cq._Read_CenQue()
 
-    cms = CMS.CentralMS()       # SF + quenching population
-    cms._Read_CenQue()
-    eev = CMS.Evolver(cms, evol_dict=evol_dict)
-    MSpop = eev()
+    # import evolved galaxy population 
+    MSpop = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
+    MSpop.Read() 
 
     smf = Obvs.getSMF(
             np.array(list(MSpop.mass)+list(cq.mass))
@@ -67,11 +66,9 @@ def plotCMS_SMF(evol_dict=None):
 def plotCMS_SMF_MS(evol_dict=None): 
     '''
     '''
-    # calculate SMF 
-    cms = CMS.CentralMS()       # SF + quenching population
-    cms._Read_CenQue()
-    eev = CMS.Evolver(cms, evol_dict=evol_dict)
-    MSpop = eev()
+    # import evolved galaxy population 
+    MSpop = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
+    MSpop.Read() 
 
     MSonly = np.where(MSpop.t_quench == 999.) 
 
@@ -105,45 +102,77 @@ def plotCMS_SMF_MS(evol_dict=None):
     return None
 
 
-def plotCMS_SMF_component(): 
+def plotCMS_SMF_comp(criteria='Mhalo0', population='all', Mtype='integ', evol_dict=None): 
+    ''' Look at the composition of the SMF based on different criteria
     '''
-    '''
-    # calculate SMF 
+    # import the catalogs
     cq = CMS.CentralQuenched()  # quenched population
     cq._Read_CenQue()
-
-    cms = CMS.CentralMS()       # SF + quenching population
-    cms._Read_CenQue()
-    eev = CMS.Evolver(cms)
-    MSpop = eev()
-
-    keep_Q = np.where(cq.nsnap_genesis == 15) 
-    keep_MS = np.where(MSpop.nsnap_genesis == 15) 
-    masses = np.array(list(MSpop.mass[keep_MS]) + list(cq.mass[keep_Q]))
-    halomass_genesis = np.array(
-            list(MSpop.halomass_genesis[keep_MS]) + list(cq.halomass_genesis[keep_Q])
-            )
+    
+    MSpop = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
+    MSpop.Read() 
 
     prettyplot() 
     pretty_colors = prettycolors() 
-
     fig = plt.figure()
     sub = fig.add_subplot(111)
     
-    halomass_bins = np.arange(halomass_genesis.min(), halomass_genesis.max(), 0.5) 
+    if criteria == 'Mhalo0': 
+        keep_Q = np.where(cq.nsnap_genesis == 15) 
+        keep_MS = np.where(MSpop.nsnap_genesis == 15) 
+        if population == 'all': 
+            if Mtype == 'integ': 
+                masses = np.array(list(MSpop.mass[keep_MS]) + list(cq.mass[keep_Q]))
+            elif Mtype == 'sham': 
+                masses = np.array(list(MSpop.M_sham[keep_MS]) + list(cq.M_sham[keep_Q]))
+            halomass_genesis = np.array(
+                    list(MSpop.halomass_genesis[keep_MS]) + list(cq.halomass_genesis[keep_Q])
+                    )
+        elif population == 'ms': 
+            if Mtype == 'integ': 
+                masses = MSpop.mass[keep_MS]
+            elif Mtype == 'sham': 
+                masses = MSpop.M_sham[keep_MS]
+            halomass_genesis = MSpop.halomass_genesis[keep_MS]
 
-    for i in range(len(halomass_bins)-1): 
-        bin = np.where(
-                (halomass_genesis >= halomass_bins[i]) & 
-                (halomass_genesis < halomass_bins[i+1]))
+        halomass_bins = np.arange(halomass_genesis.min(), halomass_genesis.max(), 0.5) 
+        for i in range(len(halomass_bins)-1): 
+            bin = np.where(
+                    (halomass_genesis >= halomass_bins[i]) & 
+                    (halomass_genesis < halomass_bins[i+1]))
 
-        smf = Obvs.getSMF(masses[bin], m_arr=None, dlogm=0.1, box=250, h=0.7)
-        if i == 0: 
-            smf_sum = np.zeros(len(smf[1]))
-        sub.fill_between(smf[0], smf_sum,  smf_sum + smf[1], 
-                lw=0, color=pretty_colors[i])
-        
-        smf_sum += smf[1]
+            smf = Obvs.getSMF(masses[bin], m_arr=None, dlogm=0.1, box=250, h=0.7)
+            if i == 0: 
+                smf_sum = np.zeros(len(smf[1]))
+            sub.fill_between(smf[0], smf_sum,  smf_sum + smf[1], 
+                    lw=0, color=pretty_colors[i], 
+                    label=r"$\mathtt{M_{halo,0}} = ["+str(round(halomass_bins[i],1))+","+str(round(halomass_bins[i+1],1))+"$")
+            smf_sum += smf[1]
+
+    elif criteria == 't0': 
+        if population == 'all': 
+            if Mtype == 'integ': 
+                masses = np.array(list(MSpop.mass) + list(cq.mass))
+            elif Mtype == 'sham': 
+                masses = np.array(list(MSpop.M_sham) + list(cq.M_sham))
+            t_genesis = np.array(list(MSpop.tsnap_genesis) + list(cq.tsnap_genesis))
+        elif population == 'ms': 
+            if Mtype == 'integ': 
+                masses = MSpop.mass
+            elif Mtype == 'sham': 
+                masses = MSpop.M_sham
+            t_genesis = MSpop.tsnap_genesis
+
+        for it, tt in enumerate(np.unique(t_genesis)): 
+            t_bin = np.where(t_genesis == tt) 
+
+            smf = Obvs.getSMF(masses[t_bin], m_arr=None, dlogm=0.1, box=250, h=0.7)
+            if it == 0: 
+                smf_sum = np.zeros(len(smf[1]))
+            sub.fill_between(smf[0], smf_sum,  smf_sum + smf[1], 
+                    lw=0, color=pretty_colors[it], 
+                    label=r"$\mathtt{t_0} = "+str(round(tt,1))+"$")
+            smf_sum += smf[1]
 
     sub.set_ylim([10**-5, 10**-1])
     sub.set_xlim([6., 12.0])
@@ -153,7 +182,13 @@ def plotCMS_SMF_component():
     sub.legend(loc='upper right', frameon=False)
     
     fig_file = ''.join([UT.fig_dir(), 
-        'test_CentralMS_SMF_component.png']) 
+        'test_CentralMS_SMF', 
+        '.', population, 
+        '.criteria_', criteria, 
+        '.M', Mtype, 
+        '.sfr_', evol_dict['sfr']['name'], 
+        '.mass_', evol_dict['mass']['type'], '_', str(evol_dict['mass']['t_step']), 
+        '.png']) 
     fig.savefig(fig_file) 
     plt.close() 
     return None
@@ -297,17 +332,85 @@ def plotCMS_SFMS_Pssfr(evol_dict=None):
     return None
 
 
+def plotCMS_SMHMR_MS(evol_dict=None, Mtype='integ'): 
+    ''' Plot the Stellar Mass to Halo Mass Relation of the evolved Gal population 
+    '''
+    # import evolved galaxy population 
+    egp = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
+    egp.Read() 
+    
+    # Calculate the SMHMR for the EvolvedGalPop
+    m_halo_bin = np.arange(10., 15.25, 0.25)    # M_halo bins 
+    m_halo_mid = 0.5 * (m_halo_bin[:-1] + m_halo_bin[1:]) # M_halo bin mid
+
+    smhmr = np.zeros((len(m_halo_bin)-1, 5)) 
+    for im, m_mid in enumerate(m_halo_mid): 
+        inbin = np.where(
+                (egp.halo_mass > m_halo_bin[im]) &
+                (egp.halo_mass <= m_halo_bin[im+1])) 
+        if Mtype == 'integ': 
+            smhmr[im,:] = np.percentile(egp.mass[inbin], [2.5, 16, 50, 84, 97.5])
+        elif Mtype == 'sham': 
+            smhmr[im,:] = np.percentile(egp.M_sham[inbin], [2.5, 16, 50, 84, 97.5])
+
+    # "observations" with observed scatter of 0.2 dex 
+    obvs_smhmr = np.zeros((len(m_halo_bin)-1, 2))
+    obvs_smhmr[:,0] = smhmr[:,2] - 0.2      
+    obvs_smhmr[:,1] = smhmr[:,2] + 0.2      
+
+    prettyplot() 
+    pretty_colors = prettycolors() 
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+
+    sub.fill_between(m_halo_mid, smhmr[:,0], smhmr[:,-1], 
+        color=pretty_colors[1], alpha=0.25, edgecolor=None, lw=0) 
+    sub.fill_between(m_halo_mid, smhmr[:,1], smhmr[:,-2], 
+        color=pretty_colors[1], alpha=0.5, edgecolor=None, lw=0) 
+    
+    sub.plot(m_halo_mid, obvs_smhmr[:,0], 
+        color='k', ls='--', lw=3) 
+    sub.plot(m_halo_mid, obvs_smhmr[:,1], 
+        color='k', ls='--', lw=3) 
+
+    sub.set_xlim([10., 15.0])
+    sub.set_ylim([9., 12.0])
+    sub.set_xlabel(r'$\mathtt{log}\;\mathtt{M_{halo}}\;\;[\mathtt{M_\odot}]$', fontsize=25) 
+    if Mtype == 'integ': 
+        sub.set_ylabel(r'$\mathtt{log}\;\mathtt{M_{*}}\;\;[\mathtt{M_\odot}]$', fontsize=25) 
+    elif Mtype == 'sham': 
+        sub.set_ylabel(r'$\mathtt{log}\;\mathtt{M_{SHAM}}\;\;[\mathtt{M_\odot}]$', fontsize=25) 
+
+    sub.legend(loc='upper right') 
+    
+    if Mtype == 'integ': 
+        fig_file = ''.join([UT.fig_dir(), 
+            'test_CentralMS_SMHMR_MS', 
+            '.sfr_', evol_dict['sfr']['name'], 
+            '.mass_', evol_dict['mass']['type'], 
+            '_', str(evol_dict['mass']['t_step']), 
+            '.png']) 
+    elif Mtype == 'sham': 
+        fig_file = ''.join([UT.fig_dir(), 
+            'test_CentralMS_SMHMR_MS', 
+            '.sfr_', evol_dict['sfr']['name'], 
+            '.mass_SHAM',
+            '.png']) 
+    fig.savefig(fig_file, bbox_inches='tight') 
+    plt.close() 
+    return None
+
+
 
 
 if __name__=='__main__': 
     #plotCMS_SMF_MS()
     #plotCMS_SMF_component() 
-    for tstep in [0.1, 0.05, 0.01]: 
-        evol_dict = {
-                'sfr': {'name': 'no_scatter'}, 
-                'mass': {'type': 'rk4', 'f_retain': 0.6, 't_step': tstep} 
-                }
-        plotCMS_SMF(evol_dict=evol_dict) 
-        plotCMS_SMF_MS(evol_dict=evol_dict)
+    evol_dict = {
+            'sfr': {'name': 'constant_offset'}, 
+            'mass': {'type': 'rk4', 'f_retain': 0.6, 't_step': 0.01} 
+            } 
+    plotCMS_SMF_comp(criteria='t0', population='ms', evol_dict=evol_dict)
+    plotCMS_SMF_comp(criteria='t0', population='ms', Mtype='sham', evol_dict=evol_dict)
     #plotCMS_SFMS(evol_dict=evol_dict)
     #plotCMS_SFMS_Pssfr(evol_dict=evol_dict)

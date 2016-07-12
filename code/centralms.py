@@ -3,6 +3,7 @@
 
 
 '''
+import time
 import h5py
 import numpy as np
 from scipy import interpolate
@@ -178,52 +179,71 @@ class Evolver(object):
 
         if self.evol_dict['sfr']['name'] == 'constant_offset': 
             # No assembly bias. No dutycycle
-            mu_logsfr = sfrs.AverageLogSFR_sfms(
+            dsfr = self.cms.sfr_genesis - sfrs.AverageLogSFR_sfms(
                     self.cms.mass_genesis, UT.z_from_t(self.cms.tsnap_genesis), 
                     sfms_dict=self.cms.sfms_dict)
-            dsfr = self.cms.sfr_genesis - mu_logsfr
-
             sfh_kwargs['dsfr'] = dsfr
-        # ---- 
 
-        # identify the quenching galaxies 
-        qing = np.where(
-                (self.cms.t_quench != 999.) & (self.cms.t_quench > 0.) 
-                )  
-        t_final = np.repeat(13.1328, len(self.cms.mass_genesis))    
-        t_final[qing] = self.cms.t_quench[qing]
-    
-        z_table, t_table = UT.zt_table()    # construct z(t) interpolation function 
+        elif self.evol_dict['sfr']['name'] == 'random_step': 
+            # No assembly bias. Random step function duty cycle 
+            del_t_max = 13.1328 - self.cms.tsnap_genesis.min() 
+            tshift_min, tshift_max = 0.1, 0.5  # hardcoded for now 
+
+            n_col = int(np.ceil(del_t_max/tshift_min))  # number of columns 
+            n_gal = len(self.cms.mass_genesis)
+            sfh_kwargs['tshift'] = np.cumsum(
+                    np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col)), axis=1
+                    ) + np.tile(self.cms.tsnap_genesis, (n_col, 1)).T
+            outofrange = np.where(sfh_kwargs['tshift'] > 13.1328)
+            sfh_kwargs['tshift'][outofrange] = 0.
+            sfh_kwargs['amp'] = np.random.randn(n_gal, n_col) * self.evol_dict['sfr']['sigma']
+
+        # ---- 
+        # construct z(t) interpolation function to try to speed up the integration 
+        z_table, t_table = UT.zt_table()     
         z_of_t = interpolate.interp1d(list(reversed(t_table)), list(reversed(z_table)), 
                 kind='cubic') 
 
+        t_output = t_table[1:16][::-1]
+
+        # identify the quenching galaxies 
+        qing = np.where((self.cms.t_quench != 999.) & (self.cms.t_quench > 0.))  
+        t_final = np.repeat(13.1328, len(self.cms.mass_genesis))    
+        t_final[qing] = self.cms.t_quench[qing]
+    
         # ---- 
         # integrated SFR stellar mass while on SFMS 
         # for galaxies that do not quench, this is their final mass  
         # ---- 
-        earliest = self.cms.tsnap_genesis.min()
         func_kwargs = {
-                't_offset': self.cms.tsnap_genesis - earliest, 
+                't_initial': self.cms.tsnap_genesis, 
                 't_final': t_final, 
                 'f_retain': self.evol_dict['mass']['f_retain'], 
                 'zfromt': z_of_t, 
                 'sfh_kwargs': sfh_kwargs
                 }
-        if self.evol_dict['mass']['type'] == 'rk4': 
+        if self.evol_dict['mass']['type'] == 'rk4':     # RK4
             f_ode = sfrs.ODE_RK4
-        elif self.evol_dict['mass']['type'] == 'euler': 
+        elif self.evol_dict['mass']['type'] == 'euler': # Forward euler
             f_ode = sfrs.ODE_Euler
         integ_logM = f_ode(
                 sfrs.dlogMdt_MS,                    # dy/dt
                 self.cms.mass_genesis,              # logM0
-                np.array([earliest, 13.1328]),      # output times  
+                t_output,                # output times  
                 self.evol_dict['mass']['t_step'],   # time step
                 **func_kwargs) 
-        #integ_logM = odeint(sfrs.logM_integrand_MS, self.cms.mass_genesis, [earliest, 13.1328], 
-        #        (t_offset, t_final, sfh_kwargs,))
     
-        self.cms.mass = integ_logM[-1]                  # integrated SFR mass 
+        self.cms.mass = (integ_logM.T)[:,-1].copy()     # integrated SFR mass 
         self.cms.sfr = sfrs.LogSFR_sfms(integ_logM[-1], z_of_t(t_final), sfms_dict=sfh_kwargs) 
+
+        t_matrix = np.tile(t_output, (integ_logM.shape[1],1))
+        t_genesis_matrix = np.tile(self.cms.tsnap_genesis, (integ_logM.shape[0],1)).T
+        t_final_matrix = np.tile(t_final, (integ_logM.shape[0],1)).T
+
+        outofbounds = np.where((t_matrix < t_genesis_matrix) | (t_matrix > t_final_matrix))
+        self.cms.Minteg_hist = integ_logM.T.copy()
+        self.cms.Minteg_hist[outofbounds] = -999.       
+        
         # ---- 
 
         # quenching galaxies after they're off the SFMS
@@ -231,32 +251,49 @@ class Evolver(object):
         tauQ = sfrs.getTauQ(self.cms.mass[qing], tau_dict=self.cms.tau_dict)
 
         # calculate finall stellar mass of quenching galaxies
+        t_output = np.array(
+                [self.cms.t_quench[qing].min()] +
+                list(t_output[np.where(t_output > self.cms.t_quench[qing].min())])
+                )
         func_kwargs = {
                 'logSFR_Q': self.cms.sfr[qing],         # log SFR_Q
                 'tau_Q': tauQ,
                 't_Q': self.cms.t_quench[qing],         # quenching time 
                 'f_retain': self.evol_dict['mass']['f_retain'], 
-                't_offset': self.cms.t_quench[qing] - self.cms.t_quench[qing].min(), 
                 't_final': t_final[qing]
                 }
-        integ_logM_Q = sfrs.ODE_RK4(
+        integ_logM_Q = f_ode(
                 sfrs.dlogMdt_Q, 
                 self.cms.mass[qing], 
-                np.array([self.cms.t_quench[qing].min(), 13.1328]), 
+                t_output,
                 self.evol_dict['mass']['t_step'],   # time step
                 **func_kwargs)
-        self.cms.mass[qing] = integ_logM_Q[-1]
+        self.cms.mass[qing] = integ_logM_Q.T[:,-1].copy() 
         self.cms.sfr[qing] = sfrs.LogSFR_Q(
                 13.1328, 
                 logSFR_Q=self.cms.sfr[qing],         # log SFR_Q
                 tau_Q=tauQ,
                 t_Q=self.cms.t_quench[qing])
+        
+        t_quench_matrix = np.tile(self.cms.t_quench, (integ_logM.shape[0],1)).T
+        qqing = np.where(
+                (t_quench_matrix != 999.) & (t_quench_matrix > 0.) & 
+                (t_matrix >= t_quench_matrix)) 
+
+        t_q_matrix = np.tile(self.cms.t_quench[qing], (integ_logM_Q.shape[0]-1,1)).T
+        tt_matrix = np.tile(t_output[1:], (integ_logM_Q.shape[1],1))
+        qqqing = np.where(tt_matrix >= t_q_matrix)
+        
+        self.cms.Minteg_hist[qqing] = integ_logM_Q.T[qqqing].copy() 
         return None
 
 
 class EvolvedGalPop(GalPop): 
     def __init__(self, cenque='default', evol_dict=None): 
-        ''' 
+        ''' Class object for the (integrated SFR) evolved galaxy population. 
+        Convenience functions for saving and reading the files so that it does
+        not have to be run over and over again. Currently the hdf5 files include
+        only the bare minimum metadata. 
         '''
         self.cenque = cenque
         if evol_dict is None: 
@@ -283,7 +320,7 @@ class EvolvedGalPop(GalPop):
             'sfms.centrals.', 
             'tf', str(tf), 
             '.abc_', abcrun, 
-            '.prior_', prior_name, 
+            '.prior_', prior, 
             '.sfr_', self.evol_dict['sfr']['name'], 
             '.mass_', self.evol_dict['mass']['type'], 
             '_tstep', str(self.evol_dict['mass']['t_step']), 
@@ -291,26 +328,29 @@ class EvolvedGalPop(GalPop):
         return evol_file 
 
     def Write(self):  
+        ''' Run the evolver on the CentralMS object with the 
+        evol_dict specificiations and then save to file. 
         '''
-        '''
+        t_start = time.time() 
         cms = CentralMS(cenque=self.cenque)
         cms._Read_CenQue()
         eev = Evolver(cms, evol_dict=self.evol_dict)
         MSpop = eev()
+        print time.time() - t_start, ' seconds to run the evolver'
 
         f = h5py.File(self.File(), 'w')    
         grp = f.create_group('data')
         # hardcoded columns for the catalogs
-        for col in ['mass', 'sfr', 'halo_mass',
+        for col in ['mass', 'sfr', 'halo_mass', 'M_sham', 
                 'tsnap_genesis', 'nsnap_genesis', 'zsnap_genesis', 
                 'mass_genesis', 'halomass_genesis', 
-                't_quench', 'Minteg_hist', 'Msham_hist']: 
+                't_quench', 'Minteg_hist', 'Msham_hist', 'Mhalo_hist']: 
             grp.create_dataset(col, data = getattr(MSpop, col)) 
         f.close()
         return None
 
     def Read(self): 
-        '''
+        ''' Read in the hdf5 file. 
         '''
         f = h5py.File(self.File(), 'r')    
         grp = f['data']
@@ -324,16 +364,14 @@ class EvolvedGalPop(GalPop):
 
 
 
-
-
 if __name__=='__main__': 
-
-    evol_dict = {
-            'sfr': {'name': 'no_scatter'}, 
-            'mass': {'type': 'rk4', 'f_retain': 0.6, 't_step': 0.01} 
-            } 
-    EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
-    EGP.Write() 
+    for tstep in [0.1]:#, 0.05, 0.01]: 
+        evol_dict = {
+                'sfr': {'name': 'random_step', 'sigma':0.3}, 
+                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
+                } 
+        EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
+        EGP.Write() 
 
     #cms = CentralMS()
     #cms._Read_CenQue()

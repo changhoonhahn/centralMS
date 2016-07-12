@@ -199,7 +199,7 @@ def ODE_Euler(dydt, init_cond, t_arr, delt, **func_args):
         if it+1 in indices: 
             y_out.append(y.copy())
     
-    return y_out 
+    return np.array(y_out)
 
 
 def ODE_RK4(dydt, init_cond, t_arr, delt, **func_args): 
@@ -231,12 +231,11 @@ def ODE_RK4(dydt, init_cond, t_arr, delt, **func_args):
         if it+1 in indices: 
             y_out.append(y.copy())
     
-    return y_out 
+    return np.array(y_out)
 
 
-def dlogMdt_MS(logMstar, t, t_offset=None, t_final=None, f_retain=None, zfromt=None, sfh_kwargs=None): 
-    ''' 
-    Integrand for solving the ODE 
+def dlogMdt_MS(logMstar, t, t_initial=None, t_final=None, f_retain=None, zfromt=None, sfh_kwargs=None): 
+    ''' Integrand d(logM)/dt for solving the ODE 
 
     d(logM)/dt = SFR'(logM, t) * 10^9/(M ln(10))
 
@@ -246,13 +245,13 @@ def dlogMdt_MS(logMstar, t, t_offset=None, t_final=None, f_retain=None, zfromt=N
     '''
     if sfh_kwargs['name'] == 'constant_offset':  
         # the offset from the average SFMS is preserved throughout the redshift
-        within = np.where(t + t_offset <= t_final) 
-    
         dlogMdt = np.zeros(len(logMstar))
+
+        within = np.where((t <= t_final) & (t >= t_initial) )
         if len(within[0]) > 0:  
             tmp = AverageLogSFR_sfms(
                     logMstar[within], 
-                    zfromt(t + t_offset[within]), 
+                    zfromt(t), 
                     sfms_dict=sfh_kwargs['sfms']) + \
                             sfh_kwargs['dsfr'][within] + \
                             9. - \
@@ -260,34 +259,33 @@ def dlogMdt_MS(logMstar, t, t_offset=None, t_final=None, f_retain=None, zfromt=N
                             np.log10(f_retain) - \
                             0.3622157
             dlogMdt[within] = np.power(10, tmp)
-        return dlogMdt 
 
     elif sfh_kwargs['name'] == 'no_scatter': 
         # SFR is just the average SFMS 
-        within = np.where(t + t_offset <= t_final) 
-    
         dlogMdt = np.zeros(len(logMstar))
+
+        within = np.where((t <= t_final) & (t >= t_initial) )
         if len(within[0]) > 0:  
             dlogMdt[within] = np.power(10, AverageLogSFR_sfms(
                 logMstar[within], 
-                zfromt(t + t_offset[within]), 
+                zfromt(t), 
                 sfms_dict=sfh_kwargs['sfms']) + 9. - logMstar[within]) / np.log(10) 
-        return dlogMdt 
 
+    return dlogMdt 
 
-def dlogMdt_Q(logMstar, t, logSFR_Q=None, tau_Q=None, t_Q=None, f_retain=None, t_offset=None, t_final=None): 
+def dlogMdt_Q(logMstar, t, logSFR_Q=None, tau_Q=None, t_Q=None, f_retain=None, t_final=None): 
     ''' dlogM/dt for quenching galaxies. Note that this is derived from dM/dt.  
 
     dlogM/dt quenching = SFR(M_Q, t_Q)/(M ln10) * exp( (t_Q - t) / tau_Q ) 
     '''
-    within = np.where(t + t_offset <= t_final) 
-    
     dlogMdt = np.zeros(len(logMstar))
+
+    within = np.where((t <= t_final) & (t >= t_Q))
     if len(within[0]) > 0:  
-        SFRQ = np.power(10, logSFR_Q[within] + 9 - logMstar[within])
+        SFRQ = np.power(10, logSFR_Q[within] + 9. - logMstar[within])
 
         dlogMdt[within] = f_retain * SFRQ * \
-                np.exp( (t_Q[within] - (t + t_offset[within])) / tau_Q[within] ) / np.log(10)  
+                np.exp( (t_Q[within] - t) / tau_Q[within] ) / np.log(10)  
     return dlogMdt 
 
 
