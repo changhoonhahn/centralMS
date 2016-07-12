@@ -11,6 +11,28 @@ import numpy as np
 import util as UT
 
 
+def LogSFR_sfms(logMstar, z_in, sfms_dict=None): 
+    ''' Wrapper for SFMS star formation rates 
+    '''
+    if sfms_dict['name'] == 'constant_offset':  
+        # the offset from the average SFMS is preserved throughout the redshift
+        logsfr = AverageLogSFR_sfms(logMstar, z_in, sfms_dict=sfms_dict['sfms']) + \
+                sfms_dict['dsfr']
+    elif sfms_dict['name'] == 'no_scatter': 
+        # SFR is just the average SFMS 
+        logsfr = AverageLogSFR_sfms(logMstar, z_in, sfms_dict=sfms_dict['sfms'])
+
+    return logsfr 
+
+
+def LogSFR_Q(t, logSFR_Q=None, tau_Q=None, t_Q=None):
+    ''' Wrapper for SFR of quenching galaxies
+    '''
+    SFRQ = np.power(10, logSFR_Q)
+    logsfr = np.log10(SFRQ * np.exp( (t_Q - t) / tau_Q ) )
+    return logsfr
+
+
 def AverageLogSFR_sfms(mstar, z_in, sfms_dict=None): 
     ''' Model for the average SFR of the SFMS as a function of M* at redshift z_in.
     The model takes the functional form of 
@@ -151,25 +173,160 @@ def integSFR(logsfr, mass0, t0, tf, mass_dict=None):
     return logM_n_1, logSFR_n_1
 
 
-def SFRt_MS_nothing(mstar, t, dsfr, sfms_dict=None):
-    ''' log SFR(t) for the `nothing` scenario
+def ODE_Euler(dydt, init_cond, t_arr, delt, **func_args): 
     '''
-    mu_logsfr = AverageLogSFR_sfms(mstar, UT.z_from_t(t), sfms_dict=sfms_dict)
-    return mu_logsfr + dsfr
+    '''
+    # t where we will evaluate 
+    t_eval = np.arange(t_arr.min(), t_arr.max()+delt, delt) 
+    t_eval[-1] = t_arr[-1]
+
+    indices = []
+    for tt in t_arr[1:-1]:
+        idx = np.argmin(np.abs(t_eval - tt))
+        t_eval[idx] = tt
+        indices.append(idx)
+    indices.append(len(t_eval) - 1) 
+
+    dts = t_eval[1:] - t_eval[:-1]
+
+    y = init_cond.copy()
+    y_out = [init_cond.copy()]
+
+    for it in range(len(dts)):
+        dy = dts[it] * dydt(y, t_eval[it], **func_args)
+        y += dy 
+
+        if it+1 in indices: 
+            y_out.append(y.copy())
+    
+    return y_out 
 
 
-def SFRt_Q_nothing(MQ, t, dsfr, tQ=None, sfms_dict=None, tau_dict=None): 
+def ODE_RK4(dydt, init_cond, t_arr, delt, **func_args): 
+    '''
+    '''
+    # t where we will evaluate 
+    t_eval = np.arange(t_arr.min(), t_arr.max()+delt, delt) 
+    t_eval[-1] = t_arr[-1]
+
+    indices = []
+    for tt in t_arr[1:-1]:
+        idx = np.argmin(np.abs(t_eval - tt))
+        t_eval[idx] = tt
+        indices.append(idx)
+    indices.append(len(t_eval) - 1) 
+
+    dts = t_eval[1:] - t_eval[:-1]
+
+    y = init_cond.copy()
+    y_out = [init_cond.copy()]
+
+    for it in range(len(dts)):
+        k1 = dts[it] * dydt(y, t_eval[it], **func_args)
+        k2 = dts[it] * dydt(y + 0.5 * k1, t_eval[it] + 0.5 * dts[it], **func_args)
+        k3 = dts[it] * dydt(y + 0.5 * k2, t_eval[it] + 0.5 * dts[it], **func_args)
+        k4 = dts[it] * dydt(y + k3, t_eval[it] + dts[it], **func_args)
+        y += (k1 + 2.*k2 + 2.*k3 + k4)/6.
+
+        if it+1 in indices: 
+            y_out.append(y.copy())
+    
+    return y_out 
+
+
+def dlogMdt_MS(logMstar, t, t_offset=None, t_final=None, f_retain=None, zfromt=None, sfh_kwargs=None): 
+    ''' 
+    Integrand for solving the ODE 
+
+    d(logM)/dt = SFR'(logM, t) * 10^9/(M ln(10))
+
+    SFR'(t) = SFR(M*, t+t_offset) 
+    or  
+            = 0 if t > tf - t_offset
+    '''
+    if sfh_kwargs['name'] == 'constant_offset':  
+        # the offset from the average SFMS is preserved throughout the redshift
+        within = np.where(t + t_offset <= t_final) 
+    
+        dlogMdt = np.zeros(len(logMstar))
+        if len(within[0]) > 0:  
+            tmp = AverageLogSFR_sfms(
+                    logMstar[within], 
+                    zfromt(t + t_offset[within]), 
+                    sfms_dict=sfh_kwargs['sfms']) + \
+                            sfh_kwargs['dsfr'][within] + \
+                            9. - \
+                            logMstar[within] + \
+                            np.log10(f_retain) - \
+                            0.3622157
+            dlogMdt[within] = np.power(10, tmp)
+        return dlogMdt 
+
+    elif sfh_kwargs['name'] == 'no_scatter': 
+        # SFR is just the average SFMS 
+        within = np.where(t + t_offset <= t_final) 
+    
+        dlogMdt = np.zeros(len(logMstar))
+        if len(within[0]) > 0:  
+            dlogMdt[within] = np.power(10, AverageLogSFR_sfms(
+                logMstar[within], 
+                zfromt(t + t_offset[within]), 
+                sfms_dict=sfh_kwargs['sfms']) + 9. - logMstar[within]) / np.log(10) 
+        return dlogMdt 
+
+
+def dlogMdt_Q(logMstar, t, logSFR_Q=None, tau_Q=None, t_Q=None, f_retain=None, t_offset=None, t_final=None): 
+    ''' dlogM/dt for quenching galaxies. Note that this is derived from dM/dt.  
+
+    dlogM/dt quenching = SFR(M_Q, t_Q)/(M ln10) * exp( (t_Q - t) / tau_Q ) 
+    '''
+    within = np.where(t + t_offset <= t_final) 
+    
+    dlogMdt = np.zeros(len(logMstar))
+    if len(within[0]) > 0:  
+        SFRQ = np.power(10, logSFR_Q[within] + 9 - logMstar[within])
+
+        dlogMdt[within] = f_retain * SFRQ * \
+                np.exp( (t_Q[within] - (t + t_offset[within])) / tau_Q[within] ) / np.log(10)  
+    return dlogMdt 
+
+
+
+def logSFRt_MS(mstar, t, method_kwargs=None):
+    ''' log SFR(t) for different methods 
+    '''
+    if method_kwargs['name'] == 'constant_offset':  
+        # the offset from the average SFMS is preserved throughout the redshift
+        mu_logsfr = AverageLogSFR_sfms(mstar, UT.z_from_t(t), sfms_dict=method_kwargs['sfms'])
+        return mu_logsfr + method_kwargs['dsfr']
+
+    elif method_kwargs['name'] == 'no_scatter': 
+        # SFR is just the average SFMS 
+        mu_logsfr = AverageLogSFR_sfms(mstar, UT.z_from_t(t), sfms_dict=method_kwargs['sfms'])
+        return mu_logsfr
+
+
+def logSFRt_Q(MQ, t, tQ=None, tau_dict=None, method_kwargs=None): 
     ''' log SFR(t) after tQ to tf for quenching galaxies (NOTE THAT THIS IS VERY SPECIFIC)
                                 
     log(SFR)_quenching = np.log10( np.exp( -(t_f - t_Q)/tau) )
     '''
-    mu_logsfr = AverageLogSFR_sfms(MQ, UT.z_from_t(tQ), sfms_dict=sfms_dict)
+    if method_kwargs == 'constant_offset': 
+        mu_logsfr = AverageLogSFR_sfms(MQ, UT.z_from_t(tQ), sfms_dict=method_kwargs['sfms'])
 
-    tauQ = getTauQ(MQ, tau_dict=tau_dict)
-    
-    dlogsfrq = np.log10( np.exp( (tQ - t) / tauQ ) ) 
-    
-    return mu_logsfr + dsfr + dlogsfrq  
+        tauQ = getTauQ(MQ, tau_dict=tau_dict)
+        
+        dlogsfrq = np.log10( np.exp( (tQ - t) / tauQ ) ) 
+        
+        return mu_logsfr + method_kwargs['dsfr'] + dlogsfrq  
+
+    elif method_kwargs == 'no_scatter':
+        mu_logsfr = AverageLogSFR_sfms(MQ, UT.z_from_t(tQ), sfms_dict=method_kwargs['sfms'])
+
+        tauQ = getTauQ(MQ, tau_dict=tau_dict)
+        dlogsfrq = np.log10( np.exp( (tQ - t) / tauQ ) ) 
+        
+        return mu_logsfr + dlogsfrq  
 
 
 def getTauQ(mstar, tau_dict=None): 
