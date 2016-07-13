@@ -21,6 +21,14 @@ def LogSFR_sfms(logMstar, z_in, sfms_dict=None):
     elif sfms_dict['name'] == 'no_scatter': 
         # SFR is just the average SFMS 
         logsfr = AverageLogSFR_sfms(logMstar, z_in, sfms_dict=sfms_dict['sfms'])
+        
+    elif sfms_dict['name'] == 'random_step':
+        t = UT.t_from_z(z_in)
+        ishift = np.abs(sfms_dict['tshift'] - 
+                np.tile(t, (sfms_dict['tshift'].shape[1],1)).T).argmin(axis=1)
+        ishift[np.where((sfms_dict['tshift'])[range(len(ishift)), ishift] > t)] -= 1
+        dsfr = sfms_dict['amp'][range(len(ishift)), ishift]
+        logsfr = AverageLogSFR_sfms(logMstar, z_in, sfms_dict=sfms_dict['sfms']) + dsfr
 
     return logsfr 
 
@@ -243,35 +251,40 @@ def dlogMdt_MS(logMstar, t, t_initial=None, t_final=None, f_retain=None, zfromt=
     or  
             = 0 if t > tf - t_offset
     '''
-    if sfh_kwargs['name'] == 'constant_offset':  
-        # the offset from the average SFMS is preserved throughout the redshift
-        dlogMdt = np.zeros(len(logMstar))
+    dlogMdt = np.zeros(len(logMstar))
+    within = np.where((t <= t_final) & (t >= t_initial) )
+    if len(within[0]) > 0:  
+        try: 
+            dsfr = dSFR_MS(t, sfh_kwargs)[within]
+        except TypeError:
+            dsfr = dSFR_MS(t, sfh_kwargs)
 
-        within = np.where((t <= t_final) & (t >= t_initial) )
-        if len(within[0]) > 0:  
-            tmp = AverageLogSFR_sfms(
-                    logMstar[within], 
-                    zfromt(t), 
-                    sfms_dict=sfh_kwargs['sfms']) + \
-                            sfh_kwargs['dsfr'][within] + \
-                            9. - \
-                            logMstar[within] + \
-                            np.log10(f_retain) - \
-                            0.3622157
-            dlogMdt[within] = np.power(10, tmp)
-
-    elif sfh_kwargs['name'] == 'no_scatter': 
-        # SFR is just the average SFMS 
-        dlogMdt = np.zeros(len(logMstar))
-
-        within = np.where((t <= t_final) & (t >= t_initial) )
-        if len(within[0]) > 0:  
-            dlogMdt[within] = np.power(10, AverageLogSFR_sfms(
+        tmp = AverageLogSFR_sfms(
                 logMstar[within], 
                 zfromt(t), 
-                sfms_dict=sfh_kwargs['sfms']) + 9. - logMstar[within]) / np.log(10) 
+                sfms_dict=sfh_kwargs['sfms']) + dsfr + \
+                        9. - \
+                        logMstar[within] + \
+                        np.log10(f_retain) - \
+                        0.3622157
+        dlogMdt[within] = np.power(10, tmp)
 
     return dlogMdt 
+
+
+def dSFR_MS(t, sfh_kwargs): 
+    '''
+    '''
+    if sfh_kwargs['name'] == 'constant_offset':  
+        dsfr = sfh_kwargs['dsfr']
+    elif sfh_kwargs['name'] == 'no_scatter': 
+        dsfr = 0.
+    elif sfh_kwargs['name'] == 'random_step':
+        ishift = np.abs(sfh_kwargs['tshift'] - t).argmin(axis=1)
+        ishift[np.where((sfh_kwargs['tshift'])[range(len(ishift)), ishift] > t)] -= 1
+        dsfr = sfh_kwargs['amp'][range(len(ishift)), ishift]
+    return dsfr
+
 
 def dlogMdt_Q(logMstar, t, logSFR_Q=None, tau_Q=None, t_Q=None, f_retain=None, t_final=None): 
     ''' dlogM/dt for quenching galaxies. Note that this is derived from dM/dt.  
@@ -287,7 +300,6 @@ def dlogMdt_Q(logMstar, t, logSFR_Q=None, tau_Q=None, t_Q=None, f_retain=None, t
         dlogMdt[within] = f_retain * SFRQ * \
                 np.exp( (t_Q[within] - t) / tau_Q[within] ) / np.log(10)  
     return dlogMdt 
-
 
 
 def logSFRt_MS(mstar, t, method_kwargs=None):

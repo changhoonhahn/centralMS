@@ -158,11 +158,40 @@ class Evolver(object):
             raise ValueError
 
         # Assign SFR to star-forming galaxies 
-        mu_logsfr = sfrs.AverageLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis, 
-                sfms_dict=self.cms.sfms_dict)
-        sigma_logsfr = sfrs.ScatterLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis, 
-                sfms_dict=self.cms.sfms_dict)
-        self.cms.sfr_genesis = mu_logsfr + sigma_logsfr * np.random.randn(len(mu_logsfr))
+        if self.evol_dict['initial']['assembly_bias'] == 'none': 
+            # No assembly bias 
+            mu_logsfr = sfrs.AverageLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis, 
+                    sfms_dict=self.cms.sfms_dict)
+            sigma_logsfr = sfrs.ScatterLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis, 
+                    sfms_dict=self.cms.sfms_dict)
+            self.cms.sfr_genesis = mu_logsfr + sigma_logsfr * np.random.randn(len(mu_logsfr))
+        elif self.evol_dict['initial']['assembly_bias'] == 'longterm': 
+            # long term assembly bias (rank ordered by the ultimate mass growth) 
+            dMhalo = self.cms.halo_mass -  self.cms.halomass_genesis
+
+            mu_logsfr = sfrs.AverageLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis, 
+                    sfms_dict=self.cms.sfms_dict)
+            sigma_logsfr = sfrs.ScatterLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis, 
+                    sfms_dict=self.cms.sfms_dict)
+            sigma_eff = np.sqrt(sigma_logsfr**2 - self.evol_dict['initial']['scatter']**2)
+            dsfr = sigma_eff * np.random.randn(len(mu_logsfr)) 
+            dsfr_scat = self.evol_dict['initial']['scatter'] * np.random.randn(len(mu_logsfr))
+
+            self.cms.sfr_genesis = np.zeros(len(mu_logsfr))
+            for tg in np.unique(self.cms.tsnap_genesis): 
+                snap = np.where(self.cms.tsnap_genesis == tg)[0]
+                Mhsort = np.argsort(dMhalo[snap]) 
+                self.cms.sfr_genesis[snap[Mhsort]] = (mu_logsfr[snap])[Mhsort] + \
+                        np.sort(dsfr[snap]) + dsfr_scat[snap]
+                #print 't = ', tg
+                #print dMhalo[snap]
+                #print dMhalo[snap][Mhsort]
+                #print Mhsort
+                #print (mu_logsfr[snap])[Mhsort]
+                #print np.sort(dsfr[snap]) 
+                #print  (self.cms.sfr_genesis[snap])[Mhsort]
+        else: 
+            raise NotImplementedError
 
         return None 
 
@@ -175,28 +204,29 @@ class Evolver(object):
         # ---- 
         # different SFH prescriptions
         # ---- 
-        sfh_kwargs = {'name': self.evol_dict['sfr']['name'], 'sfms': self.cms.sfms_dict} 
+        sfh_kwargs = {'name': self.evol_dict['sfh']['name'], 'sfms': self.cms.sfms_dict} 
 
-        if self.evol_dict['sfr']['name'] == 'constant_offset': 
+        if self.evol_dict['sfh']['name'] == 'constant_offset': 
             # No assembly bias. No dutycycle
             dsfr = self.cms.sfr_genesis - sfrs.AverageLogSFR_sfms(
                     self.cms.mass_genesis, UT.z_from_t(self.cms.tsnap_genesis), 
                     sfms_dict=self.cms.sfms_dict)
             sfh_kwargs['dsfr'] = dsfr
 
-        elif self.evol_dict['sfr']['name'] == 'random_step': 
+        elif self.evol_dict['sfh']['name'] == 'random_step': 
             # No assembly bias. Random step function duty cycle 
             del_t_max = 13.1328 - self.cms.tsnap_genesis.min() 
-            tshift_min, tshift_max = 0.1, 0.5  # hardcoded for now 
+            tshift_min, tshift_max = self.evol_dict['sfh']['dt_min'], self.evol_dict['sfh']['dt_max']  # hardcoded for now 
 
             n_col = int(np.ceil(del_t_max/tshift_min))  # number of columns 
             n_gal = len(self.cms.mass_genesis)
-            sfh_kwargs['tshift'] = np.cumsum(
-                    np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col)), axis=1
-                    ) + np.tile(self.cms.tsnap_genesis, (n_col, 1)).T
+            tshift = np.zeros((n_gal, n_col))
+            tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+            sfh_kwargs['tshift'] = np.cumsum(tshift , axis=1) + \
+                    np.tile(self.cms.tsnap_genesis, (n_col, 1)).T
             outofrange = np.where(sfh_kwargs['tshift'] > 13.1328)
-            sfh_kwargs['tshift'][outofrange] = 0.
-            sfh_kwargs['amp'] = np.random.randn(n_gal, n_col) * self.evol_dict['sfr']['sigma']
+            sfh_kwargs['tshift'][outofrange] = -999.
+            sfh_kwargs['amp'] = np.random.randn(n_gal, n_col) * self.evol_dict['sfh']['sigma']
 
         # ---- 
         # construct z(t) interpolation function to try to speed up the integration 
@@ -285,6 +315,7 @@ class Evolver(object):
         qqqing = np.where(tt_matrix >= t_q_matrix)
         
         self.cms.Minteg_hist[qqing] = integ_logM_Q.T[qqqing].copy() 
+        self.cms.sfh_dict = sfh_kwargs
         return None
 
 
@@ -307,25 +338,63 @@ class EvolvedGalPop(GalPop):
     def File(self): 
         '''
         '''
+        # Write Star forming and Quenching catalog 
+        evol_file = ''.join([
+            '/data1/hahn/centralMS/galpop/', 
+            'sfms.centrals.', 
+            self._Spec_str(),
+            '.hdf5'])
+        return evol_file 
+
+    def _Spec_str(self): 
+        spec_str = ''.join([
+            self._CenQue_str(), self._Initial_str(), self._SFH_str(), self._Mass_str()
+            ])
+        return spec_str
+
+    def _CenQue_str(self): 
         if self.cenque == 'default': 
             tf = 7 
             abcrun = 'RHOssfrfq_TinkerFq_Std'
             prior = 'updated'
         else: 
             raise NotImplementedError
+        #cq_str = ''.join(['tf', str(tf), '.abc_', abcrun, '.prior_', prior])
+        cq_str = self.cenque
+        return cq_str
 
-        # Write Star forming and Quenching catalog 
-        evol_file = ''.join([
-            '/data1/hahn/centralMS/galpop/', 
-            'sfms.centrals.', 
-            'tf', str(tf), 
-            '.abc_', abcrun, 
-            '.prior_', prior, 
-            '.sfr_', self.evol_dict['sfr']['name'], 
+    def _Initial_str(self): 
+        ''' Initial conditions whether it has assembly bias or not
+        '''
+        init_str = ''.join([
+            '.Initial_', 
+            self.evol_dict['initial']['assembly_bias'], 
+            'AssemblyBias'
+            ]) 
+        return init_str 
+
+    def _SFH_str(self): 
+        '''
+        '''
+        if self.evol_dict['sfh']['name'] in ['constant_offset', 'no_scatter']: 
+            sfh_str = ''.join(['.SFH', self.evol_dict['sfh']['name']])
+        elif self.evol_dict['sfh']['name'] in ['random_step']: 
+            sfh_str = ''.join([
+                '.SFH', self.evol_dict['sfh']['name'],
+                '_sigma', str(round(self.evol_dict['sfh']['sigma'],1)),
+                '_dt', str(round(self.evol_dict['sfh']['dt_min'],2)),
+                '_', str(round(self.evol_dict['sfh']['dt_max'],2))
+                ])
+        else: 
+            raise ValueError
+        return sfh_str 
+    
+    def _Mass_str(self): 
+        mass_str = ''.join([ 
             '.mass_', self.evol_dict['mass']['type'], 
-            '_tstep', str(self.evol_dict['mass']['t_step']), 
-            '.hdf5'])
-        return evol_file 
+            '_tstep', str(self.evol_dict['mass']['t_step']) 
+            ])
+        return mass_str
 
     def Write(self):  
         ''' Run the evolver on the CentralMS object with the 
@@ -340,12 +409,28 @@ class EvolvedGalPop(GalPop):
 
         f = h5py.File(self.File(), 'w')    
         grp = f.create_group('data')
-        # hardcoded columns for the catalogs
+        # hardcoded main data columns for the catalogs
         for col in ['mass', 'sfr', 'halo_mass', 'M_sham', 
                 'tsnap_genesis', 'nsnap_genesis', 'zsnap_genesis', 
                 'mass_genesis', 'halomass_genesis', 
                 't_quench', 'Minteg_hist', 'Msham_hist', 'Mhalo_hist']: 
             grp.create_dataset(col, data = getattr(MSpop, col)) 
+    
+        # SFH dictionary 
+        sfh_grp = f.create_group('sfh_dict')
+        for key in MSpop.sfh_dict.keys(): 
+            if key == 'sfms':   # SFMS dictinary
+                sfms_prop_str = ','.join([   
+                    ':'.join([k, str(MSpop.sfh_dict['sfms'][k])]) 
+                    for k in MSpop.sfh_dict['sfms'].keys()
+                    ])
+                sfh_grp.create_dataset(key, data=str(sfms_prop_str))
+            else: 
+                if isinstance(MSpop.sfh_dict[key], str): 
+                    sfh_grp.create_dataset(key, data=str(MSpop.sfh_dict[key]))
+                else: 
+                    sfh_grp.create_dataset(key, data=MSpop.sfh_dict[key]) 
+
         f.close()
         return None
 
@@ -353,10 +438,24 @@ class EvolvedGalPop(GalPop):
         ''' Read in the hdf5 file. 
         '''
         f = h5py.File(self.File(), 'r')    
+        # read main data columns 
         grp = f['data']
-
         for key in grp.keys(): 
             setattr(self, key, grp[key][:])
+        
+        # read in SFH dictionary
+        sfh_grp = f['sfh_dict']
+        self.sfh_dict = {} 
+        for key in sfh_grp.keys(): 
+            if key == 'sfms': 
+                self.sfh_dict[key] = {} 
+                for keyind in (sfh_grp[key].value).split(','): 
+                    try: 
+                        self.sfh_dict[key][keyind.split(':')[0]] = float(keyind.split(':')[1])
+                    except ValueError:
+                        self.sfh_dict[key][keyind.split(':')[0]] = keyind.split(':')[1]
+            else: 
+                self.sfh_dict[key] = sfh_grp[key].value
 
         f.close()
         return None
@@ -365,14 +464,15 @@ class EvolvedGalPop(GalPop):
 
 
 if __name__=='__main__': 
-    for tstep in [0.1]:#, 0.05, 0.01]: 
+    for tstep in [0.1, 0.05, 0.01]: 
         evol_dict = {
-                'sfr': {'name': 'random_step', 'sigma':0.3}, 
-                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
+                'initial': {'assembly_bias': 'longterm', 'scatter': 0.}, 
+                'sfh': {'name': 'constant_offset'}, 
+                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': tstep} 
                 } 
         EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
         EGP.Write() 
-
+    # 'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
     #cms = CentralMS()
     #cms._Read_CenQue()
 

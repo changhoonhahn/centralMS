@@ -18,12 +18,12 @@ import centralms as CMS
 import observables as Obvs
 
 def plotCMS_SMF(evol_dict=None): 
-    '''
+    ''' Plot the stellar mass function of the integrated SFR population 
+    and compare it to the theoretic stellar mass function
     '''
     # calculate SMF 
     cq = CMS.CentralQuenched()  # quenched population
     cq._Read_CenQue()
-
     # import evolved galaxy population 
     MSpop = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
     MSpop.Read() 
@@ -53,24 +53,21 @@ def plotCMS_SMF(evol_dict=None):
     sub.set_ylabel(r'Stellar Mass Function $\mathtt{\Phi}$', fontsize=25) 
     sub.legend(loc='upper right', frameon=False)
     
-    fig_file = ''.join([UT.fig_dir(), 
-        'test_CentralMS_SMF', 
-        '.sfr_', evol_dict['sfr']['name'], 
-        '.mass_', evol_dict['mass']['type'], '_', str(evol_dict['mass']['t_step']), 
-        '.png']) 
+    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SMF', MSpop._Spec_str(), '.png']) 
     fig.savefig(fig_file, bbox_inches='tight') 
     plt.close() 
     return None
 
 
 def plotCMS_SMF_MS(evol_dict=None): 
-    '''
+    '''Plot the stellar mass function of the integrated SFR main sequence population 
+    and compare it to the theoretic stellar mass function of the main sequence 
+    population 
     '''
     # import evolved galaxy population 
     MSpop = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
     MSpop.Read() 
-
-    MSonly = np.where(MSpop.t_quench == 999.) 
+    MSonly = np.where(MSpop.t_quench == 999.)   # remove the quenching galaxies
 
     smf = Obvs.getSMF(MSpop.mass[MSonly])
     prettyplot() 
@@ -92,11 +89,7 @@ def plotCMS_SMF_MS(evol_dict=None):
     sub.set_ylabel(r'Stellar Mass Function $\mathtt{\Phi}$', fontsize=25) 
     sub.legend(loc='upper right', frameon=False)
     
-    fig_file = ''.join([UT.fig_dir(), 
-        'test_CentralMS_SMF_MS', 
-        '.sfr_', evol_dict['sfr']['name'], 
-        '.mass_', evol_dict['mass']['type'], '_', str(evol_dict['mass']['t_step']), 
-        '.png']) 
+    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SMF_MS', MSpop._Spec_str(), '.png']) 
     fig.savefig(fig_file, bbox_inches='tight') 
     plt.close() 
     return None
@@ -186,7 +179,7 @@ def plotCMS_SMF_comp(criteria='Mhalo0', population='all', Mtype='integ', evol_di
         '.', population, 
         '.criteria_', criteria, 
         '.M', Mtype, 
-        '.sfr_', evol_dict['sfr']['name'], 
+        '.sfh_', evol_dict['sfh']['name'], 
         '.mass_', evol_dict['mass']['type'], '_', str(evol_dict['mass']['t_step']), 
         '.png']) 
     fig.savefig(fig_file) 
@@ -197,33 +190,26 @@ def plotCMS_SMF_comp(criteria='Mhalo0', population='all', Mtype='integ', evol_di
 def plotCMS_SFMS(evol_dict=None):
     ''' Plot the SFR-M* relation of the SFMS and compare to expectations
     '''
-    cms = CMS.CentralMS()       # SF + quenching population
+    # import evolved galaxy population 
+    cms = CMS.CentralMS(cenque='default')
     cms._Read_CenQue()
-    eev = CMS.Evolver(cms, evol_dict=evol_dict)
-    MSpop = eev()
+    MSpop = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
+    MSpop.Read() 
     MSonly = np.where(MSpop.t_quench == 999.) 
     
     delta_m = 0.5
     mbins = np.arange(MSpop.mass[MSonly].min(), MSpop.mass[MSonly].max(), delta_m) 
     
-    sfr_a = np.zeros(len(mbins)-1) 
-    sfr_b = np.zeros(len(mbins)-1) 
-    sfr_d = np.zeros(len(mbins)-1) 
-    sfr_e = np.zeros(len(mbins)-1) 
+    sfr_percent = np.zeros((len(mbins)-1, 4))
     for im, mbin in enumerate(mbins[:-1]):  
         within = np.where(
                 (MSpop.mass[MSonly] > mbin) & 
                 (MSpop.mass[MSonly] <= mbin + delta_m) 
                 ) 
-        a, b, d, e = np.percentile(MSpop.sfr[MSonly[0][within]], [2.5, 16, 84, 97.5])
-        sfr_a[im] = a 
-        sfr_b[im] = b 
-        sfr_d[im] = d 
-        sfr_e[im] = e 
+        sfr_percent[im,:] = np.percentile(MSpop.sfr[MSonly[0][within]], [2.5, 16, 84, 97.5])
         
     prettyplot() 
     pretty_colors = prettycolors()
-
     fig = plt.figure()
     sub = fig.add_subplot(111)
 
@@ -238,11 +224,9 @@ def plotCMS_SFMS(evol_dict=None):
             color=pretty_colors[1], alpha=0.5, edgecolor=None, lw=0, label='Observations') 
 
     # simulation 
-    #sub.errorbar(0.5*(mbins[:-1] + mbins[1:]), mu_sfr, yerr=sig_sfr, 
-    #        c='k', fmt='o', markersize=7, elinewidth=2, capsize=4, label='Simulated')
-    sub.fill_between(0.5*(mbins[:-1] + mbins[1:]), sfr_a, sfr_e,  
+    sub.fill_between(0.5*(mbins[:-1] + mbins[1:]), sfr_percent[:,0], sfr_percent[:,-1],  
             color=pretty_colors[3], alpha=0.3, edgecolor=None, lw=0) 
-    sub.fill_between(0.5*(mbins[:-1] + mbins[1:]), sfr_b, sfr_d,  
+    sub.fill_between(0.5*(mbins[:-1] + mbins[1:]), sfr_percent[:,1], sfr_percent[:,-2], 
             color=pretty_colors[3], alpha=0.5, edgecolor=None, lw=0, label='Simulated') 
 
     # x,y axis
@@ -253,9 +237,7 @@ def plotCMS_SFMS(evol_dict=None):
 
     sub.legend(loc='lower right', numpoints=1, markerscale=1.) 
 
-    fig_file = ''.join([UT.fig_dir(), 
-        'test_CentralMS_SFMS', 
-        '.', evol_dict['sfr']['name'], '.png']) 
+    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SFMS', MSpop._Spec_str(), '.png'])
     plt.savefig(fig_file, bbox_inches='tight') 
     plt.close()
     return None
@@ -265,10 +247,11 @@ def plotCMS_SFMS_Pssfr(evol_dict=None):
     ''' Plot SSFR distribution of the SFMS in mass bins. 
     The SFMS SSFR distirbution *should* be a Gaussian!
     '''
-    cms = CMS.CentralMS()       # SF + quenching population
+    # import evolved galaxy population 
+    cms = CMS.CentralMS(cenque='default')
     cms._Read_CenQue()
-    eev = CMS.Evolver(cms, evol_dict=evol_dict)
-    MSpop = eev()
+    MSpop = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
+    MSpop.Read() 
 
     mass_bins = [[9.7, 10.1], [10.1, 10.5], [10.5, 10.9], [10.9, 11.3]]
     
@@ -312,8 +295,8 @@ def plotCMS_SFMS_Pssfr(evol_dict=None):
             r'$\mathtt{log \; M_{*} = [', 
             str(mbin[0]), ',\;', str(mbin[1]), ']}$' ])
         sub[im].text(-10.5, 1.4, massbin_str, fontsize=20)
-        sub[im].set_xlim([-13.0, -7.0])
-        sub[im].set_ylim([0.0, 1.6])
+        sub[im].set_xlim([-12.0, -9.0])
+        sub[im].set_ylim([0.0, 2.0])
         if im in [0,1]: 
             sub[im].set_xticklabels([])
         if im in [1,3]: 
@@ -324,17 +307,20 @@ def plotCMS_SFMS_Pssfr(evol_dict=None):
     subsub.set_ylabel(r'$\mathtt{P(log \; SSFR)}$', fontsize=25) 
     fig.subplots_adjust(hspace=0.05, wspace=0.05)
 
-    fig_file = ''.join([UT.fig_dir(), 
-        'test_CentralMS_SFMS_Pssfr',
-        '.', evol_dict['name'], '.png']) 
+    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SFMS_Pssfr', MSpop._Spec_str(), '.png'])
     plt.savefig(fig_file, bbox_inches='tight') 
     plt.close()
     return None
 
 
-def plotCMS_SMHMR_MS(evol_dict=None, Mtype='integ'): 
+def plotSHAM_SMHMR_MS(): 
     ''' Plot the Stellar Mass to Halo Mass Relation of the evolved Gal population 
     '''
+    evol_dict = {
+            'initial': {'assembly_bias': 'none'}, 
+            'sfh': {'name': 'constant_offset'}, 
+            'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
+            } 
     # import evolved galaxy population 
     egp = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
     egp.Read() 
@@ -348,10 +334,7 @@ def plotCMS_SMHMR_MS(evol_dict=None, Mtype='integ'):
         inbin = np.where(
                 (egp.halo_mass > m_halo_bin[im]) &
                 (egp.halo_mass <= m_halo_bin[im+1])) 
-        if Mtype == 'integ': 
-            smhmr[im,:] = np.percentile(egp.mass[inbin], [2.5, 16, 50, 84, 97.5])
-        elif Mtype == 'sham': 
-            smhmr[im,:] = np.percentile(egp.M_sham[inbin], [2.5, 16, 50, 84, 97.5])
+        smhmr[im,:] = np.percentile(egp.M_sham[inbin], [2.5, 16, 50, 84, 97.5])
 
     # "observations" with observed scatter of 0.2 dex 
     obvs_smhmr = np.zeros((len(m_halo_bin)-1, 2))
@@ -376,41 +359,123 @@ def plotCMS_SMHMR_MS(evol_dict=None, Mtype='integ'):
     sub.set_xlim([10., 15.0])
     sub.set_ylim([9., 12.0])
     sub.set_xlabel(r'$\mathtt{log}\;\mathtt{M_{halo}}\;\;[\mathtt{M_\odot}]$', fontsize=25) 
-    if Mtype == 'integ': 
-        sub.set_ylabel(r'$\mathtt{log}\;\mathtt{M_{*}}\;\;[\mathtt{M_\odot}]$', fontsize=25) 
-    elif Mtype == 'sham': 
-        sub.set_ylabel(r'$\mathtt{log}\;\mathtt{M_{SHAM}}\;\;[\mathtt{M_\odot}]$', fontsize=25) 
+    sub.set_ylabel(r'$\mathtt{log}\;\mathtt{M_{SHAM}}\;\;[\mathtt{M_\odot}]$', fontsize=25) 
 
     sub.legend(loc='upper right') 
     
-    if Mtype == 'integ': 
-        fig_file = ''.join([UT.fig_dir(), 
-            'test_CentralMS_SMHMR_MS', 
-            '.sfr_', evol_dict['sfr']['name'], 
-            '.mass_', evol_dict['mass']['type'], 
-            '_', str(evol_dict['mass']['t_step']), 
-            '.png']) 
-    elif Mtype == 'sham': 
-        fig_file = ''.join([UT.fig_dir(), 
-            'test_CentralMS_SMHMR_MS', 
-            '.sfr_', evol_dict['sfr']['name'], 
-            '.mass_SHAM',
-            '.png']) 
+    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SMHMR_MS', '.M_sham', '.png']) 
     fig.savefig(fig_file, bbox_inches='tight') 
     plt.close() 
     return None
 
 
+def plotCMS_SMHMR_MS(evol_dict=None): 
+    ''' Plot the Stellar Mass to Halo Mass Relation of the evolved Gal population 
+    '''
+    # import evolved galaxy population 
+    egp = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
+    egp.Read() 
+    
+    # Calculate the SMHMR for the EvolvedGalPop
+    m_halo_bin = np.arange(10., 15.25, 0.25)    # M_halo bins 
+    m_halo_mid = 0.5 * (m_halo_bin[:-1] + m_halo_bin[1:]) # M_halo bin mid
+
+    smhmr = np.zeros((len(m_halo_bin)-1, 5)) 
+    for im, m_mid in enumerate(m_halo_mid): 
+        inbin = np.where(
+                (egp.halo_mass > m_halo_bin[im]) &
+                (egp.halo_mass <= m_halo_bin[im+1])) 
+        smhmr[im,:] = np.percentile(egp.mass[inbin], [2.5, 16, 50, 84, 97.5])
+
+    # "observations" with observed scatter of 0.2 dex 
+    obvs_smhmr = np.zeros((len(m_halo_bin)-1, 2))
+    obvs_smhmr[:,0] = smhmr[:,2] - 0.2      
+    obvs_smhmr[:,1] = smhmr[:,2] + 0.2      
+
+    prettyplot() 
+    pretty_colors = prettycolors() 
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+
+    sub.fill_between(m_halo_mid, smhmr[:,0], smhmr[:,-1], 
+        color=pretty_colors[1], alpha=0.25, edgecolor=None, lw=0) 
+    sub.fill_between(m_halo_mid, smhmr[:,1], smhmr[:,-2], 
+        color=pretty_colors[1], alpha=0.5, edgecolor=None, lw=0) 
+    
+    sub.plot(m_halo_mid, obvs_smhmr[:,0], 
+        color='k', ls='--', lw=3) 
+    sub.plot(m_halo_mid, obvs_smhmr[:,1], 
+        color='k', ls='--', lw=3) 
+
+    sub.set_xlim([10., 15.0])
+    sub.set_ylim([9., 12.0])
+    sub.set_xlabel(r'$\mathtt{log}\;\mathtt{M_{halo}}\;\;[\mathtt{M_\odot}]$', fontsize=25) 
+    sub.set_ylabel(r'$\mathtt{log}\;\mathtt{M_{*}}\;\;[\mathtt{M_\odot}]$', fontsize=25) 
+
+    sub.legend(loc='upper right') 
+    
+    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SMHMR_MS', egp._Spec_str(), '.png']) 
+    fig.savefig(fig_file, bbox_inches='tight') 
+    plt.close() 
+    return None
+
+
+def plotCMS_SFH(evol_dict=None): 
+    ''' Plot the star formation history of star forming main sequence galaxies
+    '''
+    # import evolved galaxy population 
+    egp = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
+    egp.Read() 
+
+    MSonly = np.where(egp.t_quench == 999.)     # only keep main-sequence galaxies
+    MSonly_rand = np.random.choice(MSonly[0], size=10)
+
+    z_acc, t_acc = UT.zt_table()
+    t_cosmic  = t_acc[1:16]
+    dt = 0.1
+    
+    t_arr = np.arange(t_cosmic.min(), t_cosmic.max()+dt, dt)
+
+    prettyplot() 
+    pretty_colors = prettycolors() 
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    
+    dsfrt = np.zeros((len(t_arr), len(MSonly_rand)))
+    for i_t, tt in enumerate(t_arr): 
+        dsfr = SFR.dSFR_MS(tt, egp.sfh_dict) 
+        for ii, i_gal in enumerate(MSonly_rand): 
+            dsfrt[i_t,ii] = dsfr[i_gal]
+    
+    for ii, i_gal in enumerate(MSonly_rand): 
+        tlim = np.where(t_arr > egp.tsnap_genesis[i_gal]) 
+        sub.plot(t_arr[tlim], dsfrt[:,ii][tlim], lw=3, c=pretty_colors[ii])
+
+    sub.set_xlim([5.0, 13.5])
+    sub.set_xlabel(r'$\mathtt{t_{cosmic}}$', fontsize=25)
+    sub.set_ylim([-1., 1.])
+    sub.set_ylabel(r'$\mathtt{SFR(t) - <SFR_{MS}(t)>}$', fontsize=25)
+
+    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SFH', egp._Spec_str(), '.png']) 
+    fig.savefig(fig_file, bbox_inches='tight') 
+    plt.close()
+
+
 
 
 if __name__=='__main__': 
-    #plotCMS_SMF_MS()
-    #plotCMS_SMF_component() 
     evol_dict = {
-            'sfr': {'name': 'constant_offset'}, 
-            'mass': {'type': 'rk4', 'f_retain': 0.6, 't_step': 0.01} 
+            'initial': {'assembly_bias': 'longterm'}, 
+            'sfh': {'name': 'constant_offset'}, 
+            'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
             } 
-    plotCMS_SMF_comp(criteria='t0', population='ms', evol_dict=evol_dict)
-    plotCMS_SMF_comp(criteria='t0', population='ms', Mtype='sham', evol_dict=evol_dict)
-    #plotCMS_SFMS(evol_dict=evol_dict)
-    #plotCMS_SFMS_Pssfr(evol_dict=evol_dict)
+    #'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
+    plotCMS_SMF(evol_dict=evol_dict)
+    plotCMS_SMF_MS(evol_dict=evol_dict)
+    plotCMS_SFMS(evol_dict=evol_dict)
+    plotCMS_SFMS_Pssfr(evol_dict=evol_dict)
+    plotCMS_SMHMR_MS(evol_dict=evol_dict)
+    plotCMS_SFH(evol_dict=evol_dict)
+    #plotSHAM_SMHMR_MS()
+    #plotCMS_SMF_comp(criteria='t0', population='ms', evol_dict=evol_dict)
+    #plotCMS_SMF_comp(criteria='t0', population='ms', Mtype='sham', evol_dict=evol_dict)
