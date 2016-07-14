@@ -316,7 +316,7 @@ def AccretionCorr(evol_dict=None):
 
 if __name__=='__main__': 
     evol_dict = {
-            'initial': {'assembly_bias': 'longterm', 'scatter':0.0}, 
+            'initial': {'assembly_bias': 'longterm', 'scatter':0.3}, 
             'sfh': {'name': 'constant_offset'}, 
             'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
             } 

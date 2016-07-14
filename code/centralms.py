@@ -165,14 +165,20 @@ class Evolver(object):
             sigma_logsfr = sfrs.ScatterLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis, 
                     sfms_dict=self.cms.sfms_dict)
             self.cms.sfr_genesis = mu_logsfr + sigma_logsfr * np.random.randn(len(mu_logsfr))
+
         elif self.evol_dict['initial']['assembly_bias'] == 'longterm': 
             # long term assembly bias (rank ordered by the ultimate mass growth) 
+            # scatter determines the scatter in the assembly bias 
+            # scatter = 0.3 is the same as none
             dMhalo = self.cms.halo_mass -  self.cms.halomass_genesis
 
             mu_logsfr = sfrs.AverageLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis, 
                     sfms_dict=self.cms.sfms_dict)
-            sigma_logsfr = sfrs.ScatterLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis, 
+            sigma_logsfr = sfrs.ScatterLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis,
                     sfms_dict=self.cms.sfms_dict)
+            if self.evol_dict['initial']['scatter'] > sigma_logsfr: 
+                raise ValueError("You can't have negative scatter!") 
+
             sigma_eff = np.sqrt(sigma_logsfr**2 - self.evol_dict['initial']['scatter']**2)
             dsfr = sigma_eff * np.random.randn(len(mu_logsfr)) 
             dsfr_scat = self.evol_dict['initial']['scatter'] * np.random.randn(len(mu_logsfr))
@@ -341,14 +347,14 @@ class EvolvedGalPop(GalPop):
         # Write Star forming and Quenching catalog 
         evol_file = ''.join([
             '/data1/hahn/centralMS/galpop/', 
-            'sfms.centrals.', 
+            'sfms.centrals', 
             self._Spec_str(),
             '.hdf5'])
         return evol_file 
 
     def _Spec_str(self): 
         spec_str = ''.join([
-            self._CenQue_str(), self._Initial_str(), self._SFH_str(), self._Mass_str()
+            '.', self._CenQue_str(), self._Initial_str(), self._SFH_str(), self._Mass_str()
             ])
         return spec_str
 
@@ -366,11 +372,15 @@ class EvolvedGalPop(GalPop):
     def _Initial_str(self): 
         ''' Initial conditions whether it has assembly bias or not
         '''
-        init_str = ''.join([
-            '.Initial_', 
-            self.evol_dict['initial']['assembly_bias'], 
-            'AssemblyBias'
-            ]) 
+        if self.evol_dict['initial']['assembly_bias'] == 'none': 
+            init_str = ''.join([
+                '.00', self.evol_dict['initial']['assembly_bias'], 'AsBias'])
+        elif self.evol_dict['initial']['assembly_bias'] == 'longterm': 
+            init_str = ''.join([
+                '.00', 
+                self.evol_dict['initial']['assembly_bias'], 'AsBias',
+                str(round(self.evol_dict['initial']['scatter'],1)),'scat'
+                ]) 
         return init_str 
 
     def _SFH_str(self): 
@@ -391,7 +401,7 @@ class EvolvedGalPop(GalPop):
     
     def _Mass_str(self): 
         mass_str = ''.join([ 
-            '.mass_', self.evol_dict['mass']['type'], 
+            '.M_', self.evol_dict['mass']['type'], 
             '_tstep', str(self.evol_dict['mass']['t_step']) 
             ])
         return mass_str
@@ -464,14 +474,15 @@ class EvolvedGalPop(GalPop):
 
 
 if __name__=='__main__': 
-    for tstep in [0.1, 0.05, 0.01]: 
-        evol_dict = {
-                'initial': {'assembly_bias': 'longterm', 'scatter': 0.}, 
-                'sfh': {'name': 'constant_offset'}, 
-                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': tstep} 
-                } 
-        EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
-        EGP.Write() 
+    for tstep in [0.01]: 
+        for scat in [0.1, 0.2, 0.3]: 
+            evol_dict = {
+                    'initial': {'assembly_bias': 'longterm', 'scatter': scat}, 
+                    'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
+                    'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': tstep} 
+                    } 
+            EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
+            EGP.Write() 
     # 'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
     #cms = CentralMS()
     #cms._Read_CenQue()

@@ -53,7 +53,7 @@ def plotCMS_SMF(evol_dict=None):
     sub.set_ylabel(r'Stellar Mass Function $\mathtt{\Phi}$', fontsize=25) 
     sub.legend(loc='upper right', frameon=False)
     
-    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SMF', MSpop._Spec_str(), '.png']) 
+    fig_file = ''.join([UT.fig_dir(), 'SMF.CMS', MSpop._Spec_str(), '.png']) 
     fig.savefig(fig_file, bbox_inches='tight') 
     plt.close() 
     return None
@@ -89,7 +89,7 @@ def plotCMS_SMF_MS(evol_dict=None):
     sub.set_ylabel(r'Stellar Mass Function $\mathtt{\Phi}$', fontsize=25) 
     sub.legend(loc='upper right', frameon=False)
     
-    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SMF_MS', MSpop._Spec_str(), '.png']) 
+    fig_file = ''.join([UT.fig_dir(), 'SMF_MS.CMS', MSpop._Spec_str(), '.png']) 
     fig.savefig(fig_file, bbox_inches='tight') 
     plt.close() 
     return None
@@ -237,7 +237,7 @@ def plotCMS_SFMS(evol_dict=None):
 
     sub.legend(loc='lower right', numpoints=1, markerscale=1.) 
 
-    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SFMS', MSpop._Spec_str(), '.png'])
+    fig_file = ''.join([UT.fig_dir(), 'SFMS.CMS', MSpop._Spec_str(), '.png'])
     plt.savefig(fig_file, bbox_inches='tight') 
     plt.close()
     return None
@@ -257,7 +257,7 @@ def plotCMS_SFMS_Pssfr(evol_dict=None):
     
     prettyplot() 
     pretty_colors = prettycolors()
-    fig = plt.figure(figsize=(16,16))
+    fig = plt.figure(figsize=(8,8))
     sub = [fig.add_subplot(2,2, ii+1) for ii in xrange(len(mass_bins))]
     subsub = fig.add_subplot(111, frameon=False)
     
@@ -276,6 +276,10 @@ def plotCMS_SFMS_Pssfr(evol_dict=None):
                 bins=40,
                 normed=True)
     
+        # P(SSFR) for the MS galaxies in the mass bin 
+        sub[im].plot(0.5*(bin_edges[:-1] + bin_edges[1:]), Pssfr, 
+                lw=4, c=pretty_colors[3]) 
+        
         # Gaussian  
         mu_ssfr = SFR.AverageLogSFR_sfms(0.5*(mbin[0]+mbin[1]), 0.05, sfms_dict=cms.sfms_dict) -\
                 0.5*(mbin[0]+mbin[1])
@@ -285,29 +289,30 @@ def plotCMS_SFMS_Pssfr(evol_dict=None):
                 range=[-13.0, -7.0],
                 bins=40,
                 normed=True)
-        sub[im].plot(0.5*(bin_edges[:-1] + bin_edges[1:]), norm_Pssfr, lw=3, c='k') 
-        
-        # P(SSFR) for the MS galaxies in the mass bin 
-        sub[im].plot(0.5*(bin_edges[:-1] + bin_edges[1:]), Pssfr, 
-                lw=3, ls='--', c=pretty_colors[3]) 
+        sub[im].plot(0.5*(bin_edges[:-1] + bin_edges[1:]), norm_Pssfr, lw=4, ls='--', c='k') 
 
         massbin_str = ''.join([         # mark the mass bins
             r'$\mathtt{log \; M_{*} = [', 
             str(mbin[0]), ',\;', str(mbin[1]), ']}$' ])
-        sub[im].text(-10.5, 1.4, massbin_str, fontsize=20)
+        sub[im].text(-11.8, 1.8, massbin_str, fontsize=15)
         sub[im].set_xlim([-12.0, -9.0])
         sub[im].set_ylim([0.0, 2.0])
         if im in [0,1]: 
             sub[im].set_xticklabels([])
         if im in [1,3]: 
             sub[im].set_yticklabels([])
+        if im in [2]: 
+            sub[im].set_xticklabels([-12., '', -11., '', -10.])
+            sub[im].set_yticklabels([0.0, 0.5, 1.0, 1.5])
+        if im in [3]:
+            sub[im].set_xticklabels([-12., '', -11., '', -10., '', -9.])
 
     subsub.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
     subsub.set_xlabel(r'$\mathtt{log \; SSFR \;[yr^{-1}]}$', fontsize=25) 
     subsub.set_ylabel(r'$\mathtt{P(log \; SSFR)}$', fontsize=25) 
     fig.subplots_adjust(hspace=0.05, wspace=0.05)
 
-    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SFMS_Pssfr', MSpop._Spec_str(), '.png'])
+    fig_file = ''.join([UT.fig_dir(), 'Pssfr_SFMS.CMS', MSpop._Spec_str(), '.png'])
     plt.savefig(fig_file, bbox_inches='tight') 
     plt.close()
     return None
@@ -400,12 +405,14 @@ def plotCMS_SMHMR_MS(evol_dict=None):
     sub.fill_between(m_halo_mid, smhmr[:,0], smhmr[:,-1], 
         color=pretty_colors[1], alpha=0.25, edgecolor=None, lw=0) 
     sub.fill_between(m_halo_mid, smhmr[:,1], smhmr[:,-2], 
-        color=pretty_colors[1], alpha=0.5, edgecolor=None, lw=0) 
+        color=pretty_colors[1], alpha=0.5, edgecolor=None, lw=0, 
+        label=r'$\mathtt{Simulated}$') 
     
     sub.plot(m_halo_mid, obvs_smhmr[:,0], 
         color='k', ls='--', lw=3) 
     sub.plot(m_halo_mid, obvs_smhmr[:,1], 
-        color='k', ls='--', lw=3) 
+        color='k', ls='--', lw=3, 
+        label=r"$\sigma = \mathtt{0.2}$") 
 
     sub.set_xlim([10., 15.0])
     sub.set_ylim([9., 12.0])
@@ -414,7 +421,7 @@ def plotCMS_SMHMR_MS(evol_dict=None):
 
     sub.legend(loc='upper right') 
     
-    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SMHMR_MS', egp._Spec_str(), '.png']) 
+    fig_file = ''.join([UT.fig_dir(), 'SMHMR_MS.CMS', egp._Spec_str(), '.png']) 
     fig.savefig(fig_file, bbox_inches='tight') 
     plt.close() 
     return None
@@ -464,18 +471,19 @@ def plotCMS_SFH(evol_dict=None):
 
 
 if __name__=='__main__': 
-    evol_dict = {
-            'initial': {'assembly_bias': 'longterm'}, 
-            'sfh': {'name': 'constant_offset'}, 
-            'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
-            } 
-    #'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
-    plotCMS_SMF(evol_dict=evol_dict)
-    plotCMS_SMF_MS(evol_dict=evol_dict)
-    plotCMS_SFMS(evol_dict=evol_dict)
-    plotCMS_SFMS_Pssfr(evol_dict=evol_dict)
-    plotCMS_SMHMR_MS(evol_dict=evol_dict)
-    plotCMS_SFH(evol_dict=evol_dict)
-    #plotSHAM_SMHMR_MS()
+    for scat in [0.0, 0.1, 0.2, 0.3]: 
+        evol_dict = {
+                'initial': {'assembly_bias': 'longterm', 'scatter': scat}, 
+                'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
+                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
+                } 
+        #'sfh': {'name': 'constant_offset'}, 
+        #'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
+        #plotCMS_SMF(evol_dict=evol_dict)
+        #plotCMS_SMF_MS(evol_dict=evol_dict)
+        plotCMS_SFMS(evol_dict=evol_dict)
+        #plotCMS_SFMS_Pssfr(evol_dict=evol_dict)
+        #plotCMS_SMHMR_MS(evol_dict=evol_dict)
+        #plotCMS_SFH(evol_dict=evol_dict)
     #plotCMS_SMF_comp(criteria='t0', population='ms', evol_dict=evol_dict)
     #plotCMS_SMF_comp(criteria='t0', population='ms', Mtype='sham', evol_dict=evol_dict)
