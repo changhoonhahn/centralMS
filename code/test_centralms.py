@@ -463,7 +463,7 @@ def plotCMS_SFH(evol_dict=None):
     sub.set_ylim([-1., 1.])
     sub.set_ylabel(r'$\mathtt{SFR(t) - <SFR_{MS}(t)>}$', fontsize=25)
 
-    fig_file = ''.join([UT.fig_dir(), 'test_CentralMS_SFH', egp._Spec_str(), '.png']) 
+    fig_file = ''.join([UT.fig_dir(), 'SFH.CMS', egp._Spec_str(), '.png']) 
     fig.savefig(fig_file, bbox_inches='tight') 
     plt.close()
 
@@ -481,9 +481,9 @@ if __name__=='__main__':
         #'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
         #plotCMS_SMF(evol_dict=evol_dict)
         #plotCMS_SMF_MS(evol_dict=evol_dict)
-        plotCMS_SFMS(evol_dict=evol_dict)
+        #plotCMS_SFMS(evol_dict=evol_dict)
         #plotCMS_SFMS_Pssfr(evol_dict=evol_dict)
         #plotCMS_SMHMR_MS(evol_dict=evol_dict)
-        #plotCMS_SFH(evol_dict=evol_dict)
+        plotCMS_SFH(evol_dict=evol_dict)
     #plotCMS_SMF_comp(criteria='t0', population='ms', evol_dict=evol_dict)
     #plotCMS_SMF_comp(criteria='t0', population='ms', Mtype='sham', evol_dict=evol_dict)
