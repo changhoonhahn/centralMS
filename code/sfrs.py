@@ -279,7 +279,7 @@ def dSFR_MS(t, sfh_kwargs):
         dsfr = sfh_kwargs['dsfr']
     elif sfh_kwargs['name'] == 'no_scatter': 
         dsfr = 0.
-    elif sfh_kwargs['name'] in ['random_step', 'assembly_bias']:
+    elif sfh_kwargs['name'] in ['random_step']:
         ishift = np.abs(sfh_kwargs['tshift'] - t).argmin(axis=1)
         ishift[np.where((sfh_kwargs['tshift'])[range(len(ishift)), ishift] > t)] -= 1
         dsfr = sfh_kwargs['amp'][range(len(ishift)), ishift]

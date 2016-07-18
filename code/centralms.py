@@ -12,6 +12,7 @@ from scipy import interpolate
 # --- local --- 
 import util as UT
 import sfrs 
+import observables as obvs
 
 
 class GalPop(object): 
@@ -21,51 +22,7 @@ class GalPop(object):
         pass 
 
 
-class CentralQuenched(GalPop):  # Quenched Central Galaxies
-    def __init__(self, cenque='default'):
-        ''' This object reads in the quenched galaxies generated 
-        from the CenQue project and is an object for those galaxies. 
-        '''
-        self.cenque = cenque
-        self.mass = None
-        self.sfr = None
-        self.ssfr = None 
-
-    def _Read_CenQue(self):  
-        
-        galpop = Read_CenQue('quenched', cenque='default')
-        for key in galpop.__dict__.keys(): 
-            setattr(self, key, getattr(galpop, key))
-            
-        return None 
-
-
-class CentralMS(GalPop):        # Star-forming + Quenching Central Galaxies
-    def __init__(self, cenque='default'):
-        ''' This object reads in the star-forming and quenching
-        galaxies generated from the CenQue project and is an object
-        for those galaxies. Unlike CenQue, this object WILL NOT
-        have extensive functions and will act as a data catalog. 
-     
-        '''
-        self.cenque = cenque
-        self.mass = None
-        self.sfr = None
-        self.ssfr = None 
-        self.sfr_genesis = None
-
-    def _Read_CenQue(self):  
-        ''' Read in SF and Quenching galaixes generated from 
-        the CenQue project. 
-        '''
-        galpop = Read_CenQue('sfms', cenque='default')
-        for key in galpop.__dict__.keys(): 
-            setattr(self, key, getattr(galpop, key))
-
-        return None 
-
-
-def Read_CenQue(type, cenque='default'):
+def Read_CenQue(type, cenque='default', downsampled=None):
     ''' Read in either (SF and Quenching galaixes) or (Quenched galaxies)
     generated from the CenQue project. 
     '''
@@ -83,11 +40,17 @@ def Read_CenQue(type, cenque='default'):
         galpop_str = 'quenched'
     else: 
         raise ValueError
+    if downsampled is None: 
+        down_str = ''
+    else: 
+        down_str = ''.join(['.down', str(downsampled), 'x']) 
+
     file = ''.join([UT.dat_dir(), 'cenque/',
         galpop_str, '.centrals.', 
         'tf', str(tf), 
         '.abc_', abcrun, 
         '.prior_', prior, 
+        down_str, 
         '.hdf5']) 
 
     gpop = GalPop()
@@ -129,6 +92,200 @@ def Read_CenQue(type, cenque='default'):
     return gpop 
 
 
+def DownsampleCenQue(cenque='default', ngal_thresh=4000, dmhalo=0.2): 
+    ''' Downsample the CenQue objects in order to make the calculations more 
+    tractable. Bin the halos in terms of their z = 0 masses and down sample 
+    them so that there is still sufficient statistics in each bin.  
+    '''
+    # read in the entire galaxy population  
+    q_pop = CentralQuenched(cenque=cenque, downsampled=None)
+    q_pop._Read_CenQue()
+    sfms_pop = CentralMS(cenque=cenque, downsampled=None)
+    sfms_pop._Read_CenQue()
+    
+    # halo mass bins delta M_h = 0.2 dex for now... 
+    mhalo_bin = np.arange(
+            np.min([sfms_pop.halo_mass.min(), q_pop.halo_mass.min()]) - 0.5 * dmhalo, 
+            np.max([sfms_pop.halo_mass.max(), q_pop.halo_mass.max()]) + dmhalo, 
+            dmhalo
+            ) 
+    
+    # weights 
+    weights_sf = np.repeat(1., len(sfms_pop.M_sham)) 
+    weights_q = np.repeat(1., len(q_pop.M_sham)) 
+
+    Ngal_sf, Ngal_q = 0, 0 
+    for i_m in range(len(mhalo_bin) - 1): 
+        inbin_sf = np.where(
+                (mhalo_bin[i_m] < sfms_pop.halo_mass) &
+                (mhalo_bin[i_m+1] >= sfms_pop.halo_mass)
+                ) 
+        inbin_q = np.where(
+                (mhalo_bin[i_m] < q_pop.halo_mass) &
+                (mhalo_bin[i_m+1] >= q_pop.halo_mass)
+                ) 
+        ngal_sf = len(inbin_sf[0]) 
+        ngal_q = len(inbin_q[0]) 
+
+        # make sure there's sufficient statistics for both star forming and quiescent
+        # galaxies based on a rough criteria for now ... assign appropriate 
+        # corresponding weights 
+        if (ngal_sf + ngal_q > ngal_thresh):  
+            f_down = ngal_thresh/np.float(ngal_sf + ngal_q) 
+            #print np.float(ngal_q) * f_down
+
+            weights_q[inbin_q] = 0.
+            weights_sf[inbin_sf] = 0.
+
+            keep_ind = np.random.choice(range(ngal_sf + ngal_q), ngal_thresh, replace=False) 
+            keep_sf = (inbin_sf[0])[keep_ind[np.where(keep_ind < ngal_sf)]]
+            keep_q = (inbin_q[0])[keep_ind[np.where(keep_ind >= ngal_sf)] - ngal_sf]
+
+            weights_sf[keep_sf] = 1./f_down
+            weights_q[keep_q] = 1./f_down
+    
+            # sanity check
+            if (int(round(np.sum(weights_sf[inbin_sf]) + np.sum(weights_q[inbin_q]))) 
+                    != ngal_sf+ngal_q): 
+                print np.sum(weights_sf[inbin_sf]) + np.sum(weights_q[inbin_q])
+                print ngal_sf+ngal_q 
+                raise ValueError
+         
+        Ngal_sf += ngal_sf
+        Ngal_q += ngal_q
+        
+    # More sanity checks
+    if int(round(np.sum(weights_sf) + np.sum(weights_q))) != len(sfms_pop.M_sham)+len(q_pop.M_sham): 
+        print np.sum(weights_sf) + np.sum(weights_q), len(sfms_pop.M_sham)+len(q_pop.M_sham)
+        raise ValueError
+
+    # the galaxy sample is downsamped by
+    down_frac = np.float(Ngal_sf + Ngal_q) / \
+            np.float(len(weights_sf[np.where(weights_sf != 0.)]) + 
+                    len(weights_q[np.where(weights_q != 0.)])) 
+    print 'downsampled ', int(round(down_frac)), 'x'
+        
+    # save the downsampled galaxy populations to file
+    q_file = h5py.File(q_pop._File(), 'r') 
+    sf_file = h5py.File(sfms_pop._File(), 'r') 
+    
+    q_down_file = h5py.File(q_pop._File().replace(
+        '.hdf5', ''.join(['.down', str(int(round(down_frac))), 'x', '.hdf5'])), 'w') 
+    sf_down_file = h5py.File(sfms_pop._File().replace(
+        '.hdf5', ''.join(['.down', str(int(round(down_frac))), 'x', '.hdf5'])), 'w') 
+    q_file.copy('data', q_down_file) 
+    sf_file.copy('data', sf_down_file) 
+    q_file.close() 
+    sf_file.close() 
+
+    insample_q = np.where(weights_q != 0.) 
+    insample_sf = np.where(weights_sf != 0.) 
+
+    q_grp = q_down_file['data']
+    for col in q_grp.keys():
+        new_col = q_grp[col].value[insample_q]
+        q_grp.__delitem__(col) 
+        q_grp.create_dataset(col, data = new_col) 
+    q_grp.create_dataset('weight_down', data = weights_q[insample_q])
+    q_down_file.close()  
+
+    sf_grp = sf_down_file['data']
+    for col in sf_grp.keys():
+        new_col = sf_grp[col].value[insample_sf]
+        sf_grp.__delitem__(col) 
+        sf_grp.create_dataset(col, data = new_col) 
+    sf_grp.create_dataset('weight_down', data = weights_sf[insample_sf])
+    sf_down_file.close()  
+
+    return None
+
+
+class CentralQuenched(GalPop):  # Quenched Central Galaxies
+    def __init__(self, cenque='default', downsampled=20):
+        ''' This object reads in the quenched galaxies generated 
+        from the CenQue project and is an object for those galaxies. 
+        '''
+        self.cenque = cenque
+        self.downsampled = downsampled
+        self.mass = None
+        self.sfr = None
+        self.ssfr = None 
+
+    def _Read_CenQue(self):  
+        
+        galpop = Read_CenQue('quenched', cenque='default', downsampled=self.downsampled)
+        for key in galpop.__dict__.keys(): 
+            setattr(self, key, getattr(galpop, key))
+            
+        return None 
+
+    def _File(self): 
+        if self.cenque == 'default': 
+            tf = 7 
+            abcrun = 'RHOssfrfq_TinkerFq_Std'
+            prior = 'updated'
+        else: 
+            raise NotImplementedError
+    
+        # cenque files
+        file_name = ''.join([UT.dat_dir(), 'cenque/',
+            'quenched.centrals.', 
+            'tf', str(tf), 
+            '.abc_', abcrun, 
+            '.prior_', prior, 
+            '.hdf5']) 
+        return file_name
+
+
+class CentralMS(GalPop):        # Star-forming + Quenching Central Galaxies
+    def __init__(self, cenque='default', downsampled=20):
+        ''' This object reads in the star-forming and quenching
+        galaxies generated from the CenQue project and is an object
+        for those galaxies. Unlike CenQue, this object WILL NOT
+        have extensive functions and will act as a data catalog. 
+     
+        '''
+        self.cenque = cenque
+        self.downsampled = downsampled
+        self.mass = None
+        self.sfr = None
+        self.ssfr = None 
+        self.sfr_genesis = None
+
+    def _Read_CenQue(self):  
+        ''' Read in SF and Quenching galaixes generated from 
+        the CenQue project. 
+        '''
+        galpop = Read_CenQue('sfms', cenque='default', downsampled=self.downsampled)
+        for key in galpop.__dict__.keys(): 
+            setattr(self, key, getattr(galpop, key))
+
+        return None 
+
+    def _File(self): 
+        if self.cenque == 'default': 
+            tf = 7 
+            abcrun = 'RHOssfrfq_TinkerFq_Std'
+            prior = 'updated'
+        else: 
+            raise NotImplementedError
+
+        if self.downsampled is None: 
+            down_str = ''
+        else: 
+            down_str = ''.join(['.down', str(self.downsampled), 'x']) 
+    
+        # cenque files
+        file_name = ''.join([UT.dat_dir(), 'cenque/',
+            'sfms.centrals.', 
+            'tf', str(tf), 
+            '.abc_', abcrun, 
+            '.prior_', prior, 
+            down_str, 
+            '.hdf5']) 
+        return file_name
+
+
 class Evolver(object): 
     def __init__(self, cms, evol_dict=None): 
         ''' Class object that evolves the CentralMS galaxy catalog catalog object .
@@ -155,7 +312,6 @@ class Evolver(object):
         integrates that. Currently set up to minimize the amount of
         specific cases. 
         '''
-
         # ---- 
         # construct z(t) interpolation function to try to speed up the integration 
         z_table, t_table = UT.zt_table()     
@@ -168,7 +324,6 @@ class Evolver(object):
         # different SFH prescriptions
         # ---- 
         sfh_kwargs = {'name': self.evol_dict['sfh']['name'], 'sfms': self.cms.sfms_dict} 
-
         if self.evol_dict['sfh']['name'] == 'constant_offset': 
             if self.evol_dict['sfh']['assembly_bias'] == 'none': 
                 # No assembly bias. No dutycycle
@@ -187,20 +342,23 @@ class Evolver(object):
                         sfms_dict=self.cms.sfms_dict)
                 sigma_logsfr = sfrs.ScatterLogSFR_sfms(self.cms.mass_genesis, self.cms.zsnap_genesis,
                         sfms_dict=self.cms.sfms_dict)
-                if self.evol_dict['initial']['scatter'] > sigma_logsfr: 
+                if self.evol_dict['sfh']['sigma_bias'] > sigma_logsfr: 
                     raise ValueError("You can't have negative scatter!") 
 
-                sigma_eff = np.sqrt(sigma_logsfr**2 - self.evol_dict['initial']['scatter']**2)
+                sigma_eff = np.sqrt(sigma_logsfr**2 - self.evol_dict['sfh']['sigma_bias']**2)
                 dsfr = sigma_eff * np.random.randn(len(mu_logsfr)) 
-                dsfr_scat = self.evol_dict['initial']['scatter'] * np.random.randn(len(mu_logsfr))
-
+                dsfr_scat = self.evol_dict['sfh']['sigma_bias'] * np.random.randn(len(mu_logsfr))
+    
+                dsfr_tot = np.zeros(len(dsfr))
                 self.cms.sfr_genesis = np.zeros(len(mu_logsfr))
                 for tg in np.unique(self.cms.tsnap_genesis): 
                     snap = np.where(self.cms.tsnap_genesis == tg)[0]
                     Mhsort = np.argsort(dMhalo[snap]) 
                     self.cms.sfr_genesis[snap[Mhsort]] = (mu_logsfr[snap])[Mhsort] + \
                             np.sort(dsfr[snap]) + dsfr_scat[snap]
+                    dsfr_tot[snap] = np.sort(dsfr[snap]) + dsfr_scat[snap]
 
+                sfh_kwargs['dsfr'] = dsfr_tot 
 
         elif self.evol_dict['sfh']['name'] == 'random_step': 
             if self.evol_dict['sfh']['assembly_bias'] == 'none': 
@@ -296,11 +454,12 @@ class Evolver(object):
                     sfh_kwargs['amp'][t_range] = (biased_dsfr[:,i_t])[t_range[0]] +\
                             sig_noise * np.random.randn(len(t_range[0]))
 
-                test = np.where(
-                        (sfh_kwargs['tshift'] <= tsnaps[0]) & 
-                        (sfh_kwargs['tshift'] >= tsnaps[-1]) 
-                        ) 
-
+                #test = np.where(
+                #        (sfh_kwargs['tshift'] <= tsnaps[0]) & 
+                #        (sfh_kwargs['tshift'] >= tsnaps[-1]) 
+                #        ) 
+                #print sfh_kwargs['amp'][test].min(),  sfh_kwargs['amp'][test].max()
+                # ---- 
         # identify the quenching galaxies 
         qing = np.where((self.cms.t_quench != 999.) & (self.cms.t_quench > 0.))  
         t_final = np.repeat(13.1328, len(self.cms.mass_genesis))    
@@ -340,7 +499,6 @@ class Evolver(object):
         self.cms.Minteg_hist[outofbounds] = -999.       
         
         # ---- 
-
         # quenching galaxies after they're off the SFMS
         t_final = np.repeat(13.1328, len(self.cms.mass_genesis))
         tauQ = sfrs.getTauQ(self.cms.mass[qing], tau_dict=self.cms.tau_dict)
@@ -374,8 +532,8 @@ class Evolver(object):
         qqing = np.where(
                 (t_quench_matrix != 999.) & (t_quench_matrix > 0.) & 
                 (t_matrix >= t_quench_matrix)) 
-
-        t_q_matrix = np.tile(self.cms.t_quench[qing], (integ_logM_Q.shape[0]-1,1)).T
+        
+        t_q_matrix = np.tile(self.cms.t_quench[qing], (integ_logM_Q.shape[0],1)).T
         tt_matrix = np.tile(t_output[1:], (integ_logM_Q.shape[1],1))
         qqqing = np.where(tt_matrix >= t_q_matrix)
         
@@ -385,13 +543,14 @@ class Evolver(object):
 
 
 class EvolvedGalPop(GalPop): 
-    def __init__(self, cenque='default', evol_dict=None): 
+    def __init__(self, cenque='default', evol_dict=None, downsampled=20): 
         ''' Class object for the (integrated SFR) evolved galaxy population. 
         Convenience functions for saving and reading the files so that it does
         not have to be run over and over again. Currently the hdf5 files include
         only the bare minimum metadata. 
         '''
         self.cenque = cenque
+        self.downsampled = downsampled
         if evol_dict is None: 
             self.evol_dict = {
                     'sfr': {'name': 'constant_offset'}, 
@@ -424,6 +583,11 @@ class EvolvedGalPop(GalPop):
             prior = 'updated'
         else: 
             raise NotImplementedError
+        
+        if self.downsampled is None: 
+            down_str = ''
+        else: 
+            down_str = str(self.downsampled) 
         #cq_str = ''.join(['tf', str(tf), '.abc_', abcrun, '.prior_', prior])
         cq_str = self.cenque
         return cq_str
@@ -446,17 +610,23 @@ class EvolvedGalPop(GalPop):
         '''
         '''
         if self.evol_dict['sfh']['name'] in ['constant_offset', 'no_scatter']: 
-            sfh_str = ''.join([
-                '.SFH', self.evol_dict['sfh']['name'], 
-                '.AsBias', self.evol_dict['sfh']['assembly_bias']])
+            if self.evol_dict['sfh']['assembly_bias'] == 'none': 
+                sfh_str = ''.join([
+                    '.SFH', self.evol_dict['sfh']['name'], 
+                    '.AsBias', self.evol_dict['sfh']['assembly_bias']])
+            elif self.evol_dict['sfh']['assembly_bias'] == 'longterm': 
+                sfh_str = ''.join([
+                    '.SFH', self.evol_dict['sfh']['name'], 
+                    '.AsBias', self.evol_dict['sfh']['assembly_bias'], 
+                    '_sigma', str(round(self.evol_dict['sfh']['sigma_bias'],1))])
 
         elif self.evol_dict['sfh']['name'] in ['random_step']: 
             if self.evol_dict['sfh']['assembly_bias'] == 'none': 
                 sfh_str = ''.join([
                     '.SFH', self.evol_dict['sfh']['name'],
-                    '_sigma', str(round(self.evol_dict['sfh']['sigma'],1)), 
                     '_dt', str(round(self.evol_dict['sfh']['dt_min'],2)),
-                    '_', str(round(self.evol_dict['sfh']['dt_max'],2))
+                    '_', str(round(self.evol_dict['sfh']['dt_max'],2)),
+                    '_sigma', str(round(self.evol_dict['sfh']['sigma'],1))
                     ])
             elif self.evol_dict['sfh']['assembly_bias'] == 'acc_hist': 
                 sfh_str = ''.join([
@@ -465,7 +635,7 @@ class EvolvedGalPop(GalPop):
                     '_', str(round(self.evol_dict['sfh']['dt_max'],2)), 
                     '_sigma', str(round(self.evol_dict['sfh']['sigma'],1)),
                     '.AsBias', self.evol_dict['sfh']['assembly_bias'], 
-                    '_sigma',  self.evol_dict['sfh']['sigma_bias']
+                    '_sigma',  str(self.evol_dict['sfh']['sigma_bias'])
                     ])
         else: 
             raise ValueError
@@ -483,7 +653,7 @@ class EvolvedGalPop(GalPop):
         evol_dict specificiations and then save to file. 
         '''
         t_start = time.time() 
-        cms = CentralMS(cenque=self.cenque)
+        cms = CentralMS(cenque=self.cenque, downsampled=self.downsampled)
         cms._Read_CenQue()
         eev = Evolver(cms, evol_dict=self.evol_dict)
         MSpop = eev()
@@ -556,12 +726,15 @@ if __name__=='__main__':
         EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
         EGP.Write() 
     '''
+    DownsampleCenQue(cenque='default') 
     # testing purposes
     evol_dict = {
-            'sfh': {'name': 'random_step', 'dt_min': 0.01, 'dt_max':0.25, 'sigma': 0.3, 
-                'assembly_bias': 'acc_hist', 'sigma_bias':0.2}, 
-            'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
+            'sfh': {'name': 'constant_offset', 'assembly_bias': 'longterm', 'sigma_bias': 0.3}, 
+            'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
             } 
+
+    #'sfh': {'name': 'random_step', 'dt_min': 0.01, 'dt_max':0.25, 'sigma': 0.3, 
+    #    'assembly_bias': 'acc_hist', 'sigma_bias':0.2}, 
     EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
     EGP.Write() 
     # 'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 

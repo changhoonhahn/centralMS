@@ -473,9 +473,9 @@ def plotCMS_SFH(evol_dict=None):
 if __name__=='__main__': 
     for scat in [0.0, 0.1, 0.2, 0.3]: 
         evol_dict = {
-                'initial': {'assembly_bias': 'longterm', 'scatter': scat}, 
-                'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
-                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
+                'sfh': {'name': 'constant_offset', 
+                    'assembly_bias': 'longterm', 'sigma_bias': scat}, 
+                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
                 } 
         #'sfh': {'name': 'constant_offset'}, 
         #'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
