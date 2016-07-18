@@ -252,8 +252,14 @@ def AccretionCorr(evol_dict=None):
                     (f_arr[im] <= dfrac_Mhalo) & 
                     (f_arr[im+1] > dfrac_Mhalo)
                     )
-            sham_percent[im,:] = np.percentile(dfrac_Msham[df_bin], [2.5, 16, 50, 84, 97.5])
-            integ_percent[im,:] = np.percentile(dfrac_Minteg[df_bin], [2.5, 16, 50, 84, 97.5])
+            #sham_percent[im,:] = np.percentile(dfrac_Msham[df_bin], [2.5, 16, 50, 84, 97.5])
+            #integ_percent[im,:] = np.percentile(dfrac_Minteg[df_bin], [2.5, 16, 50, 84, 97.5])
+            sham_percent[im,:] = UT.weighted_quantile(dfrac_Msham[df_bin], 
+                    [0.025, 0.16, 0.50, 0.84, 0.975], 
+                    weights=galpop.weight_down[mhalo_bin[0][df_bin]])
+            integ_percent[im,:] = UT.weighted_quantile(dfrac_Minteg[df_bin], 
+                    [0.025, 0.16, 0.50, 0.84, 0.975], 
+                    weights=galpop.weight_down[mhalo_bin[0][df_bin]])
         
         sham_sub.fill_between(
                 0.5 * (f_arr[:-1] + f_arr[1:]), 
@@ -315,10 +321,11 @@ def AccretionCorr(evol_dict=None):
 
 
 if __name__=='__main__': 
+    #for scat in [0.0, 0.1, 0.2, 0.3]: 
     evol_dict = {
-            'initial': {'assembly_bias': 'longterm', 'scatter':0.3}, 
-            'sfh': {'name': 'constant_offset'}, 
-            'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
+            'sfh': {'name': 'random_step', 'dt_min': 0.1, 'dt_max':0.25, 'sigma': 0.3,
+                'assembly_bias': 'none'}, 
+            'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
             } 
     # 'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
     AccretionCorr(evol_dict=evol_dict)

@@ -356,7 +356,7 @@ class Evolver(object):
                     Mhsort = np.argsort(dMhalo[snap]) 
                     self.cms.sfr_genesis[snap[Mhsort]] = (mu_logsfr[snap])[Mhsort] + \
                             np.sort(dsfr[snap]) + dsfr_scat[snap]
-                    dsfr_tot[snap] = np.sort(dsfr[snap]) + dsfr_scat[snap]
+                    dsfr_tot[snap[Mhsort]] = np.sort(dsfr[snap]) + dsfr_scat[snap]
 
                 sfh_kwargs['dsfr'] = dsfr_tot 
 
@@ -419,24 +419,31 @@ class Evolver(object):
                     halo_exists = np.where(
                             (self.cms.Mhalo_hist[:,i_d] != -999.) &
                             (self.cms.Mhalo_hist[:,i_d+1] != -999.))[0]
-
-                    sorted = np.argsort(dMhalo[:,i_d][halo_exists])
+                    #M_h_tip1 = self.cms.Mhalo_hist[:,i_d][halo_exists]
+                    M_h_ti = self.cms.Mhalo_hist[:,i_d+1][halo_exists]
                     
-                    #print 'M i', self.cms.Mhalo_hist[:,i_d][halo_exists[sorted]]
-                    #print np.mean(self.cms.Mhalo_hist[:,i_d][halo_exists[sorted]])
-                    #print 'M i-1', self.cms.Mhalo_hist[:,i_d+1][halo_exists[sorted]]
-                    #print np.mean(self.cms.Mhalo_hist[:,i_d+1][halo_exists[sorted]])
-                    #print 'dM', dMhalo[:,i_d][halo_exists[sorted]]
+                    M_h_bins = np.arange(M_h_ti.min()-0.1, M_h_ti.max()+0.2, 0.2) 
+                    for im in xrange(len(M_h_bins)-1): 
+                        inbin = np.where(
+                                (M_h_ti > M_h_bins[im]) & 
+                                (M_h_ti <= M_h_bins[im+1])
+                                )[0]
+                        sorted = np.argsort(dMhalo[:,i_d][halo_exists[inbin]])
 
-                    biased_dsfr[:,i_d][halo_exists[sorted]] = \
-                            np.sort(np.random.randn(len(sorted))) * sig_eff
+                        biased_dsfr[:,i_d][halo_exists[inbin[sorted]]] = \
+                                np.sort(np.random.randn(len(sorted))) * sig_eff
                     
-                    no_halo = np.logical_not(
-                            (self.cms.Mhalo_hist[:,i_d] != -999.) &
-                            (self.cms.Mhalo_hist[:,i_d+1] != -999.))
-                    biased_dsfr[:,i_d][no_halo] = np.random.randn(np.sum(no_halo)) * sig_eff
-
-                print biased_dsfr.min() 
+                    #no_halo = np.logical_not(
+                    #        (self.cms.Mhalo_hist[:,i_d] != -999.) &
+                    #        (self.cms.Mhalo_hist[:,i_d+1] != -999.))
+                    no_halo = np.where(
+                            (self.cms.Mhalo_hist[:,i_d] == -999.) |
+                            (self.cms.Mhalo_hist[:,i_d+1] == -999.))
+                    biased_dsfr[:,i_d][no_halo] = np.random.randn(len(no_halo[0])) * sig_eff
+                
+                print biased_dsfr.min(),  biased_dsfr.max()
+                if biased_dsfr.min() == -999.: 
+                    raise ValueError
 
                 sfh_kwargs['amp'] = np.tile(-999., (n_gal, n_col)) 
                 for i_t in xrange(len(tsnaps)-1): 
@@ -532,8 +539,7 @@ class Evolver(object):
         qqing = np.where(
                 (t_quench_matrix != 999.) & (t_quench_matrix > 0.) & 
                 (t_matrix >= t_quench_matrix)) 
-        
-        t_q_matrix = np.tile(self.cms.t_quench[qing], (integ_logM_Q.shape[0],1)).T
+        t_q_matrix = np.tile(self.cms.t_quench[qing], (integ_logM_Q.shape[0]-1,1)).T
         tt_matrix = np.tile(t_output[1:], (integ_logM_Q.shape[1],1))
         qqqing = np.where(tt_matrix >= t_q_matrix)
         
@@ -587,9 +593,9 @@ class EvolvedGalPop(GalPop):
         if self.downsampled is None: 
             down_str = ''
         else: 
-            down_str = str(self.downsampled) 
+            down_str = ''.join(['.down', str(self.downsampled), 'x'])
         #cq_str = ''.join(['tf', str(tf), '.abc_', abcrun, '.prior_', prior])
-        cq_str = self.cenque
+        cq_str = ''.join([self.cenque, down_str] )
         return cq_str
 
     def _Initial_str(self): 
@@ -665,7 +671,8 @@ class EvolvedGalPop(GalPop):
         for col in ['mass', 'sfr', 'halo_mass', 'M_sham', 
                 'tsnap_genesis', 'nsnap_genesis', 'zsnap_genesis', 
                 'mass_genesis', 'halomass_genesis', 
-                't_quench', 'Minteg_hist', 'Msham_hist', 'Mhalo_hist']: 
+                't_quench', 'Minteg_hist', 'Msham_hist', 'Mhalo_hist', 
+                'weight_down']: 
             grp.create_dataset(col, data = getattr(MSpop, col)) 
     
         # SFH dictionary 
@@ -716,27 +723,18 @@ class EvolvedGalPop(GalPop):
 
 
 if __name__=='__main__': 
-    '''
-    for tstep in [0.005]: 
+    #DownsampleCenQue(cenque='default') 
+    # testing purposes
+    for scat in [0.0, 0.1, 0.2, 0.3]:
         evol_dict = {
-                'initial': {'assembly_bias': 'none'}, 
-                'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.01, 'dt_max':0.25}, 
-                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': tstep} 
+                'sfh': {'name': 'random_step', 'dt_min': 0.1, 'dt_max':0.25, 'sigma': 0.3,
+                    'assembly_bias': 'acc_hist', 'halo_prop': 'frac', 'sigma_bias': scat}, 
+                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
                 } 
         EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
         EGP.Write() 
-    '''
-    DownsampleCenQue(cenque='default') 
-    # testing purposes
-    evol_dict = {
-            'sfh': {'name': 'constant_offset', 'assembly_bias': 'longterm', 'sigma_bias': 0.3}, 
-            'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
-            } 
-
     #'sfh': {'name': 'random_step', 'dt_min': 0.01, 'dt_max':0.25, 'sigma': 0.3, 
     #    'assembly_bias': 'acc_hist', 'sigma_bias':0.2}, 
-    EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
-    EGP.Write() 
     # 'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
     #cms = CentralMS()
     #cms._Read_CenQue()

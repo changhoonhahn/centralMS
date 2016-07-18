@@ -14,15 +14,20 @@ import centralms as CMS
 from sham_hack import SMFClass 
 
 
-def getSMF(masses, m_arr=None, dlogm=0.1, box=250, h=0.7): 
+def getSMF(masses, weights=None, m_arr=None, dlogm=0.1, box=250, h=0.7): 
     ''' Calculate the Stellar Mass Function for a given set of stellar masses.
     '''
     if m_arr is None: 
         m_arr = np.arange(6.0, 12.1, dlogm) 
 
+    if weights is None: 
+        w_arr = np.repeat(1.0, len(masses))
+    else: 
+        w_arr = weights
+
     vol = box ** 3  # box volume
     
-    Ngal, mbin_edges = np.histogram(masses, bins=m_arr) # number of galaxies in mass bin  
+    Ngal, mbin_edges = np.histogram(masses, bins=m_arr, weights=w_arr) # number of galaxies in mass bin  
 
     mbin = 0.5 * (mbin_edges[:-1] + mbin_edges[1:]) 
     phi = Ngal.astype('float') / vol /dlogm * h**3

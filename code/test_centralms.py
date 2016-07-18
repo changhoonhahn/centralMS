@@ -29,14 +29,16 @@ def plotCMS_SMF(evol_dict=None):
     MSpop.Read() 
 
     smf = Obvs.getSMF(
-            np.array(list(MSpop.mass)+list(cq.mass))
+            np.array(list(MSpop.mass)+list(cq.mass)), 
+            weights=np.array(list(MSpop.weight_down) + list(cq.weight_down))
             )
     prettyplot() 
     pretty_colors = prettycolors() 
 
     # analytic SMF 
     theory_smf = Obvs.getSMF(
-            np.array(list(MSpop.M_sham)+list(cq.M_sham))
+            np.array(list(MSpop.M_sham)+list(cq.M_sham)),
+            weights=np.array(list(MSpop.weight_down) + list(cq.weight_down))
             )
     #Obvs.analyticSMF(0.1, source='li-march')
 
@@ -69,12 +71,12 @@ def plotCMS_SMF_MS(evol_dict=None):
     MSpop.Read() 
     MSonly = np.where(MSpop.t_quench == 999.)   # remove the quenching galaxies
 
-    smf = Obvs.getSMF(MSpop.mass[MSonly])
+    smf = Obvs.getSMF(MSpop.mass[MSonly], weights=MSpop.weight_down[MSonly])
     prettyplot() 
     pretty_colors = prettycolors() 
 
     # analytic SMF 
-    theory_smf = Obvs.getSMF(MSpop.M_sham[MSonly])
+    theory_smf = Obvs.getSMF(MSpop.M_sham[MSonly], weights=MSpop.weight_down[MSonly])
 
     fig = plt.figure()
     sub = fig.add_subplot(111)
@@ -206,7 +208,9 @@ def plotCMS_SFMS(evol_dict=None):
                 (MSpop.mass[MSonly] > mbin) & 
                 (MSpop.mass[MSonly] <= mbin + delta_m) 
                 ) 
-        sfr_percent[im,:] = np.percentile(MSpop.sfr[MSonly[0][within]], [2.5, 16, 84, 97.5])
+        #sfr_percent[im,:] = np.percentile(MSpop.sfr[MSonly[0][within]], [2.5, 16, 84, 97.5])
+        sfr_percent[im,:] = UT.weighted_quantile(MSpop.sfr[MSonly[0][within]], 
+                [0.025, 0.16, 0.84, 0.975], weights=MSpop.weight_down[MSonly[0][within]])
         
     prettyplot() 
     pretty_colors = prettycolors()
@@ -272,6 +276,7 @@ def plotCMS_SFMS_Pssfr(evol_dict=None):
         # calculate P(SSFR)
         Pssfr, bin_edges = np.histogram(
                 bin_ssfrs,
+                weights=MSpop.weight_down[MSonly_bin],
                 range=[-13.0, -7.0],
                 bins=40,
                 normed=True)
@@ -286,6 +291,7 @@ def plotCMS_SFMS_Pssfr(evol_dict=None):
         sig_ssfr = SFR.ScatterLogSFR_sfms(0.5*(mbin[0]+mbin[1]), 0.05, sfms_dict=cms.sfms_dict)
         norm_Pssfr, bin_edges = np.histogram(
                 mu_ssfr + sig_ssfr * np.random.randn(len(bin_ssfrs)),
+                weights=MSpop.weight_down[MSonly_bin],
                 range=[-13.0, -7.0],
                 bins=40,
                 normed=True)
@@ -390,7 +396,9 @@ def plotCMS_SMHMR_MS(evol_dict=None):
         inbin = np.where(
                 (egp.halo_mass > m_halo_bin[im]) &
                 (egp.halo_mass <= m_halo_bin[im+1])) 
-        smhmr[im,:] = np.percentile(egp.mass[inbin], [2.5, 16, 50, 84, 97.5])
+        #smhmr[im,:] = np.percentile(egp.mass[inbin], [2.5, 16, 50, 84, 97.5])
+        smhmr[im,:] = UT.weighted_quantile(egp.mass[inbin], [0.025, 0.16, 0.50, 0.84, 0.975], 
+                weights=egp.weight_down[inbin])
 
     # "observations" with observed scatter of 0.2 dex 
     obvs_smhmr = np.zeros((len(m_halo_bin)-1, 2))
@@ -468,22 +476,79 @@ def plotCMS_SFH(evol_dict=None):
     plt.close()
 
 
+def plotCMS_SFH_AsBias(evol_dict=None): 
+    ''' Plot the star formation history of star forming main sequence galaxies
+    and their corresponding halo mass acretion history 
+    '''
+    # import evolved galaxy population 
+    egp = CMS.EvolvedGalPop(cenque='default', evol_dict=evol_dict) 
+    egp.Read() 
+
+    MSonly = np.where(egp.t_quench == 999.)     # only keep main-sequence galaxies
+    MSonly_rand = np.random.choice(MSonly[0], size=100)
+
+    z_acc, t_acc = UT.zt_table()
+    t_cosmic  = t_acc[1:16]
+    dt = 0.1
+    
+    t_arr = np.arange(t_cosmic.min(), t_cosmic.max()+dt, dt)
+
+    prettyplot() 
+    pretty_colors = prettycolors() 
+    fig = plt.figure()
+    sub1 = fig.add_subplot(211)
+    sub2 = fig.add_subplot(212)
+    
+    dsfrt = np.zeros((len(t_arr), len(MSonly_rand)))
+    for i_t, tt in enumerate(t_arr): 
+        dsfr = SFR.dSFR_MS(tt, egp.sfh_dict) 
+        for ii, i_gal in enumerate(MSonly_rand): 
+            dsfrt[i_t,ii] = dsfr[i_gal]
+    
+    i_col = 0 
+    for ii, i_gal in enumerate(MSonly_rand): 
+        tlim = np.where(t_arr > egp.tsnap_genesis[i_gal]) 
+
+        tcoslim = np.where(t_cosmic >= egp.tsnap_genesis[i_gal]) 
+        halo_hist = (egp.Mhalo_hist[i_gal])[tcoslim][::-1]
+        halo_exists = np.where(halo_hist != -999.) 
+        if np.power(10, halo_hist[halo_exists]-egp.halo_mass[i_gal]).min() < 0.7:  
+            if i_col < 5: 
+                sub1.plot(t_arr[tlim], dsfrt[:,ii][tlim], lw=3, c=pretty_colors[i_col])
+                sub2.plot(t_cosmic[tcoslim][::-1][halo_exists], 
+                        np.power(10, halo_hist[halo_exists]-egp.halo_mass[i_gal]), 
+                        lw=3, c=pretty_colors[i_col])
+                i_col += 1 
+
+    sub1.set_xlim([5.0, 13.5])
+    sub1.set_xticklabels([])
+    sub1.set_ylim([-1., 1.])
+    sub1.set_ylabel(r'$\mathtt{SFR(t) - <SFR_{MS}(t)>}$', fontsize=25)
+    
+    sub2.set_xlim([5.0, 13.5])
+    sub2.set_xlabel(r'$\mathtt{t_{cosmic}}$', fontsize=25)
+    sub2.set_ylim([0.0, 1.1])
+    sub2.set_ylabel(r'$\mathtt{M_h(t)}/\mathtt{M_h(t_f)}$', fontsize=25)
+    fig_file = ''.join([UT.fig_dir(), 'SFH_AsBias.CMS', egp._Spec_str(), '.png']) 
+    fig.savefig(fig_file, bbox_inches='tight') 
+    plt.close()
+    return None
+
 
 
 if __name__=='__main__': 
     for scat in [0.0, 0.1, 0.2, 0.3]: 
         evol_dict = {
-                'sfh': {'name': 'constant_offset', 
-                    'assembly_bias': 'longterm', 'sigma_bias': scat}, 
+                'sfh': {'name': 'random_step', 'dt_min': 0.1, 'dt_max':0.25, 'sigma': 0.3,
+                    'assembly_bias': 'acc_hist', 'sigma_bias': scat}, 
                 'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
                 } 
-        #'sfh': {'name': 'constant_offset'}, 
-        #'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
         #plotCMS_SMF(evol_dict=evol_dict)
         #plotCMS_SMF_MS(evol_dict=evol_dict)
         #plotCMS_SFMS(evol_dict=evol_dict)
         #plotCMS_SFMS_Pssfr(evol_dict=evol_dict)
-        #plotCMS_SMHMR_MS(evol_dict=evol_dict)
-        plotCMS_SFH(evol_dict=evol_dict)
+        plotCMS_SMHMR_MS(evol_dict=evol_dict)
+        #plotCMS_SFH(evol_dict=evol_dict)
+        #plotCMS_SFH_AsBias(evol_dict=evol_dict)
     #plotCMS_SMF_comp(criteria='t0', population='ms', evol_dict=evol_dict)
     #plotCMS_SMF_comp(criteria='t0', population='ms', Mtype='sham', evol_dict=evol_dict)

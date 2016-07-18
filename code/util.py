@@ -75,3 +75,35 @@ def zt_table():
     t = np.array([13.8099, 13.1328, 12.4724, 11.8271, 11.1980, 10.5893, 9.9988, 9.4289, 8.8783, 8.3525, 7.8464, 7.3635, 6.9048, 6.4665, 6.0513, 5.6597, 5.2873, 4.9378, 4.6080, 4.2980, 4.0079, 3.7343, 3.4802, 3.2408, 3.0172, 2.8078, 2.6136, 2.4315, 2.2611, 2.1035, 1.9569, 1.8198, 1.6918])
 
     return [z,t]
+
+
+def weighted_quantile(values, quantiles, weights=None, values_sorted=False, old_style=False):
+    """ 
+    Very close to numpy.percentile, but supports weights.
+    NOTE: quantiles should be in [0, 1]!
+    :param values: numpy.array with data
+    :param quantiles: array-like with many quantiles needed
+    :param weights: array-like of the same length as `array`
+    :param values_sorted: bool, if True, then will avoid sorting of initial array
+    :param old_style: if True, will correct output to be consistent with numpy.percentile.
+    :return: numpy.array with computed quantiles.
+    """
+    values = np.array(values)
+    quantiles = np.array(quantiles)
+    if weights is None:
+        weights = np.ones(len(values))
+    weights = np.array(weights)
+    assert np.all(quantiles >= 0) and np.all(quantiles <= 1), 'quantiles should be in [0, 1]' 
+    if not values_sorted:
+        sorter = np.argsort(values)
+        values = values[sorter]
+        weights = weights[sorter]
+
+    weighted_quantiles = np.cumsum(weights) - 0.5 * weights
+    if old_style: 
+        # To be convenient with np.percentile
+        weighted_quantiles -= weighted_quantiles[0]
+        weighted_quantiles /= weighted_quantiles[-1]
+    else:
+        weighted_quantiles /= np.sum(weights)
+    return np.interp(quantiles, weighted_quantiles, values)
