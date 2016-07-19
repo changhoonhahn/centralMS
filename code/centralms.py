@@ -22,13 +22,17 @@ class GalPop(object):
         pass 
 
 
-def Read_CenQue(type, cenque='default', downsampled=None):
-    ''' Read in either (SF and Quenching galaixes) or (Quenched galaxies)
-    generated from the CenQue project. 
+def CenQue_File(type, cenque='default', downsampled=None): 
+    ''' Function for getting the file name of CenQue Files when cenque and type are 
+    specified. 
     '''
     if cenque == 'default': 
         tf = 7 
         abcrun = 'RHOssfrfq_TinkerFq_Std'
+        prior = 'updated'
+    elif cenque == 'nosmfevol':
+        tf = 8 
+        abcrun = 'RHOssfrfq_TinkerFq_NOSMFevol'
         prior = 'updated'
     else: 
         raise NotImplementedError
@@ -52,7 +56,14 @@ def Read_CenQue(type, cenque='default', downsampled=None):
         '.prior_', prior, 
         down_str, 
         '.hdf5']) 
+    return file 
 
+
+def Read_CenQue(type, cenque='default', downsampled=None):
+    ''' Read in either (SF and Quenching galaixes) or (Quenched galaxies)
+    generated from the CenQue project. 
+    '''
+    file = CenQue_File(type, cenque=cenque, downsampled=downsampled)
     gpop = GalPop()
 
     # read in the file and save to object
@@ -99,8 +110,10 @@ def DownsampleCenQue(cenque='default', ngal_thresh=4000, dmhalo=0.2):
     '''
     # read in the entire galaxy population  
     q_pop = CentralQuenched(cenque=cenque, downsampled=None)
+    print q_pop._File() 
     q_pop._Read_CenQue()
     sfms_pop = CentralMS(cenque=cenque, downsampled=None)
+    print sfms_pop._File() 
     sfms_pop._Read_CenQue()
     
     # halo mass bins delta M_h = 0.2 dex for now... 
@@ -212,29 +225,13 @@ class CentralQuenched(GalPop):  # Quenched Central Galaxies
         self.ssfr = None 
 
     def _Read_CenQue(self):  
-        
-        galpop = Read_CenQue('quenched', cenque='default', downsampled=self.downsampled)
+        galpop = Read_CenQue('quenched', cenque=self.cenque, downsampled=self.downsampled)
         for key in galpop.__dict__.keys(): 
             setattr(self, key, getattr(galpop, key))
-            
         return None 
 
     def _File(self): 
-        if self.cenque == 'default': 
-            tf = 7 
-            abcrun = 'RHOssfrfq_TinkerFq_Std'
-            prior = 'updated'
-        else: 
-            raise NotImplementedError
-    
-        # cenque files
-        file_name = ''.join([UT.dat_dir(), 'cenque/',
-            'quenched.centrals.', 
-            'tf', str(tf), 
-            '.abc_', abcrun, 
-            '.prior_', prior, 
-            '.hdf5']) 
-        return file_name
+        return CenQue_File('quenched', cenque=self.cenque, downsampled=self.downsampled)
 
 
 class CentralMS(GalPop):        # Star-forming + Quenching Central Galaxies
@@ -256,34 +253,14 @@ class CentralMS(GalPop):        # Star-forming + Quenching Central Galaxies
         ''' Read in SF and Quenching galaixes generated from 
         the CenQue project. 
         '''
-        galpop = Read_CenQue('sfms', cenque='default', downsampled=self.downsampled)
+        galpop = Read_CenQue('sfms', cenque=self.cenque, downsampled=self.downsampled)
         for key in galpop.__dict__.keys(): 
             setattr(self, key, getattr(galpop, key))
 
         return None 
 
     def _File(self): 
-        if self.cenque == 'default': 
-            tf = 7 
-            abcrun = 'RHOssfrfq_TinkerFq_Std'
-            prior = 'updated'
-        else: 
-            raise NotImplementedError
-
-        if self.downsampled is None: 
-            down_str = ''
-        else: 
-            down_str = ''.join(['.down', str(self.downsampled), 'x']) 
-    
-        # cenque files
-        file_name = ''.join([UT.dat_dir(), 'cenque/',
-            'sfms.centrals.', 
-            'tf', str(tf), 
-            '.abc_', abcrun, 
-            '.prior_', prior, 
-            down_str, 
-            '.hdf5']) 
-        return file_name
+        return CenQue_File('sfms', cenque=self.cenque, downsampled=self.downsampled)
 
 
 class Evolver(object): 
@@ -294,10 +271,6 @@ class Evolver(object):
         self.cms = cms 
         if evol_dict is None:  # default 
             raise ValueError
-            #self.evol_dict = {
-            #        'sfr': {'name': 'constant_offset'}, 
-            #        'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
-            #        }
         else: 
             self.evol_dict = evol_dict
 
@@ -349,15 +322,23 @@ class Evolver(object):
                 dsfr = sigma_eff * np.random.randn(len(mu_logsfr)) 
                 dsfr_scat = self.evol_dict['sfh']['sigma_bias'] * np.random.randn(len(mu_logsfr))
     
-                dsfr_tot = np.zeros(len(dsfr))
+                dsfr_tot = np.repeat(-999., len(dsfr))
                 self.cms.sfr_genesis = np.zeros(len(mu_logsfr))
                 for tg in np.unique(self.cms.tsnap_genesis): 
                     snap = np.where(self.cms.tsnap_genesis == tg)[0]
-                    Mhsort = np.argsort(dMhalo[snap]) 
-                    self.cms.sfr_genesis[snap[Mhsort]] = (mu_logsfr[snap])[Mhsort] + \
-                            np.sort(dsfr[snap]) + dsfr_scat[snap]
-                    dsfr_tot[snap[Mhsort]] = np.sort(dsfr[snap]) + dsfr_scat[snap]
 
+                    M_h_bins = np.arange(self.cms.halomass_genesis[snap].min()-0.1, 
+                            self.cms.halomass_genesis[snap].max()+0.2, 0.2)
+                    for im in xrange(len(M_h_bins)-1): 
+                        inbin = np.where(
+                                (self.cms.halomass_genesis[snap] > M_h_bins[im]) & 
+                                (self.cms.halomass_genesis[snap] <= M_h_bins[im+1])
+                                )[0]
+                        Mhsort = np.argsort(dMhalo[snap[inbin]]) 
+                        self.cms.sfr_genesis[snap[inbin[Mhsort]]] = \
+                                (mu_logsfr[snap])[inbin[Mhsort]] + \
+                                np.sort(dsfr[snap[inbin]]) + dsfr_scat[snap[inbin]]
+                        dsfr_tot[snap[inbin[Mhsort]]] = np.sort(dsfr[snap[inbin]]) + dsfr_scat[snap[inbin]]
                 sfh_kwargs['dsfr'] = dsfr_tot 
 
         elif self.evol_dict['sfh']['name'] == 'random_step': 
@@ -399,8 +380,16 @@ class Evolver(object):
                 outofrange = np.where(sfh_kwargs['tshift'] > 13.1328)
                 sfh_kwargs['tshift'][outofrange] = -999.
             
-                # halo mass accretion history 
+                # Fractional halo growth
                 dMhalo = -1. * np.diff(self.cms.Mhalo_hist, axis=1)
+                # halo mass accretion history 
+                #if self.evol_dict['sfh']['halo_prop'] == 'frac': 
+                #    # Fractional halo growth
+                #    dMhalo = -1. * np.diff(self.cms.Mhalo_hist, axis=1)
+                #elif self.evol_dict['sfh']['halo_prop'] == 'abs': 
+                #    # absolute halo growth 
+                #    #dMhalo = -1. * np.diff(self.cms.Mhalo_hist, axis=1)
+                #elif self.evol_dict['sfh']['halo_prop'] == 'longterm': 
                
                 # scatter in the correlation between accretion history and SFR 
                 # if sig_noise = 0.3, that means that accretion history and SFR
@@ -441,7 +430,7 @@ class Evolver(object):
                             (self.cms.Mhalo_hist[:,i_d+1] == -999.))
                     biased_dsfr[:,i_d][no_halo] = np.random.randn(len(no_halo[0])) * sig_eff
                 
-                print biased_dsfr.min(),  biased_dsfr.max()
+                #print biased_dsfr.min(),  biased_dsfr.max()
                 if biased_dsfr.min() == -999.: 
                     raise ValueError
 
@@ -557,13 +546,7 @@ class EvolvedGalPop(GalPop):
         '''
         self.cenque = cenque
         self.downsampled = downsampled
-        if evol_dict is None: 
-            self.evol_dict = {
-                    'sfr': {'name': 'constant_offset'}, 
-                    'mass': {'type': 'rk4', 'f_retain': 0.6, 't_step': 0.01} 
-                    }
-        else: 
-            self.evol_dict = evol_dict
+        self.evol_dict = evol_dict
 
     def File(self): 
         '''
@@ -583,13 +566,6 @@ class EvolvedGalPop(GalPop):
         return spec_str
 
     def _CenQue_str(self): 
-        if self.cenque == 'default': 
-            tf = 7 
-            abcrun = 'RHOssfrfq_TinkerFq_Std'
-            prior = 'updated'
-        else: 
-            raise NotImplementedError
-        
         if self.downsampled is None: 
             down_str = ''
         else: 
@@ -597,20 +573,6 @@ class EvolvedGalPop(GalPop):
         #cq_str = ''.join(['tf', str(tf), '.abc_', abcrun, '.prior_', prior])
         cq_str = ''.join([self.cenque, down_str] )
         return cq_str
-
-    def _Initial_str(self): 
-        ''' Initial conditions whether it has assembly bias or not
-        '''
-        if self.evol_dict['initial']['assembly_bias'] == 'none': 
-            init_str = ''.join([
-                '.00', self.evol_dict['initial']['assembly_bias'], 'AsBias'])
-        elif self.evol_dict['initial']['assembly_bias'] == 'longterm': 
-            init_str = ''.join([
-                '.00', 
-                self.evol_dict['initial']['assembly_bias'], 'AsBias',
-                str(round(self.evol_dict['initial']['scatter'],1)),'scat'
-                ]) 
-        return init_str 
 
     def _SFH_str(self): 
         '''
@@ -723,16 +685,17 @@ class EvolvedGalPop(GalPop):
 
 
 if __name__=='__main__': 
-    #DownsampleCenQue(cenque='default') 
+    #EGP_FreqTest()
+    DownsampleCenQue(cenque='nosmfevol') 
     # testing purposes
-    for scat in [0.0, 0.1, 0.2, 0.3]:
-        evol_dict = {
-                'sfh': {'name': 'random_step', 'dt_min': 0.1, 'dt_max':0.25, 'sigma': 0.3,
-                    'assembly_bias': 'acc_hist', 'halo_prop': 'frac', 'sigma_bias': scat}, 
-                'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
-                } 
-        EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
-        EGP.Write() 
+    #for scat in [0.0, 0.1, 0.2, 0.3]:
+    #    evol_dict = {
+    #            'sfh': {'name': 'random_step', 'dt_min': 0.1, 'dt_max':0.25, 'sigma': 0.3,
+    #                'assembly_bias': 'acc_hist', 'halo_prop': 'frac', 'sigma_bias': scat}, 
+    #            'mass': {'type': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
+    #            } 
+    #    EGP = EvolvedGalPop(cenque='default', evol_dict=evol_dict)
+    #    EGP.Write() 
     #'sfh': {'name': 'random_step', 'dt_min': 0.01, 'dt_max':0.25, 'sigma': 0.3, 
     #    'assembly_bias': 'acc_hist', 'sigma_bias':0.2}, 
     # 'sfh': {'name': 'random_step', 'sigma':0.3, 'dt_min': 0.1, 'dt_max':0.5}, 
