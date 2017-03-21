@@ -14,6 +14,7 @@ import sham_hack as sham
 import util as UT
 from utilities import utility as wetzel_util
 
+
 class SubhaloHistory(object): 
     def __init__(self, sigma_smhm=0.2, smf_source='li-march', nsnap_ancestor=20): 
         ''' Subhalo/SHAM M* history of SHAMed galaxies at snapshot 1. 
@@ -115,7 +116,7 @@ class SubhaloHistory(object):
         catalog['central'] = np.zeros(len(sub[1]['halo.m'])).astype('int')
         catalog['central'][central_indices] = 1
 
-        # save catalog
+        # save catalog to hdf5
         file_name = self.File() 
         f = h5py.File(file_name, 'w') 
         grp = f.create_group('data') 
@@ -171,6 +172,7 @@ class PureCentralHistory(object):
             '.sigma_SMHM', str(self.sigma_smhm), 
             '.smf_', self.smf_source, 
             '.Anc_nsnap', str(self.nsnap_ancestor), 
+            str_down,
             '.hdf5']) 
         return file_name 
 
@@ -202,13 +204,17 @@ class PureCentralHistory(object):
         print np.sum(ispure), ' of', n_central, ' central subhalos at nsnap=1 are pure (central throughout)'
         print np.float(np.sum(ispure & (all_catalog['m.star'] > 9.0)))/np.float(np.sum((all_catalog['central'] == 1) & (all_catalog['m.star'] > 9.0))), ' central subhalos w/ M* > 9. at nsnap=1 are pure'
         print np.float(np.sum(ispure & (all_catalog['m.star'] > 9.5)))/np.float(np.sum((all_catalog['central'] == 1) & (all_catalog['m.star'] > 9.5))), ' central subhalos w/ M* > 9.5 at nsnap=1 are pure'
+
+        cut_mass = (all_catalog['m.star'] > 8.)
+        cut_tot = np.where(ispure & cut_mass) 
     
         catalog = {} 
         for key in all_catalog.keys(): 
-            catalog[key] = all_catalog[key][np.where(ispure)]
+            catalog[key] = all_catalog[key][cut_tot]
 
         # save catalog
         file_name = self.File() 
+        print 'writing to ... ', file_name 
         f = h5py.File(file_name, 'w') 
         grp = f.create_group('data') 
         for key in catalog.keys(): 
@@ -222,7 +228,6 @@ class PureCentralHistory(object):
         ''' Downsample the catalog 
         '''
         catalog = self.Read()
-        dmhalo = 0.2
         Mhalo_min = np.min(catalog['halo.m'])
         Mhalo_max = np.max(catalog['halo.m'])
 
@@ -246,15 +251,17 @@ class PureCentralHistory(object):
         f_down = np.float(len(catalog['halo.m'])) / np.float(np.sum(weights > 0.)) 
         print 'downsampled by ', int(round(f_down)), 'x'
         
+        # ouptut downsampled catalog to hdf5 file  
         down_file = self.File(downsampled=str(int(round(f_down))))
+        print 'writing to ... ', down_file
         f = h5py.File(down_file, 'w') 
         grp = f.create_group('data') 
         for key in catalog.keys(): 
-            grp.create_dataset(key, data=catalog[key])
+            if key != 'weights': 
+                grp.create_dataset(key, data=catalog[key])
         grp.create_dataset('weights', data=weights)
         f.close() 
         return None 
-
 
 
             
