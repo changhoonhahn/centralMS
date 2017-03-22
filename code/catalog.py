@@ -195,15 +195,14 @@ class PureCentralHistory(object):
         
         ispure = (all_catalog['central'] == 1)
         n_central = np.sum(ispure)
-        print n_central, ' of', len(all_catalog['central']), ' subhalos at nsnap=1 are centrals'
+        print n_central, ' of', len(all_catalog['central']), ' subhalos at nsnap=1 are pure centrals'
 
         for i_snap in self.snapshots[1:]: # 2 to nsnap_ancestor
             ispure = ispure & (all_catalog['snapshot'+str(i_snap)+'_central'] == 1)
 
-        print np.sum(ispure), ' of', len(all_catalog['central']), ' subhalos at nsnap=1 are pure centrals'
         print np.sum(ispure), ' of', n_central, ' central subhalos at nsnap=1 are pure (central throughout)'
-        print np.float(np.sum(ispure & (all_catalog['m.star'] > 9.0)))/np.float(np.sum((all_catalog['central'] == 1) & (all_catalog['m.star'] > 9.0))), ' central subhalos w/ M* > 9. at nsnap=1 are pure'
-        print np.float(np.sum(ispure & (all_catalog['m.star'] > 9.5)))/np.float(np.sum((all_catalog['central'] == 1) & (all_catalog['m.star'] > 9.5))), ' central subhalos w/ M* > 9.5 at nsnap=1 are pure'
+        print np.float(np.sum(ispure & (all_catalog['m.star'] > 9.0)))/np.float(np.sum((all_catalog['central'] == 1) & (all_catalog['m.star'] > 9.0))), ' central subhalos w/ M* > 9. at nsnap=1 are pure throughout z < 1'
+        print np.float(np.sum(ispure & (all_catalog['m.star'] > 9.5)))/np.float(np.sum((all_catalog['central'] == 1) & (all_catalog['m.star'] > 9.5))), ' central subhalos w/ M* > 9.5 at nsnap=1 are pure throughout z < 1'
 
         cut_mass = (all_catalog['m.star'] > 8.)
         cut_tot = np.where(ispure & cut_mass) 
@@ -230,6 +229,7 @@ class PureCentralHistory(object):
         catalog = self.Read()
         Mhalo_min = np.min(catalog['halo.m'])
         Mhalo_max = np.max(catalog['halo.m'])
+        print Mhalo_min, Mhalo_max
 
         mhalo_bin = np.arange(Mhalo_min - 0.5 * dmhalo, Mhalo_max + dmhalo, dmhalo) 
         
