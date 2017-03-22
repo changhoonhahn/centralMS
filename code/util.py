@@ -77,6 +77,47 @@ def zt_table():
     return [z,t]
 
 
+def z_nsnap(nsnap): 
+    # given n_snapshot get redshift
+    if not isinstance(nsnap, int): 
+        raise ValueError
+
+    z = np.array([0.0000, 0.0502, 0.1028, 0.1581, 0.2162, 0.2771, 0.3412, 0.4085, 0.4793, 0.5533, 0.6313, 0.7132, 0.7989, 0.8893, 0.9841, 1.0833, 1.1882, 1.2978, 1.4131, 1.5342, 1.6610, 1.7949, 1.9343, 2.0817, 2.2362, 2.3990, 2.5689, 2.7481, 2.9370, 3.1339, 3.3403, 3.5579, 3.7870])
+    return z[nsnap]
+
+
+def t_nsnap(nsnap): 
+    # given n_snapshot return t_cosmic 
+    if not isinstance(nsnap, int): 
+        raise ValueError
+    t = np.array([13.8099, 13.1328, 12.4724, 11.8271, 11.1980, 10.5893, 9.9988, 9.4289, 8.8783, 8.3525, 7.8464, 7.3635, 6.9048, 6.4665, 6.0513, 5.6597, 5.2873, 4.9378, 4.6080, 4.2980, 4.0079, 3.7343, 3.4802, 3.2408, 3.0172, 2.8078, 2.6136, 2.4315, 2.2611, 2.1035, 1.9569, 1.8198, 1.6918])
+    return t[nsnap]
+
+
+def replicate(arr, n): 
+    ''' Given array or value, produce a "blank" numpy array of length n 
+    that has the same variable type as arr. 
+    '''
+    try: 
+        if isinstance(arr, str): 
+            val = arr
+        else: 
+            val = arr[0]
+    except TypeError: 
+        val = arr
+
+    if isinstance(val, int): 
+        return np.tile(-999, n)
+    elif isinstance(val, float): 
+        return np.tile(-999., n)
+    elif isinstance(val, str): 
+        if len(val) < 16: 
+            return np.tile(val, n).astype('|S16')
+        else: 
+            leng = str(np.ceil(len(val)/16)*16)
+            return np.tile(val, n).astype('|S'+leng)
+
+
 def weighted_quantile(values, quantiles, weights=None, values_sorted=False, old_style=False):
     """ 
     Very close to numpy.percentile, but supports weights.

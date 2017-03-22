@@ -73,9 +73,10 @@ class Fq(object):
         self.mass_high = mb[1:]
         self.mass_mid  = 0.5 * (self.mass_low + self.mass_high) 
     
-    def Calculate(self, mass=None, sfr=None, z=None, sfr_class=None, mass_bins=None, theta_SFMS=None):
+    def Calculate(self, mass=None, sfr=None, z=None, weights=None, sfr_class=None, mass_bins=None, theta_SFMS=None):
         ''' Calculate the quiescent fraction 
         '''
+        # input cross-checks 
         if theta_SFMS is None: 
             raise ValueError
         if sfr_class is None: 
@@ -93,20 +94,23 @@ class Fq(object):
             mass_mid = 0.5 * (mass_bins[:-1] + mass_bins[1:])
             mass_low = mass_bins[:-1]
             mass_high = mass_bins[1:]
+
+        if weights is None: 
+            ws = np.repeat(1., len(sfq))
+        else: 
+            ws = weights 
             
         f_q = np.zeros(len(mass_mid)) 
         for i_m in xrange(len(mass_mid)):
-
             masslim = np.where(
                     (mass > mass_low[i_m]) & 
-                    (mass <= mass_high[i_m]) 
-                    )
-            ngal_mass = len(masslim[0])
+                    (mass <= mass_high[i_m]))[0]
+            ngal_mass = len(masslim)
             if ngal_mass == 0:  # no galaxy in mass bin 
                 continue 
-
-            ngal_q = len(np.where(sfq[masslim] == 'quiescent')[0])
-            f_q[i_m] = np.float(ngal_q)/np.float(ngal_mass) 
+            
+            isQ = masslim[np.where(sfq[masslim] == 'quiescent')]
+            f_q[i_m] = np.sum(ws[isQ])/np.float(ngal_mass) 
 
         return [mass_mid, f_q]
     
@@ -139,7 +143,7 @@ class Fq(object):
         offset = -0.9
         return mu_sfr + offset
 
-    def model(self, Mstar, z_in, lit='cosmosinterp'):
+    def model(self, Mstar, z_in, lit='cosmos_tinker'):
         ''' Model quiescent fraction as a funcnction of 
         stellar mass and redshift from literature. Different methods 
 
@@ -361,12 +365,15 @@ class Ssfr(object):
         self.ssfr_bin_edges = None 
         self.ssfr_bin_mid = None 
 
-    def Calculate(self, mass, ssfr): 
+    def Calculate(self, mass, ssfr, weights=None): 
         ''' Calculate the SSFR distribution for the four hardcoded mass bins 
         from the mass and ssfr values 
         '''
         if len(mass) != len(ssfr): 
-            raise ValueError
+            raise ValueError("mass and ssfr lengths do not match")
+        if weights is not None: 
+            if len(mass) != len(weights):
+                raise ValueError("mass and weights lengths do not match")
 
         self.ssfr_dist = [] 
         self.ssfr_bin_mid = [] 
@@ -379,12 +386,17 @@ class Ssfr(object):
                     (mass < mass_bin[1])
                     )
             n_bin = len(mass_lim[0])
+            
+            w_bin = None
+            if weights is not None: 
+                w_bin = weights[mass_lim]
 
             # calculate SSFR distribution  
             dist, bin_edges = np.histogram(
                     ssfr[mass_lim], 
                     range=self.ssfr_range, 
                     bins=self.ssfr_nbin, 
+                    weights=w_bin,
                     normed=True)
 
             self.ssfr_dist.append(dist)
@@ -458,3 +470,65 @@ def sigSSFR_SFMS(mstar): #, z_in, theta_SFMS=None):
     redshift z_in. Hardcoded at 0.3 
     '''
     return 0.3 
+
+
+def tauQ(mstar, theta_tau={'name': 'instant'}): 
+    ''' Quenching efold models as a function of stellar mass
+    '''
+    type = theta_tau['name']
+
+    if type == 'constant':      # constant tau 
+
+        n_arr = len(mstar) 
+        tau = np.array([0.5 for i in xrange(n_arr)]) 
+
+    elif type == 'linear':      # lienar tau(mass) 
+
+        tau = -(0.8 / 1.67) * ( mstar - 9.5) + 1.0
+        #if np.min(tau) < 0.1: #    tau[ tau < 0.1 ] = 0.1
+         
+    elif type == 'instant':     # instant quenching 
+
+        n_arr = len(mstar) 
+        tau = np.array([0.001 for i in range(n_arr)]) 
+
+    elif type == 'discrete': 
+        # param will give 4 discrete tau at the center of mass bins 
+        masses = np.array([9.75, 10.25, 10.75, 11.25]) 
+
+        tau = np.interp(mstar, masses, param) 
+        tau[ tau < 0.05 ] = 0.05
+
+    elif type == 'linear': 
+        # param will give slope and yint of pivoted tau line 
+        tau = theta_tau['slope'] * (mstar - theta_tau['fid_mass']) + theta_tau['yint']
+        try: 
+            if np.min(tau) < 0.001: 
+                tau[np.where( tau < 0.001 )] = 0.001
+        except ValueError: 
+            pass 
+
+    elif type == 'satellite':   # quenching e-fold of satellite
+
+        tau = -0.57 * ( mstar - 9.78) + 0.8
+        if np.min(tau) < 0.001:     
+            tau[np.where( tau < 0.001 )] = 0.001
+
+    elif type == 'satellite_upper': 
+        tau = -0.57 * ( mstar - 9.78) + 0.8 + 0.15
+        if np.min(tau) < 0.001:     
+            tau[np.where( tau < 0.001 )] = 0.001
+
+    elif type == 'satellite_lower': 
+        tau = -0.57 * ( mstar - 9.78) + 0.8 - 0.15
+        if np.min(tau) < 0.001:     
+            tau[np.where( tau < 0.001 )] = 0.001
+    elif type == 'long':      # long quenching (for qa purposes)
+
+        n_arr = len(mstar) 
+        tau = np.array([2.5 for i in xrange(n_arr)]) 
+
+    else: 
+        raise NotImplementedError('asdf')
+
+    return tau 
