@@ -73,7 +73,7 @@ class Fq(object):
         self.mass_high = mb[1:]
         self.mass_mid  = 0.5 * (self.mass_low + self.mass_high) 
     
-    def Calculate(self, mass=None, sfr=None, z=None, sfr_class=None, theta_SFMS=None):
+    def Calculate(self, mass=None, sfr=None, z=None, sfr_class=None, mass_bins=None, theta_SFMS=None):
         ''' Calculate the quiescent fraction 
         '''
         if theta_SFMS is None: 
@@ -84,23 +84,31 @@ class Fq(object):
             sfq = self.Classify(mass, sfr, z, theta_SFMS=theta_SFMS)
         else: 
             sfq = sfr_class  
+    
+        if mass_bins is None: 
+            mass_mid = self.mass_mid
+            mass_low = self.mass_low
+            mass_high = self.mass_high
+        else: 
+            mass_mid = 0.5 * (mass_bins[:-1] + mass_bins[1:])
+            mass_low = mass_bins[:-1]
+            mass_high = mass_bins[1:]
             
-        masses, f_q = [], [] 
-        for i_m in xrange(len(self.mass_mid)):
+        f_q = np.zeros(len(mass_mid)) 
+        for i_m in xrange(len(mass_mid)):
 
             masslim = np.where(
-                    (mass > self.mass_low[i_m]) & 
-                    (mass <= self.mass_high[i_m]) 
+                    (mass > mass_low[i_m]) & 
+                    (mass <= mass_high[i_m]) 
                     )
             ngal_mass = len(masslim[0])
             if ngal_mass == 0:  # no galaxy in mass bin 
                 continue 
 
             ngal_q = len(np.where(sfq[masslim] == 'quiescent')[0])
-            masses.append( self.mass_mid[i_m] ) 
-            f_q.append( np.float(ngal_q)/np.float(ngal_mass) )
+            f_q[i_m] = np.float(ngal_q)/np.float(ngal_mass) 
 
-        return [np.array(masses), np.array(f_q)]
+        return [mass_mid, f_q]
     
     def Classify(self, mstar, sfr, z_in, theta_SFMS=None):
         ''' Classify galaxies based on M*, SFR, and redshift inputs.
@@ -126,7 +134,7 @@ class Fq(object):
         #factor[lowmass] = 1.0 
         #return -0.75 + 0.76*(zin-0.05) + 0.5*(mstar-10.5)
         #return -0.75 + 0.76*(zin-0.04) + factor*(mstar-9.5) - 0.8
-        mu_sfr = AverageLogSFR_sfms(mstar, zin, theta_SFMS=theta_SFMS)
+        mu_sfr = SSFR_SFMS(mstar, zin, theta_SFMS=theta_SFMS) + mstar
         #offset = -0.75
         offset = -0.9
         return mu_sfr + offset
@@ -384,3 +392,69 @@ class Ssfr(object):
             self.ssfr_bin_edges.append(bin_edges)
         
         return [self.ssfr_bin_mid, self.ssfr_dist]
+
+
+def SSFR_Qpeak(mstar):  
+    ''' Roughly the average of the log(SSFR) of the quiescent peak 
+    of the SSFR distribution. This is designed to reproduce the 
+    Brinchmann et al. (2004) SSFR limits.
+    '''
+    #return -0.4 * (mstar - 11.1) - 12.61
+    return 0.4 * (mstar - 10.5) - 1.73 - mstar 
+
+
+def sigSSFR_Qpeak(mstar):  
+    ''' Scatter of the log(SSFR) quiescent peak of the SSFR distribution 
+    '''
+    return 0.18 
+
+
+def SSFR_SFMS(mstar, z_in, theta_SFMS=None): 
+    ''' Model for the average SSFR of the SFMS as a function of M* at redshift z_in.
+    The model takes the functional form of 
+
+    log(SFR) = A * log M* + B * z + C
+
+    '''
+    assert theta_SFMS is not None 
+
+    if theta_SFMS['name'] == 'linear': 
+        # mass slope
+        A_highmass = 0.53
+        A_lowmass = 0.53
+        try: 
+            mslope = np.repeat(A_highmass, len(mstar))
+        except TypeError: 
+            mstar = np.array([mstar])
+            mslope = np.repeat(A_highmass, len(mstar))
+        # z slope
+        zslope = theta_SFMS['zslope']            # 0.76, 1.1
+        # offset 
+        offset = np.repeat(-0.11, len(mstar))
+
+    elif theta_SFMS['name'] == 'kinked': # Kinked SFMS 
+        # mass slope
+        A_highmass = 0.53 
+        A_lowmass = theta_SFMS['mslope_lowmass'] 
+        try: 
+            mslope = np.repeat(A_highmass, len(mstar))
+        except TypeError: 
+            mstar = np.array([mstar])
+            mslope = np.repeat(A_highmass, len(mstar))
+        lowmass = np.where(mstar < 9.5)
+        mslope[lowmass] = A_lowmass
+        # z slope
+        zslope = theta_SFMS['zslope']            # 0.76, 1.1
+        # offset
+        offset = np.repeat(-0.11, len(mstar))
+        offset[lowmass] += A_lowmass - A_highmass 
+
+    mu_SSFR = (mslope * (mstar - 10.5) + zslope * (z_in-0.0502) + offset) - mstar
+    return mu_SSFR
+
+
+def sigSSFR_SFMS(mstar): #, z_in, theta_SFMS=None): 
+    ''' Scatter of the SFMS logSFR as a function of M* and 
+    redshift z_in. Hardcoded at 0.3 
+    '''
+    return 0.3 
