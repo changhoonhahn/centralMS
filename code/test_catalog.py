@@ -39,11 +39,21 @@ def plotPureCentral_SHMF(nsnap_ancestor=20):
     plt.show() 
 
 
+def test_Observations_GroupCat(): 
+    ''' Simple test of the Cat.Observations class 
+    '''
+    real = Cat.Observations('group_catalog', Mrcut=18, position='central')
+    catalog = real.Read()
+    print catalog.keys()
+
+
 
 
 
 if __name__=='__main__': 
-    plotPureCentral_SHMF(nsnap_ancestor=20)
+    test_Observations_GroupCat()
+
+    #plotPureCentral_SHMF(nsnap_ancestor=20)
 
     #subhist = Cat.SubhaloHistory(nsnap_ancestor=20)
     #subhist._CheckHistory()

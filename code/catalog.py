@@ -12,7 +12,12 @@ import numpy as np
 from treepm import subhalo_io 
 import sham_hack as sham
 import util as UT
-from utilities import utility as wetzel_util
+from ChangTools.fitstables import mrdfits
+
+try: # only available on Harmattan or Sirocco
+    from utilities import utility as wetzel_util
+except ImportError: 
+    pass 
 
 
 class SubhaloHistory(object): 
@@ -262,6 +267,114 @@ class PureCentralHistory(object):
         grp.create_dataset('weights', data=weights)
         f.close() 
         return None 
+
+
+class Observations(object):
+    '''
+    '''
+    def __init__(self, cat, **cat_kwargs):
+        ''' Load in disparate observations into some universal format. 
+        '''
+        available = ['group_catalog']
+
+        if cat not in available: 
+            raise ValueError('must be one of the following : '+','.join(available))
+        self.name = cat
+    
+        self._Unpack_kwargs(cat_kwargs)     # unpack keywoard arguments that specify the catalog 
+
+    def Read(self):
+
+        if self.name == 'group_catalog': 
+            catalog = self._ReadGroupCat()
+        else: 
+            raise NotImplementedError
+
+        return catalog 
+    
+    def _ReadGroupCat(self):
+        '''
+        '''
+        # check that appropriate kwargs are set 
+        assert 'Mrcut' in self._catalog_kwargs.keys()
+        assert 'masscut' in self._catalog_kwargs.keys()
+        assert 'position' in self._catalog_kwargs.keys()
+
+        h = 0.7
+        # load in galdata .fits file  
+        galdata_file = ''.join([UT.dat_dir(), 'observations/', 
+            'clf_groups_M', str(self._catalog_kwargs['Mrcut']), 
+            '_', str(self._catalog_kwargs['masscut']), '_D360.', 
+            'galdata_corr.fits']) 
+        gal_data = mrdfits(galdata_file) 
+    
+        # process some of the data
+        for column in gal_data.__dict__.keys(): 
+            column_data = getattr(gal_data, column)
+            if column == 'stellmass': # stellmass is in units of Msol/h^2
+                column_data = column_data / h**2
+                # convert to log Mass
+                setattr(gal_data, 'mass', np.log10(column_data))
+            elif column == 'ssfr': 
+                column_data = column_data + np.log10(h**2)
+                # convert to log Mass 
+                setattr(gal_data, 'ssfr', column_data)    
+            elif column == 'cz': # convert to z else: 
+                setattr(gal_data, 'z', column_data/299792.458)
+            else: 
+                pass
+        setattr(gal_data, 'sfr', gal_data.mass + gal_data.ssfr)     # get sfr values
+        
+        # read in central/satellite probability file 
+        file = ''.join([UT.dat_dir(), 'observations/', 
+            'clf_groups_M', str(self._catalog_kwargs['Mrcut']), 
+            '_', str(self._catalog_kwargs['masscut']), '_D360.', 
+            'prob.fits']) 
+        prob_data = mrdfits(file)            
+
+        # central or satellite 
+        if self._catalog_kwargs['position'] == 'central': 
+            prob_index = np.where(prob_data.p_sat <= 0.5)
+        elif self._catalog_kwargs['position'] == 'satellite': 
+            prob_index = np.where(prob_data.p_sat > 0.5)
+        elif self._catalog_kwargs['position'] == 'all': 
+            prob_index = range(len(prob_data.p_sat))
+        else: 
+            raise ValueError
+    
+        # hardcoded list of columns... but oh well 
+        columns = ['ra', 'dec', 'mass', 'sfr', 'ssfr', 'z']
+        
+        # save columns into catalog dictionary 
+        catalog = {} 
+        for column in columns: 
+            column_data = getattr(gal_data, column)[prob_index]
+            if column in ['ra', 'dec']: 
+                catalog[column] = column_data * 57.2957795
+            else: 
+                catalog[column] = column_data
+        
+        return catalog 
+        
+    def _Unpack_kwargs(self, kwargs): 
+        ''' Process the keyword arguments for different observable 
+        catalogs. And load to self._catalog_kwargs
+        '''
+        if self.name == 'group_catalog': 
+            # absolute magnitude and mass cuts 
+            Mrcut = kwargs['Mrcut']
+            if Mrcut == 18:
+                masscut='9.4'
+            elif Mrcut == 19: 
+                masscut='9.8'
+            elif Mrcut == 20: 
+                masscut='10.2'
+            
+            # save to object
+            self._catalog_kwargs = {}
+            self._catalog_kwargs['Mrcut'] = Mrcut
+            self._catalog_kwargs['masscut'] = masscut 
+            self._catalog_kwargs['position'] = kwargs['position']
 
             
 
