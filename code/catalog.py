@@ -9,15 +9,16 @@ import h5py
 import numpy as np
 
 # --- Local --- 
-from treepm import subhalo_io 
-import sham_hack as sham
 import util as UT
 from ChangTools.fitstables import mrdfits
 
-try: # only available on Harmattan or Sirocco
+# modules only available on Harmattan or Sirocco
+import sham_hack as sham
+try: 
+    from treepm import subhalo_io 
     from utilities import utility as wetzel_util
-except ImportError: 
-    pass 
+except ImportError:
+    pass
 
 
 class SubhaloHistory(object): 
