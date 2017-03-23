@@ -14,7 +14,7 @@ import observables as Obvs
 
 class Evolver(object): 
     def __init__(self, PCH_catalog, theta, nsnap0=20): 
-        ''' Using a given catalog of subhalo accretion histories track 
+        ''' Using a given catalog of galaxy and subhalo snapshots track 
         galaxy star formation histories. 
 
         Parameters
@@ -98,7 +98,6 @@ def Evolve_a_Snapshot(SHcat, nsnap_i, **theta):
     ssfrs_i = SHcat['snapshot'+str(nsnap_i)+'_sfr'] - SHcat['snapshot'+str(nsnap_i)+'_m.star']
     
     qf = Obvs.Fq()
-    fq_M = lambda mm, zz: qf.model(mm, zz, lit=theta['theta_fq']['name'])
     
     for key in SHcat.keys(): 
         if 'snapshot'+str(nsnap_i) in key: 
@@ -119,18 +118,59 @@ def Evolve_a_Snapshot(SHcat, nsnap_i, **theta):
     # 2) Star-forming galaxies
     isSF = np.where(SHcat['snapshot'+str(nsnap_i)+'_gclass'] == 'starforming')
 
+    # quenching probability/Gyr
+    mf = _SnapCat_mf(SHcat, nsnap_i, prop='m.sham')     # MF 
+    dmf_dt = _SnapCat_dmfdt(SHcat, nsnap_i, prop='m.sham')  # dMF/dt
+    mf_M = interp1d(mf[0], mf[1]) 
+    dmf_dt_M = interp1d(mf_dt[0], mf_dt[1]) 
+
+    # quenching probabily "fudge factor"
+    fPQ_M = lambda mm: theta['fpq']['slope'] * (mm - theta['fpq']['fidmass']) + theta['fpq']['offset']
+
+    # fPQ * ( dfQ/dt * MF + fQ * dMF/dt ) or fPQ * (Moustakas2013 quenching rate)
+    Pq_M = lambda mm: fPQ_M(mm) * (
+            qf.dfQ_dz(mm, zz, lit=theta['theta_fq']['name']) / UT.dt_dz(zz) * mf_M(mm) +
+            qf.model(mm, zz, lit=theta['theta_fq']['name']) * dmf_dt_M(mm)
+            )
+    rand = np.random.uniform(0., 1., len(isSF[0])) 
+    # Star-forming galaxies that start quenching between t_i and t_i+1
+    now_qing = np.where(rand < Pq_M(SHcat['snapshot'+str(nsnap_i)+'_m.star'][isSF]) * dt) 
+    tQs = np.random.uniform(UT.t_nsnap(nsnap_i - 1), UT.t_nsnap(nsnap_i)) # when SF galaxies start to quench
+
+    # evolve M* and SFR of star-forming (t_i --> t_i+1 or t_i --> t_Q) 
+    # some wrapper for all SFR(M*, t) prescriptions
+
+
+
+
+    # now solve M*, SFR ODE 
+    z_table, t_table = UT.zt_table()     
+    z_of_t = interpolate.interp1d(list(reversed(t_table)), list(reversed(z_table)), kind='cubic') 
+    func_kwargs = {
+            't_initial': UT.t_nsnap(nsnap_i), 
+            't_final': tf, 
+            'f_retain': theta['mass']['f_retain'], 
+            'zfromt': z_of_t, 
+            'sfh_kwargs': sfh_kwargs
+            }
+
+    if theta['mass']['type'] == 'rk4':     # RK4
+        f_ode = sfrs.ODE_RK4
+    elif theta['mass']['type'] == 'euler': # Forward euler
+        f_ode = sfrs.ODE_Euler
+    integ_logM = f_ode(
+            sfrs.dlogMdt_MS,                    # dy/dt
+            SHcat['snapshot'+str(nsnap_i)+'_m.star'],              # logM0
+            UT.t_nsnap(nsnap_i - 1),            # t_final 
+            self.evol_dict['mass']['t_step'],   # time step
+            **func_kwargs) 
+
     ################
     # 3) quenching galaxies: ones are in the process of quenching
     isQing = np.where(SHcat['snapshot'+str(nsnap_i)+'_gclass'] == 'qing')
     # SFR(t_i+1) = SFR(t_i) * exp(-dt / tauQ)
     sfr_qing = lambda sfr0, mq: sfr0 - 0.43429 * dt / Obvs.tauQ(mq, theta_tau=theta['theta_tau'])
     
-    isQing
-
-
-
-
-
     return SHcat
 
 
@@ -233,3 +273,36 @@ def defaultTheta():
     theta['fq'] = {'name': 'cosmos_tinker'}
 
     return theta 
+
+def _SnapCat_mf(snapcat, nsnap, prop='m.sham'):
+    # Calculate mass function (mass specified by prop) 
+    kk = 'snapshot'+str(nsnap)+'_'+prop
+    if kk not in snapcat.keys() or 'weights' not in snapcat.keys():
+        raise ValueError
+    mf = Obvs.getMF(snapcat[kk], weights=snapcat['weights'])
+    return mf 
+
+def _SnapCat_dmfdt(snapcat, nsnap, prop='m.sham'): 
+    ''' Calculate the derivative of the mass function (mass specified by prop) 
+    '''
+    k1 = 'snapshot'+str(nsnap-1)+'_'+prop      # check keys
+    k2 = 'snapshot'+str(nsnap+1)+'_'+prop
+    if k1 not in snapcat.keys() and k2 not in snapcat.keys():
+        raise ValueError
+    elif k1 not in snapcat.keys(): 
+        k1 = 'snapshot'+str(nsnap)+'_'+prop      # check keys
+        dt = UT.t_nsnap(nsnap) - UT.t_nsnap(nsnap-1)
+    elif k2 not in snapcat.keys(): 
+        k2 = 'snapshot'+str(nsnap)+'_'+prop      # check keys
+        dt = UT.t_nsnap(nsnap+1) - UT.t_nsnap(nsnap)
+    else: 
+        dt = UT.t_nsnap(nsnap+1) - UT.t_nsnap(nsnap-1)
+
+    if 'weights' not in snapcat.keys():
+        raise ValueError
+
+    mf1 = Obvs.getMF(snapcat[k1], weights=snapcat['weights'])
+    mf2 = Obvs.getMF(snapcat[k2], weights=snapcat['weights'])
+    assert mf1[0] == mf2[0]
+
+    return [mf1[0], (mf1[1] - mf2[1])/dt]

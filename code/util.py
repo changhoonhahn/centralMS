@@ -66,6 +66,13 @@ def t_from_z(redshift):
 
     return t_of_z(redshift) 
 
+def dt_dz(zz): 
+    # dt/dz estimate from Hogg 1999 per Gyr
+    if zz < 1.: 
+        return −13.8835 + 19.3598 * zz − 13.621 * zz**2 + 4.2141 * zz**3
+    else: 
+        return (t_from_z(zz + 0.01) - t_from_z(zz - 0.01))/ 0.02
+    
 
 def zt_table(): 
     ''' Return z and t tables in case you want to construct the interpolation function

@@ -263,7 +263,6 @@ class PureCentralHistory(object):
         f.close() 
         return None 
 
-
             
 
 """

@@ -347,6 +347,14 @@ class Fq(object):
         else: 
             raise NameError('Not yet coded') 
 
+    def dfQ_dz(self, Mstar, z_in, dz=0.01, lit='cosmos_tinker'):
+        ''' Estimate dfQ/dt(Mstar, z_in) using the central difference formula
+        '''
+        fq_ip1 = self.model(Mstar, z_in+dz, lit=lit)
+        fq_im1 = self.model(Mstar, z_in-dz, lit=lit)
+
+        return (fq_ip1 - fq_im1)/(2. * dz)
+
 
 class Ssfr(object): 
     def __init__(self, **kwargs): 
