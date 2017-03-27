@@ -11,7 +11,7 @@ from numpy import log10, Inf
 from scipy import integrate, interpolate, ndimage
 # local -----
 #from visualize import plot_sm
-from utilities import utility as ut
+#from utilities import utility as ut
 
 
 def assign(sub, m_kind='m.star', scat=0, dis_mf=0.007, source='', sham_prop='m.max', zis=None):

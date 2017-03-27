@@ -552,8 +552,7 @@ class EvolvedGalPop(GalPop):
         '''
         '''
         # Write Star forming and Quenching catalog 
-        evol_file = ''.join([
-            '/data1/hahn/centralMS/galpop/', 
+        evol_file = ''.join([UT.dat_dir(), 'galpop/' 
             'sfms.centrals', 
             self._Spec_str(),
             '.hdf5'])
