@@ -53,12 +53,12 @@ class Evolver(object):
         -------
         * Assign SFRs to galaxies *with* weights
         '''
-        # 
-        for i in range(1, self.nsnap0+1): 
-            self.SH_catalog['snapshot'+str(i)+'_m.sham'] = self.SH_catalog.pop('snapshot'+str(i)+'_m.sham') 
+        for i in range(1, self.nsnap0+1): # "m.star" from subhalo catalog is from SHAM
+            self.SH_catalog['snapshot'+str(i)+'_m.sham'] = self.SH_catalog.pop('snapshot'+str(i)+'_m.star') 
 
         keep = np.where(self.SH_catalog['weights'] > 0) # only galaxies that are weighted
-
+    
+        # assign SFRs at z0 
         sfr_out = assignSFRs(
                 self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.star'][keep], 
                 np.repeat(UT.z_nsnap(self.nsnap0), len(keep[0])), 
@@ -140,9 +140,6 @@ def Evolve_a_Snapshot(SHcat, nsnap_i, **theta):
     # evolve M* and SFR of star-forming (t_i --> t_i+1 or t_i --> t_Q) 
     # some wrapper for all SFR(M*, t) prescriptions
 
-
-
-
     # now solve M*, SFR ODE 
     z_table, t_table = UT.zt_table()     
     z_of_t = interpolate.interp1d(list(reversed(t_table)), list(reversed(z_table)), kind='cubic') 
@@ -172,6 +169,37 @@ def Evolve_a_Snapshot(SHcat, nsnap_i, **theta):
     sfr_qing = lambda sfr0, mq: sfr0 - 0.43429 * dt / Obvs.tauQ(mq, theta_tau=theta['theta_tau'])
     
     return SHcat
+
+
+def pickSF(SHcat, nsnap0=20, nsnapf=1,**theta): 
+    ''' Take subhalo catalog and then based on P_Q(M_sham, z) determine, which
+    galaxies quench or stay star-forming
+    '''
+    z0_SF = np.where(SHcat['Gclass'] == 'star-forming')  # identify z0 SF galaxies 
+
+    # then go from nsnap_0 --> nsnap_f and identify the quenching 
+    # galaxies based on P_Q
+    for n in range(nsnapf+1, nsnap0+1)[::-1]: 
+
+        t_step = UT.t_nsnap(n - 1) - UT.t_nsnap(n) # Gyr between Snapshot n and n-1 
+        
+        # P_Q^cen = f_PQ * ( d( n_Q)/dt 1/n_SF ) 
+
+        # calculate the necessary mass functions to estimate P_Q
+        mf_Q_n = Obvs.getMF()
+
+        mf_Q_n_1 = Obvs.getMF()
+
+        # P_q_tot = PQ
+        P_q_tot = PQ * t_step
+
+        m_sham = SHcat['snapshot'+str(n)+'_m.sham'][z0_SF]
+        
+
+
+    
+
+    return SHcat 
 
 
 def assignSFRs(masses, zs, theta_GV=None, theta_SFMS=None, theta_FQ=None): 
@@ -255,14 +283,14 @@ def assignSFRs(masses, zs, theta_GV=None, theta_SFMS=None, theta_FQ=None):
     issf = np.where(output['Gclass'] == '')
     Nsf = len(issf[0])
 
-    output['Gclass'][issf] = 'starforming'
+    output['Gclass'][issf] = 'star-forming'
     output['SFR'][issf] = Obvs.SSFR_SFMS(masses[issf], zs[issf], theta_SFMS=theta_SFMS) + \
             np.random.randn(Nsf) * Obvs.sigSSFR_SFMS(masses[issf]) + \
             masses[issf]
     
     return output
 
-    
+
 def defaultTheta(): 
     ''' Return generic default parameter values
     '''
