@@ -15,257 +15,10 @@ import sfrs
 import observables as obvs
 
 
-class GalPop(object): 
-    def __init__(self): 
-        ''' Empty class object for galaxy catalogs 
-        '''
-        pass 
-
-
-def CenQue_File(type, cenque='default', downsampled=None): 
-    ''' Function for getting the file name of CenQue Files when cenque and type are 
-    specified. 
-    '''
-    if cenque == 'default': 
-        tf = 7 
-        abcrun = 'RHOssfrfq_TinkerFq_Std'
-        prior = 'updated'
-    elif cenque == 'nosmfevol':
-        tf = 8 
-        abcrun = 'RHOssfrfq_TinkerFq_NOSMFevol'
-        prior = 'updated'
-    else: 
-        raise NotImplementedError
-    
-    # cenque files
-    if type == 'sfms': 
-        galpop_str = 'sfms'
-    elif type == 'quenched': 
-        galpop_str = 'quenched'
-    else: 
-        raise ValueError
-    if downsampled is None: 
-        down_str = ''
-    else: 
-        down_str = ''.join(['.down', str(downsampled), 'x']) 
-
-    file = ''.join([UT.dat_dir(), 'cenque/',
-        galpop_str, '.centrals.', 
-        'tf', str(tf), 
-        '.abc_', abcrun, 
-        '.prior_', prior, 
-        down_str, 
-        '.hdf5']) 
-    return file 
-
-
-def Read_CenQue(type, cenque='default', downsampled=None):
-    ''' Read in either (SF and Quenching galaixes) or (Quenched galaxies)
-    generated from the CenQue project. 
-    '''
-    file = CenQue_File(type, cenque=cenque, downsampled=downsampled)
-    gpop = GalPop()
-
-    # read in the file and save to object
-    f = h5py.File(file, 'r')  
-    grp = f['data'] 
-    for col in grp.keys(): 
-        if col == 'mass': 
-            # make sure to mark as SHAM mass
-            if type == 'sfms': 
-                setattr(gpop, 'M_sham', grp[col][:])    
-            elif type == 'quenched': 
-                setattr(gpop, 'M_sham', grp[col][:])    
-                setattr(gpop, 'mass', grp[col][:])    
-        elif col in ['sfr', 'ssfr']:
-            continue 
-        else: 
-            setattr(gpop, col, grp[col][:])
-
-    for key in grp.attrs.keys(): 
-        if key in ['sfms', 'tau']: 
-            attr_dict = {}
-            for keyind in grp.attrs[key].split(','): 
-                try: 
-                    attr_dict[keyind.split(':')[0]] = float(keyind.split(':')[1])
-                except ValueError:
-                    attr_dict[keyind.split(':')[0]] = keyind.split(':')[1]
-
-            setattr(gpop, key+'_dict', attr_dict)
-        else:
-            setattr(gpop, key+'_attr', grp.attrs[key])
-
-    f.close() 
-        
-    # some small pre-processing here so convenience 
-    setattr(gpop, 'zsnap_genesis', UT.z_from_t(gpop.tsnap_genesis)) 
-
-    return gpop 
-
-
-def DownsampleCenQue(cenque='default', ngal_thresh=4000, dmhalo=0.2): 
-    ''' Downsample the CenQue objects in order to make the calculations more 
-    tractable. Bin the halos in terms of their z = 0 masses and down sample 
-    them so that there is still sufficient statistics in each bin.  
-    '''
-    # read in the entire galaxy population  
-    q_pop = CentralQuenched(cenque=cenque, downsampled=None)
-    print q_pop._File() 
-    q_pop._Read_CenQue()
-    sfms_pop = CentralMS(cenque=cenque, downsampled=None)
-    print sfms_pop._File() 
-    sfms_pop._Read_CenQue()
-    
-    # halo mass bins delta M_h = 0.2 dex for now... 
-    mhalo_bin = np.arange(
-            np.min([sfms_pop.halo_mass.min(), q_pop.halo_mass.min()]) - 0.5 * dmhalo, 
-            np.max([sfms_pop.halo_mass.max(), q_pop.halo_mass.max()]) + dmhalo, 
-            dmhalo
-            ) 
-    
-    # weights 
-    weights_sf = np.repeat(1., len(sfms_pop.M_sham)) 
-    weights_q = np.repeat(1., len(q_pop.M_sham)) 
-
-    Ngal_sf, Ngal_q = 0, 0 
-    for i_m in range(len(mhalo_bin) - 1): 
-        inbin_sf = np.where(
-                (mhalo_bin[i_m] < sfms_pop.halo_mass) &
-                (mhalo_bin[i_m+1] >= sfms_pop.halo_mass)
-                ) 
-        inbin_q = np.where(
-                (mhalo_bin[i_m] < q_pop.halo_mass) &
-                (mhalo_bin[i_m+1] >= q_pop.halo_mass)
-                ) 
-        ngal_sf = len(inbin_sf[0]) 
-        ngal_q = len(inbin_q[0]) 
-
-        # make sure there's sufficient statistics for both star forming and quiescent
-        # galaxies based on a rough criteria for now ... assign appropriate 
-        # corresponding weights 
-        if (ngal_sf + ngal_q > ngal_thresh):  
-            f_down = ngal_thresh/np.float(ngal_sf + ngal_q) 
-            #print np.float(ngal_q) * f_down
-
-            weights_q[inbin_q] = 0.
-            weights_sf[inbin_sf] = 0.
-
-            keep_ind = np.random.choice(range(ngal_sf + ngal_q), ngal_thresh, replace=False) 
-            keep_sf = (inbin_sf[0])[keep_ind[np.where(keep_ind < ngal_sf)]]
-            keep_q = (inbin_q[0])[keep_ind[np.where(keep_ind >= ngal_sf)] - ngal_sf]
-
-            weights_sf[keep_sf] = 1./f_down
-            weights_q[keep_q] = 1./f_down
-    
-            # sanity check
-            if (int(round(np.sum(weights_sf[inbin_sf]) + np.sum(weights_q[inbin_q]))) 
-                    != ngal_sf+ngal_q): 
-                print np.sum(weights_sf[inbin_sf]) + np.sum(weights_q[inbin_q])
-                print ngal_sf+ngal_q 
-                raise ValueError
-         
-        Ngal_sf += ngal_sf
-        Ngal_q += ngal_q
-        
-    # More sanity checks
-    if int(round(np.sum(weights_sf) + np.sum(weights_q))) != len(sfms_pop.M_sham)+len(q_pop.M_sham): 
-        print np.sum(weights_sf) + np.sum(weights_q), len(sfms_pop.M_sham)+len(q_pop.M_sham)
-        raise ValueError
-
-    # the galaxy sample is downsamped by
-    down_frac = np.float(Ngal_sf + Ngal_q) / \
-            np.float(len(weights_sf[np.where(weights_sf != 0.)]) + 
-                    len(weights_q[np.where(weights_q != 0.)])) 
-    print 'downsampled ', int(round(down_frac)), 'x'
-        
-    # save the downsampled galaxy populations to file
-    q_file = h5py.File(q_pop._File(), 'r') 
-    sf_file = h5py.File(sfms_pop._File(), 'r') 
-    
-    q_down_file = h5py.File(q_pop._File().replace(
-        '.hdf5', ''.join(['.down', str(int(round(down_frac))), 'x', '.hdf5'])), 'w') 
-    sf_down_file = h5py.File(sfms_pop._File().replace(
-        '.hdf5', ''.join(['.down', str(int(round(down_frac))), 'x', '.hdf5'])), 'w') 
-    q_file.copy('data', q_down_file) 
-    sf_file.copy('data', sf_down_file) 
-    q_file.close() 
-    sf_file.close() 
-
-    insample_q = np.where(weights_q != 0.) 
-    insample_sf = np.where(weights_sf != 0.) 
-
-    q_grp = q_down_file['data']
-    for col in q_grp.keys():
-        new_col = q_grp[col].value[insample_q]
-        q_grp.__delitem__(col) 
-        q_grp.create_dataset(col, data = new_col) 
-    q_grp.create_dataset('weight_down', data = weights_q[insample_q])
-    q_down_file.close()  
-
-    sf_grp = sf_down_file['data']
-    for col in sf_grp.keys():
-        new_col = sf_grp[col].value[insample_sf]
-        sf_grp.__delitem__(col) 
-        sf_grp.create_dataset(col, data = new_col) 
-    sf_grp.create_dataset('weight_down', data = weights_sf[insample_sf])
-    sf_down_file.close()  
-
-    return None
-
-
-class CentralQuenched(GalPop):  # Quenched Central Galaxies
-    def __init__(self, cenque='default', downsampled=20):
-        ''' This object reads in the quenched galaxies generated 
-        from the CenQue project and is an object for those galaxies. 
-        '''
-        self.cenque = cenque
-        self.downsampled = downsampled
-        self.mass = None
-        self.sfr = None
-        self.ssfr = None 
-
-    def _Read_CenQue(self):  
-        galpop = Read_CenQue('quenched', cenque=self.cenque, downsampled=self.downsampled)
-        for key in galpop.__dict__.keys(): 
-            setattr(self, key, getattr(galpop, key))
-        return None 
-
-    def _File(self): 
-        return CenQue_File('quenched', cenque=self.cenque, downsampled=self.downsampled)
-
-
-class CentralMS(GalPop):        # Star-forming + Quenching Central Galaxies
-    def __init__(self, cenque='default', downsampled=20):
-        ''' This object reads in the star-forming and quenching
-        galaxies generated from the CenQue project and is an object
-        for those galaxies. Unlike CenQue, this object WILL NOT
-        have extensive functions and will act as a data catalog. 
-     
-        '''
-        self.cenque = cenque
-        self.downsampled = downsampled
-        self.mass = None
-        self.sfr = None
-        self.ssfr = None 
-        self.sfr_genesis = None
-
-    def _Read_CenQue(self):  
-        ''' Read in SF and Quenching galaixes generated from 
-        the CenQue project. 
-        '''
-        galpop = Read_CenQue('sfms', cenque=self.cenque, downsampled=self.downsampled)
-        for key in galpop.__dict__.keys(): 
-            setattr(self, key, getattr(galpop, key))
-
-        return None 
-
-    def _File(self): 
-        return CenQue_File('sfms', cenque=self.cenque, downsampled=self.downsampled)
-
-
 class Evolver(object): 
     def __init__(self, cms, evol_dict=None): 
-        ''' Class object that evolves the CentralMS galaxy catalog catalog object .
+        ''' Class object that evolves the input CentralMS galaxy catalog catalog object.
+        See CentralMS object for details regarding CentralMS galaxy catalog. 
         Object contains suite of functions for the evolution. 
         '''
         self.cms = cms 
@@ -277,7 +30,6 @@ class Evolver(object):
     def __call__(self):  
         self.Evolve()
         return self.cms 
-
 
     def Evolve(self): 
         ''' Evolve SFR and calculated integrated SFR stellar masses. 
@@ -296,10 +48,16 @@ class Evolver(object):
         # ---- 
         # different SFH prescriptions
         # ---- 
-        sfh_kwargs = {'name': self.evol_dict['sfh']['name'], 'sfms': self.cms.sfms_dict} 
+        sfh_kwargs = {
+                'name': self.evol_dict['sfh']['name'], 
+                'sfms': self.cms.sfms_dict
+                } 
+
         if self.evol_dict['sfh']['name'] == 'constant_offset': 
+            # SFH 
+
             if self.evol_dict['sfh']['assembly_bias'] == 'none': 
-                # No assembly bias. No dutycycle
+                # Simplest case: No assembly bias. No dutycycle
                 sigma_logsfr = sfrs.ScatterLogSFR_sfms(
                         self.cms.mass_genesis, self.cms.zsnap_genesis, 
                         sfms_dict=self.cms.sfms_dict)
@@ -679,6 +437,255 @@ class EvolvedGalPop(GalPop):
 
         f.close()
         return None
+
+
+class GalPop(object): 
+    def __init__(self): 
+        ''' Empty class object for galaxy catalogs 
+        '''
+        pass 
+
+
+def CenQue_File(type, cenque='default', downsampled=None): 
+    ''' Function for getting the file name of CenQue Files when cenque and type are 
+    specified. 
+    '''
+    if cenque == 'default': 
+        tf = 7 
+        abcrun = 'RHOssfrfq_TinkerFq_Std'
+        prior = 'updated'
+    elif cenque == 'nosmfevol':
+        tf = 8 
+        abcrun = 'RHOssfrfq_TinkerFq_NOSMFevol'
+        prior = 'updated'
+    else: 
+        raise NotImplementedError
+    
+    # cenque files
+    if type == 'sfms': 
+        galpop_str = 'sfms'
+    elif type == 'quenched': 
+        galpop_str = 'quenched'
+    else: 
+        raise ValueError
+    if downsampled is None: 
+        down_str = ''
+    else: 
+        down_str = ''.join(['.down', str(downsampled), 'x']) 
+
+    file = ''.join([UT.dat_dir(), 'cenque/',
+        galpop_str, '.centrals.', 
+        'tf', str(tf), 
+        '.abc_', abcrun, 
+        '.prior_', prior, 
+        down_str, 
+        '.hdf5']) 
+    return file 
+
+
+def Read_CenQue(type, cenque='default', downsampled=None):
+    ''' Read in either (SF and Quenching galaixes) or (Quenched galaxies)
+    generated from the CenQue project. 
+    '''
+    file = CenQue_File(type, cenque=cenque, downsampled=downsampled)
+    gpop = GalPop()
+
+    # read in the file and save to object
+    f = h5py.File(file, 'r')  
+    grp = f['data'] 
+    for col in grp.keys(): 
+        if col == 'mass': 
+            # make sure to mark as SHAM mass
+            if type == 'sfms': 
+                setattr(gpop, 'M_sham', grp[col][:])    
+            elif type == 'quenched': 
+                setattr(gpop, 'M_sham', grp[col][:])    
+                setattr(gpop, 'mass', grp[col][:])    
+        elif col in ['sfr', 'ssfr']:
+            continue 
+        else: 
+            setattr(gpop, col, grp[col][:])
+
+    for key in grp.attrs.keys(): 
+        if key in ['sfms', 'tau']: 
+            attr_dict = {}
+            for keyind in grp.attrs[key].split(','): 
+                try: 
+                    attr_dict[keyind.split(':')[0]] = float(keyind.split(':')[1])
+                except ValueError:
+                    attr_dict[keyind.split(':')[0]] = keyind.split(':')[1]
+
+            setattr(gpop, key+'_dict', attr_dict)
+        else:
+            setattr(gpop, key+'_attr', grp.attrs[key])
+
+    f.close() 
+        
+    # some small pre-processing here so convenience 
+    setattr(gpop, 'zsnap_genesis', UT.z_from_t(gpop.tsnap_genesis)) 
+
+    return gpop 
+
+
+def DownsampleCenQue(cenque='default', ngal_thresh=4000, dmhalo=0.2): 
+    ''' Downsample the CenQue objects in order to make the calculations more 
+    tractable. Bin the halos in terms of their z = 0 masses and down sample 
+    them so that there is still sufficient statistics in each bin.  
+    '''
+    # read in the entire galaxy population  
+    q_pop = CentralQuenched(cenque=cenque, downsampled=None)
+    print q_pop._File() 
+    q_pop._Read_CenQue()
+    sfms_pop = CentralMS(cenque=cenque, downsampled=None)
+    print sfms_pop._File() 
+    sfms_pop._Read_CenQue()
+    
+    # halo mass bins delta M_h = 0.2 dex for now... 
+    mhalo_bin = np.arange(
+            np.min([sfms_pop.halo_mass.min(), q_pop.halo_mass.min()]) - 0.5 * dmhalo, 
+            np.max([sfms_pop.halo_mass.max(), q_pop.halo_mass.max()]) + dmhalo, 
+            dmhalo
+            ) 
+    
+    # weights 
+    weights_sf = np.repeat(1., len(sfms_pop.M_sham)) 
+    weights_q = np.repeat(1., len(q_pop.M_sham)) 
+
+    Ngal_sf, Ngal_q = 0, 0 
+    for i_m in range(len(mhalo_bin) - 1): 
+        inbin_sf = np.where(
+                (mhalo_bin[i_m] < sfms_pop.halo_mass) &
+                (mhalo_bin[i_m+1] >= sfms_pop.halo_mass)
+                ) 
+        inbin_q = np.where(
+                (mhalo_bin[i_m] < q_pop.halo_mass) &
+                (mhalo_bin[i_m+1] >= q_pop.halo_mass)
+                ) 
+        ngal_sf = len(inbin_sf[0]) 
+        ngal_q = len(inbin_q[0]) 
+
+        # make sure there's sufficient statistics for both star forming and quiescent
+        # galaxies based on a rough criteria for now ... assign appropriate 
+        # corresponding weights 
+        if (ngal_sf + ngal_q > ngal_thresh):  
+            f_down = ngal_thresh/np.float(ngal_sf + ngal_q) 
+            #print np.float(ngal_q) * f_down
+
+            weights_q[inbin_q] = 0.
+            weights_sf[inbin_sf] = 0.
+
+            keep_ind = np.random.choice(range(ngal_sf + ngal_q), ngal_thresh, replace=False) 
+            keep_sf = (inbin_sf[0])[keep_ind[np.where(keep_ind < ngal_sf)]]
+            keep_q = (inbin_q[0])[keep_ind[np.where(keep_ind >= ngal_sf)] - ngal_sf]
+
+            weights_sf[keep_sf] = 1./f_down
+            weights_q[keep_q] = 1./f_down
+    
+            # sanity check
+            if (int(round(np.sum(weights_sf[inbin_sf]) + np.sum(weights_q[inbin_q]))) 
+                    != ngal_sf+ngal_q): 
+                print np.sum(weights_sf[inbin_sf]) + np.sum(weights_q[inbin_q])
+                print ngal_sf+ngal_q 
+                raise ValueError
+         
+        Ngal_sf += ngal_sf
+        Ngal_q += ngal_q
+        
+    # More sanity checks
+    if int(round(np.sum(weights_sf) + np.sum(weights_q))) != len(sfms_pop.M_sham)+len(q_pop.M_sham): 
+        print np.sum(weights_sf) + np.sum(weights_q), len(sfms_pop.M_sham)+len(q_pop.M_sham)
+        raise ValueError
+
+    # the galaxy sample is downsamped by
+    down_frac = np.float(Ngal_sf + Ngal_q) / \
+            np.float(len(weights_sf[np.where(weights_sf != 0.)]) + 
+                    len(weights_q[np.where(weights_q != 0.)])) 
+    print 'downsampled ', int(round(down_frac)), 'x'
+        
+    # save the downsampled galaxy populations to file
+    q_file = h5py.File(q_pop._File(), 'r') 
+    sf_file = h5py.File(sfms_pop._File(), 'r') 
+    
+    q_down_file = h5py.File(q_pop._File().replace(
+        '.hdf5', ''.join(['.down', str(int(round(down_frac))), 'x', '.hdf5'])), 'w') 
+    sf_down_file = h5py.File(sfms_pop._File().replace(
+        '.hdf5', ''.join(['.down', str(int(round(down_frac))), 'x', '.hdf5'])), 'w') 
+    q_file.copy('data', q_down_file) 
+    sf_file.copy('data', sf_down_file) 
+    q_file.close() 
+    sf_file.close() 
+
+    insample_q = np.where(weights_q != 0.) 
+    insample_sf = np.where(weights_sf != 0.) 
+
+    q_grp = q_down_file['data']
+    for col in q_grp.keys():
+        new_col = q_grp[col].value[insample_q]
+        q_grp.__delitem__(col) 
+        q_grp.create_dataset(col, data = new_col) 
+    q_grp.create_dataset('weight_down', data = weights_q[insample_q])
+    q_down_file.close()  
+
+    sf_grp = sf_down_file['data']
+    for col in sf_grp.keys():
+        new_col = sf_grp[col].value[insample_sf]
+        sf_grp.__delitem__(col) 
+        sf_grp.create_dataset(col, data = new_col) 
+    sf_grp.create_dataset('weight_down', data = weights_sf[insample_sf])
+    sf_down_file.close()  
+
+    return None
+
+
+class CentralQuenched(GalPop):  # Quenched Central Galaxies
+    def __init__(self, cenque='default', downsampled=20):
+        ''' This object reads in the quenched galaxies generated 
+        from the CenQue project and is an object for those galaxies. 
+        '''
+        self.cenque = cenque
+        self.downsampled = downsampled
+        self.mass = None
+        self.sfr = None
+        self.ssfr = None 
+
+    def _Read_CenQue(self):  
+        galpop = Read_CenQue('quenched', cenque=self.cenque, downsampled=self.downsampled)
+        for key in galpop.__dict__.keys(): 
+            setattr(self, key, getattr(galpop, key))
+        return None 
+
+    def _File(self): 
+        return CenQue_File('quenched', cenque=self.cenque, downsampled=self.downsampled)
+
+
+class CentralMS(GalPop):        # Star-forming + Quenching Central Galaxies
+    def __init__(self, cenque='default', downsampled=20):
+        ''' This object reads in the star-forming and quenching
+        galaxies generated from the CenQue project and is an object
+        for those galaxies. Unlike CenQue, this object WILL NOT
+        have extensive functions and will act as a data catalog. 
+     
+        '''
+        self.cenque = cenque
+        self.downsampled = downsampled
+        self.mass = None
+        self.sfr = None
+        self.ssfr = None 
+        self.sfr_genesis = None
+
+    def _Read_CenQue(self):  
+        ''' Read in SF and Quenching galaixes generated from 
+        the CenQue project. 
+        '''
+        galpop = Read_CenQue('sfms', cenque=self.cenque, downsampled=self.downsampled)
+        for key in galpop.__dict__.keys(): 
+            setattr(self, key, getattr(galpop, key))
+
+        return None 
+
+    def _File(self): 
+        return CenQue_File('sfms', cenque=self.cenque, downsampled=self.downsampled)
+
 
 
 
