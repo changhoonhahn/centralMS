@@ -155,3 +155,19 @@ def weighted_quantile(values, quantiles, weights=None, values_sorted=False, old_
     else:
         weighted_quantiles /= np.sum(weights)
     return np.interp(quantiles, weighted_quantiles, values)
+
+
+def GrabLocalFile(string, machine='harmattan'): 
+    ''' scp dat_dir()+string from machine (harmattan)
+    '''
+    # parse subdirectory
+    sub_dir = '/'.join(string.split('/')[:-1] + [''])
+
+    if machine == 'harmattan': 
+        scp_cmd = "scp harmattan:/data1/hahn/centralMS/"+string+" "+dat_dir()+sub_dir
+        print scp_cmd
+        os.system(scp_cmd)
+    else: 
+        raise NotImplementedError
+
+    return None
