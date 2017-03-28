@@ -54,25 +54,32 @@ class Evolver(object):
         -------
         * Assign SFRs to galaxies *with* weights
         '''
-        for i in range(1, self.nsnap0+1): # "m.star" from subhalo catalog is from SHAM
+        for i in range(2, self.nsnap0+1): # "m.star" from subhalo catalog is from SHAM
             self.SH_catalog['snapshot'+str(i)+'_m.sham'] = self.SH_catalog.pop('snapshot'+str(i)+'_m.star') 
+        self.SH_catalog['m.sham'] = self.SH_catalog.pop('m.star')  
 
         keep = np.where(self.SH_catalog['weights'] > 0) # only galaxies that are weighted
     
         # assign SFRs at z0 
         sfr_out = assignSFRs(
-                self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.star'][keep], 
+                self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham'][keep], 
                 np.repeat(UT.z_nsnap(self.nsnap0), len(keep[0])), 
                 theta_GV = self.theta_gv, 
                 theta_SFMS = self.theta_sfms,
                 theta_FQ = self.theta_fq) 
-
+    
+        # save z0 SFR into self.SH_catalog 
         for key in sfr_out: 
             self.SH_catalog['snapshot'+str(self.nsnap0)+'_'+key.lower()] = \
-                    UT.replicate(sfr_out[key], len(self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.star']))
-            self.SH_catalog['snapshot'+str(self.nsnap0)+'_'+key.lower()] = sfr_out[key][keep]
-       
-       self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.star'] = self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham']
+                    UT.replicate(sfr_out[key], len(self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham']))
+            self.SH_catalog['snapshot'+str(self.nsnap0)+'_'+key.lower()] = sfr_out[key][keep] 
+        self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.star'] = self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham'] 
+        
+        # Propagate P_Q from z0 to zf and pick out quenching galaxies
+        gclass, nsnap_quench = _pickSF(self.SH_catalog, nsnap0=self.nsnap0, theta_fq=self.theta_fq, theta_fpq=self.theta_fpq)
+
+        self.SH_catalog['gclass'] = gclass
+        self.SH_catalog['nsnap_quench'] = nsnap_quench
         
         return None
     
@@ -85,6 +92,9 @@ class Evolver(object):
         self.theta_sfms = theta['sfms']
         # fq parameters (name of fQ model) 
         self.theta_fq = theta['fq']
+        # f_PQ parameters 
+        self.theta_fpq = theta['fpq'] 
+
 
         return None
 
@@ -172,47 +182,54 @@ def Evolve_a_Snapshot(SHcat, nsnap_i, **theta):
     return SHcat
 
 
-def pickSF(SHcat, nsnap0=20, nsnapf=1,**theta): 
+def _pickSF(SHcat, nsnap0=20, theta_fq=None, theta_fpq=None): 
     ''' Take subhalo catalog and then based on P_Q(M_sham, z) determine, which
     galaxies quench or stay star-forming
-    '''
-    isSF = np.where(SHcat['Gclass'] == 'star-forming')  # identify z0 SF galaxies 
+    ''' 
+    nsnap_quench = np.repeat(-999, len(SHcat['weights']))  # snapshot where galaxy quenches 
+    gclass = SHcat['snapshot'+str(nsnap0)+'_gclass']
+    
+    # identify SF galaxies @ nsnap0
+    isSF = np.where((gclass == 'star-forming') & (SHcat['weights'] > 0.))
+    
+    qf = Obvs.Fq() # qf object
 
-    qf = Obvs.Fq()
-    # then go from nsnap_0 --> nsnap_f and identify the quenching 
-    # galaxies based on P_Q
-    for n in range(nsnapf+1, nsnap0+1)[::-1]: 
+    #  go from nsnap_0 --> nsnap_f and identify the quenching galaxies based on P_Q
+    for n in range(2, nsnap0+1)[::-1]: 
+
         z_i = UT.z_nsnap(n) # snapshot redshift
 
-        m_sham = SHcat['snapshot'+str(n)+'_m.sham'][isSF] # M_sham 
+        m_sham = SHcat['snapshot'+str(n)+'_m.sham'][isSF] # M_sham of SF galaxies
 
         t_step = UT.t_nsnap(n - 1) - UT.t_nsnap(n) # Gyr between Snapshot n and n-1 
         
         # quenching probabily 
         # P_Q^cen = f_PQ * ( d(n_Q)/dt 1/n_SF ) 
-    
         mf = _SnapCat_mf(SHcat, n, prop='m.sham')     # MF 
         dmf_dt = _SnapCat_dmfdt(SHcat, n, prop='m.sham')  # dMF/dt
-        assert mf[0] == dmf_dt[0]
-
+        assert np.array_equal(mf[0], dmf_dt[0])
+    
+        # (P_Q fiducial) * (1-fq) 
         Pq_M_fid = (qf.dfQ_dz(mf[0], z_i, lit=theta_fq['name']) / UT.dt_dz(z_i) +
                 qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
 
-        Pq_M_fid_interp = interp1d(mf[0], Pq_M_fid) # interpolate
+        Pq_M_fid_interp = interp1d(mf[0], Pq_M_fid, fill_value='extrapolate') # interpolate
 
-        Pq_M = lambda mm: t_step * (
-                theta_fpq['slope'] * (mm - theta_fpq['fidmass']) + theta_fpq['offset']
-                ) *  Pq_M_fid_interp(mm) / (1. - qf.model(mf[0], z_i, lit=theta_fq['name']))
+        Pq_M = lambda mm: t_step * _f_PQ(mm, theta_fpq['slope'], theta_fpq['fidmass'], theta_fpq['offset']) *  \
+                Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+
+        hasmass = np.where(m_sham > 0.) 
+        Pq_Msham = Pq_M(m_sham[hasmass])
+        rand_Pq = np.random.uniform(0., 1., len(hasmass[0])) 
         
-        Pq_Msham = Pq_M(m_sham)
-        rand_Pq = np.random.uniform(0., 1., len(m_sham)) 
-        
+        # galaxies that quench between snpashots n and n-1 
         quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
-        SHcat['Gclass'][isSF[0][quenches]] = 'quenching'
+        gclass[isSF[0][hasmass[0][quenches]]] = 'quenching'
+        nsnap_quench[isSF[0][hasmass[0][quenches]]] = n
         
-        isSF = np.where(SHcat['Gclass'] == 'star-forming') # update is SF
+        isSF = np.where((gclass == 'star-forming') & (SHcat['weights'] > 0.)) # update is SF
 
-    return SHcat 
+    return [gclass, nsnap_quench]
 
 
 def assignSFRs(masses, zs, theta_GV=None, theta_SFMS=None, theta_FQ=None): 
@@ -269,7 +286,7 @@ def assignSFRs(masses, zs, theta_GV=None, theta_SFMS=None, theta_FQ=None):
     
     rand = np.random.uniform(0., 1., ngal)
     isgreen = np.where(rand < f_gv(masses))
-    output['Gclass'][isgreen] = 'qing'
+    output['Gclass'][isgreen] = 'quenching'
     output['MQ'][isgreen] = masses[isgreen]         # M* at quenching
     output['SFR'][isgreen] = np.random.uniform(     # sample SSFR from uniform distribution 
             Obvs.SSFR_Qpeak(masses[isgreen]),       # between SSFR_Qpeak
@@ -312,8 +329,14 @@ def defaultTheta():
     theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
     theta['sfms'] = {'name': 'linear', 'zslope': 1.14}
     theta['fq'] = {'name': 'cosmos_tinker'}
+    theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
 
     return theta 
+
+def _f_PQ(mm, slope, fidmass, offset): 
+    fpq = slope * (mm - fidmass) + offset
+    fpq.clip(min=1.)
+    return fpq
 
 def _SnapCat_mf(snapcat, nsnap, prop='m.sham'):
     # Calculate mass function (mass specified by prop) 
@@ -344,6 +367,6 @@ def _SnapCat_dmfdt(snapcat, nsnap, prop='m.sham'):
 
     mf1 = Obvs.getMF(snapcat[k1], weights=snapcat['weights'])
     mf2 = Obvs.getMF(snapcat[k2], weights=snapcat['weights'])
-    assert mf1[0] == mf2[0]
+    assert np.array_equal(mf1[0], mf2[0])
 
     return [mf1[0], (mf1[1] - mf2[1])/dt]
