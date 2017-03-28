@@ -43,10 +43,23 @@ class Evolver(object):
     def Evolve(self): 
         ''' Evolve the galaxies from initial conditions specified in self.Initiate()
         '''
-        Evolve_Wrapper(self.SH_catalog, 
+        # get integrated stellar masses 
+        logM_integ = _Evolve_Wrapper(self.SH_catalog, self.nsnap0, 1,  
                 theta_sfh=self.theta_sfh, 
                 theta_sfms=self.theta_sfms, 
                 theta_mass=self.theta_mass)
+
+        # save into SH catalog
+        isSF = np.where(self.SH_catalog['gclass'] == 'star-forming') 
+
+        for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
+            self.SH_catalog['snapshot'+str(n_snap)+'_m.star'] = UT.replicate(self.SH_catalog['m.sham'], 
+                    len(self.SH_catalog['m.sham']))
+            print type(self.SH_catalog['snapshot'+str(n_snap)+'_m.star'])
+            self.SH_catalog['snapshot'+str(n_snap)+'_m.star'][isSF] = logM_integ[ii]
+
+        self.SH_catalog['m.star'] = UT.replicate(self.SH_catalog['m.sham'], len(self.SH_catalog['m.sham']))
+        self.SH_catalog['m.star'][isSF] = logM_integ[-1]
 
     def Initiate(self): 
         ''' Assign the initial conditions to galaxies at z0. More specifically
@@ -105,7 +118,7 @@ class Evolver(object):
         return None
 
 
-def Evolve_Wrapper(SHcat, **theta): 
+def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta): 
     ''' Evolve galaxies that remain star-forming throughout the snapshots. 
     '''
     # parse theta 
@@ -115,7 +128,7 @@ def Evolve_Wrapper(SHcat, **theta):
 
     # precompute z(t_cosmic) 
     z_table, t_table = UT.zt_table()     
-    z_of_t = interpolate.interp1d(t_table, z_table, kind='cubic') 
+    z_of_t = interp1d(t_table, z_table, kind='cubic') 
     
     # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
     isSF = np.where(SHcat['gclass'] == 'star-forming') # only includes galaxies with w > 0 
@@ -135,11 +148,10 @@ def Evolve_Wrapper(SHcat, **theta):
 
     logM_integ = f_ode(
             SFH.dlogMdt,                    # dy/dt
-            SHcat['snapshot'+str(nsnap_i)+'_m.star'][isSF],              # logM0
-            t_table[1:20][::-1],            # t_final 
+            SHcat['snapshot'+str(nsnap0)+'_m.star'][isSF],              # logM0
+            t_table[nsnapf:nsnap0][::-1],            # t_final 
             theta_mass['t_step'],   # time step
             **dlogmdt_kwargs) 
-    print len(logM_integ)
 
     return logM_integ 
 
@@ -292,7 +304,7 @@ def defaultTheta():
     theta['sfms'] = {'name': 'linear', 'zslope': 1.14}
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    theta['mass'] = {'solver': 'euler'} 
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
     theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
 
     return theta 

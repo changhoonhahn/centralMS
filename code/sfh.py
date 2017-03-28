@@ -14,7 +14,7 @@ import observables as Obvs
 def logSFR_wrapper(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
     '''
     '''
-    if theta_sfh['name'] == 'cosntant_offset':
+    if theta_sfh['name'] == 'constant_offset':
         mu_sfr = Obvs.SSFR_SFMS(
                 SHsnaps['snapshot'+str(theta_sfh['nsnap0'])+'_m.sham'][indices], 
                 UT.z_nsnap(theta_sfh['nsnap0']), theta_SFMS=theta_sfms)

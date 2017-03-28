@@ -82,7 +82,6 @@ def test_EvolverInitiate(test):
         plt.show()
     
     elif test == 'smf_evol': # check the SMF evolution of the SF population
-        
         fig = plt.figure(figsize=(7,7))
         sub = fig.add_subplot(111)
 
@@ -134,6 +133,47 @@ def test_EvolverEvolve():
     eev.Initiate()
 
     eev.Evolve() 
+
+    subcat = eev.SH_catalog
+    subcat['m.star']
+
+    raise ValueError
+
+    fig = plt.figure(figsize=(7,7))
+    sub = fig.add_subplot(111)
+
+    for n in range(2, 21)[::-1]: 
+        # identify SF population at snapshot
+        pop_sf = np.where(
+                (subcat['snapshot20_gclass'] == 'star-forming') & 
+                (subcat['nsnap_quench'] <= n) & 
+                (subcat['weights'] > 0.)
+                )
+
+        smf_sf = Obvs.getMF(
+                subcat['snapshot'+str(n)+'_m.sham'][pop_sf], 
+                weights=subcat['weights'][pop_sf])
+
+        sub.plot(smf_sf[0], smf_sf[1], lw=2, c='k', alpha=0.05 * (21. - n))#, label='Snapshot '+str(n))
+
+    print subcat['weights'][np.where(subcat['gclass'] == 'star-forming')].min()
+    pop_sf = np.where(
+                (subcat['gclass'] == 'star-forming') & 
+                (subcat['weights'] > 0.)
+                )
+    smf_sf = Obvs.getMF(
+            subcat['m.sham'][pop_sf], 
+            weights=subcat['weights'][pop_sf])
+    sub.plot(smf_sf[0], smf_sf[1], lw=3, c='k', ls='--', label='Snapshot 1')
+
+    sub.set_xlim([6., 12.])
+    sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
+    sub.set_ylim([1e-5, 10**-1.5])
+    sub.set_yscale('log')
+    sub.set_ylabel('$\Phi$', fontsize=25)
+    sub.legend(loc='upper right') 
+    plt.show()
+
 
     return None
 
