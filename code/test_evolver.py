@@ -100,6 +100,7 @@ def test_EvolverInitiate(test):
     
             sub.plot(smf_sf[0], smf_sf[1], lw=2, c='k', alpha=0.05 * (21. - n))#, label='Snapshot '+str(n))
     
+        print subcat['weights'][np.where(subcat['gclass'] == 'star-forming')].min()
         pop_sf = np.where(
                     (subcat['gclass'] == 'star-forming') & 
                     (subcat['weights'] > 0.)
@@ -116,6 +117,24 @@ def test_EvolverInitiate(test):
         sub.set_ylabel('$\Phi$', fontsize=25)
         sub.legend(loc='upper right') 
         plt.show()
+    return None
+
+
+def test_EvolverEvolve(): 
+    ''' Tests for Initiate method in Evolver
+    '''
+    # load in Subhalo Catalog (pure centrals)
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=20)
+    subcat = subhist.Read()
+
+    # load in generic theta (parameter values)
+    theta = Evol.defaultTheta() 
+
+    eev = Evol.Evolver(subcat, theta, nsnap0=20)
+    eev.Initiate()
+
+    eev.Evolve() 
+
     return None
 
 
@@ -182,6 +201,7 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    test_EvolverInitiate('smf_evol')
+    test_EvolverEvolve()
+    #test_EvolverInitiate('smf_evol')
     #test_assignSFRs() 
 

@@ -66,12 +66,15 @@ def t_from_z(redshift):
 
     return t_of_z(redshift) 
 
-def dt_dz(zz): 
-    # dt/dz estimate from Hogg 1999 per Gyr
-    if zz < 1.: 
+def dt_dz(zz, t_of_z=None): 
+    # dt/dz estimate from Hogg 1999 per Gyr because it's faster
+    if zz < 1.:  
         return -13.8835 + 19.3598 * zz - 13.621 * zz**2 + 4.2141 * zz**3
     else: 
-        return (t_from_z(zz + 0.01) - t_from_z(zz - 0.01))/ 0.02
+        if t_of_z is not None: 
+            return (t_of_z(zz + 0.01) - t_of_z(zz - 0.01))/ 0.02
+        else: 
+            return (t_from_z(zz + 0.01) - t_from_z(zz - 0.01))/ 0.02
     
 
 def zt_table(): 
