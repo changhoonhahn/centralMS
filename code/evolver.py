@@ -41,6 +41,7 @@ class Evolver(object):
     def Evolve(self): 
         ''' Evolve the galaxies from initial conditions specified in self.Initiate()
         '''
+        pass
 
 
 
@@ -175,29 +176,41 @@ def pickSF(SHcat, nsnap0=20, nsnapf=1,**theta):
     ''' Take subhalo catalog and then based on P_Q(M_sham, z) determine, which
     galaxies quench or stay star-forming
     '''
-    z0_SF = np.where(SHcat['Gclass'] == 'star-forming')  # identify z0 SF galaxies 
+    isSF = np.where(SHcat['Gclass'] == 'star-forming')  # identify z0 SF galaxies 
 
+    qf = Obvs.Fq()
     # then go from nsnap_0 --> nsnap_f and identify the quenching 
     # galaxies based on P_Q
     for n in range(nsnapf+1, nsnap0+1)[::-1]: 
+        z_i = UT.z_nsnap(n) # snapshot redshift
+
+        m_sham = SHcat['snapshot'+str(n)+'_m.sham'][isSF] # M_sham 
 
         t_step = UT.t_nsnap(n - 1) - UT.t_nsnap(n) # Gyr between Snapshot n and n-1 
         
-        # P_Q^cen = f_PQ * ( d( n_Q)/dt 1/n_SF ) 
-
-        # calculate the necessary mass functions to estimate P_Q
-        mf_Q_n = Obvs.getMF()
-
-        mf_Q_n_1 = Obvs.getMF()
-
-        # P_q_tot = PQ
-        P_q_tot = PQ * t_step
-
-        m_sham = SHcat['snapshot'+str(n)+'_m.sham'][z0_SF]
-        
-
-
+        # quenching probabily 
+        # P_Q^cen = f_PQ * ( d(n_Q)/dt 1/n_SF ) 
     
+        mf = _SnapCat_mf(SHcat, n, prop='m.sham')     # MF 
+        dmf_dt = _SnapCat_dmfdt(SHcat, n, prop='m.sham')  # dMF/dt
+        assert mf[0] == dmf_dt[0]
+
+        Pq_M_fid = (qf.dfQ_dz(mf[0], z_i, lit=theta_fq['name']) / UT.dt_dz(z_i) +
+                qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+
+        Pq_M_fid_interp = interp1d(mf[0], Pq_M_fid) # interpolate
+
+        Pq_M = lambda mm: t_step * (
+                theta_fpq['slope'] * (mm - theta_fpq['fidmass']) + theta_fpq['offset']
+                ) *  Pq_M_fid_interp(mm) / (1. - qf.model(mf[0], z_i, lit=theta_fq['name']))
+        
+        Pq_Msham = Pq_M(m_sham)
+        rand_Pq = np.random.uniform(0., 1., len(m_sham)) 
+        
+        quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+        SHcat['Gclass'][isSF[0][quenches]] = 'quenching'
+        
+        isSF = np.where(SHcat['Gclass'] == 'star-forming') # update is SF
 
     return SHcat 
 
