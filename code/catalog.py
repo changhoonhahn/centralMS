@@ -121,7 +121,10 @@ class SubhaloHistory(object):
         # go through snapshots and get when m.star > 0 
         nsnap_start = np.repeat(-999, len(catalog['m.star'])) 
         for i_snap in self.snapshots[::-1]: 
-            started = np.where((catalog['snapshot'+str(i_snap)+'_m.star'] > 0) & (nsnap_start < i_snap))
+            if i_snap > 1: 
+                started = np.where((catalog['snapshot'+str(i_snap)+'_m.star'] > 0) & (nsnap_start < i_snap))
+            else: 
+                started = np.where((catalog['m.star'] > 0) & (nsnap_start < i_snap))
             nsnap_start[started] = i_snap 
         catalog['nsnap_start'] = nsnap_start
 

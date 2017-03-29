@@ -378,8 +378,8 @@ class SMFClass:
             # deconvolve osbserved smf assuming scatter to find unscattered one
             dndms_scat = ut.math.deconvolute(dndms, scat, dm, iter_num)
             # chop off lower boundaries, unreliable
-            m_stars = m_stars[dm_scat_lo / dm:]
-            dndms_scat = dndms_scat[dm_scat_lo / dm:]
+            m_stars = m_stars[int(dm_scat_lo / dm):]
+            dndms_scat = dndms_scat[int(dm_scat_lo / dm):]
             # find spline to integrate over
             self.dndm_m_scat_spl = interpolate.splrep(m_stars, dndms_scat)
             numdens_scat = np.zeros(m_stars.size)
