@@ -53,13 +53,16 @@ class Evolver(object):
         isSF = np.where(self.SH_catalog['gclass'] == 'star-forming') 
 
         for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
-            self.SH_catalog['snapshot'+str(n_snap)+'_m.star'] = UT.replicate(self.SH_catalog['m.sham'], 
+            self.SH_catalog['snapshot'+str(n_snap)+'_m.star'] = UT.replicate(
+                    self.SH_catalog['m.sham'], 
                     len(self.SH_catalog['m.sham']))
-            print type(self.SH_catalog['snapshot'+str(n_snap)+'_m.star'])
+
             self.SH_catalog['snapshot'+str(n_snap)+'_m.star'][isSF] = logM_integ[ii]
 
         self.SH_catalog['m.star'] = UT.replicate(self.SH_catalog['m.sham'], len(self.SH_catalog['m.sham']))
         self.SH_catalog['m.star'][isSF] = logM_integ[-1]
+
+        return None
 
     def Initiate(self): 
         ''' Assign the initial conditions to galaxies at z0. More specifically

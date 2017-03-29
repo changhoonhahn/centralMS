@@ -118,6 +118,13 @@ class SubhaloHistory(object):
         for gal_prop in ['halo.m', 'm.max', 'm.star', 'pos', 'ilk']: 
             catalog[gal_prop] = sub[1][gal_prop]
 
+        # go through snapshots and get when m.star > 0 
+        nsnap_start = np.repeat(-999, len(catalog['m.star'])) 
+        for i_snap in self.snapshots[::-1]: 
+            started = np.where((catalog['snapshot'+str(i_snap)+'_m.star'] > 0) & (nsnap_start < i_snap))
+            nsnap_start[started] = i_snap 
+        catalog['nsnap_start'] = nsnap_start
+
         central_indices = wetzel_util.utility_catalog.indices_ilk(sub[1], ilk='cen') 
         catalog['central'] = np.zeros(len(sub[1]['halo.m'])).astype('int')
         catalog['central'][central_indices] = 1

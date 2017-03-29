@@ -116,6 +116,24 @@ def test_EvolverInitiate(test):
         sub.set_ylabel('$\Phi$', fontsize=25)
         sub.legend(loc='upper right') 
         plt.show()
+    
+    elif test == 'smf_M0': # check the SMF of galaxies with M_sham(z0) = 0
+        fig = plt.figure(figsize=(7,7))
+        sub = fig.add_subplot(111)
+
+        blank = np.where((subcat['snapshot20_m.sham'] == 0.) & (subcat['weights'] > 0.))
+            
+        smf_blank = Obvs.getMF(subcat['m.sham'][blank], weights=subcat['weights'][blank])
+        smf_tot = Obvs.getMF(subcat['m.sham'], weights=subcat['weights'])
+        sub.plot(smf_tot[0], smf_blank[1]/smf_tot[1], lw=3, c='k', ls='-')
+        
+        sub.set_xlim([6., 12.])
+        sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
+        #sub.set_ylim([1e-5, 10**-1.5])
+        #sub.set_yscale('log')
+        #sub.set_ylabel('$\Phi$', fontsize=25)
+        plt.show()
+
     return None
 
 
@@ -135,7 +153,10 @@ def test_EvolverEvolve():
     eev.Evolve() 
 
     subcat = eev.SH_catalog
-    subcat['m.star']
+    print subcat['m.sham'][np.where(subcat['snapshot20_m.sham'] == 0.)].max() 
+
+    print subcat['m.star'][np.where(subcat['gclass'] == 'star-forming')]
+    print subcat['m.star'] - subcat['snapshot20_m.sham']
 
     raise ValueError
 
@@ -241,7 +262,7 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    test_EvolverEvolve()
-    #test_EvolverInitiate('smf_evol')
+    #test_EvolverEvolve()
+    test_EvolverInitiate('smf_M0')
     #test_assignSFRs() 
 

@@ -51,11 +51,12 @@ def test_Observations_GroupCat():
 
 
 if __name__=='__main__': 
-    test_Observations_GroupCat()
+    #test_Observations_GroupCat()
 
     #plotPureCentral_SHMF(nsnap_ancestor=20)
 
-    #subhist = Cat.SubhaloHistory(nsnap_ancestor=20)
+    subhist = Cat.SubhaloHistory(nsnap_ancestor=20)
+    subhist.Build()
     #subhist._CheckHistory()
     #subhist = Cat.PureCentralHistory(nsnap_ancestor=20)
     #subhist.Build()

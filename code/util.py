@@ -118,7 +118,7 @@ def replicate(arr, n):
 
     if isinstance(val, int): 
         return np.tile(-999, n)
-    elif isinstance(val, float): 
+    elif isinstance(val, float) or isinstance(val, np.float32) or isinstance(val, np.float64): 
         return np.tile(-999., n)
     elif isinstance(val, str): 
         if len(val) < 16: 
@@ -126,6 +126,9 @@ def replicate(arr, n):
         else: 
             leng = str(np.ceil(len(val)/16)*16)
             return np.tile(val, n).astype('|S'+leng)
+    else: 
+        print val, type(val) 
+        raise ValueError
 
 
 def weighted_quantile(values, quantiles, weights=None, values_sorted=False, old_style=False):
