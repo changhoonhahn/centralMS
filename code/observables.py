@@ -73,7 +73,7 @@ class Fq(object):
         self.mass_high = mb[1:]
         self.mass_mid  = 0.5 * (self.mass_low + self.mass_high) 
     
-    def Calculate(self, mass=None, sfr=None, z=None, weights=None, sfr_class=None, mass_bins=None, theta_SFMS=None):
+    def Calculate(self, mass=None, sfr=None, z=None, weights=None, sfr_class=None, mass_bins=None, theta_SFMS=None, counts=False):
         ''' Calculate the quiescent fraction 
         '''
         # input cross-checks 
@@ -101,6 +101,7 @@ class Fq(object):
             ws = weights 
             
         f_q = np.zeros(len(mass_mid)) 
+        count_arr = np.zeros(len(mass_mid))
         for i_m in xrange(len(mass_mid)):
             masslim = np.where(
                     (mass > mass_low[i_m]) & 
@@ -110,9 +111,13 @@ class Fq(object):
                 continue 
             
             isQ = masslim[np.where(sfq[masslim] == 'quiescent')]
-            f_q[i_m] = np.sum(ws[isQ])/np.float(ngal_mass) 
-
-        return [mass_mid, f_q]
+            f_q[i_m] = np.sum(ws[isQ])/np.sum(ws[masslim])
+            count_arr[i_m] = np.sum(ws[masslim])
+    
+        if not counts: 
+            return [mass_mid, f_q]
+        else: 
+            return [mass_mid, f_q, count_arr]
     
     def Classify(self, mstar, sfr, z_in, theta_SFMS=None):
         ''' Classify galaxies based on M*, SFR, and redshift inputs.

@@ -5,8 +5,10 @@
 
 
 '''
+import time 
 import numpy as np 
 from scipy.interpolate import interp1d
+from scipy.integrate import odeint
 
 import util as UT 
 import sfh as SFH
@@ -73,25 +75,42 @@ class Evolver(object):
         -------
         * Assign SFRs to galaxies *with* weights
         '''
+        m0 = np.zeros(len(self.SH_catalog['m.star']))
         for i in range(2, self.nsnap0+1): # "m.star" from subhalo catalog is from SHAM
             self.SH_catalog['snapshot'+str(i)+'_m.sham'] = self.SH_catalog.pop('snapshot'+str(i)+'_m.star') 
+            started = np.where(self.SH_catalog['nsnap_start'] == i)
+            m0[started] = self.SH_catalog['snapshot'+str(i)+'_m.sham'][started]
+
         self.SH_catalog['m.sham'] = self.SH_catalog.pop('m.star')  
+        self.SH_catalog['m.star0'] = m0
 
         keep = np.where(self.SH_catalog['weights'] > 0) # only galaxies that are weighted
     
+        t_s = time.time()
         # assign SFRs at z0 
         sfr_out = assignSFRs(
-                self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham'][keep], 
-                np.repeat(UT.z_nsnap(self.nsnap0), len(keep[0])), 
+                m0[keep], 
+                UT.z_nsnap(self.SH_catalog['nsnap_start'][keep]), 
+                self.SH_catalog['weights'][keep],
                 theta_GV = self.theta_gv, 
                 theta_SFMS = self.theta_sfms,
                 theta_FQ = self.theta_fq) 
-    
+        print 'assignSFRs takes ', time.time() - t_s
+
         # save z0 SFR into self.SH_catalog 
-        for key in sfr_out: 
-            self.SH_catalog['snapshot'+str(self.nsnap0)+'_'+key.lower()] = \
-                    UT.replicate(sfr_out[key], len(self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham']))
-            self.SH_catalog['snapshot'+str(self.nsnap0)+'_'+key.lower()] = sfr_out[key][keep] 
+        for key in sfr_out.keys(): 
+            if key == 'SFR': 
+                k = 'sfr0'
+            elif key == 'Gclass': 
+                k = 'gclass0' 
+            else: 
+                k = key 
+            self.SH_catalog[k] = UT.replicate(sfr_out[key], len(self.SH_catalog['m.sham']))
+            self.SH_catalog[k][keep] = sfr_out.pop(key)
+        #for key in sfr_out: 
+        #    self.SH_catalog['snapshot'+str(self.nsnap0)+'_'+key.lower()] = \
+        #            UT.replicate(sfr_out[key], len(self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham']))
+        #    self.SH_catalog['snapshot'+str(self.nsnap0)+'_'+key.lower()] = sfr_out[key][keep] 
         self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.star'] = self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham'] 
         
         # Propagate P_Q from z0 to zf and pick out quenching galaxies
@@ -137,7 +156,30 @@ def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta):
     isSF = np.where(SHcat['gclass'] == 'star-forming') # only includes galaxies with w > 0 
     
     # logSFR(logM, z) function and keywords
+    logSFR_logM_z, dlogmdt_arg = SFH.logSFR_scipy(SHcat, isSF, theta_sfh=theta_sfh, theta_sfms=theta_sfms)
+     
+    dlogmdt_args = (logSFR_logM_z, theta_mass['f_retain'], z_of_t)
+    #dlogmdt_args += (dlogmdt_arg[0][0],)
+    #dlogmdt_args += (dlogmdt_arg[1],)
+
+    for arg in dlogmdt_arg: 
+        dlogmdt_args += (arg,)
+    
+    t_s = time.time()     
+    logM_integ = odeint(
+            SFH.dlogMdt_scipy,                    # dy/dt
+            SHcat['m.star0'][isSF],              # logM0
+            t_table[nsnapf:nsnap0][::-1],        # t_output
+            args=dlogmdt_args, 
+            rtol=1e-5, mxstep=10000) 
+    print time.time() - t_s
+
+    print 'SCIPY', logM_integ[-1,:] - SHcat['m.star0'][isSF]
+
+    t_s = time.time()     
+    # logSFR(logM, z) function and keywords
     logSFR_logM_z, dlogmdt_kwargs = SFH.logSFR_wrapper(SHcat, isSF, theta_sfh=theta_sfh, theta_sfms=theta_sfms)
+    #dlogmdt_kwargs['dSFR'] = dlogmdt_kwargs['dSFR'][0]
 
     # now solve M*, SFR ODE 
     dlogmdt_kwargs['logsfr_M_z'] = logSFR_logM_z 
@@ -149,12 +191,18 @@ def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta):
     elif theta_mass['solver'] == 'euler': # Forward euler
         f_ode = SFH.ODE_Euler
 
+    t_s = time.time() 
     logM_integ = f_ode(
             SFH.dlogMdt,                    # dy/dt
-            SHcat['snapshot'+str(nsnap0)+'_m.star'][isSF],              # logM0
-            t_table[nsnapf:nsnap0][::-1],            # t_final 
+            SHcat['m.star0'][isSF],              # logM0
+            t_table[nsnapf:nsnap0][::-1],           # t_final 
             theta_mass['t_step'],   # time step
             **dlogmdt_kwargs) 
+    
+    print time.time() - t_s
+    
+    print 'MINE', logM_integ[-1] - SHcat['m.star0'][isSF]
+
 
     return logM_integ 
 
@@ -164,7 +212,7 @@ def _pickSF(SHcat, nsnap0=20, theta_fq=None, theta_fpq=None):
     galaxies quench or stay star-forming
     ''' 
     nsnap_quench = np.repeat(-999, len(SHcat['weights']))  # snapshot where galaxy quenches 
-    gclass = SHcat['snapshot'+str(nsnap0)+'_gclass']
+    gclass = SHcat['gclass0']
     
     # identify SF galaxies @ nsnap0
     isSF = np.where((gclass == 'star-forming') & (SHcat['weights'] > 0.))
@@ -209,9 +257,12 @@ def _pickSF(SHcat, nsnap0=20, theta_fq=None, theta_fpq=None):
     return [gclass, nsnap_quench]
 
 
-def assignSFRs(masses, zs, theta_GV=None, theta_SFMS=None, theta_FQ=None): 
+def assignSFRs(masses, zs, ws, theta_GV=None, theta_SFMS=None, theta_FQ=None): 
     ''' Given stellar masses, zs, and parameters that describe the 
     green valley, SFMS, and FQ return SFRs
+
+    CURRENTLY DOES NOT SUPPORT WEIGHTS!!!! 
+    weights are hard because sampling distributions with weights is hard...
 
     Details: 
     -------
@@ -247,6 +298,7 @@ def assignSFRs(masses, zs, theta_GV=None, theta_SFMS=None, theta_FQ=None):
 
     assert len(masses) > 0  
     assert len(masses) == len(zs) 
+    assert len(masses) == len(ws) 
 
     ngal = len(masses)   # N_gals
 
@@ -270,16 +322,26 @@ def assignSFRs(masses, zs, theta_GV=None, theta_SFMS=None, theta_FQ=None):
             Obvs.SSFR_SFMS(masses[isgreen], zs[isgreen], theta_SFMS=theta_SFMS),                
             len(isgreen[0])) + masses[isgreen]      # and SSFR_SFMS 
 
-    # GV galaxy queiscent fraction 
-    gv_fQ = qf.Calculate(mass=masses[isgreen], sfr=output['SFR'][isgreen], z=zs[isgreen], 
-            mass_bins=np.arange(masses.min()-0.1, masses.max()+0.2, 0.2), theta_SFMS=theta_SFMS)
+    notgreen = rand >= f_gv(masses)
+    isnotgreen = np.where(notgreen)[0]
+    fQ_true = np.zeros(ngal)
+
+    for zz in np.unique(zs): 
+        isgreen_z = np.where((rand < f_gv(masses)) & (zs == zz))
+
+        # GV galaxy queiscent fraction 
+        gv_fQ = qf.Calculate(mass=masses[isgreen_z], sfr=output['SFR'][isgreen_z], z=zz, 
+                mass_bins=np.arange(masses.min()-0.1, masses.max()+0.2, 0.2), theta_SFMS=theta_SFMS)
     
-    # quiescent galaxies 
-    fQ_gv = interp1d(gv_fQ[0], gv_fQ[1] * f_gv(gv_fQ[0]))
+        # quiescent galaxies 
+        fQ_gv = interp1d(gv_fQ[0], gv_fQ[1] * f_gv(gv_fQ[0]))
+
+        isnotgreen_z = np.where(notgreen & (zs == zz))[0]
+        fQ_true[isnotgreen_z] = qf.model(masses[isnotgreen_z], zz, lit=theta_FQ['name']) - fQ_gv(masses[isnotgreen_z])
     
-    isnotgreen = np.where(rand >= f_gv(masses))[0]
-    fQ_true = qf.model(masses[isnotgreen], zs[isnotgreen], lit=theta_FQ['name']) - fQ_gv(masses[isnotgreen])
-    isq = isnotgreen[np.where(rand[isnotgreen] < fQ_true)]
+    rand2 = np.random.uniform(0., 1., len(isnotgreen))
+
+    isq = isnotgreen[np.where(rand2 < fQ_true[isnotgreen])]
     Nq = len(isq)
 
     output['Gclass'][isq] = 'quiescent'
@@ -307,7 +369,7 @@ def defaultTheta():
     theta['sfms'] = {'name': 'linear', 'zslope': 1.14}
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
     theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
 
     return theta 

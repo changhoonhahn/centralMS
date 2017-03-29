@@ -15,21 +15,38 @@ def logSFR_wrapper(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
     '''
     '''
     if theta_sfh['name'] == 'constant_offset':
-        mu_sfr = Obvs.SSFR_SFMS(
-                SHsnaps['snapshot'+str(theta_sfh['nsnap0'])+'_m.sham'][indices], 
-                UT.z_nsnap(theta_sfh['nsnap0']), theta_SFMS=theta_sfms)
+        mu_sfr = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
+                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms)
     
         F_sfr = _logSFR_dSFR 
-        sfr_kwargs = {
-                'dSFR': SHsnaps['snapshot'+str(theta_sfh['nsnap0'])+'_sfr'][indices] - mu_sfr,  # offset
+        sfr_kwargs = {'dSFR': SHsnaps['sfr0'][indices] - mu_sfr,  # offset
                 'theta_sfms': theta_sfms}
     else:
         raise NotImplementedError
 
     return F_sfr, sfr_kwargs
 
+
+def logSFR_scipy(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
+    '''
+    '''
+    if theta_sfh['name'] == 'constant_offset':
+        mu_sfr = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
+                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms)
+    
+        F_sfr = _logSFR_dSFR_scipy
+        sfr_args = (SHsnaps['sfr0'][indices] - mu_sfr, theta_sfms)
+    else:
+        raise NotImplementedError
+
+    return F_sfr, sfr_args
+
     
 def _logSFR_dSFR(logmm, zz, dSFR=None, theta_sfms=None): 
+    return Obvs.SSFR_SFMS(logmm, zz, theta_SFMS=theta_sfms) + dSFR
+
+
+def _logSFR_dSFR_scipy(logmm, zz, dSFR, theta_sfms): 
     return Obvs.SSFR_SFMS(logmm, zz, theta_SFMS=theta_sfms) + dSFR
 
 
@@ -116,3 +133,27 @@ def dlogMdt(logMstar, t, logsfr_M_z=None, f_retain=None, zoft=None, **sfr_kwargs
     dlogMdz = f_retain * np.power(10, tmp) 
 
     return dlogMdz 
+
+
+def dlogMdt_scipy(logMstar, t, logsfr_M_z, f_retain, zoft, *sfr_args): 
+    ''' Integrand d(logM)/dt for solving the ODE 
+
+    d(logM)/dz = SFR(logM, z) * dt/dz * 10^9 / (M ln(10))
+
+    Parameters
+    ----------
+    logsfr_M_t : (function) 
+        log( SFR(logM, z) )
+
+    logMstar : (array)
+        Array of stellar masses
+
+    t : (float) 
+        Cosmic time 
+
+    '''
+    tmp = logsfr_M_z(logMstar, zoft(t), *sfr_args) + 8.6377843113005373 - logMstar
+    dlogMdz = f_retain * np.power(10, tmp) 
+
+    return dlogMdz 
+
