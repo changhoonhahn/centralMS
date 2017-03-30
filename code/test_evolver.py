@@ -6,6 +6,7 @@ import observables as Obvs
 import util as UT
 
 import matplotlib.pyplot as plt 
+import bovy_plot as bovy
 from ChangTools.plotting import prettycolors
 
 
@@ -185,6 +186,9 @@ def test_EvolverEvolve(test):
 
             sub.plot(smf_sf[0], smf_sf[1], lw=2, c='b', alpha=0.05 * (21. - n))        
 
+        smf_sf_msham0 = Obvs.getMF(subcat['m.star0'][isSF], weights=subcat['weights'][isSF])
+        sub.plot(smf_sf_msham0[0], smf_sf_msham0[1], lw=3, c='k', ls='--')
+
         smf_sf_msham = Obvs.getMF(subcat['m.sham'][isSF], weights=subcat['weights'][isSF])
         sub.plot(smf_sf_msham[0], smf_sf_msham[1], lw=3, c='k', ls='--', label='SHAM')
         
@@ -197,12 +201,108 @@ def test_EvolverEvolve(test):
 
         sub.set_xlim([6., 12.])
         sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
-        sub.set_ylim([1e-6, 10**-2.])
+        sub.set_ylim([1e-6, 10**-1.75])
         sub.set_yscale('log')
         sub.set_ylabel('$\Phi$', fontsize=25)
         sub.legend(loc='upper right') 
         plt.show()
 
+    elif test == 'pssfr':
+        obv_ssfr = Obvs.Ssfr()
+        
+        isSF = np.where(subcat['gclass'] == 'star-forming')
+        ssfr_bin_mids, ssfr_dists0 = obv_ssfr.Calculate(subcat['m.star0'][isSF], 
+                subcat['sfr0'][isSF]-subcat['m.star0'][isSF], 
+                subcat['weights'][isSF])
+    
+        ssfr_bin_mids, ssfr_dists = obv_ssfr.Calculate(subcat['m.star'][isSF], 
+                subcat['sfr'][isSF]-subcat['m.star'][isSF], 
+                subcat['weights'][isSF])
+
+        fig = plt.figure(figsize=(20, 5))
+        bkgd = fig.add_subplot(111, frameon=False)
+
+        panel_mass_bins = [[9.7, 10.1], [10.1, 10.5], [10.5, 10.9], [10.9, 11.3]]
+        for i_m, mass_bin in enumerate(panel_mass_bins): 
+            sub = fig.add_subplot(1, 4, i_m+1)
+
+            sub.plot(ssfr_bin_mids[i_m], ssfr_dists0[i_m], 
+                    lw=3, ls='--', c='b')
+            sub.plot(ssfr_bin_mids[i_m], ssfr_dists[i_m], 
+                    lw=3, ls='-', c='k')
+            
+            # mark the SSFR of SFMS and Quiescent peak 
+            sub.vlines(Obvs.SSFR_SFMS(0.5 * np.sum(mass_bin), UT.z_nsnap(1), theta_SFMS=theta['sfms']), 0., 1.7, 
+                    color='b', linewidth=3)
+            sub.vlines(Obvs.SSFR_Qpeak(0.5 * np.sum(mass_bin)), 0., 1.7, 
+                    color='r', linewidth=3)
+
+            massbin_str = ''.join([ 
+                r'$\mathtt{log \; M_{*} = [', 
+                str(mass_bin[0]), ',\;', 
+                str(mass_bin[1]), ']}$'
+                ])
+            sub.text(-12., 1.4, massbin_str, fontsize=20)
+        
+            # x-axis
+            sub.set_xlim([-13., -8.])
+            # y-axis 
+            sub.set_ylim([0.0, 1.7])
+            sub.set_yticks([0.0, 0.5, 1.0, 1.5])
+            if i_m == 0: 
+                sub.set_ylabel(r'$\mathtt{P(log \; SSFR)}$', fontsize=25) 
+            else: 
+                sub.set_yticklabels([])
+            
+            ax = plt.gca()
+            leg = sub.legend(bbox_to_anchor=(-8.5, 1.55), loc='upper right', prop={'size': 20}, borderpad=2, 
+                    bbox_transform=ax.transData, handletextpad=0.5)
+        
+        bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+        bkgd.set_xlabel(r'$\mathtt{log \; SSFR \;[yr^{-1}]}$', fontsize=25) 
+        plt.show()
+
+    elif test == 'smhmr': # stellar mass to halo mass relation 
+        isSF = np.where(subcat['gclass'] == 'star-forming')
+
+        smhmr = Obvs.Smhmr()
+        m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat['m.star'][isSF], subcat['halo.m'][isSF])
+
+        fig = plt.figure()
+        sub = fig.add_subplot(111)
+        
+        sub.errorbar(m_mid, mu_mhalo, yerr=sig_mhalo)
+        sub.fill_between(m_mid, mu_mhalo - 0.2, mu_mhalo + 0.2, color='k', alpha=0.25, linewidth=0, edgecolor=None)
+    
+        sub.set_xlim([8., 12.])
+        sub.set_xlabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
+        sub.set_ylabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+        
+        plt.show()
+
+    elif test == 'sfms': 
+        isSF = np.where(subcat['gclass'] == 'star-forming')
+
+        bovy.scatterplot(subcat['m.star'][isSF], subcat['sfr'][isSF], scatter=True, s=2, 
+                xrange=[8., 12.], yrange=[-4., 3.],
+                xlabel='\mathtt{log\;M_*}', ylabel='\mathtt{log\;SFR}')
+
+        m_arr = np.arange(8., 12.1, 0.1) 
+        plt.plot(m_arr, Obvs.SSFR_SFMS(m_arr, UT.z_nsnap(1), theta_SFMS=theta['sfms']) + m_arr, c='r', lw=2, ls='-')
+        plt.plot(m_arr, Obvs.SSFR_SFMS(m_arr, UT.z_nsnap(1), theta_SFMS=theta['sfms']) + m_arr - 0.3, c='r', lw=2, ls='-.')
+        plt.plot(m_arr, Obvs.SSFR_SFMS(m_arr, UT.z_nsnap(1), theta_SFMS=theta['sfms']) + m_arr + 0.3, c='r', lw=2, ls='-.')
+
+        plt.show()
+
+    elif test == 'delMstar': 
+        isSF = np.where(subcat['gclass'] == 'star-forming')
+
+        delMstar = subcat['m.star'][isSF] - subcat['m.sham'][isSF]  # Delta M*
+
+        bovy.scatterplot(subcat['m.star'][isSF], delMstar, scatter=True, s=2, 
+                xrange=[8., 12.], yrange=[-4., 4.], xlabel='\mathtt{log\;M_*}', ylabel='\mathtt{log\;M_* - log\;M_{sham}}')
+
+        plt.show()
 
     return None
 
@@ -270,7 +370,7 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    test_EvolverEvolve('smf')
+    test_EvolverEvolve('delMstar')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 
 

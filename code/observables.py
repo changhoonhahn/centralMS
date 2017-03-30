@@ -419,6 +419,30 @@ class Ssfr(object):
         return [self.ssfr_bin_mid, self.ssfr_dist]
 
 
+class Smhmr(object): 
+    def __init__(self, **kwargs): 
+        self.kwargs = kwargs.copy()
+    
+    def Calculate(self, mstar, mhalo, dmstar=0.1, bells=None, whistles=None):
+        ''' 
+        ''' 
+        m_low = np.arange(mstar.min(), mstar.max(), dmstar)
+        m_high = m_low + dmstar
+
+        mu_mhalo = np.zeros(len(m_low)) 
+        sig_mhalo = np.zeros(len(m_low))
+        counts = np.zeros(len(m_low))
+        for i_m in range(len(m_low)):
+            inbin = np.where((mstar >= m_low[i_m]) & (mstar < m_high[i_m]))
+            
+            counts[i_m] = len(inbin[0])
+            mu_mhalo[i_m] = np.mean(mhalo[inbin])
+            sig_mhalo[i_m] = np.std(mhalo[inbin]) 
+    
+        return [0.5*(m_low + m_high), mu_mhalo, sig_mhalo, counts]
+
+
+
 def SSFR_Qpeak(mstar):  
     ''' Roughly the average of the log(SSFR) of the quiescent peak 
     of the SSFR distribution. This is designed to reproduce the 

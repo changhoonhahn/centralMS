@@ -2,8 +2,6 @@
 
 
 
-
-
 '''
 import time 
 import numpy as np 
@@ -46,14 +44,13 @@ class Evolver(object):
         ''' Evolve the galaxies from initial conditions specified in self.Initiate()
         '''
         # get integrated stellar masses 
-        logM_integ = _Evolve_Wrapper(self.SH_catalog, self.nsnap0, 1,  
-                theta_sfh=self.theta_sfh, 
-                theta_sfms=self.theta_sfms, 
-                theta_mass=self.theta_mass)
+        logM_integ, logSFRs = _Evolve_Wrapper(self.SH_catalog, self.nsnap0, 1,  
+                theta_sfh=self.theta_sfh, theta_sfms=self.theta_sfms, theta_mass=self.theta_mass)
         #isSF = np.where(self.SH_catalog['gclass'] == 'star-forming') 
 
         # save into SH catalog
         self.SH_catalog['m.star'] = logM_integ[:,-1] # nsnap = 1 
+        self.SH_catalog['sfr'] = logSFRs
         for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
             self.SH_catalog['snapshot'+str(n_snap)+'_m.star'] = logM_integ[:,ii]
 
@@ -167,7 +164,7 @@ def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta):
         f_ode = SFH.ODE_Euler
 
     logM_integ = np.tile(-999., (len(SHcat['gclass']), nsnap0 - nsnapf))
-
+    
     t_s = time.time() 
     for nn in range(nsnapf+1, nsnap0+1)[::-1]: 
         # starts at n_snap = nn 
@@ -190,8 +187,12 @@ def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta):
     isStart = np.where(SHcat['nsnap_start'][isSF] == 1)  
     logM_integ[isSF[isStart], -1] = SHcat['m.star0'][isSF[isStart]]
     print time.time() - t_s
+    
+    # log(SFR) @ nsnapf
+    logSFRs = np.repeat(-999., len(SHcat['gclass']))
+    logSFRs[isSF] = logSFR_logM_z(logM_integ[isSF, -1], UT.z_nsnap(nsnapf), **sfr_kwargs) 
 
-    return logM_integ 
+    return logM_integ, logSFRs
 
 
 def _pickSF(SHcat, nsnap0=20, theta_fq=None, theta_fpq=None): 
