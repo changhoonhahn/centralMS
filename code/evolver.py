@@ -153,7 +153,8 @@ def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta):
     z_of_t = interp1d(t_table, z_table, kind='cubic') 
     
     # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
-    isSF = np.where(SHcat['gclass'] == 'star-forming') # only includes galaxies with w > 0 
+    SF = SHcat['gclass'] == 'star-forming'
+    isSF = np.where(SF) # only includes galaxies with w > 0 
     
     # logSFR(logM, z) function and keywords
     logSFR_logM_z, dlogmdt_arg = SFH.logSFR_scipy(SHcat, isSF, theta_sfh=theta_sfh, theta_sfms=theta_sfms)
@@ -166,12 +167,20 @@ def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta):
         dlogmdt_args += (arg,)
     
     t_s = time.time()     
-    logM_integ = odeint(
-            SFH.dlogMdt_scipy,                    # dy/dt
-            SHcat['m.star0'][isSF],              # logM0
-            t_table[nsnapf:nsnap0][::-1],        # t_output
-            args=dlogmdt_args, 
-            rtol=1e-5, mxstep=10000) 
+    for nn in range(2, 21)[::-1]: 
+        isSFstarted = 
+        ##############################
+        ##############################
+        ##############################
+        ##############################
+        ##############################
+
+        logM_integ = odeint(
+                SFH.dlogMdt_scipy,                    # dy/dt
+                SHcat['m.star0'][isSF],              # logM0
+                t_table[nsnapf:nn][::-1],        # t_output
+                args=dlogmdt_args, 
+                rtol=1e-5, mxstep=10000) 
     print time.time() - t_s
 
     print 'SCIPY', logM_integ[-1,:] - SHcat['m.star0'][isSF]
