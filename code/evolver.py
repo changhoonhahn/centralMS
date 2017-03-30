@@ -186,6 +186,9 @@ def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta):
                 **dlogmdt_kwargs) 
 
         logM_integ[isSF[isStart], nsnap0-nn:] = tmp_logM_integ.T[:,1:]
+
+    isStart = np.where(SHcat['nsnap_start'][isSF] == 1)  
+    logM_integ[isSF[isStart], -1] = SHcat['m.star0'][isSF[isStart]]
     print time.time() - t_s
 
     return logM_integ 
