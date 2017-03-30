@@ -170,8 +170,8 @@ def test_EvolverEvolve():
 
     subcat = eev.SH_catalog
     #print subcat['m.sham'][np.where(subcat['snapshot20_m.sham'] == 0.)].max() 
-    print subcat['m.star'][np.where(subcat['gclass'] == 'star-forming')]
-    print subcat['m.star'] - subcat['m.star0']
+    isSF = np.where(subcat['gclass'] == 'star-forming')
+    print subcat['m.star'][isSF] - subcat['m.star0'][isSF]
 
     raise ValueError
 

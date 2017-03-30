@@ -53,8 +53,16 @@ def fit_zoft(deg):
     p = np.polyfit(t_table[:25], z_table[:25], deg) 
     return p
 
-#def z_of_t(tcosmic): 
-#    pass
+
+def z_of_t(tcosmic, deg=6): 
+    if deg == 6: 
+        coeff = [4.79981405e-06, -2.78012322e-04, 6.67694215e-03, -8.61053273e-02, 6.45836541e-01, -2.88397725e+00, 6.93399197e+00]
+    elif deg == 7: 
+        coeff = [-6.25747556e-07, 4.13664580e-05, -1.16240613e-03, 1.81118817e-02, -1.71157185e-01, 1.00848397e+00, -3.70236957e+00, 7.68673323e+00]
+    else:
+        raise NotImplementedError
+    zt = np.poly1d(coeff)
+    return zt(tcosmic)
 
 
 def t_from_z(redshift): 

@@ -52,6 +52,7 @@ def _logSFR_dSFR_scipy(logmm, zz, dSFR, theta_sfms):
 
 def ODE_Euler(dydt, init_cond, t_arr, delt, **func_args): 
     '''
+    NOTE t_arr[0] = t0!!! 
     '''
     # t where we will evaluate 
     t_eval = np.arange(t_arr.min(), t_arr.max()+delt, delt) 

@@ -50,19 +50,12 @@ class Evolver(object):
                 theta_sfh=self.theta_sfh, 
                 theta_sfms=self.theta_sfms, 
                 theta_mass=self.theta_mass)
+        #isSF = np.where(self.SH_catalog['gclass'] == 'star-forming') 
 
         # save into SH catalog
-        isSF = np.where(self.SH_catalog['gclass'] == 'star-forming') 
-
+        self.SH_catalog['m.star'] = logM_integ[:,-1] # nsnap = 1 
         for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
-            self.SH_catalog['snapshot'+str(n_snap)+'_m.star'] = UT.replicate(
-                    self.SH_catalog['m.sham'], 
-                    len(self.SH_catalog['m.sham']))
-
-            self.SH_catalog['snapshot'+str(n_snap)+'_m.star'][isSF] = logM_integ[ii]
-
-        self.SH_catalog['m.star'] = UT.replicate(self.SH_catalog['m.sham'], len(self.SH_catalog['m.sham']))
-        self.SH_catalog['m.star'][isSF] = logM_integ[-1]
+            self.SH_catalog['snapshot'+str(n_snap)+'_m.star'] = logM_integ[:,ii]
 
         return None
 
@@ -150,68 +143,50 @@ def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta):
 
     # precompute z(t_cosmic) 
     z_table, t_table = UT.zt_table()     
-    z_of_t = interp1d(t_table, z_table, kind='cubic') 
+    #z_of_t = interp1d(t_table, z_table, kind='cubic') 
+    z_of_t = lambda tt: UT.z_of_t(tt, deg=6)
     
     # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
-    SF = SHcat['gclass'] == 'star-forming'
-    isSF = np.where(SF) # only includes galaxies with w > 0 
-    
-    # logSFR(logM, z) function and keywords
-    logSFR_logM_z, dlogmdt_arg = SFH.logSFR_scipy(SHcat, isSF, theta_sfh=theta_sfh, theta_sfms=theta_sfms)
-     
-    dlogmdt_args = (logSFR_logM_z, theta_mass['f_retain'], z_of_t)
-    #dlogmdt_args += (dlogmdt_arg[0][0],)
-    #dlogmdt_args += (dlogmdt_arg[1],)
-
-    for arg in dlogmdt_arg: 
-        dlogmdt_args += (arg,)
+    isSF = np.where(SHcat['gclass'] == 'star-forming')[0] # only includes galaxies with w > 0 
     
     t_s = time.time()     
-    for nn in range(2, 21)[::-1]: 
-        isSFstarted = 
-        ##############################
-        ##############################
-        ##############################
-        ##############################
-        ##############################
-
-        logM_integ = odeint(
-                SFH.dlogMdt_scipy,                    # dy/dt
-                SHcat['m.star0'][isSF],              # logM0
-                t_table[nsnapf:nn][::-1],        # t_output
-                args=dlogmdt_args, 
-                rtol=1e-5, mxstep=10000) 
-    print time.time() - t_s
-
-    print 'SCIPY', logM_integ[-1,:] - SHcat['m.star0'][isSF]
-
-    t_s = time.time()     
     # logSFR(logM, z) function and keywords
-    logSFR_logM_z, dlogmdt_kwargs = SFH.logSFR_wrapper(SHcat, isSF, theta_sfh=theta_sfh, theta_sfms=theta_sfms)
+    logSFR_logM_z, sfr_kwargs = SFH.logSFR_wrapper(SHcat, isSF, theta_sfh=theta_sfh, theta_sfms=theta_sfms)
     #dlogmdt_kwargs['dSFR'] = dlogmdt_kwargs['dSFR'][0]
 
     # now solve M*, SFR ODE 
+    dlogmdt_kwargs = {}
     dlogmdt_kwargs['logsfr_M_z'] = logSFR_logM_z 
     dlogmdt_kwargs['f_retain'] = theta_mass['f_retain']
     dlogmdt_kwargs['zoft'] = z_of_t
-
-    if theta_mass['solver'] == 'rk4':     # RK4
+    
+    # choose ODE solver
+    if theta_mass['solver'] == 'rk4':     # RK4 (does not work for stiff ODEs -- thanks geoff!)
         f_ode = SFH.ODE_RK4
     elif theta_mass['solver'] == 'euler': # Forward euler
         f_ode = SFH.ODE_Euler
 
-    t_s = time.time() 
-    logM_integ = f_ode(
-            SFH.dlogMdt,                    # dy/dt
-            SHcat['m.star0'][isSF],              # logM0
-            t_table[nsnapf:nsnap0][::-1],           # t_final 
-            theta_mass['t_step'],   # time step
-            **dlogmdt_kwargs) 
-    
-    print time.time() - t_s
-    
-    print 'MINE', logM_integ[-1] - SHcat['m.star0'][isSF]
+    logM_integ = np.tile(-999., (len(SHcat['gclass']), nsnap0 - nsnapf))
 
+    t_s = time.time() 
+    for nn in range(nsnapf+1, nsnap0+1)[::-1]: 
+        # starts at n_snap = nn 
+        isStart = np.where(SHcat['nsnap_start'][isSF] == nn)  
+        for k in sfr_kwargs.keys(): 
+            if isinstance(sfr_kwargs[k], np.ndarray): 
+                dlogmdt_kwargs[k] = sfr_kwargs[k][isStart]
+            else: 
+                dlogmdt_kwargs[k] = sfr_kwargs[k]
+
+        tmp_logM_integ = f_ode(
+                SFH.dlogMdt,                            # dy/dt
+                SHcat['m.star0'][isSF[isStart]],        # logM0
+                t_table[nsnapf:nn+1][::-1],             # t_final 
+                theta_mass['t_step'],                   # time step
+                **dlogmdt_kwargs) 
+
+        logM_integ[isSF[isStart], nsnap0-nn:] = tmp_logM_integ.T[:,1:]
+    print time.time() - t_s
 
     return logM_integ 
 
