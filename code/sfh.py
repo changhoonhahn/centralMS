@@ -15,12 +15,53 @@ def logSFR_wrapper(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
     '''
     '''
     if theta_sfh['name'] == 'constant_offset':
+        # constant d_logSFR 
         mu_sfr = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
                 UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
     
         F_sfr = _logSFR_dSFR 
         sfr_kwargs = {'dSFR': SHsnaps['sfr0'][indices] - mu_sfr,  # offset
                 'theta_sfms': theta_sfms}
+
+    elif theta_sfh['name'] == 'corr_constant_offset': 
+        # constant d_logSFR (assigned based on halo accretion rate) 
+        mu_sfr = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
+                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
+
+        #dSFR0 = SHsnaps['sfr0'][indices] - mu_sfr
+
+        # now rank order it based on halo accretion rate
+        dMhalo = SHsnaps['halo.m'][indices] - SHsnaps['halo.m0'][indices]
+        
+        m_kind = SHsnaps[theta_sfh['m.kind']+'0'][indices] # how do we bin the SFRs?
+        dm_kind = theta_sfh['dm.kind'] # bins to rank order
+    
+        # scatter from noise -- subtract intrinsic assembly bias scatter from sig_SFMS 
+        sig_noise = np.sqrt(Obvs.sigSSFR_SFMS(SHsnaps['m.star0'][indices])**2 - theta_sfh['sig_abias']**2)
+
+        dsfr = np.repeat(-999., len(dMhalo))
+        for nn in np.arange(21): 
+            started = np.where(SHsnaps['nsnap_start'][indices] == nn)[0]
+
+            m_kind_bin = np.arange(m_kind[started].min(), m_kind[started].max()+dm_kind, dm_kind)
+            ibin = np.digitize(m_kind[started], m_kind_bin) 
+
+            for i in np.unique(ibin): 
+                inbin = np.where(ibin == i+1)
+
+                isort = np.argsort(dMhalo[started[inbin]])
+
+                dsfr[started[inbin]][isort] = np.sort(np.random.randn(len(inbin[0]))) * theta_sfh['sig_abias']
+
+        assert dsfr.min() != -999.
+
+        dsfr += sig_noise * np.random.randn(len(dMhalo))
+        
+        SHsnaps['sfr0'][indices] = mu_sfr + dsfr
+
+        F_sfr = _logSFR_dSFR 
+
+        sfr_kwargs = {'dSFR': dsfr, 'theta_sfms': theta_sfms}
     else:
         raise NotImplementedError
     return F_sfr, sfr_kwargs

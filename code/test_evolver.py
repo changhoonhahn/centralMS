@@ -207,6 +207,78 @@ def test_EvolverEvolve(test):
         sub.legend(loc='upper right') 
         plt.show()
 
+    elif test == 'smf_comp':  # SMF of composition
+        isSF = np.where(subcat['gclass'] == 'star-forming')[0]
+        
+        fig = plt.figure(figsize=(15,7))
+        sub = fig.add_subplot(121)
+        
+        #smf_sf_msham0 = Obvs.getMF(subcat['m.star0'][isSF], weights=subcat['weights'][isSF])
+        #sub.plot(smf_sf_msham0[0], smf_sf_msham0[1], lw=3, c='k', ls='--')
+    
+        m0s = subcat['m.star0'][isSF]
+        mlow = np.arange(m0s.min(), m0s.max(), 0.5)
+
+        for i_m in range(len(mlow)): 
+            inMbin = np.where((subcat['m.star0'][isSF] > mlow[i_m]) & (subcat['m.star0'][isSF] < mlow[i_m] + 0.5))
+
+            smf_sf = Obvs.getMF(subcat['m.star'][isSF[inMbin]], weights=subcat['weights'][isSF[inMbin]])
+
+            if i_m == 0: 
+                smf_sf0 = np.zeros(len(smf_sf[0]))
+                smf_sf1 = smf_sf[1]
+            else: 
+                smf_sf1 = smf_sf0 + smf_sf[1]
+
+            mbin_label = ''.join([str(mlow[i_m])+', '+str(mlow[i_m] + 0.5)]) 
+
+            sub.fill_between(smf_sf[0], smf_sf0, smf_sf1, 
+                    facecolor=pretty_colors[i_m % 20], edgecolor=None, lw=0)#, label=mbin_label)
+
+            smf_sf0 = smf_sf1
+
+        smf_sf = Obvs.getMF(subcat['m.star'][isSF], weights=subcat['weights'][isSF])
+        sub.plot(smf_sf[0], smf_sf[1], lw=3, c='k', ls='-')
+
+        sub.set_xlim([6., 12.])
+        sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
+        sub.set_ylim([1e-6, 10**-1.75])
+        sub.set_yscale('log')
+        sub.set_ylabel('$\Phi$', fontsize=25)
+        #sub.legend(loc='upper right') 
+
+        sub = fig.add_subplot(122)
+        
+        m0s = subcat['m.star0'][isSF]
+        mlow = np.arange(m0s.min(), m0s.max(), 0.5)
+
+        for i_m in range(len(mlow)): 
+            inMbin = np.where((subcat['m.star0'][isSF] > mlow[i_m]) & (subcat['m.star0'][isSF] < mlow[i_m] + 0.5))
+
+            smf_sf = Obvs.getMF(subcat['m.sham'][isSF[inMbin]], weights=subcat['weights'][isSF[inMbin]])
+
+            if i_m == 0: 
+                smf_sf0 = np.zeros(len(smf_sf[0]))
+                smf_sf1 = smf_sf[1]
+            else: 
+                smf_sf1 = smf_sf0 + smf_sf[1]
+
+            mbin_label = ''.join([str(mlow[i_m])+', '+str(mlow[i_m] + 0.5)]) 
+
+            sub.fill_between(smf_sf[0], smf_sf0, smf_sf1, 
+                    facecolor=pretty_colors[i_m % 20], edgecolor=None, lw=0)#, label=mbin_label)
+
+            smf_sf0 = smf_sf1
+
+        smf_sf = Obvs.getMF(subcat['m.sham'][isSF], weights=subcat['weights'][isSF])
+        sub.plot(smf_sf[0], smf_sf[1], lw=3, c='k', ls='-')
+
+        sub.set_xlim([6., 12.])
+        sub.set_xlabel('Stellar Masses $(\mathcal{M}_{SHAM})$', fontsize=25)
+        sub.set_ylim([1e-6, 10**-1.75])
+        sub.set_yscale('log')
+        plt.show()
+
     elif test == 'pssfr':
         obv_ssfr = Obvs.Ssfr()
         
@@ -294,13 +366,26 @@ def test_EvolverEvolve(test):
 
         plt.show()
 
-    elif test == 'delMstar': 
+    elif test == 'delMstar':  # difference between sham M* and integrated M* 
         isSF = np.where(subcat['gclass'] == 'star-forming')
 
         delMstar = subcat['m.star'][isSF] - subcat['m.sham'][isSF]  # Delta M*
 
         bovy.scatterplot(subcat['m.star'][isSF], delMstar, scatter=True, s=2, 
                 xrange=[8., 12.], yrange=[-4., 4.], xlabel='\mathtt{log\;M_*}', ylabel='\mathtt{log\;M_* - log\;M_{sham}}')
+
+        plt.show()
+
+    elif test == 'delMgrowth': 
+        isSF = np.where(subcat['gclass'] == 'star-forming')
+
+        bovy.scatterplot(subcat['m.star'][isSF], subcat['m.star'][isSF] - subcat['m.star0'][isSF], scatter=True, s=2, 
+                xrange=[8., 12.], yrange=[-4., 4.], 
+                xlabel=r'{\rm Integrated}\;\mathtt{log\;M_*}', ylabel='\mathtt{log\;M_* - log\;M_0}')
+
+        bovy.scatterplot(subcat['m.sham'][isSF], subcat['m.sham'][isSF] - subcat['m.star0'][isSF], scatter=True, s=2, 
+                xrange=[8., 12.], yrange=[-4., 4.], 
+                xlabel=r'{\rm SHAM}\;\mathtt{log\;M_*}', ylabel='\mathtt{log\;M_* - log\;M_0}')
 
         plt.show()
 
@@ -370,7 +455,7 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    test_EvolverEvolve('delMstar')
+    test_EvolverEvolve('smf_comp')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 
 

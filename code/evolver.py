@@ -13,6 +13,20 @@ import sfh as SFH
 import observables as Obvs
 
 
+def defaultTheta(): 
+    ''' Return generic default parameter values
+    '''
+    theta = {} 
+
+    theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
+    theta['sfms'] = {'name': 'linear', 'zslope': 1.14}
+    theta['fq'] = {'name': 'cosmos_tinker'}
+    theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
+    theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
+
+    return theta 
+
 
 class Evolver(object): 
     def __init__(self, PCH_catalog, theta, nsnap0=20): 
@@ -43,8 +57,17 @@ class Evolver(object):
     def Evolve(self): 
         ''' Evolve the galaxies from initial conditions specified in self.Initiate()
         '''
+        # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
+        isSF = np.where(self.SH_catalog['gclass'] == 'star-forming')[0] # only includes galaxies with w > 0 
+    
+        print self.SH_catalog['sfr0'][:10]
+        # logSFR(logM, z) function and keywords
+        logSFR_logM_z, sfr_kwargs = SFH.logSFR_wrapper(self.SH_catalog, isSF, theta_sfh=theta_sfh, theta_sfms=theta_sfms)
+        print self.SH_catalog['sfr0'][:10]
+
         # get integrated stellar masses 
-        logM_integ, logSFRs = _Evolve_Wrapper(self.SH_catalog, self.nsnap0, 1,  
+        logM_integ, logSFRs = _MassSFR_Wrapper(self.SH_catalog, self.nsnap0, 1,  
+                isSF=isSF, logSFR_logM_z=logSFR_logM_z, sfr_kwargs=sfr_kwargs,
                 theta_sfh=self.theta_sfh, theta_sfms=self.theta_sfms, theta_mass=self.theta_mass)
         #isSF = np.where(self.SH_catalog['gclass'] == 'star-forming') 
 
@@ -66,13 +89,19 @@ class Evolver(object):
         * Assign SFRs to galaxies *with* weights
         '''
         m0 = np.zeros(len(self.SH_catalog['m.star']))
+        hm0 = np.zeros(len(self.SH_catalog['m.star']))
         for i in range(2, self.nsnap0+1): # "m.star" from subhalo catalog is from SHAM
             self.SH_catalog['snapshot'+str(i)+'_m.sham'] = self.SH_catalog.pop('snapshot'+str(i)+'_m.star') 
             started = np.where(self.SH_catalog['nsnap_start'] == i)
             m0[started] = self.SH_catalog['snapshot'+str(i)+'_m.sham'][started]
+            hm0[started] = self.SH_catalog['snapshot'+str(i)+'_halo.m'][started]
+        started = np.where(self.SH_catalog['nsnap_start'] == 1)
+        m0[started] = self.SH_catalog['m.star'][started]
+        hm0[started] = self.SH_catalog['halo.m'][started]
 
         self.SH_catalog['m.sham'] = self.SH_catalog.pop('m.star')  
         self.SH_catalog['m.star0'] = m0
+        self.SH_catalog['halo.m'] = hm0
 
         keep = np.where(self.SH_catalog['weights'] > 0) # only galaxies that are weighted
     
@@ -130,7 +159,7 @@ class Evolver(object):
         return None
 
 
-def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta): 
+def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_kwargs=None, **theta): 
     ''' Evolve galaxies that remain star-forming throughout the snapshots. 
     '''
     # parse theta 
@@ -143,12 +172,7 @@ def _Evolve_Wrapper(SHcat, nsnap0, nsnapf, **theta):
     #z_of_t = interp1d(t_table, z_table, kind='cubic') 
     z_of_t = lambda tt: UT.z_of_t(tt, deg=6)
     
-    # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
-    isSF = np.where(SHcat['gclass'] == 'star-forming')[0] # only includes galaxies with w > 0 
-    
     t_s = time.time()     
-    # logSFR(logM, z) function and keywords
-    logSFR_logM_z, sfr_kwargs = SFH.logSFR_wrapper(SHcat, isSF, theta_sfh=theta_sfh, theta_sfms=theta_sfms)
     #dlogmdt_kwargs['dSFR'] = dlogmdt_kwargs['dSFR'][0]
 
     # now solve M*, SFR ODE 
@@ -346,21 +370,6 @@ def assignSFRs(masses, zs, ws, theta_GV=None, theta_SFMS=None, theta_FQ=None):
             masses[issf]
     
     return output
-
-
-def defaultTheta(): 
-    ''' Return generic default parameter values
-    '''
-    theta = {} 
-
-    theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
-    theta['sfms'] = {'name': 'linear', 'zslope': 1.14}
-    theta['fq'] = {'name': 'cosmos_tinker'}
-    theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-    theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
-
-    return theta 
 
 
 def _f_PQ(mm, slope, fidmass, offset): 
