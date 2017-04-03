@@ -13,7 +13,7 @@ import sfh as SFH
 import observables as Obvs
 
 
-def defaultTheta(): 
+def defaultTheta(sfh): 
     ''' Return generic default parameter values
     '''
     theta = {} 
@@ -23,10 +23,15 @@ def defaultTheta():
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
     theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-    # theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
-    theta['sfh'] = {'name': 'corr_constant_offset', 
+
+    if sfh == 'constant_offset': 
+        theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
+    elif sfh == 'corr_constant_offset':
+        theta['sfh'] = {'name': 'corr_constant_offset', 
             'm.kind': 'm.star', 'dm.kind': 0.1, 
             'sig_abias': 0.3}
+    else: 
+        raise NotImplementedError
 
     return theta 
 

@@ -11,7 +11,7 @@ from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
 
-def EvolverPlots(): 
+def EvolverPlots(sfh): 
     '''
     '''
     # load in Subhalo Catalog (pure centrals)
@@ -19,7 +19,7 @@ def EvolverPlots():
     subcat = subhist.Read()
 
     # load in generic theta (parameter values)
-    theta = Evol.defaultTheta() 
+    theta = Evol.defaultTheta(sfh) 
 
     eev = Evol.Evolver(subcat, theta, nsnap0=20)
     eev.Initiate()
@@ -80,7 +80,7 @@ def EvolverPlots():
             subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(20), 
             theta_SFMS=eev.theta_sfms) + subcat['m.star0'][isSF[i_rand]])[0]]
 
-        sub.text(UT.t_nsnap(20) + 0.1, dsfrs[0] + 0.02, '$\mathcal{M}_* \sim $'+str(m_bin[i]), fontsize=15)
+        sub.text(UT.t_nsnap(20 - i) + 0.1, dsfrs[0] + 0.02, '$\mathcal{M}_* \sim $'+str(m_bin[i]), fontsize=15)
 
         for nn in range(2, 20)[::-1]: 
             M_nn = subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]]
@@ -99,10 +99,9 @@ def EvolverPlots():
     sub.set_ylim([-1., 1.])
     sub.set_ylabel('$\Delta$log SFR', fontsize=25)
     fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-    fig.savefig(''.join([UT.fig_dir(), 'testing.png']), bbox_inches='tight')
+    fig.savefig(''.join([UT.fig_dir(), sfh+'_eval.png']), bbox_inches='tight')
     plt.close() 
     return None
-
 
 
 def test_EvolverInitiate(test, nsnap): 
@@ -608,7 +607,8 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    EvolverPlots()
+    EvolverPlots('constant_offset')
+    EvolverPlots('corr_constant_offset')
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 
