@@ -39,23 +39,26 @@ def logSFR_wrapper(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         # scatter from noise -- subtract intrinsic assembly bias scatter from sig_SFMS 
         sig_noise = np.sqrt(Obvs.sigSSFR_SFMS(SHsnaps['m.star0'][indices])**2 - theta_sfh['sig_abias']**2)
 
+        # slow and inefficient 
+
         dsfr = np.repeat(-999., len(dMhalo))
-        for nn in np.arange(21): 
+        for nn in np.arange(1, 21): 
             started = np.where(SHsnaps['nsnap_start'][indices] == nn)[0]
 
             m_kind_bin = np.arange(m_kind[started].min(), m_kind[started].max()+dm_kind, dm_kind)
             ibin = np.digitize(m_kind[started], m_kind_bin) 
-
             for i in np.unique(ibin): 
-                inbin = np.where(ibin == i+1)
+                inbin = np.where(ibin == i)
 
                 isort = np.argsort(dMhalo[started[inbin]])
 
-                dsfr[started[inbin]][isort] = np.sort(np.random.randn(len(inbin[0]))) * theta_sfh['sig_abias']
+                dsfr[started[inbin[0][isort]]] = \
+                        np.sort(np.random.randn(len(inbin[0]))) * theta_sfh['sig_abias']
 
         assert dsfr.min() != -999.
-
-        dsfr += sig_noise * np.random.randn(len(dMhalo))
+        
+        if sig_noise > 0.: 
+            dsfr += sig_noise * np.random.randn(len(dMhalo))
         
         SHsnaps['sfr0'][indices] = mu_sfr + dsfr
 

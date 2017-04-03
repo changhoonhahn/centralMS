@@ -23,7 +23,10 @@ def defaultTheta():
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
     theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-    theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
+    # theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
+    theta['sfh'] = {'name': 'corr_constant_offset', 
+            'm.kind': 'm.star', 'dm.kind': 0.1, 
+            'sig_abias': 0.3}
 
     return theta 
 
@@ -60,10 +63,9 @@ class Evolver(object):
         # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
         isSF = np.where(self.SH_catalog['gclass'] == 'star-forming')[0] # only includes galaxies with w > 0 
     
-        print self.SH_catalog['sfr0'][:10]
         # logSFR(logM, z) function and keywords
-        logSFR_logM_z, sfr_kwargs = SFH.logSFR_wrapper(self.SH_catalog, isSF, theta_sfh=theta_sfh, theta_sfms=theta_sfms)
-        print self.SH_catalog['sfr0'][:10]
+        logSFR_logM_z, sfr_kwargs = SFH.logSFR_wrapper(self.SH_catalog, isSF, 
+                theta_sfh=self.theta_sfh, theta_sfms=self.theta_sfms)
 
         # get integrated stellar masses 
         logM_integ, logSFRs = _MassSFR_Wrapper(self.SH_catalog, self.nsnap0, 1,  
@@ -76,6 +78,10 @@ class Evolver(object):
         self.SH_catalog['sfr'] = logSFRs
         for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
             self.SH_catalog['snapshot'+str(n_snap)+'_m.star'] = logM_integ[:,ii]
+            self.SH_catalog['snapshot'+str(n_snap)+'_sfr'] = \
+                    np.repeat(-999., len(logM_integ[:,ii]))
+            self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][isSF] = logSFR_logM_z(
+                    logM_integ[isSF,ii], UT.z_nsnap(n_snap), **sfr_kwargs)
 
         return None
 
@@ -101,7 +107,7 @@ class Evolver(object):
 
         self.SH_catalog['m.sham'] = self.SH_catalog.pop('m.star')  
         self.SH_catalog['m.star0'] = m0
-        self.SH_catalog['halo.m'] = hm0
+        self.SH_catalog['halo.m0'] = hm0
 
         keep = np.where(self.SH_catalog['weights'] > 0) # only galaxies that are weighted
     

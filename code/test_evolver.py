@@ -389,6 +389,65 @@ def test_EvolverEvolve(test):
 
         plt.show()
 
+    elif test == 'sfh_sfms':  # plot the SFH as a function of time 
+        # first pick a random SF galaxy
+        isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == 20))[0]
+
+        m_bin = np.arange(9.0, 12., 0.5)  
+        i_bin = np.digitize(subcat['m.star0'][isSF], m_bin)
+        
+        fig = plt.figure()
+        sub = fig.add_subplot(111)
+
+        for i in np.unique(i_bin): 
+            i_rand = np.random.choice(np.where(i_bin == i)[0], size=1)[0]
+            
+            sfrs = [subcat['sfr0'][isSF[i_rand]]]
+            mstars = [subcat['m.star0'][isSF[i_rand]]]
+            for nn in range(2, 20)[::-1]: 
+                sfrs.append(subcat['snapshot'+str(nn)+'_sfr'][isSF[i_rand]])
+                mstars.append(subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]])
+            sfrs.append(subcat['sfr'][isSF[i_rand]])
+            mstars.append(subcat['m.star'][isSF[i_rand]])
+            sub.scatter(mstars, sfrs, c=pretty_colors[i], lw=0)
+
+        sub.set_xlim([9.0, 13.])
+        sub.set_xlabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
+        sub.set_ylabel('log SFR', fontsize=25)
+        plt.show()
+
+
+    elif test == 'sfh':  # plot the SFH as a function of time 
+        # first pick a random SF galaxy
+        isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == 20))[0]
+
+        m_bin = np.arange(9.0, 12.5, 0.5)  
+        i_bin = np.digitize(subcat['m.star0'][isSF], m_bin)
+        
+        fig = plt.figure()
+        sub = fig.add_subplot(111)
+
+        for i in np.unique(i_bin): 
+            i_rand = np.random.choice(np.where(i_bin == i)[0], size=1)[0]
+            
+            dsfrs = [subcat['sfr0'][isSF[i_rand]] - (Obvs.SSFR_SFMS(
+                subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(20), 
+                theta_SFMS=eev.theta_sfms) + subcat['m.star0'][isSF[i_rand]])[0]]
+
+            for nn in range(2, 20)[::-1]: 
+                M_nn = subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]]
+                mu_sfr = Obvs.SSFR_SFMS(M_nn, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
+                dsfrs.append(subcat['snapshot'+str(nn)+'_sfr'][isSF[i_rand]] - mu_sfr[0])
+
+            mu_sfr = Obvs.SSFR_SFMS(subcat['m.star'][isSF[i_rand]], 
+                    UT.z_nsnap(1), theta_SFMS=eev.theta_sfms) + subcat['m.star'][isSF[i_rand]]
+            dsfrs.append(subcat['sfr'][isSF[i_rand]] - mu_sfr[0]) 
+            sub.plot(UT.t_nsnap(range(1,21)[::-1]), dsfrs, c=pretty_colors[i], lw=2)
+        #sub.set_xlim([9.0, 13.])
+        sub.set_xlabel('$t_{cosmic}$', fontsize=25)
+        sub.set_ylabel('$\Delta$log SFR', fontsize=25)
+        plt.show()
+
     return None
 
 
@@ -455,7 +514,7 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    test_EvolverEvolve('smf_comp')
+    test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 
 
