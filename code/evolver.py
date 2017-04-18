@@ -30,6 +30,9 @@ def defaultTheta(sfh):
         theta['sfh'] = {'name': 'corr_constant_offset', 
             'm.kind': 'm.star', 'dm.kind': 0.1, 
             'sig_abias': 0.3}
+    elif sfh == 'random_step': 
+        theta['sfh'] = {'name': 'random_step', 
+                'dt_min': 0.1, 'dt_max': 1., 'sigma': 0.3}
     else: 
         raise NotImplementedError
 
@@ -69,7 +72,7 @@ class Evolver(object):
         isSF = np.where(self.SH_catalog['gclass'] == 'star-forming')[0] # only includes galaxies with w > 0 
     
         # logSFR(logM, z) function and keywords
-        logSFR_logM_z, sfr_kwargs = SFH.logSFR_wrapper(self.SH_catalog, isSF, 
+        logSFR_logM_z, sfr_kwargs = SFH.logSFR_initiate(self.SH_catalog, isSF, 
                 theta_sfh=self.theta_sfh, theta_sfms=self.theta_sfms)
 
         # get integrated stellar masses 

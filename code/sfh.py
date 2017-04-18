@@ -11,21 +11,21 @@ import util as UT
 import observables as Obvs
 
 
-def logSFR_wrapper(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
+def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
     '''
     '''
     if theta_sfh['name'] == 'constant_offset':
         # constant d_logSFR 
-        mu_sfr = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
+        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
                 UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
     
         F_sfr = _logSFR_dSFR 
-        sfr_kwargs = {'dSFR': SHsnaps['sfr0'][indices] - mu_sfr,  # offset
+        sfr_kwargs = {'dSFR': SHsnaps['sfr0'][indices] - mu_sfr0,  # offset
                 'theta_sfms': theta_sfms}
 
     elif theta_sfh['name'] == 'corr_constant_offset': 
         # constant d_logSFR (assigned based on halo accretion rate) 
-        mu_sfr = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
+        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
                 UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
 
         #dSFR0 = SHsnaps['sfr0'][indices] - mu_sfr
@@ -60,18 +60,75 @@ def logSFR_wrapper(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         if sig_noise > 0.: 
             dsfr += sig_noise * np.random.randn(len(dMhalo))
         
-        SHsnaps['sfr0'][indices] = mu_sfr + dsfr
+        # correct initial SFR to match long-term assembly bias 
+        SHsnaps['sfr0'][indices] = mu_sfr0 + dsfr
 
         F_sfr = _logSFR_dSFR 
 
         sfr_kwargs = {'dSFR': dsfr, 'theta_sfms': theta_sfms}
+
+    elif theta_sfh['name'] == 'random_step': 
+        # completely random 
+        # amplitude is sampled randomly from a Gaussian with sig_logSFR = 0.3 
+        # time steps are sampled randomly from a unifrom distribution [dt_min, dt_max]
+        t0 = time.time()
+
+        if 'dt_min' not in theta_sfh: 
+            raise ValueError
+        if 'dt_max' not in theta_sfh: 
+            raise ValueError
+        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
+                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
+
+        dSFR0 = SHsnaps['sfr0'][indices] - mu_sfr0
+                
+        # Random step function duty cycle 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap_start'][indices].max()) 
+        
+        # the range of the steps 
+        tshift_min = theta_sfh['dt_min'] 
+        tshift_max = theta_sfh['dt_max'] 
+
+        # get the times when the amplitude changes 
+        n_col = int(np.ceil(del_t_max/tshift_min))  # number of columns 
+        n_gal = len(indices)
+        tshift = np.zeros((n_gal, n_col))
+        tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+
+        tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+
+        dlogSFR_amp = np.random.randn(n_gal, n_col) * theta_sfh['sigma']
+        dlogSFR_amp[:,0] = dSFR0
+
+        F_sfr = _logSFR_dSFR_tsteps
+        
+        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
+        print time.time() - t0, 'seconds'
     else:
         raise NotImplementedError
+
     return F_sfr, sfr_kwargs
 
 
 def _logSFR_dSFR(logmm, zz, dSFR=None, theta_sfms=None): 
     return Obvs.SSFR_SFMS(logmm, zz, theta_SFMS=theta_sfms) + logmm + dSFR
+
+
+def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=None): 
+    ''' 
+    '''
+    # log(SFR) of SF MS 
+    logsfr_sfms = Obvs.SSFR_SFMS(logmm, zz, theta_SFMS=theta_sfms) + logmm
+
+    # dlog(SFR) 
+    tt = UT.t_of_z(zz, deg=6) # t_cosmic(zz)
+    
+    # get the amplitude of the 
+    ishift = np.abs(tsteps - tt).argmin(axis=1)
+    ishift[np.where(tsteps[:, ishift] > tt)] -= 1
+    dlogsfr = dlogSFR_amp[:,ishift]
+
+    return logsfr_sfms + dlogsfr
 
 
 def ODE_Euler(dydt, init_cond, t_arr, delt, **func_args): 

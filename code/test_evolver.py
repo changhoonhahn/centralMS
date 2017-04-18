@@ -607,8 +607,9 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    EvolverPlots('constant_offset')
-    EvolverPlots('corr_constant_offset')
+    #EvolverPlots('constant_offset')
+    #EvolverPlots('corr_constant_offset')
+    EvolverPlots('random_step')
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 

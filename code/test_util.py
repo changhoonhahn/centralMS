@@ -42,6 +42,40 @@ def test_fit_zoft():
     plt.show()
 
 
+def test_fit_tofz(): 
+    z_table, t_table = UT.zt_table()
+    
+    cosmo = FlatLambdaCDM(H0=70, Om0=0.274)
+
+    prettyplot()
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+
+    for deg in range(2,10): 
+        coeff = UT.fit_tofz(deg)
+        if deg > 5: 
+            print 'deg = ', deg, coeff
+        tofz = np.poly1d(coeff)
+        
+        z_arr = np.arange(0., 2., 0.1)
+        t_arr = cosmo.age(z_arr).value 
+
+        sub.plot(z_arr, (tofz(z_arr) - t_arr)/t_arr, label='Degree='+str(deg))
+
+    t_of_z = interpolate.interp1d(z_arr, t_arr, kind='cubic') 
+    tint = t_of_z(z_table[1:20])#np.interp(t_table[:20], t_arr, z_arr)
+
+    sub.scatter(z_table[1:20], (t_table[1:20] - tint)/tint, c='k', s=30) 
+    sub.plot(np.arange(0., 2., 0.1), np.repeat(-0.025, len(np.arange(0., 2., 0.1))), c='k', ls='--', lw=3)
+    sub.plot(np.arange(0., 2., 0.1), np.repeat(0.025, len(np.arange(0., 2., 0.1))), c='k', ls='--', lw=3)
+
+    sub.set_ylim([-0.05, 0.05])
+    sub.set_xlim([0., 2.])
+    sub.legend(loc='upper left')
+    plt.show()
+
+
 
 if __name__=='__main__':
-    test_fit_zoft()
+    #test_fit_zoft()
+    test_fit_tofz()
