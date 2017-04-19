@@ -20,18 +20,18 @@ def defaultTheta(sfh):
 
     theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
     theta['sfms'] = {'name': 'linear', 
-            'zslope': 1.,#14, 
+            'zslope': 1.05,#14, 
             'mslope':0.53}
-    #theta['sfms'] = {'name': 'kinked', 'zslope': 1.14, 'mslope_high':0.53, 'mslope_low': 1.}
+    #theta['sfms'] = {'name': 'kinked', 'zslope': 1.1, 'mslope_high':0.53, 'mslope_low': 0.65}
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.025} 
 
     if sfh == 'constant_offset': 
         theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
     elif sfh == 'corr_constant_offset':
         theta['sfh'] = {'name': 'corr_constant_offset', 
-            'm.kind': 'm.star', 'dm.kind': 0.05, 
+            'm.kind': 'm.star', 'dm.kind': 0.01, 
             'sig_abias': 0.3}
     elif sfh == 'random_step': 
         theta['sfh'] = {'name': 'random_step', 

@@ -10,6 +10,103 @@ import bovy_plot as bovy
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
+def test_RandomStep_timescale(): 
+    ''' Test the impact of the timescale for random step SFH scheme
+    '''
+    # load in Subhalo Catalog (pure centrals)
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=20)
+    subcat = subhist.Read()
+
+    # load in generic theta (parameter values)
+    theta = Evol.defaultTheta('random_step') 
+    
+    for tstep in [0.1, 0.5, 1., 5.]: 
+        theta['sfh'] = {'name': 'random_step', 
+                'dt_min': tstep, 'dt_max': tstep, 'sigma': 0.3}
+
+        eev = Evol.Evolver(subcat, theta, nsnap0=20)
+        eev.Initiate()
+
+        eev.Evolve() 
+
+        subcat = eev.SH_catalog
+
+        prettyplot() 
+        pretty_colors = prettycolors() 
+
+        isSF = np.where(subcat['gclass'] == 'star-forming')[0]
+            
+        fig = plt.figure(figsize=(25,7))
+        sub = fig.add_subplot(1,3,1)
+
+        for n in range(2, 21)[::-1]: 
+            # identify SF population at snapshot
+            smf_sf = Obvs.getMF(subcat['snapshot'+str(n)+'_m.star'][isSF], 
+                    weights=subcat['weights'][isSF])
+
+            sub.plot(smf_sf[0], smf_sf[1], lw=2, c='b', alpha=0.05 * (21. - n))        
+
+        smf_sf = Obvs.getMF(subcat['m.star'][isSF], weights=subcat['weights'][isSF])
+        sub.plot(smf_sf[0], smf_sf[1], lw=3, c='b', ls='-', label='Integrated')
+
+        smf_sf_msham = Obvs.getMF(subcat['m.sham'][isSF], weights=subcat['weights'][isSF])
+        sub.plot(smf_sf_msham[0], smf_sf_msham[1], lw=3, c='k', ls='--', label='SHAM')
+
+        sub.set_xlim([6.75, 12.])
+        sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
+        sub.set_ylim([1e-5, 10**-1.75])
+        sub.set_yscale('log')
+        sub.set_ylabel('log $\Phi$', fontsize=25)
+        sub.legend(loc='upper right') 
+            
+        sub = fig.add_subplot(1,3,2)
+        smhmr = Obvs.Smhmr()
+        m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.star'][isSF])
+        
+        sub.errorbar(m_mid, mu_mstar, yerr=sig_mstar)
+        sub.fill_between(m_mid, mu_mstar - 0.2, mu_mstar + 0.2, color='k', alpha=0.25, linewidth=0, edgecolor=None)
+
+        sub.set_xlim([10.5, 14.])
+        sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+        sub.set_ylim([8., 12.])
+        sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
+            
+        isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == 20))[0]
+
+        m_bin = np.arange(9.0, 12.5, 0.5)  
+        i_bin = np.digitize(subcat['m.star0'][isSF], m_bin)
+        
+        sub = fig.add_subplot(1,3,3)
+        for i in np.unique(i_bin): 
+            i_rand = np.random.choice(np.where(i_bin == i)[0], size=1)[0]
+            
+            dsfrs = [subcat['sfr0'][isSF[i_rand]] - (Obvs.SSFR_SFMS(
+                subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(20), 
+                theta_SFMS=eev.theta_sfms) + subcat['m.star0'][isSF[i_rand]])[0]]
+
+            sub.text(UT.t_nsnap(20 - i) + 0.1, dsfrs[0] + 0.02, '$\mathcal{M}_* \sim $'+str(m_bin[i]), fontsize=15)
+
+            for nn in range(2, 20)[::-1]: 
+                M_nn = subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]]
+                mu_sfr = Obvs.SSFR_SFMS(M_nn, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
+                dsfrs.append(subcat['snapshot'+str(nn)+'_sfr'][isSF[i_rand]] - mu_sfr[0])
+
+            mu_sfr = Obvs.SSFR_SFMS(subcat['m.star'][isSF[i_rand]], 
+                    UT.z_nsnap(1), theta_SFMS=eev.theta_sfms) + subcat['m.star'][isSF[i_rand]]
+            dsfrs.append(subcat['sfr'][isSF[i_rand]] - mu_sfr[0]) 
+            sub.plot(UT.t_nsnap(range(1,21)[::-1]), dsfrs, c=pretty_colors[i], lw=2)
+
+        sub.plot([UT.t_nsnap(20), UT.t_nsnap(1)], [0.3, 0.3], c='k', ls='--', lw=2)
+        sub.plot([UT.t_nsnap(20), UT.t_nsnap(1)], [-0.3, -0.3], c='k', ls='--', lw=2)
+        sub.set_xlim([UT.t_nsnap(20), UT.t_nsnap(1)])
+        sub.set_xlabel('$t_{cosmic}$', fontsize=25)
+        sub.set_ylim([-1., 1.])
+        sub.set_ylabel('$\Delta$log SFR', fontsize=25)
+        fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+        fig.savefig(''.join([UT.fig_dir(), 'random_step.tstep', str(tstep), '.png']), bbox_inches='tight')
+        plt.close() 
+    return None
+
 
 def EvolverPlots(sfh): 
     '''
@@ -608,9 +705,10 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
+    test_RandomStep_timescale()
     #EvolverPlots('constant_offset')
     #EvolverPlots('corr_constant_offset')
-    EvolverPlots('random_step')
+    #EvolverPlots('random_step')
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 
