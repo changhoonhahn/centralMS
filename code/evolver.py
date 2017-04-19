@@ -19,20 +19,23 @@ def defaultTheta(sfh):
     theta = {} 
 
     theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
-    theta['sfms'] = {'name': 'linear', 'zslope': 1.14}
+    theta['sfms'] = {'name': 'linear', 
+            'zslope': 1.,#14, 
+            'mslope':0.53}
+    #theta['sfms'] = {'name': 'kinked', 'zslope': 1.14, 'mslope_high':0.53, 'mslope_low': 1.}
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.1} 
 
     if sfh == 'constant_offset': 
         theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
     elif sfh == 'corr_constant_offset':
         theta['sfh'] = {'name': 'corr_constant_offset', 
-            'm.kind': 'm.star', 'dm.kind': 0.1, 
+            'm.kind': 'm.star', 'dm.kind': 0.05, 
             'sig_abias': 0.3}
     elif sfh == 'random_step': 
         theta['sfh'] = {'name': 'random_step', 
-                'dt_min': 5., 'dt_max': 5., 'sigma': 0.3}
+                'dt_min': 0.5, 'dt_max': 0.5, 'sigma': 0.3}
     else: 
         raise NotImplementedError
 
@@ -203,22 +206,33 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
 
     logM_integ = np.tile(-999., (len(SHcat['gclass']), nsnap0 - nsnapf))
     
-    t_s = time.time() 
+    dlogmdt_kwarg_list = []
     for nn in range(nsnapf+1, nsnap0+1)[::-1]: 
         # starts at n_snap = nn 
         isStart = np.where(SHcat['nsnap_start'][isSF] == nn)  
+
+        dlogmdt_kwarg = dlogmdt_kwargs.copy()
+        
         for k in sfr_kwargs.keys(): 
             if isinstance(sfr_kwargs[k], np.ndarray): 
-                dlogmdt_kwargs[k] = sfr_kwargs[k][isStart]
+                dlogmdt_kwarg[k] = sfr_kwargs[k][isStart]
             else: 
-                dlogmdt_kwargs[k] = sfr_kwargs[k]
+                dlogmdt_kwarg[k] = sfr_kwargs[k]
 
+        dlogmdt_kwarg_list.append(dlogmdt_kwarg)
+        del dlogmdt_kwarg
+
+    t_s = time.time() 
+    for i_n, nn in enumerate(range(nsnapf+1, nsnap0+1)[::-1]): 
+        # starts at n_snap = nn 
+        isStart = np.where(SHcat['nsnap_start'][isSF] == nn)  
+        
         tmp_logM_integ = f_ode(
                 SFH.dlogMdt,                            # dy/dt
                 SHcat['m.star0'][isSF[isStart]],        # logM0
                 t_table[nsnapf:nn+1][::-1],             # t_final 
                 theta_mass['t_step'],                   # time step
-                **dlogmdt_kwargs) 
+                **dlogmdt_kwarg_list[i_n]) 
 
         logM_integ[isSF[isStart], nsnap0-nn:] = tmp_logM_integ.T[:,1:]
 

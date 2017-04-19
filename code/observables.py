@@ -423,24 +423,23 @@ class Smhmr(object):
     def __init__(self, **kwargs): 
         self.kwargs = kwargs.copy()
     
-    def Calculate(self, mstar, mhalo, dmstar=0.1, bells=None, whistles=None):
+    def Calculate(self, mhalo, mstar, dmhalo=0.1, bells=None, whistles=None):
         ''' 
         ''' 
-        m_low = np.arange(mstar.min(), mstar.max(), dmstar)
-        m_high = m_low + dmstar
+        m_low = np.arange(mhalo.min(), mhalo.max(), dmhalo)
+        m_high = m_low + dmhalo
 
-        mu_mhalo = np.zeros(len(m_low)) 
-        sig_mhalo = np.zeros(len(m_low))
+        mu_mstar = np.zeros(len(m_low)) 
+        sig_mstar = np.zeros(len(m_low))
         counts = np.zeros(len(m_low))
         for i_m in range(len(m_low)):
-            inbin = np.where((mstar >= m_low[i_m]) & (mstar < m_high[i_m]))
+            inbin = np.where((mhalo >= m_low[i_m]) & (mhalo < m_high[i_m]))
             
             counts[i_m] = len(inbin[0])
-            mu_mhalo[i_m] = np.mean(mhalo[inbin])
-            sig_mhalo[i_m] = np.std(mhalo[inbin]) 
+            mu_mstar[i_m] = np.mean(mstar[inbin])
+            sig_mstar[i_m] = np.std(mstar[inbin]) 
     
-        return [0.5*(m_low + m_high), mu_mhalo, sig_mhalo, counts]
-
+        return [0.5*(m_low + m_high), mu_mstar, sig_mstar, counts]
 
 
 def SSFR_Qpeak(mstar):  
@@ -469,8 +468,8 @@ def SSFR_SFMS(mstar, z_in, theta_SFMS=None):
 
     if theta_SFMS['name'] == 'linear': 
         # mass slope
-        A_highmass = 0.53
-        A_lowmass = 0.53
+        A_highmass = theta_SFMS['mslope']#0.53
+        A_lowmass = theta_SFMS['mslope']#0.53
         try: 
             mslope = np.repeat(A_highmass, len(mstar))
         except TypeError: 
@@ -483,8 +482,8 @@ def SSFR_SFMS(mstar, z_in, theta_SFMS=None):
 
     elif theta_SFMS['name'] == 'kinked': # Kinked SFMS 
         # mass slope
-        A_highmass = 0.53 
-        A_lowmass = theta_SFMS['mslope_lowmass'] 
+        A_highmass = theta_SFMS['mslope_high'] #0.53 
+        A_lowmass = theta_SFMS['mslope_low'] 
         try: 
             mslope = np.repeat(A_highmass, len(mstar))
         except TypeError: 

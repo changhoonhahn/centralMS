@@ -49,23 +49,24 @@ def EvolverPlots(sfh):
     smf_sf_msham = Obvs.getMF(subcat['m.sham'][isSF], weights=subcat['weights'][isSF])
     sub.plot(smf_sf_msham[0], smf_sf_msham[1], lw=3, c='k', ls='--', label='SHAM')
 
-    sub.set_xlim([6., 12.])
+    sub.set_xlim([6.75, 12.])
     sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
-    sub.set_ylim([1e-6, 10**-1.75])
+    sub.set_ylim([1e-5, 10**-1.75])
     sub.set_yscale('log')
     sub.set_ylabel('log $\Phi$', fontsize=25)
     sub.legend(loc='upper right') 
         
     sub = fig.add_subplot(1,3,2)
     smhmr = Obvs.Smhmr()
-    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat['m.star'][isSF], subcat['halo.m'][isSF])
+    m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.star'][isSF])
     
-    sub.errorbar(m_mid, mu_mhalo, yerr=sig_mhalo)
-    sub.fill_between(m_mid, mu_mhalo - 0.2, mu_mhalo + 0.2, color='k', alpha=0.25, linewidth=0, edgecolor=None)
+    sub.errorbar(m_mid, mu_mstar, yerr=sig_mstar)
+    sub.fill_between(m_mid, mu_mstar - 0.2, mu_mstar + 0.2, color='k', alpha=0.25, linewidth=0, edgecolor=None)
 
-    sub.set_xlim([8., 12.])
-    sub.set_xlabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
-    sub.set_ylabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+    sub.set_xlim([10.5, 14.])
+    sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+    sub.set_ylim([8., 12.])
+    sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
         
     isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == 20))[0]
 

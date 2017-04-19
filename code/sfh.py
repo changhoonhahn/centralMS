@@ -71,8 +71,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         # completely random 
         # amplitude is sampled randomly from a Gaussian with sig_logSFR = 0.3 
         # time steps are sampled randomly from a unifrom distribution [dt_min, dt_max]
-        t0 = time.time()
-
         if 'dt_min' not in theta_sfh: 
             raise ValueError
         if 'dt_max' not in theta_sfh: 
@@ -90,7 +88,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         # get the times when the amplitude changes 
         n_col = int(np.ceil(del_t_max/tshift_min))  # number of columns 
         n_gal = len(indices)
-        print n_gal, n_col
 
         tshift = np.zeros((n_gal, n_col))
         tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
@@ -103,7 +100,38 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         F_sfr = _logSFR_dSFR_tsteps
         
         sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
-        print time.time() - t0, 'seconds'
+    
+    elif theta_sfh['name'] == 'random_step_abias': 
+        # random steps with assembly bias  
+        if 'dt_min' not in theta_sfh: 
+            raise ValueError
+        if 'dt_max' not in theta_sfh: 
+            raise ValueError
+        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
+                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
+                
+        # Random step function duty cycle 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap_start'][indices].max()) 
+        
+        # the range of the steps 
+        tshift_min = theta_sfh['dt_min'] 
+        tshift_max = theta_sfh['dt_max'] 
+
+        # get the times when the amplitude changes 
+        n_col = int(np.ceil(del_t_max/tshift_min))  # number of columns 
+        n_gal = len(indices)
+
+        tshift = np.zeros((n_gal, n_col))
+        tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+        tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+        del tshift
+
+        dlogSFR_amp = np.random.randn(n_gal, n_col) * theta_sfh['sigma']
+        dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+
+        F_sfr = _logSFR_dSFR_tsteps
+        
+        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
     else:
         raise NotImplementedError
 
@@ -125,9 +153,11 @@ def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=Non
     
     # get the amplitude of the 
     ishift = np.abs(tsteps - tt).argmin(axis=1)
-    ishift[np.where(tsteps[:, ishift] > tt)] -= 1
-    dlogsfr = dlogSFR_amp[:,ishift]
-    del ishift
+    closest = tsteps[range(len(ishift)),ishift]
+    after = np.where(closest > tt)
+    ishift[after] -= 1
+    dlogsfr = dlogSFR_amp[range(len(ishift)),ishift]
+
     return logsfr_sfms + dlogsfr
 
 
