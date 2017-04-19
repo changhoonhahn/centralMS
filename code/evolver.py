@@ -32,7 +32,7 @@ def defaultTheta(sfh):
             'sig_abias': 0.3}
     elif sfh == 'random_step': 
         theta['sfh'] = {'name': 'random_step', 
-                'dt_min': 0.1, 'dt_max': 1., 'sigma': 0.3}
+                'dt_min': 5., 'dt_max': 5., 'sigma': 0.3}
     else: 
         raise NotImplementedError
 

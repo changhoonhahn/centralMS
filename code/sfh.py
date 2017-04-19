@@ -79,8 +79,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
         mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
                 UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
-
-        dSFR0 = SHsnaps['sfr0'][indices] - mu_sfr0
                 
         # Random step function duty cycle 
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap_start'][indices].max()) 
@@ -92,13 +90,15 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         # get the times when the amplitude changes 
         n_col = int(np.ceil(del_t_max/tshift_min))  # number of columns 
         n_gal = len(indices)
+        print n_gal, n_col
+
         tshift = np.zeros((n_gal, n_col))
         tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
-
         tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+        del tshift
 
         dlogSFR_amp = np.random.randn(n_gal, n_col) * theta_sfh['sigma']
-        dlogSFR_amp[:,0] = dSFR0
+        dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
 
         F_sfr = _logSFR_dSFR_tsteps
         
@@ -127,7 +127,7 @@ def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=Non
     ishift = np.abs(tsteps - tt).argmin(axis=1)
     ishift[np.where(tsteps[:, ishift] > tt)] -= 1
     dlogsfr = dlogSFR_amp[:,ishift]
-
+    del ishift
     return logsfr_sfms + dlogsfr
 
 
