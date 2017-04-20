@@ -10,19 +10,19 @@ import bovy_plot as bovy
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
-def test_RandomStep_timescale(): 
+def test_RandomStep_timescale(sig_smhm): 
     ''' Test the impact of the timescale for random step SFH scheme
     '''
-    # load in Subhalo Catalog (pure centrals)
-    subhist = Cat.PureCentralHistory(nsnap_ancestor=20)
-    subcat = subhist.Read()
-
     # load in generic theta (parameter values)
     theta = Evol.defaultTheta('random_step') 
-    
+
     for tstep in [0.1, 0.5, 1., 5.][::-1]: 
         theta['sfh'] = {'name': 'random_step', 
                 'dt_min': tstep, 'dt_max': tstep, 'sigma': 0.3}
+    
+        # load in Subhalo Catalog (pure centrals)
+        subhist = Cat.PureCentralHistory(sigma_smhm=sig_smhm, nsnap_ancestor=20)
+        subcat = subhist.Read()
 
         eev = Evol.Evolver(subcat, theta, nsnap0=20)
         eev.Initiate()
@@ -103,8 +103,12 @@ def test_RandomStep_timescale():
         sub.set_ylim([-1., 1.])
         sub.set_ylabel('$\Delta$log SFR', fontsize=25)
         fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
-        fig.savefig(''.join([UT.fig_dir(), 'random_step.tstep', str(tstep), '.png']), bbox_inches='tight')
+        fig.savefig(
+                ''.join([UT.fig_dir(), 'random_step.sigmaSMHM', str(sig_smhm), '.tstep', str(tstep), '.png']), 
+                bbox_inches='tight')
         plt.close() 
+
+        del subhist
     return None
 
 
@@ -705,7 +709,7 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    test_RandomStep_timescale()
+    test_RandomStep_timescale(0.2)
     #EvolverPlots('constant_offset')
     #EvolverPlots('corr_constant_offset')
     #EvolverPlots('random_step')

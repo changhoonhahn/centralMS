@@ -40,6 +40,21 @@ def plotPureCentral_SHMF(nsnap_ancestor=20):
     plt.show() 
 
 
+def plotPureCentral_SMHMR(sigma_smhm=0.2, nsnap_ancestor=20): 
+    subhist = Cat.PureCentralHistory(sigma_smhm=sigma_smhm, nsnap_ancestor=nsnap_ancestor)
+    subcat = subhist.Read()
+    
+    smhmr = Obvs.Smhmr()
+    m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['m.max'], subcat['m.star'])
+    plt.errorbar(m_mid, mu_mstar, yerr=sig_mstar) 
+
+    m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['snapshot20_m.max'], subcat['snapshot20_m.star'])
+    plt.errorbar(m_mid, mu_mstar, yerr=sig_mstar) 
+
+    plt.show() 
+
+
+
 def Test_nsnap_start(nsnap_ancestor=20):
     ''' 
     '''
@@ -74,7 +89,6 @@ def Test_nsnap_start(nsnap_ancestor=20):
     plt.show() 
 
 
-
 def test_Observations_GroupCat(): 
     ''' Simple test of the Cat.Observations class 
     '''
@@ -87,6 +101,7 @@ def test_Observations_GroupCat():
 
 
 if __name__=='__main__': 
+    plotPureCentral_SMHMR(sigma_smhm=0.0, nsnap_ancestor=20)
     #Test_nsnap_start(nsnap_ancestor=20)
 
     #test_Observations_GroupCat()
