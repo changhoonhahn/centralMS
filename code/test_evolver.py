@@ -10,7 +10,9 @@ import bovy_plot as bovy
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
-def test_RandomStep_timescale(sig_smhm): 
+
+
+def test_RandomStep_timescale(sig_smhm=None, nsnap_ancestor=20): 
     ''' Test the impact of the timescale for random step SFH scheme
     '''
     # load in generic theta (parameter values)
@@ -19,12 +21,13 @@ def test_RandomStep_timescale(sig_smhm):
     for tstep in [0.1, 0.5, 1., 5.][::-1]: 
         theta['sfh'] = {'name': 'random_step', 
                 'dt_min': tstep, 'dt_max': tstep, 'sigma': 0.3}
+        theta['mass']['t_step'] = np.min([0.05, tstep/10.]) 
     
         # load in Subhalo Catalog (pure centrals)
-        subhist = Cat.PureCentralHistory(sigma_smhm=sig_smhm, nsnap_ancestor=20)
+        subhist = Cat.PureCentralHistory(sigma_smhm=sig_smhm, nsnap_ancestor=nsnap_ancestor)
         subcat = subhist.Read()
 
-        eev = Evol.Evolver(subcat, theta, nsnap0=20)
+        eev = Evol.Evolver(subcat, theta, nsnap0=nsnap_ancestor)
         eev.Initiate()
 
         eev.Evolve() 
@@ -39,7 +42,7 @@ def test_RandomStep_timescale(sig_smhm):
         fig = plt.figure(figsize=(25,7))
         sub = fig.add_subplot(1,3,1)
 
-        for n in range(2, 21)[::-1]: 
+        for n in range(2, nsnap_ancestor+1)[::-1]: 
             # identify SF population at snapshot
             smf_sf = Obvs.getMF(subcat['snapshot'+str(n)+'_m.star'][isSF], 
                     weights=subcat['weights'][isSF])
@@ -71,7 +74,7 @@ def test_RandomStep_timescale(sig_smhm):
         sub.set_ylim([8., 12.])
         sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
             
-        isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == 20))[0]
+        isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == nsnap_ancestor))[0]
 
         m_bin = np.arange(9.0, 12.5, 0.5)  
         i_bin = np.digitize(subcat['m.star0'][isSF], m_bin)
@@ -81,12 +84,12 @@ def test_RandomStep_timescale(sig_smhm):
             i_rand = np.random.choice(np.where(i_bin == i)[0], size=1)[0]
             
             dsfrs = [subcat['sfr0'][isSF[i_rand]] - (Obvs.SSFR_SFMS(
-                subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(20), 
+                subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(nsnap_ancestor), 
                 theta_SFMS=eev.theta_sfms) + subcat['m.star0'][isSF[i_rand]])[0]]
 
-            sub.text(UT.t_nsnap(20 - i) + 0.1, dsfrs[0] + 0.02, '$\mathcal{M}_* \sim $'+str(m_bin[i]), fontsize=15)
+            sub.text(UT.t_nsnap(nsnap_ancestor - i) + 0.1, dsfrs[0] + 0.02, '$\mathcal{M}_* \sim $'+str(m_bin[i]), fontsize=15)
 
-            for nn in range(2, 20)[::-1]: 
+            for nn in range(2, nsnap_ancestor)[::-1]: 
                 M_nn = subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]]
                 mu_sfr = Obvs.SSFR_SFMS(M_nn, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
                 dsfrs.append(subcat['snapshot'+str(nn)+'_sfr'][isSF[i_rand]] - mu_sfr[0])
@@ -94,17 +97,18 @@ def test_RandomStep_timescale(sig_smhm):
             mu_sfr = Obvs.SSFR_SFMS(subcat['m.star'][isSF[i_rand]], 
                     UT.z_nsnap(1), theta_SFMS=eev.theta_sfms) + subcat['m.star'][isSF[i_rand]]
             dsfrs.append(subcat['sfr'][isSF[i_rand]] - mu_sfr[0]) 
-            sub.plot(UT.t_nsnap(range(1,21)[::-1]), dsfrs, c=pretty_colors[i], lw=2)
+            sub.plot(UT.t_nsnap(range(1, nsnap_ancestor+1)[::-1]), dsfrs, c=pretty_colors[i], lw=2)
 
-        sub.plot([UT.t_nsnap(20), UT.t_nsnap(1)], [0.3, 0.3], c='k', ls='--', lw=2)
-        sub.plot([UT.t_nsnap(20), UT.t_nsnap(1)], [-0.3, -0.3], c='k', ls='--', lw=2)
-        sub.set_xlim([UT.t_nsnap(20), UT.t_nsnap(1)])
+        sub.plot([UT.t_nsnap(nsnap_ancestor), UT.t_nsnap(1)], [0.3, 0.3], c='k', ls='--', lw=2)
+        sub.plot([UT.t_nsnap(nsnap_ancestor), UT.t_nsnap(1)], [-0.3, -0.3], c='k', ls='--', lw=2)
+        sub.set_xlim([UT.t_nsnap(nsnap_ancestor), UT.t_nsnap(1)])
         sub.set_xlabel('$t_{cosmic}$', fontsize=25)
         sub.set_ylim([-1., 1.])
         sub.set_ylabel('$\Delta$log SFR', fontsize=25)
         fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
         fig.savefig(
-                ''.join([UT.fig_dir(), 'random_step.sigmaSMHM', str(sig_smhm), '.tstep', str(tstep), '.png']), 
+                ''.join([UT.fig_dir(), 'random_step.nsnap0_', str(nsnap_ancestor), 
+                    '.sigmaSMHM', str(sig_smhm), '.tstep', str(tstep), '.png']), 
                 bbox_inches='tight')
         plt.close() 
 
@@ -709,11 +713,10 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    test_RandomStep_timescale(0.2)
+    test_RandomStep_timescale(sig_smhm=0.2, nsnap_ancestor=15)
     #EvolverPlots('constant_offset')
     #EvolverPlots('corr_constant_offset')
     #EvolverPlots('random_step')
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 
-
