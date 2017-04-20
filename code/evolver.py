@@ -25,7 +25,7 @@ def defaultTheta(sfh):
     #theta['sfms'] = {'name': 'kinked', 'zslope': 1.1, 'mslope_high':0.53, 'mslope_low': 0.65}
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.025} 
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
 
     if sfh == 'constant_offset': 
         theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}

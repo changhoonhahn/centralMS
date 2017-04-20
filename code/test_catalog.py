@@ -87,7 +87,7 @@ def test_Observations_GroupCat():
 
 
 if __name__=='__main__': 
-    Test_nsnap_start(nsnap_ancestor=20)
+    #Test_nsnap_start(nsnap_ancestor=20)
 
     #test_Observations_GroupCat()
     #plotPureCentral_SHMF(nsnap_ancestor=20)

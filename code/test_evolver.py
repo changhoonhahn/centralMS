@@ -20,7 +20,7 @@ def test_RandomStep_timescale():
     # load in generic theta (parameter values)
     theta = Evol.defaultTheta('random_step') 
     
-    for tstep in [0.1, 0.5, 1., 5.]: 
+    for tstep in [0.1, 0.5, 1., 5.][::-1]: 
         theta['sfh'] = {'name': 'random_step', 
                 'dt_min': tstep, 'dt_max': tstep, 'sigma': 0.3}
 
