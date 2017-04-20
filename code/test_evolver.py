@@ -34,7 +34,7 @@ def test_RandomStep_timescale(sig_smhm=None, nsnap_ancestor=20):
 
         subcat = eev.SH_catalog
 
-        prettyplot() 
+        #prettyplot() 
         pretty_colors = prettycolors() 
 
         isSF = np.where(subcat['gclass'] == 'star-forming')[0]
