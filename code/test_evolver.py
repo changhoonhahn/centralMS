@@ -18,7 +18,7 @@ def test_RandomStep_timescale(sig_smhm=None, nsnap_ancestor=20):
     # load in generic theta (parameter values)
     theta = Evol.defaultTheta('random_step') 
 
-    for tstep in [0.1, 0.5, 1., 5.][::-1]: 
+    for tstep in [0.01, 0.05][::-1]: 
         theta['sfh'] = {'name': 'random_step', 
                 'dt_min': tstep, 'dt_max': tstep, 'sigma': 0.3}
         theta['mass']['t_step'] = np.min([0.05, tstep/10.]) 
@@ -65,9 +65,14 @@ def test_RandomStep_timescale(sig_smhm=None, nsnap_ancestor=20):
         sub = fig.add_subplot(1,3,2)
         smhmr = Obvs.Smhmr()
         m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.star'][isSF])
-        
+
         sub.errorbar(m_mid, mu_mstar, yerr=sig_mstar)
         sub.fill_between(m_mid, mu_mstar - 0.2, mu_mstar + 0.2, color='k', alpha=0.25, linewidth=0, edgecolor=None)
+         
+        # also plot the SHAM SMHMR
+        m_mid, mu_msham, sig_msham, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.sham'][isSF])
+        sub.plot(m_mid, mu_msham + sig_msham, ls='--', c='k')
+        sub.plot(m_mid, mu_msham - sig_msham, ls='--', c='k')
 
         sub.set_xlim([10.5, 14.])
         sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
