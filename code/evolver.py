@@ -26,16 +26,23 @@ def defaultTheta(sfh):
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
     theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-
+    
+    theta['sfh'] = {'name': sfh}
     if sfh == 'constant_offset': 
-        theta['sfh'] = {'name': 'constant_offset', 'nsnap0': 20}
+        theta['sfh']['nsnap0'] = 20 
     elif sfh == 'corr_constant_offset':
-        theta['sfh'] = {'name': 'corr_constant_offset', 
-            'm.kind': 'm.star', 'dm.kind': 0.01, 
-            'sig_abias': 0.3}
+        theta['sfh']['m.kind'] = 'm.star'
+        theta['sfh']['dm.kind'] = 0.01 
+        theta['sfh']['sig_abias'] = 0.3 
     elif sfh == 'random_step': 
-        theta['sfh'] = {'name': 'random_step', 
-                'dt_min': 0.5, 'dt_max': 0.5, 'sigma': 0.3}
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma'] = 0.3 
+    elif sfh == 'random_step_abias': 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.2 
     else: 
         raise NotImplementedError
 
@@ -105,6 +112,8 @@ class Evolver(object):
         -------
         * Assign SFRs to galaxies *with* weights
         '''
+        self.SH_catalog['nsnap0'] = self.nsnap0
+
         m0 = np.zeros(len(self.SH_catalog['m.star']))
         hm0 = np.zeros(len(self.SH_catalog['m.star']))
         for i in range(2, self.nsnap0+1): # "m.star" from subhalo catalog is from SHAM

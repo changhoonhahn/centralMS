@@ -121,17 +121,17 @@ def test_RandomStep_timescale(sig_smhm=None, nsnap_ancestor=20):
     return None
 
 
-def EvolverPlots(sfh): 
+def EvolverPlots(sfh, nsnap0=None): 
     '''
     '''
     # load in Subhalo Catalog (pure centrals)
-    subhist = Cat.PureCentralHistory(nsnap_ancestor=20)
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
     subcat = subhist.Read()
 
     # load in generic theta (parameter values)
     theta = Evol.defaultTheta(sfh) 
 
-    eev = Evol.Evolver(subcat, theta, nsnap0=20)
+    eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
     eev.Initiate()
 
     eev.Evolve() 
@@ -146,7 +146,7 @@ def EvolverPlots(sfh):
     fig = plt.figure(figsize=(25,7))
     sub = fig.add_subplot(1,3,1)
 
-    for n in range(2, 21)[::-1]: 
+    for n in range(2, nsnap0+1)[::-1]: 
         # identify SF population at snapshot
         smf_sf = Obvs.getMF(subcat['snapshot'+str(n)+'_m.star'][isSF], 
                 weights=subcat['weights'][isSF])
@@ -178,7 +178,7 @@ def EvolverPlots(sfh):
     sub.set_ylim([8., 12.])
     sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
         
-    isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == 20))[0]
+    isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == nsnap0))[0]
 
     m_bin = np.arange(9.0, 12.5, 0.5)  
     i_bin = np.digitize(subcat['m.star0'][isSF], m_bin)
@@ -191,9 +191,9 @@ def EvolverPlots(sfh):
             subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(20), 
             theta_SFMS=eev.theta_sfms) + subcat['m.star0'][isSF[i_rand]])[0]]
 
-        sub.text(UT.t_nsnap(20 - i) + 0.1, dsfrs[0] + 0.02, '$\mathcal{M}_* \sim $'+str(m_bin[i]), fontsize=15)
+        sub.text(UT.t_nsnap(nsnap0 - i) + 0.1, dsfrs[0] + 0.02, '$\mathcal{M}_* \sim $'+str(m_bin[i]), fontsize=15)
 
-        for nn in range(2, 20)[::-1]: 
+        for nn in range(2, nsnap0)[::-1]: 
             M_nn = subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]]
             mu_sfr = Obvs.SSFR_SFMS(M_nn, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
             dsfrs.append(subcat['snapshot'+str(nn)+'_sfr'][isSF[i_rand]] - mu_sfr[0])
@@ -201,11 +201,11 @@ def EvolverPlots(sfh):
         mu_sfr = Obvs.SSFR_SFMS(subcat['m.star'][isSF[i_rand]], 
                 UT.z_nsnap(1), theta_SFMS=eev.theta_sfms) + subcat['m.star'][isSF[i_rand]]
         dsfrs.append(subcat['sfr'][isSF[i_rand]] - mu_sfr[0]) 
-        sub.plot(UT.t_nsnap(range(1,21)[::-1]), dsfrs, c=pretty_colors[i], lw=2)
+        sub.plot(UT.t_nsnap(range(1,nsnap0+1)[::-1]), dsfrs, c=pretty_colors[i], lw=2)
 
-    sub.plot([UT.t_nsnap(20), UT.t_nsnap(1)], [0.3, 0.3], c='k', ls='--', lw=2)
-    sub.plot([UT.t_nsnap(20), UT.t_nsnap(1)], [-0.3, -0.3], c='k', ls='--', lw=2)
-    sub.set_xlim([UT.t_nsnap(20), UT.t_nsnap(1)])
+    sub.plot([UT.t_nsnap(nsnap0), UT.t_nsnap(1)], [0.3, 0.3], c='k', ls='--', lw=2)
+    sub.plot([UT.t_nsnap(nsnap0), UT.t_nsnap(1)], [-0.3, -0.3], c='k', ls='--', lw=2)
+    sub.set_xlim([UT.t_nsnap(nsnap0), UT.t_nsnap(1)])
     sub.set_xlabel('$t_{cosmic}$', fontsize=25)
     sub.set_ylim([-1., 1.])
     sub.set_ylabel('$\Delta$log SFR', fontsize=25)
@@ -718,10 +718,11 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    test_RandomStep_timescale(sig_smhm=0.2, nsnap_ancestor=15)
+    #test_RandomStep_timescale(sig_smhm=0.2, nsnap_ancestor=15)
     #EvolverPlots('constant_offset')
     #EvolverPlots('corr_constant_offset')
     #EvolverPlots('random_step')
+    EvolverPlots('random_step_abias')
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 
