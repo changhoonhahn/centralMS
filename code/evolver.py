@@ -39,8 +39,8 @@ def defaultTheta(sfh):
         theta['sfh']['dt_max'] = 0.5 
         theta['sfh']['sigma'] = 0.3 
     elif sfh == 'random_step_abias': 
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['dt_min'] = 1.0 
+        theta['sfh']['dt_max'] = 1.0 
         theta['sfh']['sigma_tot'] = 0.3 
         theta['sfh']['sigma_corr'] = 0.2 
     else: 
@@ -94,12 +94,19 @@ class Evolver(object):
         # save into SH catalog
         self.SH_catalog['m.star'] = logM_integ[:,-1] # nsnap = 1 
         self.SH_catalog['sfr'] = logSFRs
+
+        # assign SFR and Mstar to other snapshots
         for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
+            isSF_i = np.where(
+                    (self.SH_catalog['gclass'] == 'star-forming') & 
+                    (self.SH_catalog['nsnap_start'] >= n_snap))[0] 
+
             self.SH_catalog['snapshot'+str(n_snap)+'_m.star'] = logM_integ[:,ii]
+
             self.SH_catalog['snapshot'+str(n_snap)+'_sfr'] = \
                     np.repeat(-999., len(logM_integ[:,ii]))
-            self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][isSF] = logSFR_logM_z(
-                    logM_integ[isSF,ii], UT.z_nsnap(n_snap), **sfr_kwargs)
+            self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][isSF_i] = logSFR_logM_z(
+                    logM_integ[isSF_i,ii], UT.z_nsnap(n_snap), **sfr_kwargs)
 
         return None
 

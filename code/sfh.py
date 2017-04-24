@@ -82,20 +82,22 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                 UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
                 
         # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap_start'][indices].max()) 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0']) #'nsnap_start'][indices].max()) 
         
         # the range of the steps 
         tshift_min = theta_sfh['dt_min'] 
         tshift_max = theta_sfh['dt_max'] 
 
         # get the times when the amplitude changes 
-        n_col = int(np.ceil(del_t_max/tshift_min))  # number of columns 
+        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
         n_gal = len(indices)
 
         tshift = np.zeros((n_gal, n_col))
         tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
         tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
         del tshift
+        # make sure everything evolves properly until the end
+        assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
 
         dlogSFR_amp = np.random.randn(n_gal, n_col) * theta_sfh['sigma']
         dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
@@ -114,64 +116,90 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                 UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
                 
         # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap_start'][indices].max()) 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
         
         # the range of the steps 
         tshift_min = theta_sfh['dt_min'] 
         tshift_max = theta_sfh['dt_max'] 
 
         # get the times when the amplitude changes 
-        n_col = int(np.ceil(del_t_max/tshift_min))  # number of columns 
+        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
         n_gal = len(indices)
 
         tshift = np.zeros((n_gal, n_col))
         tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
         tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
         del tshift
-    
-        # calculate dMhalo
-        dlogSFR = np.zeros((n_gal, SHsnaps['nsnap0']-1))
-        for nsnap in range(1, SHsnaps['nsnap0'])[::-1]: 
-            #dMhalo[range(n_gal), SHsnaps['nsnap0'] - nsnap - 1] = SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices] - \
-            #        SHsnaps['snapshot'+str(nsnap+1)+'_halo.m'][indices]
-            if nsnap == 1: 
-                dMhalo = SHsnaps['halo.m'][indices] - SHsnaps['snapshot'+str(nsnap+1)+'_halo.m'][indices]
-                ibins = np.digitize(SHsnaps['halo.m'][indices], np.arange(SHsnaps['halo.m'][indices].min(),
-                            SHsnaps['halo.m'][indices].max()+0.2, 0.2))
-            else: 
-                dMhalo = SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices] - SHsnaps['snapshot'+str(nsnap+1)+'_halo.m'][indices]
-
-                ibins = np.digitize(SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices], 
-                        np.arange(SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices].min(),
-                            SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices].max()+0.2, 0.2))
-
-            for ibin in range(1, ibins.max()+1): 
-                inbin = np.where(ibins == ibin)
-                n_bin = len(inbin[0])
-                 
-                isort = np.argsort(dMhalo[inbin])
-
-                irank = np.zeros(n_bin)
-                irank[isort] = np.arange(n_bin) + 0.5
-                irank /= np.float(n_bin)
-                dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1] = 1.41421356 * erfinv(1. - 2. * irank)
-            
-        dlogSFR *= theta_sfh['sigma_corr']
-
+        
+        assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
+        
+        # calculate d(logSFR) amplitude
         dlogSFR_amp = np.zeros((n_gal, n_col))
-        for igal in range(n_gal): 
-            i_tbins = np.digitize(tsteps[igal, range(n_col)], UT.t_nsnap(range(1, SHsnaps['nsnap0']+1)[::-1])) 
-            
-            print tsteps[igal, range(n_col)]
-            
-            raise ValueError
-            #dlogSFR_amp[igal, range(n_col)] 
+        _dMhalos = np.zeros((n_gal, n_col)) # testing purposes
 
-        #raise ValueError
-        # intrinsic scatter
+        if theta_sfh['sigma_corr'] > 0.: 
+            # calculate dMhalo
+            dlogSFR = np.zeros((n_gal, SHsnaps['nsnap0']-1)) # n_gal x (nsnap0 - 1) matrix
+
+            dMhalos = np.zeros((n_gal, SHsnaps['nsnap0']-1)) # testing purposes
+
+            for nsnap in range(1, SHsnaps['nsnap0'])[::-1]: 
+                if nsnap == 1: 
+                    dMhalo = SHsnaps['halo.m'][indices] - SHsnaps['snapshot'+str(nsnap+1)+'_halo.m'][indices]
+                    ibins = np.digitize(SHsnaps['halo.m'][indices], np.arange(SHsnaps['halo.m'][indices].min(),
+                                SHsnaps['halo.m'][indices].max()+0.2, 0.2))
+                else: 
+                    dMhalo = SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices] - SHsnaps['snapshot'+str(nsnap+1)+'_halo.m'][indices]
+
+                    ibins = np.digitize(SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices], 
+                            np.arange(SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices].min(),
+                                SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices].max()+0.2, 0.2))
+
+                for ibin in range(1, ibins.max()+1): 
+                    inbin = np.where(ibins == ibin)
+                    n_bin = len(inbin[0])
+                     
+                    isort = np.argsort(dMhalo[inbin])
+
+                    irank = np.zeros(n_bin)
+                    irank[isort] = np.arange(n_bin) + 0.5
+                    irank /= np.float(n_bin)
+                    dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1] = theta_sfh['sigma_corr'] * 1.41421356 * erfinv(2. * irank - 1.)
+                    
+                    # test assembly bias 
+                    #plt.scatter(dMhalo[inbin], 0.3 * np.random.randn(n_bin), c='k')
+                    #plt.scatter(dMhalo[inbin], 
+                    #        dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1] + \
+                    #                np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
+                    #print np.std(dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1])
+                    #plt.show()
+                    #raise ValueError
+
+                dMhalos[range(n_gal), SHsnaps['nsnap0'] - nsnap - 1] = dMhalo # testing purposes
+
+            t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+1)[::-1])
+
+            for igal in range(n_gal): 
+                i_tbins = np.digitize(tsteps[igal, range(n_col)], t_snaps) 
+                i_tbins = i_tbins.clip(0, len(t_snaps)-1) # clip out of range indices
+                
+                #for n in range(n_col): 
+                #    print t_snaps[i_tbins[n] - 1], '<= ', tsteps[igal, n], ' <',  t_snaps[i_tbins[n]]
+                dlogSFR_amp[igal, range(n_col)] = dlogSFR[igal, i_tbins-1]
+                
+                _dMhalos[igal, range(n_col)] = dMhalos[igal, i_tbins-1]
+
+        # add in intrinsic scatter
         dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
-        dlogSFR_amp = np.random.randn(n_gal, n_col) * theta_sfh['sigma']
-        dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+        dlogSFR_amp += dlogSFR_int
+
+        #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+        SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
+        
+        #for i_col in range(n_col): 
+        #    plt.scatter(_dMhalos[range(10000), i_col], 0.3 * np.random.randn(10000), c='k')
+        #    plt.scatter(_dMhalos[range(10000), i_col], dlogSFR_amp[range(10000), i_col], lw=0, c='r')
+        #    plt.show()
 
         F_sfr = _logSFR_dSFR_tsteps
         

@@ -121,6 +121,97 @@ def test_RandomStep_timescale(sig_smhm=None, nsnap_ancestor=20):
     return None
 
 
+def EvolverQAplots(subcat, theta, savefig=None): 
+    ''' Given subhalo catalog 
+    '''
+    prettyplot() 
+    pretty_colors = prettycolors() 
+
+    nsnap0 = subcat['nsnap0']
+
+    isSF = np.where(subcat['gclass'] == 'star-forming')[0]
+        
+    fig = plt.figure(figsize=(25,7))
+    sub = fig.add_subplot(1,3,1)
+
+    for n in range(2, nsnap0+1)[::-1]: 
+        # identify SF population at snapshot
+        smf_sf = Obvs.getMF(subcat['snapshot'+str(n)+'_m.star'][isSF], 
+                weights=subcat['weights'][isSF])
+
+        sub.plot(smf_sf[0], smf_sf[1], lw=2, c='b', alpha=0.05 * (21. - n))        
+
+    smf_sf = Obvs.getMF(subcat['m.star'][isSF], weights=subcat['weights'][isSF])
+    sub.plot(smf_sf[0], smf_sf[1], lw=3, c='b', ls='-', label='Integrated')
+
+    smf_sf_msham = Obvs.getMF(subcat['m.sham'][isSF], weights=subcat['weights'][isSF])
+    sub.plot(smf_sf_msham[0], smf_sf_msham[1], lw=3, c='k', ls='--', label='SHAM')
+
+    sub.set_xlim([6.75, 12.])
+    sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
+    sub.set_ylim([1e-5, 10**-1.75])
+    sub.set_yscale('log')
+    sub.set_ylabel('log $\Phi$', fontsize=25)
+    sub.legend(loc='upper right') 
+        
+    sub = fig.add_subplot(1,3,2)
+    smhmr = Obvs.Smhmr()
+    m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.star'][isSF])
+    
+    sub.errorbar(m_mid, mu_mstar, yerr=sig_mstar)
+    sub.fill_between(m_mid, mu_mstar - 0.2, mu_mstar + 0.2, color='k', alpha=0.25, linewidth=0, edgecolor=None)
+
+    # also plot the SHAM SMHMR
+    m_mid, mu_msham, sig_msham, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.sham'][isSF])
+    sub.plot(m_mid, mu_msham + sig_msham, ls='--', c='k')
+    sub.plot(m_mid, mu_msham - sig_msham, ls='--', c='k')
+
+    sub.set_xlim([10.5, 14.])
+    sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+    sub.set_ylim([8., 12.])
+    sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
+        
+    isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == nsnap0))[0]
+
+    m_bin = np.arange(9.0, 12.5, 0.5)  
+    i_bin = np.digitize(subcat['m.star0'][isSF], m_bin)
+    
+    sub = fig.add_subplot(1,3,3)
+    for i in np.unique(i_bin): 
+        i_rand = np.random.choice(np.where(i_bin == i)[0], size=1)[0]
+        
+        dsfrs = [subcat['sfr0'][isSF[i_rand]] - (Obvs.SSFR_SFMS(
+            subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(nsnap0), 
+            theta_SFMS=theta['sfms']) + subcat['m.star0'][isSF[i_rand]])[0]]
+
+        sub.text(UT.t_nsnap(nsnap0 - i) + 0.1, dsfrs[0] + 0.02, '$\mathcal{M}_* \sim $'+str(m_bin[i]), fontsize=15)
+
+        for nn in range(2, nsnap0)[::-1]: 
+            M_nn = subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]]
+            mu_sfr = Obvs.SSFR_SFMS(M_nn, UT.z_nsnap(nn), theta_SFMS=theta['sfms']) + M_nn
+            dsfrs.append(subcat['snapshot'+str(nn)+'_sfr'][isSF[i_rand]] - mu_sfr[0])
+
+        mu_sfr = Obvs.SSFR_SFMS(subcat['m.star'][isSF[i_rand]], 
+                UT.z_nsnap(1), theta_SFMS=theta['sfms']) + subcat['m.star'][isSF[i_rand]]
+        dsfrs.append(subcat['sfr'][isSF[i_rand]] - mu_sfr[0]) 
+        sub.plot(UT.t_nsnap(range(1,nsnap0+1)[::-1]), dsfrs, c=pretty_colors[i], lw=2)
+
+    sub.plot([UT.t_nsnap(nsnap0), UT.t_nsnap(1)], [0.3, 0.3], c='k', ls='--', lw=2)
+    sub.plot([UT.t_nsnap(nsnap0), UT.t_nsnap(1)], [-0.3, -0.3], c='k', ls='--', lw=2)
+    sub.set_xlim([UT.t_nsnap(nsnap0), UT.t_nsnap(1)])
+    sub.set_xlabel('$t_{cosmic}$', fontsize=25)
+    sub.set_ylim([-1., 1.])
+    sub.set_ylabel('$\Delta$log SFR', fontsize=25)
+    fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+
+    if savefig is not None: 
+        fig.savefig(''.join([UT.fig_dir(), sfh+'_eval.png']), bbox_inches='tight')
+        plt.close() 
+        return None
+    else: 
+        return fig
+
+
 def EvolverPlots(sfh, nsnap0=None): 
     '''
     '''
@@ -213,6 +304,188 @@ def EvolverPlots(sfh, nsnap0=None):
     fig.savefig(''.join([UT.fig_dir(), sfh+'_eval.png']), bbox_inches='tight')
     plt.close() 
     return None
+
+
+def test_Evolver_AssemblyBias(sig_corr, nsnap0=None):
+    ''' Test how assembly bias is implemented 
+    '''
+    # load in Subhalo Catalog (pure centrals)
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
+    subcat = subhist.Read()
+
+    # load in generic theta (parameter values)
+    theta = Evol.defaultTheta('random_step_abias') 
+    theta['sfh']['sigma_corr'] = sig_corr
+
+    eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
+    eev.Initiate()
+
+    eev.Evolve() 
+
+    subcat = eev.SH_catalog
+
+    prettyplot() 
+    pretty_colors = prettycolors() 
+
+    nsnap0 = subcat['nsnap0']
+
+    isSF = np.where(subcat['gclass'] == 'star-forming')[0]
+        
+    fig = plt.figure(figsize=(25,7))
+    sub = fig.add_subplot(1,3,1)
+
+    smhmr = Obvs.Smhmr()
+    m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.star'][isSF])
+    
+    sub.errorbar(m_mid, mu_mstar, yerr=sig_mstar)
+    sub.fill_between(m_mid, mu_mstar - 0.2, mu_mstar + 0.2, color='k', alpha=0.25, linewidth=0, edgecolor=None)
+
+    # also plot the SHAM SMHMR
+    m_mid, mu_msham, sig_msham, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.sham'][isSF])
+    sub.plot(m_mid, mu_msham + sig_msham, ls='--', c='k')
+    sub.plot(m_mid, mu_msham - sig_msham, ls='--', c='k')
+
+    sub.set_xlim([10.5, 14.])
+    sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+    sub.set_ylim([8., 12.])
+    sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
+        
+    sub = fig.add_subplot(1,3,2)
+    
+    sub.plot(m_mid, sig_mstar, label='$\sigma_{M_*}$')
+    sub.plot(m_mid, sig_msham, label='$\sigma_{M_{sham}}$')
+    
+    sub.set_xlim([10.5, 14.])
+    sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+    sub.set_ylim([0., 0.5])
+    sub.set_ylabel('$\sigma$', fontsize=25)
+    sub.legend(loc='upper right') 
+
+    sub = fig.add_subplot(1,3,3)
+    isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == nsnap0))[0]
+    i_rand = np.random.choice(isSF, size=5000, replace=False)#[0]
+
+    for n in range(1, nsnap0)[::-1]: 
+        if n == 1: 
+            Mstar_n = subcat['m.star'][i_rand] 
+            Mhalo_n = subcat['halo.m'][i_rand] 
+            SFR_n = subcat['sfr'][i_rand]
+        else: 
+            Mstar_n = subcat['snapshot'+str(n)+'_m.star'][i_rand] 
+            Mhalo_n = subcat['snapshot'+str(n)+'_halo.m'][i_rand] 
+            SFR_n = subcat['snapshot'+str(n)+'_sfr'][i_rand]
+        Mstar_n_1 = subcat['snapshot'+str(n+1)+'_m.star'][i_rand]
+        Mhalo_n_1 = subcat['snapshot'+str(n+1)+'_halo.m'][i_rand] 
+            
+        mu_sfr = Obvs.SSFR_SFMS(Mstar_n, UT.z_nsnap(n), theta_SFMS=eev.theta_sfms) + Mstar_n
+        dsfrs =  SFR_n - mu_sfr
+        
+        #mu_sfr = Obvs.SSFR_SFMS(Mstar_n, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
+        #for nn in range(2, nsnap0)[::-1]: 
+        #    #M_nn = subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]]
+        #    mu_sfr = Obvs.SSFR_SFMS(Mstar_n, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
+        #    dsfrs.append(subcat['snapshot'+str(nn)+'_sfr'][isSF[i_rand]] - mu_sfr[0])
+
+        #dsfrs = [subcat['sfr0'][isSF[i_rand]] - (Obvs.SSFR_SFMS(
+        #    subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(20), 
+        #    theta_SFMS=eev.theta_sfms) + subcat['m.star0'][isSF[i_rand]])[0]]
+        dMstar = Mstar_n - Mstar_n_1
+        dMhalo = Mhalo_n - Mhalo_n_1
+        sub.scatter(dMhalo, dMstar, lw=0)
+        #sub.scatter(dMhalo, 0.3 * np.random.randn(len(dMhalo)), c='k')
+        #print np.std(dsfrs)
+        #sub.scatter(dMhalo, dsfrs, lw=0)
+    
+    sub.set_xlim([-0.5, 0.5])
+    sub.set_xlabel('$\Delta$ log $M_{halo}$', fontsize=25)
+    #sub.set_ylabel('$\Delta$ log $M_*$', fontsize=25)
+    sub.set_ylim([-1., 1.])
+    sub.set_ylabel('$\Delta$ log SFR', fontsize=25)
+    
+    fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+    
+    plt.show() 
+    return None 
+    #if savefig is not None: 
+    #    fig.savefig(''.join([UT.fig_dir(), sfh+'_eval.png']), bbox_inches='tight')
+    #    plt.close() 
+    #    return None
+    #else: 
+    #    return fig
+
+
+def test_AssemblyBias(sig_corr, nsnap0=None):
+    ''' Test how assembly bias is implemented 
+    '''
+    # load in Subhalo Catalog (pure centrals)
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
+    subcat = subhist.Read()
+
+    # load in generic theta (parameter values)
+    theta = Evol.defaultTheta('random_step_abias') 
+    theta['sfh']['sigma_corr'] = sig_corr
+
+    eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
+    eev.Initiate()
+
+    eev.Evolve() 
+
+    subcat = eev.SH_catalog
+
+    prettyplot() 
+    pretty_colors = prettycolors() 
+
+    nsnap0 = subcat['nsnap0']
+
+    isSF = np.where(subcat['gclass'] == 'star-forming')[0]
+        
+    isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == nsnap0))[0]
+    i_rand = np.random.choice(isSF, size=5000, replace=False)#[0]
+
+    for n in range(1, nsnap0)[::-1]: 
+        fig = plt.figure(figsize=(7,7))
+        sub = fig.add_subplot(1,1,1)
+        if n == 1: 
+            Mstar_n = subcat['m.star'][i_rand] 
+            Mhalo_n = subcat['halo.m'][i_rand] 
+            SFR_n = subcat['sfr'][i_rand]
+        else: 
+            Mstar_n = subcat['snapshot'+str(n)+'_m.star'][i_rand] 
+            Mhalo_n = subcat['snapshot'+str(n)+'_halo.m'][i_rand] 
+            SFR_n = subcat['snapshot'+str(n)+'_sfr'][i_rand]
+        Mstar_n_1 = subcat['snapshot'+str(n+1)+'_m.star'][i_rand]
+        Mhalo_n_1 = subcat['snapshot'+str(n+1)+'_halo.m'][i_rand] 
+            
+        mu_sfr = Obvs.SSFR_SFMS(Mstar_n, UT.z_nsnap(n), theta_SFMS=eev.theta_sfms) + Mstar_n
+        dsfrs =  SFR_n - mu_sfr
+        
+        #mu_sfr = Obvs.SSFR_SFMS(Mstar_n, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
+        #for nn in range(2, nsnap0)[::-1]: 
+        #    #M_nn = subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]]
+        #    mu_sfr = Obvs.SSFR_SFMS(Mstar_n, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
+        #    dsfrs.append(subcat['snapshot'+str(nn)+'_sfr'][isSF[i_rand]] - mu_sfr[0])
+
+        #dsfrs = [subcat['sfr0'][isSF[i_rand]] - (Obvs.SSFR_SFMS(
+        #    subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(20), 
+        #    theta_SFMS=eev.theta_sfms) + subcat['m.star0'][isSF[i_rand]])[0]]
+        dMstar = Mstar_n - Mstar_n_1
+        dMhalo = Mhalo_n - Mhalo_n_1
+        sub.scatter(dMhalo, dMstar, lw=0)
+        #sub.scatter(dMhalo, 0.3 * np.random.randn(len(dMhalo)), c='k')
+        #print np.std(dsfrs)
+        #sub.scatter(dMhalo, dsfrs, lw=0)
+    
+        sub.set_xlim([-0.5, 0.5])
+        sub.set_xlabel('$\Delta$ log $M_{halo}$', fontsize=25)
+        #sub.set_ylabel('$\Delta$ log $M_*$', fontsize=25)
+        #sub.set_ylim([-1., 1.])
+        sub.set_ylabel('$\Delta$ log SFR', fontsize=25)
+    
+        plt.show() 
+    #fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+    
+    #plt.show() 
+    return None 
 
 
 def test_EvolverInitiate(test, nsnap): 
@@ -721,8 +994,10 @@ if __name__=="__main__":
     #test_RandomStep_timescale(sig_smhm=0.2, nsnap_ancestor=15)
     #EvolverPlots('constant_offset')
     #EvolverPlots('corr_constant_offset')
-    #EvolverPlots('random_step')
-    EvolverPlots('random_step_abias')
+    #EvolverPlots('random_step', nsnap0=15)
+    test_AssemblyBias(0.3, nsnap0=15)
+    #test_Evolver_AssemblyBias(0.3, nsnap0=15)
+    #EvolverPlots('random_step_abias', nsnap0=15)
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 
