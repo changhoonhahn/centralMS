@@ -75,7 +75,7 @@ class Evolver(object):
         # store subhalo catalog object described in catalog.py
         self.SH_catalog = PCH_catalog
 
-    def Evolve(self): 
+    def Evolve(self, forTests=False): 
         ''' Evolve the galaxies from initial conditions specified in self.Initiate()
         '''
         # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
@@ -84,6 +84,8 @@ class Evolver(object):
         # logSFR(logM, z) function and keywords
         logSFR_logM_z, sfr_kwargs = SFH.logSFR_initiate(self.SH_catalog, isSF, 
                 theta_sfh=self.theta_sfh, theta_sfms=self.theta_sfms)
+        if forTests: 
+            self.sfr_kwargs = sfr_kwargs
 
         # get integrated stellar masses 
         logM_integ, logSFRs = _MassSFR_Wrapper(self.SH_catalog, self.nsnap0, 1,  
