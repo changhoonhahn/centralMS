@@ -279,7 +279,7 @@ def EvolverPlots(sfh, nsnap0=None):
         i_rand = np.random.choice(np.where(i_bin == i)[0], size=1)[0]
         
         dsfrs = [subcat['sfr0'][isSF[i_rand]] - (Obvs.SSFR_SFMS(
-            subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(20), 
+            subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(nsnap0), 
             theta_SFMS=eev.theta_sfms) + subcat['m.star0'][isSF[i_rand]])[0]]
 
         sub.text(UT.t_nsnap(nsnap0 - i) + 0.1, dsfrs[0] + 0.02, '$\mathcal{M}_* \sim $'+str(m_bin[i]), fontsize=15)
@@ -995,9 +995,9 @@ if __name__=="__main__":
     #EvolverPlots('constant_offset')
     #EvolverPlots('corr_constant_offset')
     #EvolverPlots('random_step', nsnap0=15)
-    test_AssemblyBias(0.3, nsnap0=15)
+    #test_AssemblyBias(0.3, nsnap0=15)
     #test_Evolver_AssemblyBias(0.3, nsnap0=15)
-    #EvolverPlots('random_step_abias', nsnap0=15)
+    EvolverPlots('random_step_abias', nsnap0=15)
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 

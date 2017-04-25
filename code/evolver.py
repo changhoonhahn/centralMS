@@ -97,16 +97,34 @@ class Evolver(object):
 
         # assign SFR and Mstar to other snapshots
         for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
-            isSF_i = np.where(
-                    (self.SH_catalog['gclass'] == 'star-forming') & 
-                    (self.SH_catalog['nsnap_start'] >= n_snap))[0] 
+            isSF_i = np.where(self.SH_catalog['nsnap_start'][isSF] == n_snap)[0] 
 
             self.SH_catalog['snapshot'+str(n_snap)+'_m.star'] = logM_integ[:,ii]
 
             self.SH_catalog['snapshot'+str(n_snap)+'_sfr'] = \
                     np.repeat(-999., len(logM_integ[:,ii]))
-            self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][isSF_i] = logSFR_logM_z(
-                    logM_integ[isSF_i,ii], UT.z_nsnap(n_snap), **sfr_kwargs)
+            # assign M*0 and SFR0 
+            self.SH_catalog['snapshot'+str(n_snap)+'_m.star'][isSF[isSF_i]] = \
+                    self.SH_catalog['m.star0'][isSF[isSF_i]]
+            self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][isSF[isSF_i]] = \
+                    self.SH_catalog['sfr0'][isSF[isSF_i]]
+        
+        for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
+            isSF_i = np.where(self.SH_catalog['nsnap_start'][isSF] >= n_snap)[0] 
+            
+            sfr_tmp = logSFR_logM_z(self.SH_catalog['snapshot'+str(n_snap)+'_m.star'][isSF],
+                    UT.z_nsnap(n_snap), **sfr_kwargs)
+
+            self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][isSF[isSF_i]] = sfr_tmp[isSF_i]
+
+        #for i in isSF[range(10)]:
+        #    print '====='
+        #    print self.SH_catalog['nsnap_start'][i]
+
+        #    for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
+        #        print n_snap,  self.SH_catalog['snapshot'+str(n_snap)+'_m.star'][i], self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][i]
+        #    print '1', self.SH_catalog['m.star'][i], self.SH_catalog['sfr'][i]
+        #    print '====='
 
         return None
 
