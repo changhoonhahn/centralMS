@@ -11,6 +11,64 @@ from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
 
+def test_Evolver_logSFRinitiate(sfh, nsnap0=None):
+    ''' Test the log(SFR) initiate step within Evolver.Evolve()
+    '''
+    # load in Subhalo Catalog (pure centrals)
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
+    print subhist.File()
+    subcat = subhist.Read()
+
+    # load in generic theta (parameter values)
+    theta = Evol.defaultTheta(sfh) 
+    print theta
+    
+    eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
+    eev.Initiate()
+    eev.Evolve(forTests=True) 
+
+    #subcat = eev.SH_catalog
+    sfr_kwargs = eev.sfr_kwargs
+
+    prettyplot() 
+    pretty_colors = prettycolors() 
+    
+    if sfh in ['random_step']:
+        #print 'dlogSFR_amp', sfr_kwargs['dlogSFR_amp'].shape
+        #print 'tsteps', sfr_kwargs['tsteps'].shape
+        i_rand = np.random.choice(range(sfr_kwargs['dlogSFR_amp'].shape[0]), size=10, replace=False)
+        
+        fig = plt.figure()
+        sub = fig.add_subplot(111)
+
+        for ii in i_rand: 
+            #print sfr_kwargs['tsteps'][ii, :]
+            #print sfr_kwargs['dlogSFR_amp'][ii, :]
+            sub.plot(sfr_kwargs['tsteps'][ii, :], sfr_kwargs['dlogSFR_amp'][ii, :])
+
+        sub.set_xlim([UT.t_nsnap(nsnap0), UT.t_nsnap(1)])
+        plt.show()
+
+    elif sfh in ['random_step_abias']: 
+        i_rand = np.random.choice(range(sfr_kwargs['dlogSFR_amp'].shape[0]), size=10, replace=False)
+        
+        fig = plt.figure()
+        sub = fig.add_subplot(111)
+
+        for ii in i_rand: #range(sfr_kwargs['dlogSFR_amp'].shape[1]): 
+            #print sfr_kwargs['tsteps'][ii, :]
+            #print sfr_kwargs['dlogSFR_amp'][ii, :]
+            sub.scatter(sfr_kwargs['dMhalos'][ii,:], sfr_kwargs['dlogSFR_corr'][ii,:])
+        sub.set_xlim([-0.2, 0.2])
+        sub.set_ylim([-3.*theta['sfh']['sigma_corr'], 3.*theta['sfh']['sigma_corr']])
+        plt.show()
+
+    else: 
+        raise NotImplementedError
+
+
+    return None
+
 
 def test_RandomStep_timescale(sig_smhm=None, nsnap_ancestor=20): 
     ''' Test the impact of the timescale for random step SFH scheme
@@ -997,7 +1055,8 @@ if __name__=="__main__":
     #EvolverPlots('random_step', nsnap0=15)
     #test_AssemblyBias(0.3, nsnap0=15)
     #test_Evolver_AssemblyBias(0.3, nsnap0=15)
-    EvolverPlots('random_step_abias', nsnap0=15)
+    #EvolverPlots('random_step_abias', nsnap0=15)
+    test_Evolver_logSFRinitiate('random_step_abias', nsnap0=15)
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 

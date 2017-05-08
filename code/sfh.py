@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 
 def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
-    '''
+    ''' initiate log SFR function for Evolver.Evolve() method
     '''
     if theta_sfh['name'] == 'constant_offset':
         # constant d_logSFR 
@@ -135,12 +135,12 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         
         # calculate d(logSFR) amplitude
         dlogSFR_amp = np.zeros((n_gal, n_col))
-        _dMhalos = np.zeros((n_gal, n_col)) # testing purposes
 
         if theta_sfh['sigma_corr'] > 0.: 
+            _dMhalos = np.zeros((n_gal, n_col)) # testing purposes
+
             # calculate dMhalo
             dlogSFR = np.zeros((n_gal, SHsnaps['nsnap0']-1)) # n_gal x (nsnap0 - 1) matrix
-
             dMhalos = np.zeros((n_gal, SHsnaps['nsnap0']-1)) # testing purposes
 
             for nsnap in range(1, SHsnaps['nsnap0'])[::-1]: 
@@ -190,6 +190,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                 _dMhalos[igal, range(n_col)] = dMhalos[igal, i_tbins-1]
 
         # add in intrinsic scatter
+        dlogSFR_corr = dlogSFR_amp
         dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
         dlogSFR_amp += dlogSFR_int
 
@@ -203,7 +204,8 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
 
         F_sfr = _logSFR_dSFR_tsteps
         
-        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
+        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms, 
+                'dMhalos': _dMhalos, 'dlogSFR_corr': dlogSFR_corr}
     else:
         raise NotImplementedError
 
@@ -214,7 +216,7 @@ def _logSFR_dSFR(logmm, zz, dSFR=None, theta_sfms=None):
     return Obvs.SSFR_SFMS(logmm, zz, theta_SFMS=theta_sfms) + logmm + dSFR
 
 
-def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=None): 
+def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=None, **other_kwargs): 
     ''' 
     '''
     # log(SFR) of SF MS 
