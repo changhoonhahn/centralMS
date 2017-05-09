@@ -106,6 +106,48 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         
         sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
     
+    elif theta_sfh['name'] == 'random_step_fluct': 
+        # completely random amplitude that is sampled from a Gaussian with sig_logSFR = 0.3 
+        # EXCEPT each adjacent timesteps have alternating sign amplitudes
+        # time steps are sampled randomly from a unifrom distribution [dt_min, dt_max]
+        if 'dt_min' not in theta_sfh: 
+            raise ValueError
+        if 'dt_max' not in theta_sfh: 
+            raise ValueError
+        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
+                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
+                
+        # Random step function duty cycle 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0']) #'nsnap_start'][indices].max()) 
+        
+        # the range of the steps 
+        tshift_min = theta_sfh['dt_min'] 
+        tshift_max = theta_sfh['dt_max'] 
+
+        # get the times when the amplitude changes 
+        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
+        n_gal = len(indices)    # number of galaxies
+        tshift = np.zeros((n_gal, n_col))
+        tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+        tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+        del tshift
+        # make sure everything evolves properly until the end
+        assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
+        
+        # all positive amplitudes
+        dlogSFR_amp = np.abs(np.random.randn(n_gal, n_col)) * theta_sfh['sigma']
+        # now make every other time step negative!
+        plusminus = np.ones((n_gal, n_col))
+        for i in range(np.int(np.ceil(np.float(n_col)/2.))): 
+            plusminus[:, 2*i] *= -1. 
+        dlogSFR_amp *= plusminus
+        
+        # make sure that nsnap0 is consistent with initial conditions!
+        dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+
+        F_sfr = _logSFR_dSFR_tsteps
+        
+        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
     elif theta_sfh['name'] == 'random_step_abias': 
         # random steps with assembly bias  
         if 'dt_min' not in theta_sfh: 

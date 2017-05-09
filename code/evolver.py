@@ -6,7 +6,7 @@
 import time 
 import numpy as np 
 from scipy.interpolate import interp1d
-from scipy.integrate import odeint
+#from scipy.integrate import odeint
 
 import util as UT 
 import sfh as SFH
@@ -25,7 +25,7 @@ def defaultTheta(sfh):
     #theta['sfms'] = {'name': 'kinked', 'zslope': 1.1, 'mslope_high':0.53, 'mslope_low': 0.65}
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
     
     theta['sfh'] = {'name': sfh}
     if sfh == 'constant_offset': 
@@ -35,6 +35,10 @@ def defaultTheta(sfh):
         theta['sfh']['dm.kind'] = 0.01 
         theta['sfh']['sig_abias'] = 0.3 
     elif sfh == 'random_step': 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma'] = 0.3 
+    elif sfh == 'random_step_fluct': 
         theta['sfh']['dt_min'] = 0.5 
         theta['sfh']['dt_max'] = 0.5 
         theta['sfh']['sigma'] = 0.3 
@@ -86,6 +90,7 @@ class Evolver(object):
                 theta_sfh=self.theta_sfh, theta_sfms=self.theta_sfms)
         if forTests: 
             self.sfr_kwargs = sfr_kwargs
+            #self.logSFR_logM_z = logSFR_logM_z
 
         # get integrated stellar masses 
         logM_integ, logSFRs = _MassSFR_Wrapper(self.SH_catalog, self.nsnap0, 1,  

@@ -28,12 +28,13 @@ def test_Evolver_logSFRinitiate(sfh, nsnap0=None):
     eev.Evolve(forTests=True) 
 
     #subcat = eev.SH_catalog
-    sfr_kwargs = eev.sfr_kwargs
+    sfr_kwargs = eev.sfr_kwargs  # SFR keyword arguments 
+    #logSFR_logM_z = self.logSFR_logM_z # logSFR(logM, z) function 
 
     prettyplot() 
     pretty_colors = prettycolors() 
     
-    if sfh in ['random_step']:
+    if sfh in ['random_step', 'random_step_fluct']:
         #print 'dlogSFR_amp', sfr_kwargs['dlogSFR_amp'].shape
         #print 'tsteps', sfr_kwargs['tsteps'].shape
         i_rand = np.random.choice(range(sfr_kwargs['dlogSFR_amp'].shape[0]), size=10, replace=False)
@@ -318,9 +319,12 @@ def EvolverPlots(sfh, nsnap0=None):
     sub = fig.add_subplot(1,3,2)
     smhmr = Obvs.Smhmr()
     m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.star'][isSF])
+    sig_mstar_mh12 = smhmr.sigma_logMstar(subcat['halo.m'][isSF], subcat['m.star'][isSF], Mhalo=12.)
     
     sub.errorbar(m_mid, mu_mstar, yerr=sig_mstar)
     sub.fill_between(m_mid, mu_mstar - 0.2, mu_mstar + 0.2, color='k', alpha=0.25, linewidth=0, edgecolor=None)
+    sub.text(0.3, 0.9, '$\sigma_{log\, M*}(M_h = 10^{12} M_\odot)$ ='+str(round(sig_mstar_mh12, 3)), 
+            ha='center', va='center', transform=sub.transAxes)
 
     sub.set_xlim([10.5, 14.])
     sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
@@ -1055,8 +1059,11 @@ if __name__=="__main__":
     #EvolverPlots('random_step', nsnap0=15)
     #test_AssemblyBias(0.3, nsnap0=15)
     #test_Evolver_AssemblyBias(0.3, nsnap0=15)
-    #EvolverPlots('random_step_abias', nsnap0=15)
-    test_Evolver_logSFRinitiate('random_step_abias', nsnap0=15)
+    EvolverPlots('constant_offset', nsnap0=15)
+    EvolverPlots('random_step', nsnap0=15)
+    EvolverPlots('random_step_fluct', nsnap0=15)
+    #test_Evolver_logSFRinitiate('random_step_abias', nsnap0=15)
+    #test_Evolver_logSFRinitiate('random_step_fluct', nsnap0=15)
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 
