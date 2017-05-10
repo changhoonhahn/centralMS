@@ -148,6 +148,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         F_sfr = _logSFR_dSFR_tsteps
         
         sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
+
     elif theta_sfh['name'] == 'random_step_abias': 
         # random steps with assembly bias  
         if 'dt_min' not in theta_sfh: 
@@ -155,7 +156,8 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         if 'dt_max' not in theta_sfh: 
             raise ValueError
         mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
+                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + \
+                        SHsnaps['m.star0'][indices]
                 
         # Random step function duty cycle 
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 

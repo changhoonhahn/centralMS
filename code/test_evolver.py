@@ -21,7 +21,8 @@ def test_Evolver_logSFRinitiate(sfh, nsnap0=None):
 
     # load in generic theta (parameter values)
     theta = Evol.defaultTheta(sfh) 
-    print theta
+    for k in theta.keys(): 
+        print k, '---', theta[k]
     
     eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
     eev.Initiate()
@@ -1059,11 +1060,11 @@ if __name__=="__main__":
     #EvolverPlots('random_step', nsnap0=15)
     #test_AssemblyBias(0.3, nsnap0=15)
     #test_Evolver_AssemblyBias(0.3, nsnap0=15)
-    EvolverPlots('constant_offset', nsnap0=15)
-    EvolverPlots('random_step', nsnap0=15)
-    EvolverPlots('random_step_fluct', nsnap0=15)
+    #EvolverPlots('constant_offset', nsnap0=15)
+    #EvolverPlots('random_step', nsnap0=15)
+    #EvolverPlots('random_step_fluct', nsnap0=15)
     #test_Evolver_logSFRinitiate('random_step_abias', nsnap0=15)
-    #test_Evolver_logSFRinitiate('random_step_fluct', nsnap0=15)
+    test_Evolver_logSFRinitiate('random_step_fluct', nsnap0=15)
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 

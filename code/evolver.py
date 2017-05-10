@@ -25,11 +25,11 @@ def defaultTheta(sfh):
     #theta['sfms'] = {'name': 'kinked', 'zslope': 1.1, 'mslope_high':0.53, 'mslope_low': 0.65}
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.01} 
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
     
     theta['sfh'] = {'name': sfh}
     if sfh == 'constant_offset': 
-        theta['sfh']['nsnap0'] = 20 
+        theta['sfh']['nsnap0'] = 15 
     elif sfh == 'corr_constant_offset':
         theta['sfh']['m.kind'] = 'm.star'
         theta['sfh']['dm.kind'] = 0.01 
