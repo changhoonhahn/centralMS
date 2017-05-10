@@ -11,6 +11,81 @@ from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
 
+def test_Evolver_ODEsolver(sfh, nsnap0=None):
+    ''' Test the log(SFR) initiate step within Evolver.Evolve()
+    '''
+
+    solvers = ['euler', 'scipy']
+
+    prettyplot() 
+    pretty_colors = prettycolors() 
+        
+    fig = plt.figure(figsize=(18, 7*len(solvers)))
+
+    for i_s, solver in enumerate(solvers): 
+        # load in Subhalo Catalog (pure centrals)
+        subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
+        print subhist.File()
+        subcat = subhist.Read()
+
+        # load in generic theta (parameter values)
+        theta = Evol.defaultTheta(sfh) 
+        theta['mass']['solver'] = solver
+        for k in theta.keys(): 
+            print k, '---', theta[k]
+        
+        eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
+        eev.Initiate()
+        eev.Evolve() 
+        
+        isSF = np.where(subcat['gclass'] == 'star-forming')[0]
+        
+        sub = fig.add_subplot(len(solvers),2,i_s*len(solvers)+1)
+
+        for n in range(2, nsnap0+1)[::-1]: 
+            # identify SF population at snapshot
+            smf_sf = Obvs.getMF(subcat['snapshot'+str(n)+'_m.star'][isSF], 
+                    weights=subcat['weights'][isSF])
+
+            sub.plot(smf_sf[0], smf_sf[1], lw=2, c='b', alpha=0.05 * (21. - n))        
+
+        smf_sf = Obvs.getMF(subcat['m.star'][isSF], weights=subcat['weights'][isSF])
+        sub.plot(smf_sf[0], smf_sf[1], lw=3, c='b', ls='-', label='Integrated')
+
+        smf_sf_msham = Obvs.getMF(subcat['m.sham'][isSF], weights=subcat['weights'][isSF])
+        sub.plot(smf_sf_msham[0], smf_sf_msham[1], lw=3, c='k', ls='--', label='SHAM')
+
+        sub.set_xlim([6.75, 12.])
+        sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
+        sub.set_ylim([1e-5, 10**-1.75])
+        sub.set_yscale('log')
+        sub.set_ylabel('log $\Phi$', fontsize=25)
+        sub.legend(loc='upper right') 
+        
+        # mark the solver type
+        sub.text(0.15, 0.9, solver.upper(), ha='center', va='center', 
+                transform=sub.transAxes)
+            
+        sub = fig.add_subplot(len(solvers),2,i_s*len(solvers)+2)
+        smhmr = Obvs.Smhmr()
+        m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.star'][isSF])
+        sig_mstar_mh12 = smhmr.sigma_logMstar(subcat['halo.m'][isSF], subcat['m.star'][isSF], Mhalo=12.)
+        
+        sub.errorbar(m_mid, mu_mstar, yerr=sig_mstar)
+        sub.fill_between(m_mid, mu_mstar - 0.2, mu_mstar + 0.2, color='k', alpha=0.25, linewidth=0, edgecolor=None)
+        sub.text(0.3, 0.9, '$\sigma_{log\, M*}(M_h = 10^{12} M_\odot)$ ='+str(round(sig_mstar_mh12, 3)), 
+                ha='center', va='center', transform=sub.transAxes)
+
+        sub.set_xlim([10.5, 14.])
+        sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+        sub.set_ylim([8., 12.])
+        sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
+            
+    fig.savefig(''.join([UT.fig_dir(), sfh+'_ODEsolver.png']), bbox_inches='tight')
+    plt.close() 
+    return None
+
+
 def test_Evolver_logSFRinitiate(sfh, nsnap0=None):
     ''' Test the log(SFR) initiate step within Evolver.Evolve()
     '''
@@ -1064,7 +1139,8 @@ if __name__=="__main__":
     #EvolverPlots('random_step', nsnap0=15)
     #EvolverPlots('random_step_fluct', nsnap0=15)
     #test_Evolver_logSFRinitiate('random_step_abias', nsnap0=15)
-    test_Evolver_logSFRinitiate('random_step_fluct', nsnap0=15)
+    #test_Evolver_logSFRinitiate('random_step_fluct', nsnap0=15)
+    test_Evolver_ODEsolver('random_step_fluct', nsnap0=15)
     #test_EvolverEvolve('smhmr')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 

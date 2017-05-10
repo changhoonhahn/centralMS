@@ -6,7 +6,7 @@
 import time 
 import numpy as np 
 from scipy.interpolate import interp1d
-#from scipy.integrate import odeint
+from scipy.integrate import odeint
 
 import util as UT 
 import sfh as SFH
@@ -240,10 +240,13 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
     dlogmdt_kwargs['zoft'] = z_of_t
     
     # choose ODE solver
-    if theta_mass['solver'] == 'rk4':     # RK4 (does not work for stiff ODEs -- thanks geoff!)
-        f_ode = SFH.ODE_RK4
-    elif theta_mass['solver'] == 'euler': # Forward euler
+    if theta_mass['solver'] == 'euler': # Forward euler
         f_ode = SFH.ODE_Euler
+    elif theta_mass['solver'] == 'scipy':  # scipy ODE solver
+        f_ode = odeint
+    else: 
+        #theta_mass['solver'] == 'rk4':     # RK4 (does not work for stiff ODEs -- thanks geoff!)
+        raise ValueError
 
     logM_integ = np.tile(-999., (len(SHcat['gclass']), nsnap0 - nsnapf))
     
@@ -251,29 +254,55 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
     for nn in range(nsnapf+1, nsnap0+1)[::-1]: 
         # starts at n_snap = nn 
         isStart = np.where(SHcat['nsnap_start'][isSF] == nn)  
+    
+        if theta_mass['solver'] != 'scipy':  
+            dlogmdt_kwarg = dlogmdt_kwargs.copy()
+            
+            for k in sfr_kwargs.keys(): 
+                if isinstance(sfr_kwargs[k], np.ndarray): 
+                    dlogmdt_kwarg[k] = sfr_kwargs[k][isStart]
+                else: 
+                    dlogmdt_kwarg[k] = sfr_kwargs[k]
 
-        dlogmdt_kwarg = dlogmdt_kwargs.copy()
-        
-        for k in sfr_kwargs.keys(): 
-            if isinstance(sfr_kwargs[k], np.ndarray): 
-                dlogmdt_kwarg[k] = sfr_kwargs[k][isStart]
-            else: 
-                dlogmdt_kwarg[k] = sfr_kwargs[k]
-
-        dlogmdt_kwarg_list.append(dlogmdt_kwarg)
-        del dlogmdt_kwarg
+            dlogmdt_kwarg_list.append(dlogmdt_kwarg)
+            del dlogmdt_kwarg
+        else:
+            sfr_kwarg = {}
+            for k in sfr_kwargs.keys(): 
+                if isinstance(sfr_kwargs[k], np.ndarray): 
+                    sfr_kwarg[k] = sfr_kwargs[k][isStart]
+                else: 
+                    sfr_kwarg[k] = sfr_kwargs[k]
+            
+            dlogmdt_arg = (
+                    dlogmdt_kwargs['logsfr_M_z'],
+                    dlogmdt_kwargs['f_retain'],
+                    dlogmdt_kwargs['zoft'],
+                    sfr_kwarg
+                    )
+            dlogmdt_kwarg_list.append(dlogmdt_arg)
+            del dlogmdt_arg
 
     t_s = time.time() 
     for i_n, nn in enumerate(range(nsnapf+1, nsnap0+1)[::-1]): 
         # starts at n_snap = nn 
         isStart = np.where(SHcat['nsnap_start'][isSF] == nn)  
         
-        tmp_logM_integ = f_ode(
-                SFH.dlogMdt,                            # dy/dt
-                SHcat['m.star0'][isSF[isStart]],        # logM0
-                t_table[nsnapf:nn+1][::-1],             # t_final 
-                theta_mass['t_step'],                   # time step
-                **dlogmdt_kwarg_list[i_n]) 
+        if theta_mass['solver'] != 'scipy': 
+            tmp_logM_integ = f_ode(
+                    SFH.dlogMdt,                            # dy/dt
+                    SHcat['m.star0'][isSF[isStart]],        # logM0
+                    t_table[nsnapf:nn+1][::-1],             # t_final 
+                    theta_mass['t_step'],                   # time step
+                    **dlogmdt_kwarg_list[i_n]) 
+        else: 
+            print '=================================='
+            print '===========SCIPY ODEINT==========='
+            tmp_logM_integ = f_ode(
+                    SFH.dlogMdt_scipy,                      # dy/dt
+                    SHcat['m.star0'][isSF[isStart]],        # logM0
+                    t_table[nsnapf:nn+1][::-1],             # t_final 
+                    args=dlogmdt_kwarg_list[i_n]) 
 
         logM_integ[isSF[isStart], nsnap0-nn:] = tmp_logM_integ.T[:,1:]
 

@@ -363,3 +363,27 @@ def dlogMdt(logMstar, t, logsfr_M_z=None, f_retain=None, zoft=None, **sfr_kwargs
     dlogMdz = f_retain * np.power(10, tmp) 
 
     return dlogMdz 
+
+
+def dlogMdt_scipy(logMstar, t, logsfr_M_z, f_retain, zoft, sfr_kwargs): 
+    ''' Integrand d(logM)/dt for solving the ODE 
+
+    d(logM)/dz = SFR(logM, z) * dt/dz * 10^9 / (M ln(10))
+
+    Parameters
+    ----------
+    logsfr_M_t : (function) 
+        log( SFR(logM, z) )
+
+    logMstar : (array)
+        Array of stellar masses
+
+    t : (float) 
+        Cosmic time 
+
+    '''
+    tmp = logsfr_M_z(logMstar, zoft(t), **sfr_kwargs) + 8.6377843113005373 - logMstar
+    dlogMdz = f_retain * np.power(10, tmp) 
+
+    return dlogMdz 
+
