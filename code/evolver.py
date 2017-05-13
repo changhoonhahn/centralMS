@@ -46,7 +46,7 @@ def defaultTheta(sfh):
         theta['sfh']['dt_min'] = 1.0 
         theta['sfh']['dt_max'] = 1.0 
         theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.2 
+        theta['sfh']['sigma_corr'] = 0.29
     else: 
         raise NotImplementedError
 

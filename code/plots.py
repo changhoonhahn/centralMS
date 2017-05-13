@@ -26,7 +26,7 @@ def siglogMstar_tduty(nsnap0):
     sub = fig.add_subplot(111)
 
     fig_data = []  
-    tdutys = np.array([0.1, 0.5, 1., 5., 10.])
+    tdutys = np.array([0.5, 1., 5., 10.])
 
     for sfh in ['random_step_fluct']: # different SFH prescriptions
         sigmaMstar = np.repeat(-999., len(tdutys))
@@ -78,6 +78,15 @@ def siglogMstar_tduty(nsnap0):
 
     # dump to pickle file 
     pickle.dump(fig_data, open(''.join([UT.dat_dir(), 'fig_data/sigmalogMstar_tduty.p']), 'wb'))
+    
+    f = open(''.join([UT.dat_dir(), 'fig_data/sigmalogMstar_tduty.dat']), 'w')
+    f.write('# SFH, t_duty [Gyr], SMHMR sigma logMstar at Mhalo=10^12 \n')
+    for datum in fig_data: 
+        out_line = '\t'.join([datum['sfh'], str(datum['tduty']), 
+            str(datum['sigmaM*(Mh12)'])])+'\n'
+        f.write(out_line)
+    f.close()
+
     return None 
 
 
