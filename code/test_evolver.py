@@ -369,7 +369,7 @@ def EvolverPlots(sfh, nsnap0=None):
 
     subcat = eev.SH_catalog
 
-    prettyplot() 
+    #prettyplot() 
     pretty_colors = prettycolors() 
 
     isSF = np.where(subcat['gclass'] == 'star-forming')[0]
@@ -1143,7 +1143,7 @@ if __name__=="__main__":
     #EvolverPlots('constant_offset', nsnap0=15)
     #EvolverPlots('random_step', nsnap0=15)
     #EvolverPlots('random_step_fluct', nsnap0=15)
-    EvolverPlots('random_step_abias', nsnap0=15)
+    EvolverPlots('random_step_abias2', nsnap0=15)
     #test_Evolver_logSFRinitiate('random_step_abias', nsnap0=15)
     #test_Evolver_logSFRinitiate('random_step_fluct', nsnap0=15)
     #test_Evolver_ODEsolver('random_step_fluct', nsnap0=15)

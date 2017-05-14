@@ -22,13 +22,19 @@ def siglogMstar_tduty(nsnap0):
     ''' Plot sigma_logM*(M_halo = 10^12) as a function of t_duty (the duty cycle
     timescale) 
     '''
+    pretty_colors = prettycolors()
     fig = plt.figure()
     sub = fig.add_subplot(111)
 
     fig_data = []  
     tdutys = np.array([0.5, 1., 5., 10.])
-
-    for sfh in ['random_step_fluct']: # different SFH prescriptions
+    #tdutys = np.array([1., 5.])
+    
+    for i_a, abias in enumerate([0., 0.1, 0.2, 0.3]): 
+        if abias == 0.: 
+            sfh = 'random_step_fluct'
+        else: 
+            sfh = 'random_step_abias2'
         sigmaMstar = np.repeat(-999., len(tdutys))
 
         for i_t, tduty in enumerate(tdutys):  # t_duty 
@@ -43,6 +49,11 @@ def siglogMstar_tduty(nsnap0):
             theta['mass']['t_step'] = 0.05
             if theta['mass']['t_step'] > tduty/10.: 
                 theta['mass']['t_step'] = tduty/10.
+            if abias > 0.: 
+                theta['t_abias'] = 2.  # assembly bias timescale
+                theta['sigma_corr'] = abias
+            else: 
+                theta['t_abias'] = None   # assembly bias timescale
             
             eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
             eev.Initiate()
@@ -62,28 +73,34 @@ def siglogMstar_tduty(nsnap0):
             fig_datum = {
                     'sfh': sfh, 
                     'tduty': tduty,
+                    'sigma_corr': abias, 
+                    't_abias': theta['t_abias'],
                     'theta': theta,
                     'smhmr': [m_mid, mu_mstar, sig_mstar, cnts], 
                     'sigmaM*(Mh12)': sig_mstar_mh12
                     }
             fig_data.append(fig_datum)
-
-        sub.scatter(tdutys, sigmaMstar, lw=0, s=15, label=sfh)
+        
+        sfh_label = '$\sigma_{corr} = '+str(abias)+', t_{abias} = '+str(theta['t_abias'])+'$'
+        sub.scatter(tdutys, sigmaMstar, lw=0, s=20, c=pretty_colors[i_a], label=sfh_label)
+        sub.plot(tdutys, sigmaMstar, lw=2, c=pretty_colors[i_a])
 
     sub.plot([0., 11.], [0.2, 0.2], lw=3, ls='--', c='k', label='Obsv.') 
 
+    sub.legend(loc='lower right')
+
     sub.set_xlim([0., 11.])
-    sub.set_ylim([0., 0.5])
+    sub.set_ylim([0., 0.6])
     fig.savefig(''.join([UT.fig_dir(), 'sigmalogMstar_tduty.png']), bbox_inches='tight')
 
     # dump to pickle file 
     pickle.dump(fig_data, open(''.join([UT.dat_dir(), 'fig_data/sigmalogMstar_tduty.p']), 'wb'))
     
     f = open(''.join([UT.dat_dir(), 'fig_data/sigmalogMstar_tduty.dat']), 'w')
-    f.write('# SFH, t_duty [Gyr], SMHMR sigma logMstar at Mhalo=10^12 \n')
+    f.write('# SFH, t_duty [Gyr], sigma_corr, t_abias, SMHMR sigma logMstar at Mhalo=10^12 \n')
     for datum in fig_data: 
-        out_line = '\t'.join([datum['sfh'], str(datum['tduty']), 
-            str(datum['sigmaM*(Mh12)'])])+'\n'
+        out_line = '\t'.join([datum['sfh'], str(datum['tduty']), str(datum['sigma_corr']), 
+            str(datum['t_abias']), str(datum['sigmaM*(Mh12)'])])+'\n'
         f.write(out_line)
     f.close()
 

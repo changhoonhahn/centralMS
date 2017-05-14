@@ -43,8 +43,14 @@ def defaultTheta(sfh):
         theta['sfh']['dt_max'] = 0.5 
         theta['sfh']['sigma'] = 0.3 
     elif sfh == 'random_step_abias': 
-        theta['sfh']['dt_min'] = 1.0 
-        theta['sfh']['dt_max'] = 1.0 
+        theta['sfh']['dt_min'] = 0.25 
+        theta['sfh']['dt_max'] = 0.25 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.29
+    elif sfh == 'random_step_abias2': 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['t_abias'] = 2. # Gyr
         theta['sfh']['sigma_tot'] = 0.3 
         theta['sfh']['sigma_corr'] = 0.29
     else: 
