@@ -74,7 +74,7 @@ def siglogMstar_tduty(nsnap0):
                     'sfh': sfh, 
                     'tduty': tduty,
                     'sigma_corr': abias, 
-                    't_abias': theta['t_abias'],
+                    't_abias': theta['sfh']['t_abias'],
                     'theta': theta,
                     'smhmr': [m_mid, mu_mstar, sig_mstar, cnts], 
                     'sigmaM*(Mh12)': sig_mstar_mh12
