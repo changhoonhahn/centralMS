@@ -50,10 +50,10 @@ def siglogMstar_tduty(nsnap0):
             if theta['mass']['t_step'] > tduty/10.: 
                 theta['mass']['t_step'] = tduty/10.
             if abias > 0.: 
-                theta['t_abias'] = 2.  # assembly bias timescale
-                theta['sigma_corr'] = abias
+                theta['sfh']['t_abias'] = 2.  # assembly bias timescale
+                theta['sfh']['sigma_corr'] = abias
             else: 
-                theta['t_abias'] = None   # assembly bias timescale
+                theta['sfh']['t_abias'] = None   # assembly bias timescale
             
             eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
             eev.Initiate()
@@ -81,7 +81,8 @@ def siglogMstar_tduty(nsnap0):
                     }
             fig_data.append(fig_datum)
         
-        sfh_label = '$\sigma_{corr} = '+str(abias)+', t_{abias} = '+str(theta['t_abias'])+'$'
+        sfh_label = ''.join(['$\sigma_{corr} = ', str(abias), ', ', 
+            't_{abias} = ', str(theta['sfh']['t_abias']), '$']) 
         sub.scatter(tdutys, sigmaMstar, lw=0, s=20, c=pretty_colors[i_a], label=sfh_label)
         sub.plot(tdutys, sigmaMstar, lw=2, c=pretty_colors[i_a])
 
