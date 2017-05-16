@@ -27,7 +27,7 @@ def siglogMstar_tduty(nsnap0):
     sub = fig.add_subplot(111)
 
     fig_data = []  
-    tdutys = np.array([0.5, 1., 5., 10.])
+    tdutys = np.array([0.1, 0.5, 1., 5., 10.])
     #tdutys = np.array([1., 5.])
     
     for i_a, abias in enumerate([0., 0.1, 0.2, 0.3]): 
@@ -94,10 +94,14 @@ def siglogMstar_tduty(nsnap0):
     sub.set_ylim([0., 0.6])
     fig.savefig(''.join([UT.fig_dir(), 'sigmalogMstar_tduty.png']), bbox_inches='tight')
 
+    out_file = ''.join([UT.dat_dir(), 
+        'fig_data/', 
+        'sigmalogMstar', 
+        '.tduty', '_'.join(tdutys.astype('str'))]) 
     # dump to pickle file 
-    pickle.dump(fig_data, open(''.join([UT.dat_dir(), 'fig_data/sigmalogMstar_tduty.p']), 'wb'))
+    pickle.dump(fig_data, open(out_file+'.p', 'wb'))
     
-    f = open(''.join([UT.dat_dir(), 'fig_data/sigmalogMstar_tduty.dat']), 'w')
+    f = open(out_file+'.dat', 'w')
     f.write('# SFH, t_duty [Gyr], sigma_corr, t_abias, SMHMR sigma logMstar at Mhalo=10^12 \n')
     for datum in fig_data: 
         out_line = '\t'.join([datum['sfh'], str(datum['tduty']), str(datum['sigma_corr']), 
