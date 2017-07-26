@@ -28,7 +28,6 @@ def siglogMstar_tduty(nsnap0):
 
     fig_data = []  
     tdutys = np.array([0.1, 0.5, 1., 5., 10.])
-    #tdutys = np.array([1., 5.])
     
     for i_a, abias in enumerate([0., 0.1, 0.2, 0.3]): 
         if abias == 0.: 

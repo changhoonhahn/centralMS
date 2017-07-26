@@ -96,7 +96,44 @@ def test_Observations_GroupCat():
     print catalog.keys()
 
 
+def test_Downsample(nsnap0): 
+    ''' Test the downsampling of the catalog
+    '''
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
 
+    subcat = subhist.Read() # full sample 
+
+    subcat_down = subhist.Read(downsampled='33')  # downsampled
+    
+    snaps = [] 
+    for ii in range(1, nsnap0+1): 
+        if (ii-1)%5 == 0: 
+            snaps.append(ii)
+    snaps.append(nsnap0) 
+
+    pretty_colors = prettycolors()
+    fig = plt.figure(1)
+    sub = fig.add_subplot(111)
+
+    print np.sum(subcat['weights'])
+    print np.sum(subcat_down['weights'])
+    for i in snaps: 
+        if i == 1: 
+            m_tag = 'halo.m'
+        else: 
+            m_tag = 'snapshot'+str(i)+'_halo.m'
+
+        shmf = Obvs.getMF(subcat[m_tag], weights=subcat['weights'], m_arr=np.arange(10., 15.5, 0.1))
+        sub.plot(shmf[0], shmf[1], c=pretty_colors[i]) 
+        
+        shmf = Obvs.getMF(subcat_down[m_tag], weights=subcat_down['weights'], m_arr=np.arange(10., 15.5, 0.1))
+        sub.plot(shmf[0], shmf[1], c=pretty_colors[i], ls='--') 
+
+    # x-axis
+    sub.set_xlim([10., 15.])
+    # y-axis
+    sub.set_yscale("log") 
+    plt.show() 
 
 
 if __name__=='__main__': 
@@ -105,14 +142,15 @@ if __name__=='__main__':
 
     #test_Observations_GroupCat()
     #plotPureCentral_SHMF(nsnap_ancestor=20)
-    
-    for sig in [0.2, 0.]: 
-        subhist = Cat.SubhaloHistory(sigma_smhm=sig, nsnap_ancestor=15)
-        subhist.Build()
-        subhist = Cat.PureCentralHistory(sigma_smhm=sig, nsnap_ancestor=15)
-        subhist.Build()
-        subhist.Downsample()
 
+    test_Downsample(15)
+
+    #for sig in [0.2]:#, 0.]: 
+    #    #subhist = Cat.SubhaloHistory(sigma_smhm=sig, nsnap_ancestor=15)
+    #    #subhist.Build()
+    #    subhist = Cat.PureCentralHistory(sigma_smhm=sig, nsnap_ancestor=15)
+    #    subhist.Build()
+    #    subhist.Downsample()
 
     #subhist = Cat.SubhaloHistory(nsnap_ancestor=20)
     #subhist.Build()

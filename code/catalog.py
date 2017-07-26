@@ -240,7 +240,7 @@ class PureCentralHistory(object):
         return None 
 
     def Downsample(self, ngal_thresh=4000, dmhalo=0.2): 
-        ''' Downsample the catalog 
+        ''' Downsample the catalog within bins of halo mass 
         '''
         catalog = self.Read()
         Mhalo_min = np.min(catalog['halo.m'])
