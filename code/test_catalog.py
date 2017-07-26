@@ -96,14 +96,14 @@ def test_Observations_GroupCat():
     print catalog.keys()
 
 
-def test_Downsample(nsnap0): 
+def test_Downsample(nsnap0, downsampled='14'): 
     ''' Test the downsampling of the catalog
     '''
     subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
 
     subcat = subhist.Read() # full sample 
 
-    subcat_down = subhist.Read(downsampled='33')  # downsampled
+    subcat_down = subhist.Read(downsampled='14')  # downsampled
     
     snaps = [] 
     for ii in range(1, nsnap0+1): 
@@ -124,10 +124,10 @@ def test_Downsample(nsnap0):
             m_tag = 'snapshot'+str(i)+'_halo.m'
 
         shmf = Obvs.getMF(subcat[m_tag], weights=subcat['weights'], m_arr=np.arange(10., 15.5, 0.1))
-        sub.plot(shmf[0], shmf[1], c=pretty_colors[i]) 
+        sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=1, ) 
         
         shmf = Obvs.getMF(subcat_down[m_tag], weights=subcat_down['weights'], m_arr=np.arange(10., 15.5, 0.1))
-        sub.plot(shmf[0], shmf[1], c=pretty_colors[i], ls='--') 
+        sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=3, ls='--') 
 
     # x-axis
     sub.set_xlim([10., 15.])

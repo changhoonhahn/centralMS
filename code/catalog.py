@@ -246,26 +246,34 @@ class PureCentralHistory(object):
         Mhalo_min = np.min(catalog['halo.m'])
         Mhalo_max = np.max(catalog['halo.m'])
         print Mhalo_min, Mhalo_max
-
+        
+        # halo mass bins
         mhalo_bin = np.arange(Mhalo_min - 0.5 * dmhalo, Mhalo_max + dmhalo, dmhalo) 
         
         weights = np.repeat(1., len(catalog['halo.m']))
-
+        print 'Before downsample; w_tot = ', np.sum(weights) 
+        
         for i_m in range(len(mhalo_bin) - 1): 
             in_Mhalobin = np.where(
                     (mhalo_bin[i_m] < catalog['halo.m']) &
                     (mhalo_bin[i_m+1] >= catalog['halo.m'])) 
             ngal_inbin = len(in_Mhalobin[0])
-            weights[in_Mhalobin] = 0.
 
             if ngal_inbin > ngal_thresh:  
+                weights[in_Mhalobin] = 0.
                 f_down = np.float(ngal_thresh)/np.float(ngal_inbin) 
 
                 keep_ind = np.random.choice(range(ngal_inbin), ngal_thresh, replace=False) 
-                weights[keep_ind] = 1./f_down
+                weights[in_Mhalobin[0][keep_ind]] = 1./f_down
+
+            print ngal_inbin, np.sum(weights[in_Mhalobin])
 
         f_down = np.float(len(catalog['halo.m'])) / np.float(np.sum(weights > 0.)) 
         print 'downsampled by ', int(round(f_down)), 'x'
+
+        print 'After downsample; w_tot = ', np.sum(weights)
+        
+        assert np.float(len(catalog['halo.m'])) == np.sum(weights)
         
         # ouptut downsampled catalog to hdf5 file  
         down_file = self.File(downsampled=str(int(round(f_down))))
