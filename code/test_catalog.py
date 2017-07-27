@@ -96,7 +96,7 @@ def test_Observations_GroupCat():
     print catalog.keys()
 
 
-def test_Downsample(nsnap0, downsampled='14'): 
+def test_Downsample(test_type, nsnap0, downsampled='14'): 
     ''' Test the downsampling of the catalog
     '''
     subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
@@ -114,25 +114,63 @@ def test_Downsample(nsnap0, downsampled='14'):
     pretty_colors = prettycolors()
     fig = plt.figure(1)
     sub = fig.add_subplot(111)
+    
+    if test_type == 'hmf': # halo mass function 
+        for i in snaps: 
+            if i == 1: 
+                m_tag = 'halo.m'
+            else: 
+                m_tag = 'snapshot'+str(i)+'_halo.m'
 
-    print np.sum(subcat['weights'])
-    print np.sum(subcat_down['weights'])
-    for i in snaps: 
-        if i == 1: 
-            m_tag = 'halo.m'
-        else: 
-            m_tag = 'snapshot'+str(i)+'_halo.m'
+            shmf = Obvs.getMF(subcat[m_tag], weights=subcat['weights'], m_arr=np.arange(10., 15.5, 0.1))
+            sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=1, ) 
+            
+            shmf = Obvs.getMF(subcat_down[m_tag], weights=subcat_down['weights'], m_arr=np.arange(10., 15.5, 0.1))
+            sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=3, ls='--') 
 
-        shmf = Obvs.getMF(subcat[m_tag], weights=subcat['weights'], m_arr=np.arange(10., 15.5, 0.1))
-        sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=1, ) 
+        # x-axis
+        sub.set_xlim([10., 15.])
+        # y-axis
+        sub.set_yscale("log") 
+    
+    elif test_type == 'smf': # stellar mass function 
+        for i in snaps: 
+            if i == 1: 
+                m_tag = 'm.star'
+            else: 
+                m_tag = 'snapshot'+str(i)+'_m.star'
+
+            shmf = Obvs.getMF(subcat[m_tag], weights=subcat['weights'], m_arr=np.arange(8., 12.5, 0.1))
+            sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=1) 
+            
+            shmf = Obvs.getMF(subcat_down[m_tag], weights=subcat_down['weights'], m_arr=np.arange(8., 12.5, 0.1))
+            sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=3, ls='--') 
+
+        # x-axis
+        sub.set_xlim([9., 12.])
+        # y-axis
+        sub.set_yscale("log") 
+
+    elif test_type == 'smhmr': # stellar mass - halo mass relation 
+        for i in snaps: 
+            if i == 1: 
+                hm_tag = 'm.max'
+                sm_tag = 'm.star'
+            else: 
+                hm_tag = 'snapshot'+str(i)+'_m.max'
+                sm_tag = 'snapshot'+str(i)+'_m.star'
+
+            smhmr = Obvs.Smhmr()
+            m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat[hm_tag], subcat[sm_tag], weights=subcat['weights'])
+            sub.plot(m_mid, mu_mstar - sig_mstar, c=pretty_colors[i], lw=1) 
+            sub.plot(m_mid, mu_mstar + sig_mstar, c=pretty_colors[i], lw=1) 
+            
+            m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat_down[hm_tag], subcat_down[sm_tag], 
+                    weights=subcat_down['weights'])
+            sub.plot(m_mid, mu_mstar - sig_mstar, c=pretty_colors[i], lw=3, ls='--') 
+            sub.plot(m_mid, mu_mstar + sig_mstar, c=pretty_colors[i], lw=3, ls='--') 
         
-        shmf = Obvs.getMF(subcat_down[m_tag], weights=subcat_down['weights'], m_arr=np.arange(10., 15.5, 0.1))
-        sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=3, ls='--') 
-
-    # x-axis
-    sub.set_xlim([10., 15.])
-    # y-axis
-    sub.set_yscale("log") 
+        sub.set_ylim([8., 12.])
     plt.show() 
 
 
@@ -143,7 +181,7 @@ if __name__=='__main__':
     #test_Observations_GroupCat()
     #plotPureCentral_SHMF(nsnap_ancestor=20)
 
-    test_Downsample(15)
+    test_Downsample('smhmr', 15)
 
     #for sig in [0.2]:#, 0.]: 
     #    #subhist = Cat.SubhaloHistory(sigma_smhm=sig, nsnap_ancestor=15)

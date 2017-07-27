@@ -427,9 +427,13 @@ class Smhmr(object):
     def __init__(self, **kwargs): 
         self.kwargs = kwargs.copy()
     
-    def Calculate(self, mhalo, mstar, dmhalo=0.1, bells=None, whistles=None):
+    def Calculate(self, mhalo, mstar, dmhalo=0.1, weights=None, bells=None, whistles=None):
         ''' 
         ''' 
+        if weights is not None: 
+            if len(mhalo) != len(weights): 
+                raise ValueError('lenghts of mhalo and weights do not match!')
+
         m_low = np.arange(mhalo.min(), mhalo.max(), dmhalo)
         m_high = m_low + dmhalo
 
@@ -439,10 +443,19 @@ class Smhmr(object):
         for i_m in range(len(m_low)):
             inbin = np.where((mhalo >= m_low[i_m]) & (mhalo < m_high[i_m]))
             
-            counts[i_m] = len(inbin[0])
-            mu_mstar[i_m] = np.mean(mstar[inbin])
-            sig_mstar[i_m] = np.std(mstar[inbin]) 
-    
+            if weights is None: 
+                if len(inbin[0]) == 0: 
+                    continue
+                counts[i_m] = len(inbin[0])
+                mu_mstar[i_m] = np.mean(mstar[inbin])
+                sig_mstar[i_m] = np.std(mstar[inbin]) 
+            else: 
+                if np.sum(weights[inbin]) == 0.: 
+                    continue
+                counts[i_m] = np.sum(weights[inbin])
+                mu_mstar[i_m] = np.average(mstar[inbin], weights=weights[inbin])
+                sig_mstar[i_m] = np.sqrt(np.average((mstar[inbin]-mu_mstar[i_m])**2, weights=weights[inbin]) )
+ 
         return [0.5*(m_low + m_high), mu_mstar, sig_mstar, counts]
 
     def sigma_logMstar(self, mhalo, mstar, Mhalo=12., dmhalo=0.1): 
