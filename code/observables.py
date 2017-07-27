@@ -81,12 +81,17 @@ class Fq(object):
         ''' Calculate the quiescent fraction 
         '''
         # input cross-checks 
+        if weights is None: # weights
+            ws = np.repeat(1., len(mass))
+        else: 
+            ws = weights 
         if theta_SFMS is None: 
             raise ValueError
         if sfr_class is None: 
             if sfr is None or z is None: 
                 raise ValueError
-            sfq = self.Classify(mass, sfr, z, theta_SFMS=theta_SFMS)
+            # classify galaxies SF/Q  
+            sfq = self.Classify(mass, sfr, z, weights=weights, theta_SFMS=theta_SFMS)
         else: 
             sfq = sfr_class  
     
@@ -99,13 +104,7 @@ class Fq(object):
             mass_low = mass_bins[:-1]
             mass_high = mass_bins[1:]
 
-        if weights is None: 
-            ws = np.repeat(1., len(sfq))
-        else: 
-            ws = weights 
-            
-        f_q = np.zeros(len(mass_mid)) 
-        count_arr = np.zeros(len(mass_mid))
+        f_q, count_arr = np.zeros(len(mass_mid)), np.zeros(len(mass_mid))
         for i_m in xrange(len(mass_mid)):
             masslim = np.where(
                     (mass > mass_low[i_m]) & 
@@ -123,18 +122,28 @@ class Fq(object):
         else: 
             return [mass_mid, f_q, count_arr]
     
-    def Classify(self, mstar, sfr, z_in, theta_SFMS=None):
+    def Classify(self, mstar, sfr, z_in, weights=None, theta_SFMS=None):
         ''' Classify galaxies based on M*, SFR, and redshift inputs.
         Returns an array of classifications
         '''
-        sfr_class = self.SFRcut(mstar, z_in, theta_SFMS=theta_SFMS)
+        ngal = len(mstar)
+        if weights is None: 
+            ws = np.repeat(1., ngal)
+        else: 
+            ws = weights
+        hasw = np.where(weights > 0.)
+        
+        if isinstance(z_in, np.ndarray): 
+            sfr_class = self.SFRcut(mstar[hasw], z_in[hasw], theta_SFMS=theta_SFMS)
+        else: 
+            sfr_class = self.SFRcut(mstar[hasw], z_in, theta_SFMS=theta_SFMS)
 
         sfq = np.empty(len(mstar), dtype=(str,16))
 
-        sf_index = np.where(sfr > sfr_class)
-        sfq[sf_index] = 'star-forming'
-        q_index = np.where(sfr <= sfr_class)
-        sfq[q_index] = 'quiescent'
+        sf_index = np.where(sfr[hasw] > sfr_class)
+        sfq[hasw[0][sf_index]] = 'star-forming'
+        q_index = np.where(sfr[hasw] <= sfr_class)
+        sfq[hasw[0][q_index]] = 'quiescent'
 
         return sfq 
 

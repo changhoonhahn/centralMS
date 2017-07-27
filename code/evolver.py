@@ -61,14 +61,14 @@ def defaultTheta(sfh):
 
 class Evolver(object): 
     def __init__(self, PCH_catalog, theta, nsnap0=20): 
-        ''' Using a given catalog of galaxy and subhalo snapshots track 
-        galaxy star formation histories. 
+        ''' class object that takes a given catalog of galaxy/subhalo snapshots 
+        then constructs star formation histories for them. 
 
         Parameters
         ----------
 
         PCH_catalog : (obj)
-            Object that contains the subhalo accretion histories
+            Object with catalog of subhalo accretion histories
     
         theta : (dictionary) 
             Dictionary that specifies the inital conditions and evolution
@@ -77,7 +77,6 @@ class Evolver(object):
         nsnap0 : (int) 
             The oldest snapshot. Default is nsnap = 20, which corresponds
             to z = 1.661 .
-            
         '''
         self.nsnap0 = nsnap0
         self._UnpackTheta(theta) # unpack the parameters to be usable
@@ -142,35 +141,44 @@ class Evolver(object):
         return None
 
     def Initiate(self): 
-        ''' Assign the initial conditions to galaxies at z0. More specifically
-        assign SFRs to galaxies at snpashot self.nsnap0 based on their SHAM 
-        stellar masses, theta_gv, theta_sfms, and theta_fq. 
+        ''' Assign initial conditions to galaxies at their nsnap_start. More 
+        specifically assign SFRs to galaxies at snpashot self.nsnap0 based 
+        on their SHAM stellar masses, theta_gv, theta_sfms, and theta_fq. 
 
         Details 
         -------
         * Assign SFRs to galaxies *with* weights
+        * Although most nsnap_start corresponds to nsnap0. They do not 
+            necessary have to correspond. 
         '''
         self.SH_catalog['nsnap0'] = self.nsnap0
 
-        m0 = np.zeros(len(self.SH_catalog['m.star']))
-        hm0 = np.zeros(len(self.SH_catalog['m.star']))
-        for i in range(2, self.nsnap0+1): # "m.star" from subhalo catalog is from SHAM
-            self.SH_catalog['snapshot'+str(i)+'_m.sham'] = self.SH_catalog.pop('snapshot'+str(i)+'_m.star') 
-            started = np.where(self.SH_catalog['nsnap_start'] == i)
-            m0[started] = self.SH_catalog['snapshot'+str(i)+'_m.sham'][started]
-            hm0[started] = self.SH_catalog['snapshot'+str(i)+'_halo.m'][started]
-        started = np.where(self.SH_catalog['nsnap_start'] == 1)
-        m0[started] = self.SH_catalog['m.star'][started]
-        hm0[started] = self.SH_catalog['halo.m'][started]
+        ngal = len(self.SH_catalog['m.star'])
+        
+        # first determine initial subhalo and stellar mass
+        m0, hm0 = np.zeros(ngal), np.zeros(ngal)
+        for i in range(1, self.nsnap0+1): # "m.star" from subhalo catalog is from SHAM
+            if i == 1: 
+                sm_tag = 'm.sham'
+                hm_tag = 'halo.m'
+                self.SH_catalog[sm_tag] = self.SH_catalog.pop('m.star')  # store sham masses
+            else: 
+                sm_tag = 'snapshot'+str(i)+'_m.sham'
+                hm_tag = 'snapshot'+str(i)+'_halo.m'
+                self.SH_catalog[sm_tag] = self.SH_catalog.pop('snapshot'+str(i)+'_m.star') 
 
-        self.SH_catalog['m.sham'] = self.SH_catalog.pop('m.star')  
-        self.SH_catalog['m.star0'] = m0
-        self.SH_catalog['halo.m0'] = hm0
+            started = np.where(self.SH_catalog['nsnap_start'] == i) # subhalos that being at snapshot i  
+
+            m0[started] = self.SH_catalog[sm_tag][started]
+            hm0[started] = self.SH_catalog[hm_tag][started]
+
+        self.SH_catalog['m.star0'] = m0 # initial SHAM stellar mass 
+        self.SH_catalog['halo.m0'] = hm0 # initial subhalo mass 
 
         keep = np.where(self.SH_catalog['weights'] > 0) # only galaxies that are weighted
     
         t_s = time.time()
-        # assign SFRs at z0 
+        # assign SFRs at z_star
         sfr_out = assignSFRs(
                 m0[keep], 
                 UT.z_nsnap(self.SH_catalog['nsnap_start'][keep]), 
@@ -179,6 +187,8 @@ class Evolver(object):
                 theta_SFMS = self.theta_sfms,
                 theta_FQ = self.theta_fq) 
         print 'assignSFRs takes ', time.time() - t_s
+
+        print sfr_out.keys()
 
         # save z0 SFR into self.SH_catalog 
         for key in sfr_out.keys(): 

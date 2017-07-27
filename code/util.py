@@ -26,6 +26,21 @@ def fig_dir():
     return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'fig/'
 
 
+def bar_plot(bin_edges, values): 
+    ''' Take outputs from numpy histogram and return pretty bar plot
+    '''
+    xx = [] 
+    yy = [] 
+
+    for i_val, val in enumerate(values): 
+        xx.append(bin_edges[i_val]) 
+        yy.append(val)
+        xx.append(bin_edges[i_val+1]) 
+        yy.append(val)
+
+    return [np.array(xx), np.array(yy)]
+
+
 def z_from_t(tcosmic): 
     ''' Given cosmic time return redshift using spline interpolation of snapshot table 
 
