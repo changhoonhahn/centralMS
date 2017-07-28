@@ -88,9 +88,9 @@ class Evolver(object):
         ''' Evolve the galaxies from initial conditions specified in self.Initiate()
         '''
         # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
-        isSF = np.where(self.SH_catalog['gclass'] == 'star-forming')[0] # only includes galaxies with w > 0 
-        print 'below should not have any 0s!'
-        print self.SH_catalog['weights'][isSF][:100]
+        isSF = np.where(
+                (self.SH_catalog['gclass'] == 'star-forming') & 
+                (self.SH_catalog['weights'] > 0.))[0] # only includes galaxies with w > 0 
     
         # initiate logSFR(logM, z) function and keywords
         logSFR_logM_z, sfr_kwargs = SFH.logSFR_initiate(self.SH_catalog, isSF, 
@@ -103,7 +103,6 @@ class Evolver(object):
         logM_integ, logSFRs = _MassSFR_Wrapper(self.SH_catalog, self.nsnap0, 1,  
                 isSF=isSF, logSFR_logM_z=logSFR_logM_z, sfr_kwargs=sfr_kwargs,
                 theta_sfh=self.theta_sfh, theta_sfms=self.theta_sfms, theta_mass=self.theta_mass)
-        #isSF = np.where(self.SH_catalog['gclass'] == 'star-forming') 
 
         # save into SH catalog
         self.SH_catalog['m.star'] = logM_integ[:,-1] # nsnap = 1 
@@ -130,15 +129,6 @@ class Evolver(object):
                     UT.z_nsnap(n_snap), **sfr_kwargs)
 
             self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][isSF[isSF_i]] = sfr_tmp[isSF_i]
-
-        #for i in isSF[range(10)]:
-        #    print '====='
-        #    print self.SH_catalog['nsnap_start'][i]
-
-        #    for ii, n_snap in enumerate(range(2, self.nsnap0)[::-1]): 
-        #        print n_snap,  self.SH_catalog['snapshot'+str(n_snap)+'_m.star'][i], self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][i]
-        #    print '1', self.SH_catalog['m.star'][i], self.SH_catalog['sfr'][i]
-        #    print '====='
 
         return None
 

@@ -17,13 +17,13 @@ def code_dir():
 def dat_dir(): 
     ''' dat directory is symlinked to a local path where the data files are located
     '''
-    return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'dat/'
+    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/dat/'
 
 
 def fig_dir(): 
     ''' dat directory is symlinked to a local path where the data files are located
     '''
-    return os.path.dirname(os.path.realpath(__file__)).split('code')[0]+'fig/'
+    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/fig/'
 
 
 def bar_plot(bin_edges, values): 
