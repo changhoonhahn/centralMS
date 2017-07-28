@@ -89,6 +89,8 @@ class Evolver(object):
         '''
         # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
         isSF = np.where(self.SH_catalog['gclass'] == 'star-forming')[0] # only includes galaxies with w > 0 
+        print 'below should not have any 0s!'
+        print self.SH_catalog['weights'][isSF][:100]
     
         # initiate logSFR(logM, z) function and keywords
         logSFR_logM_z, sfr_kwargs = SFH.logSFR_initiate(self.SH_catalog, isSF, 
