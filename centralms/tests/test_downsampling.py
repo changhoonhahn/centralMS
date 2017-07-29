@@ -20,8 +20,94 @@ from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
 
+def test_Catalog_Downsample(test_type, nsnap0, downsampled='14'): 
+    ''' Test the downsampling of the catalog
+
+    ========================================
+    Everything looks good
+    ========================================
+    '''
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
+
+    subcat = subhist.Read() # full sample 
+
+    subcat_down = subhist.Read(downsampled='14')  # downsampled
+    
+    snaps = [] 
+    for ii in range(1, nsnap0+1): 
+        if (ii-1)%5 == 0: 
+            snaps.append(ii)
+    snaps.append(nsnap0) 
+
+    pretty_colors = prettycolors()
+    fig = plt.figure(1)
+    sub = fig.add_subplot(111)
+    
+    if test_type == 'hmf': # halo mass function 
+        for i in snaps: 
+            if i == 1: 
+                m_tag = 'halo.m'
+            else: 
+                m_tag = 'snapshot'+str(i)+'_halo.m'
+
+            shmf = Obvs.getMF(subcat[m_tag], weights=subcat['weights'], m_arr=np.arange(10., 15.5, 0.1))
+            sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=1, ) 
+            
+            shmf = Obvs.getMF(subcat_down[m_tag], weights=subcat_down['weights'], m_arr=np.arange(10., 15.5, 0.1))
+            sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=3, ls='--') 
+
+        # x-axis
+        sub.set_xlim([10., 15.])
+        # y-axis
+        sub.set_yscale("log") 
+    
+    elif test_type == 'smf': # stellar mass function 
+        for i in snaps: 
+            if i == 1: 
+                m_tag = 'm.star'
+            else: 
+                m_tag = 'snapshot'+str(i)+'_m.star'
+
+            shmf = Obvs.getMF(subcat[m_tag], weights=subcat['weights'], m_arr=np.arange(8., 12.5, 0.1))
+            sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=1) 
+            
+            shmf = Obvs.getMF(subcat_down[m_tag], weights=subcat_down['weights'], m_arr=np.arange(8., 12.5, 0.1))
+            sub.plot(shmf[0], shmf[1], c=pretty_colors[i], lw=3, ls='--') 
+
+        # x-axis
+        sub.set_xlim([9., 12.])
+        # y-axis
+        sub.set_yscale("log") 
+
+    elif test_type == 'smhmr': # stellar mass - halo mass relation 
+        for i in snaps: 
+            if i == 1: 
+                hm_tag = 'm.max'
+                sm_tag = 'm.star'
+            else: 
+                hm_tag = 'snapshot'+str(i)+'_m.max'
+                sm_tag = 'snapshot'+str(i)+'_m.star'
+
+            smhmr = Obvs.Smhmr()
+            m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat[hm_tag], subcat[sm_tag], weights=subcat['weights'])
+            sub.plot(m_mid, mu_mstar - sig_mstar, c=pretty_colors[i], lw=1) 
+            sub.plot(m_mid, mu_mstar + sig_mstar, c=pretty_colors[i], lw=1) 
+            
+            m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat_down[hm_tag], subcat_down[sm_tag], 
+                    weights=subcat_down['weights'])
+            sub.plot(m_mid, mu_mstar - sig_mstar, c=pretty_colors[i], lw=3, ls='--') 
+            sub.plot(m_mid, mu_mstar + sig_mstar, c=pretty_colors[i], lw=3, ls='--') 
+        
+        sub.set_ylim([8., 12.])
+    plt.show() 
+
+
 def test_EvolverInitiate_downsample(test, nsnap, nsnap0=20, downsampled=None): 
     ''' Tests for Initiate method in Evolver for specified nsnap snapshot.
+
+    ========================================
+    Everything looks good
+    ========================================
     '''
     if nsnap > nsnap0: 
         raise ValueError('nsnap has to be less than or equal to nsnap0')
@@ -208,7 +294,6 @@ def test_EvolverInitiate_downsample(test, nsnap, nsnap0=20, downsampled=None):
         plt.show()
     
     elif test == 'sfms': # check the SFMS of the initial SFRs of the full vs down-samples
-    
         fig = plt.figure(figsize=(7,7))
         sub = fig.add_subplot(111)
 
@@ -226,19 +311,23 @@ def test_EvolverInitiate_downsample(test, nsnap, nsnap0=20, downsampled=None):
                 plot_datapoints=False, fill_contours=False, plot_density=False, ax=sub) 
         plt.show()
 
-
-
     return None
 
 
-def test_EvolverEvolve_downsample(test, nsnap0=20, downsampled=None): 
+def test_EvolverEvolve_downsample(test, nsnap0=20, downsampled=None, sfh='constant_offset'): 
     ''' Tests for Evolve method in Evolver
+
+    ========================================
+    SMF, P(ssfr), SFMS look good. SMHMR gets 
+    noisy at high masses
+    ========================================
+
     '''
     if downsampled is None: 
         raise ValueError('the whole point of this function is to test downsampling...')
 
     # load in generic theta (parameter values)
-    theta = Evol.defaultTheta('constant_offset') 
+    theta = Evol.defaultTheta(sfh) 
 
     # load in Subhalo Catalog (pure centrals)
     subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
@@ -302,20 +391,21 @@ def test_EvolverEvolve_downsample(test, nsnap0=20, downsampled=None):
     elif test == 'pssfr': # compare the full and down - sampled P(SSFR)s
         obv_ssfr = Obvs.Ssfr()
         
-        isSF = np.where(subcat['gclass'] == 'star-forming')
-        ssfr_bin_mids, ssfr_dists0 = obv_ssfr.Calculate(subcat['m.star0'][isSF], 
-                subcat['sfr0'][isSF]-subcat['m.star0'][isSF], 
-                subcat['weights'][isSF])
-    
-        ssfr_bin_mids, pssfrs = obv_ssfr.Calculate(subcat['m.star'][isSF], 
-                subcat['sfr'][isSF] - subcat['m.star'][isSF], 
-                subcat['weights'][isSF])
+        #  P(ssfr) at nsnap0  
+        ssfr_bin_mids, ssfr_dists0 = obv_ssfr.Calculate(subcat['m.star0'], 
+                subcat['sfr0'] - subcat['m.star0'], 
+                subcat['weights'])
+        
+        # full sample 
+        ssfr_bin_mids, pssfrs = obv_ssfr.Calculate(subcat['m.star'], 
+                subcat['sfr'] - subcat['m.star'], 
+                subcat['weights'])
         x_ssfrs = obv_ssfr.ssfr_bin_edges
         
-        isSF_down = np.where((subcat_down['gclass'] == 'star-forming') & (subcat_down['weights'] > 0.))
-        ssfr_bin_mids, pssfrs_down = obv_ssfr.Calculate(subcat_down['m.star'][isSF_down], 
-                subcat_down['sfr'][isSF_down] - subcat_down['m.star'][isSF_down], 
-                subcat_down['weights'][isSF_down])
+        # down sample 
+        ssfr_bin_mids, pssfrs_down = obv_ssfr.Calculate(subcat_down['m.star'], 
+                subcat_down['sfr'] - subcat_down['m.star'], 
+                subcat_down['weights'])
         x_ssfrs_down = obv_ssfr.ssfr_bin_edges
 
         fig = plt.figure(figsize=(20, 5))
@@ -326,17 +416,11 @@ def test_EvolverEvolve_downsample(test, nsnap0=20, downsampled=None):
             sub = fig.add_subplot(1, 4, i_m+1)
             
             sub.plot(ssfr_bin_mids[i_m], ssfr_dists0[i_m], 
-                    lw=3, ls='--', c='b', alpha=0.5)
+                    lw=3, ls='--', c='b', alpha=0.25)
             xx, yy = UT.bar_plot(x_ssfrs[i_m], pssfrs[i_m])
             sub.plot(xx, yy, lw=2, ls='-', c='k')
             xx, yy = UT.bar_plot(x_ssfrs_down[i_m], pssfrs_down[i_m])
             sub.plot(xx, yy, lw=3, ls='--', c='k')
-            
-            # mark the SSFR of SFMS and Quiescent peak 
-            sub.vlines(Obvs.SSFR_SFMS(0.5 * np.sum(mass_bin), UT.z_nsnap(1), theta_SFMS=theta['sfms']), 0., 1.7, 
-                    color='b', linewidth=2, linestyle='--')
-            sub.vlines(Obvs.SSFR_Qpeak(0.5 * np.sum(mass_bin)), 0., 1.7, 
-                    color='r', linewidth=2, linestyle='--')
 
             massbin_str = ''.join([ 
                 r'$\mathtt{log \; M_{*} = [', 
@@ -388,31 +472,21 @@ def test_EvolverEvolve_downsample(test, nsnap0=20, downsampled=None):
         plt.show()
 
     elif test == 'sfms': 
-        isSF = np.where(subcat['gclass'] == 'star-forming')
-        isSF_down = np.where(subcat_down['gclass'] == 'star-forming')
-
         fig = plt.figure(figsize=(7,7))
         sub = fig.add_subplot(111)
 
-        DFM.hist2d(subcat['m.star'][isSF], subcat['sfr'][isSF], weights=subcat['weights'][isSF], 
+        DFM.hist2d(subcat['m.star'], subcat['sfr'], weights=subcat['weights'], 
                 levels=[0.68, 0.95], range=[[6., 12.], [-4., 2.]], color='#1F77B4', 
-                plot_datapoints=False, fill_contours=False, plot_density=False, ax=sub) 
+                plot_datapoints=True, fill_contours=False, plot_density=True, ax=sub) 
 
-        DFM.hist2d(subcat_down['m.star'][isSF_down], subcat_down['sfr'][isSF_down], weights=subcat_down['weights'][isSF_down], 
+        DFM.hist2d(subcat_down['m.star'], subcat_down['sfr'], weights=subcat_down['weights'], 
                 levels=[0.68, 0.95], range=[[6., 12.], [-4., 2.]], color='#FF7F0E', 
-                plot_datapoints=False, fill_contours=False, plot_density=False, ax=sub) 
-        #bovy.scatterplot(subcat['m.star'][isSF], subcat['sfr'][isSF], scatter=True, s=2, 
-        #        xrange=[8., 12.], yrange=[-4., 3.],
-        #        xlabel='\mathtt{log\;M_*}', ylabel='\mathtt{log\;SFR}')
+                plot_datapoints=True, fill_contours=False, plot_density=True, ax=sub) 
 
-        m_arr = np.arange(8., 12.1, 0.1) 
-        sub.plot(m_arr, Obvs.SSFR_SFMS(m_arr, UT.z_nsnap(1), theta_SFMS=theta['sfms']) + m_arr, c='r', lw=2, ls='-')
-        sub.plot(m_arr, Obvs.SSFR_SFMS(m_arr, UT.z_nsnap(1), theta_SFMS=theta['sfms']) + m_arr - 0.3, c='r', lw=2, ls='-.')
-        sub.plot(m_arr, Obvs.SSFR_SFMS(m_arr, UT.z_nsnap(1), theta_SFMS=theta['sfms']) + m_arr + 0.3, c='r', lw=2, ls='-.')
-        sub.set_xlim([8., 12.])
-        sub.set_xlabel('\mathtt{log\;M_*}', fontsize=25)
+        sub.set_xlim([6., 12.])
+        sub.set_xlabel('$\mathtt{log\;M_*}$', fontsize=25)
         sub.set_ylim([-4., 2.])
-        sub.set_ylabel('\mathtt{log\;SFR}', fontsize=25)
+        sub.set_ylabel('$\mathtt{log\;SFR}$', fontsize=25)
 
         plt.show()
 
@@ -421,6 +495,6 @@ def test_EvolverEvolve_downsample(test, nsnap0=20, downsampled=None):
 
 if __name__=="__main__": 
     #test_EvolverEvolve_downsample('smhmr', nsnap0=15, downsampled='14')
-    test_EvolverEvolve_downsample('sfms', nsnap0=15, downsampled='14')
+    test_EvolverEvolve_downsample('smf', nsnap0=15, downsampled='14', sfh='random_step_abias2')
     #for i in [15, 10, 5, 1]: 
     #    test_EvolverInitiate_downsample('sfms', i, nsnap0=15, downsampled='14')

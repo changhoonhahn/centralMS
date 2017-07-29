@@ -178,9 +178,6 @@ class Evolver(object):
                 theta_GV = self.theta_gv, 
                 theta_SFMS = self.theta_sfms,
                 theta_FQ = self.theta_fq) 
-        print 'assignSFRs takes ', time.time() - t_s
-
-        print sfr_out.keys()
 
         # save z0 SFR into self.SH_catalog 
         for key in sfr_out.keys(): 
@@ -377,15 +374,12 @@ def _pickSF(SHcat, nsnap0=20, theta_fq=None, theta_fpq=None):
 
 def assignSFRs(masses, zs, ws, theta_GV=None, theta_SFMS=None, theta_FQ=None): 
     ''' Given stellar masses, zs, and parameters that describe the 
-    green valley, SFMS, and FQ return SFRs
-
-    CURRENTLY DOES NOT SUPPORT WEIGHTS!!!! 
-    weights are hard because sampling distributions with weights is hard...
+    green valley, SFMS, and FQ return SFRs. The SFRs are assigned without
+    consideration of weights. 
 
     Details: 
     -------
     - Designates a fraction of galaxies as green valley "quenching" galaxies based on theta_GV
-
     
     Parameters
     ----------
