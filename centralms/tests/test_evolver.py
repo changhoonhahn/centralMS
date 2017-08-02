@@ -813,23 +813,22 @@ def test_EvolverInitiate(test, nsnap, nsnap0=20, downsampled=None):
     return None
 
 
-def test_EvolverEvolve(test, nsnap0=20): 
+def test_EvolverEvolve(test, nsnap0=20, downsampled=None): 
     ''' Tests for Evolve method in Evolver
     '''
     # load in Subhalo Catalog (pure centrals)
     subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
-    subcat = subhist.Read()
+    subcat = subhist.Read(downsampled=downsampled)
 
     # load in generic theta (parameter values)
     theta = Evol.defaultTheta() 
 
-    eev = Evol.Evolver(subcat, theta, nsnap0=20)
+    eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
     eev.Initiate()
 
     eev.Evolve() 
 
     subcat = eev.SH_catalog
-    #print subcat['m.sham'][np.where(subcat['snapshot20_m.sham'] == 0.)].max() 
     pretty_colors = prettycolors() 
     if test == 'smf': 
         isSF = np.where(subcat['gclass'] == 'star-forming')
@@ -1172,8 +1171,7 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
-    test_Evolver_time('random_step_fluct', nsnap0=15, downsampled='14', tduty=1., abias=0.)
-    test_Evolver_time('random_step_fluct', nsnap0=15, downsampled=None, tduty=1., abias=0.)
+    #test_Evolver_time('random_step_fluct', nsnap0=15, downsampled='14', tduty=1., abias=0.)
     #test_RandomStep_timescale(sig_smhm=0.2, nsnap_ancestor=15)
     #EvolverPlots('constant_offset')
     #EvolverPlots('corr_constant_offset')
@@ -1187,6 +1185,6 @@ if __name__=="__main__":
     #test_Evolver_logSFRinitiate('random_step_abias', nsnap0=15)
     #test_Evolver_logSFRinitiate('random_step_fluct', nsnap0=15)
     #test_Evolver_ODEsolver('random_step_fluct', nsnap0=15)
-    #test_EvolverEvolve('smhmr')
+    #test_EvolverEvolve('smf', nsnap0=15, downsampled='14')
     #test_EvolverInitiate('pssfr', 15)
     #test_assignSFRs() 

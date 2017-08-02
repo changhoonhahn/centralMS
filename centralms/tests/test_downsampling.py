@@ -345,7 +345,7 @@ def test_EvolverEvolve_downsample(test, nsnap0=20, downsampled=None, sfh='consta
     subcat_down = eev_down.SH_catalog
 
     pretty_colors = prettycolors() 
-    if test == 'smf': 
+    if test == 'sf_smf': # stellar mass function of SF population 
         isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['weights'] > 0.))
         isSF_down = np.where((subcat_down['gclass'] == 'star-forming') & (subcat_down['weights'] > 0.))
 
@@ -379,6 +379,71 @@ def test_EvolverEvolve_downsample(test, nsnap0=20, downsampled=None, sfh='consta
         
         smf_sf = Obvs.getMF(subcat_down['m.star'][isSF_down], weights=subcat_down['weights'][isSF_down])
         sub.plot(smf_sf[0], smf_sf[1], lw=3, c='k', ls='-')
+
+        sub.set_xlim([6., 12.])
+        sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
+        sub.set_ylim([1e-6, 10**-1.75])
+        sub.set_yscale('log')
+        sub.set_ylabel('$\Phi$', fontsize=25)
+        sub.legend(loc='upper right') 
+        plt.show()
+
+    elif test == 'smf': # stellar mass function of all galaxies 
+        isSF = np.where(subcat['gclass'] == 'star-forming')
+        isnotSF = np.where(subcat['gclass'] != 'star-forming')
+        isSF_down = np.where(subcat_down['gclass'] == 'star-forming')
+        isnotSF_down = np.where(subcat_down['gclass'] != 'star-forming')
+
+        fig = plt.figure(figsize=(7,7))
+        sub = fig.add_subplot(111)
+
+        snaps = [] # pick a handful of snapshots 
+        for ii in range(2, nsnap0+1): 
+            if (ii-1)%7 == 0: 
+                snaps.append(ii)
+        snaps.append(nsnap0) 
+
+        for n in snaps[::-1]: 
+            # SHAM SMF 
+            smf = Obvs.getMF(subcat['snapshot'+str(n)+'_m.sham'])
+            sub.plot(smf[0], smf[1], lw=2, c='k', ls=':', alpha=0.05 * (21. - n))        
+
+            # full-sample
+            m_all = np.concatenate([subcat['snapshot'+str(n)+'_m.star'][isSF], subcat['snapshot'+str(n)+'_m.sham'][isnotSF]])
+            w_all = np.concatenate([subcat['weights'][isSF], subcat['weights'][isnotSF]]) 
+
+            smf = Obvs.getMF(m_all, weights=w_all)
+            sub.plot(smf[0], smf[1], lw=2, c='b', alpha=0.05 * (21. - n))        
+            
+            # down-sample
+            m_all = np.concatenate([
+                subcat_down['snapshot'+str(n)+'_m.star'][isSF_down], 
+                subcat_down['snapshot'+str(n)+'_m.sham'][isnotSF_down]])
+            w_all = np.concatenate([
+                subcat_down['weights'][isSF_down], 
+                subcat_down['weights'][isnotSF_down]]) 
+            smf = Obvs.getMF(m_all, weights=w_all)
+
+            sub.plot(smf[0], smf[1], lw=2, c='g', alpha=0.05 * (21. - n))        
+
+        # at snapshot 1  
+        smf = Obvs.getMF(subcat['m.sham'])
+        sub.plot(smf[0], smf[1], lw=2, c='k', ls=':')        
+
+        m_all = np.concatenate([subcat['m.star'][isSF], subcat['m.sham'][isnotSF]])
+        w_all = np.concatenate([subcat['weights'][isSF], subcat['weights'][isnotSF]]) 
+
+        smf = Obvs.getMF(m_all, weights=w_all)
+        sub.plot(smf[0], smf[1], lw=3, c='b', ls='-', label='Integrated')
+        
+        m_all = np.concatenate([
+            subcat_down['m.star'][isSF_down], 
+            subcat_down['m.sham'][isnotSF_down]])
+        w_all = np.concatenate([
+            subcat_down['weights'][isSF_down], 
+            subcat_down['weights'][isnotSF_down]]) 
+        smf = Obvs.getMF(m_all, weights=w_all)
+        sub.plot(smf[0], smf[1], lw=3, c='g')
 
         sub.set_xlim([6., 12.])
         sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
