@@ -18,19 +18,26 @@ from ChangTools.plotting import prettycolors
 def BlankTheta(run, *args): 
     ''' Given the ABC run, specify the blank variables 
     '''
-    theta_fixed = {} 
-    if run == 'test0': 
+    theta_fixed = {} # fixed values 
+    theta_list = [] # list of changing values 
 
+    if run == 'test0': 
+        # these values were set by cenque project's output
         theta_fixed['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
         theta_fixed['fq'] = {'name': 'cosmos_tinker'}
         theta_fixed['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-
-        theta_fixed['sfms'] = {'name': 'linear', 'zslope': 1.05, 'mslope':0.53}
+        
+        # for simple test 
         theta_fixed['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-        theta_fixed['sfh'] = {'name': 'constant_offset'}
         theta_fixed['sfh']['nsnap0'] = 15 
+        theta_fixed['sfh'] = {'name': 'constant_offset'}
+
+        # SFMS slopes can change 
+        theta_fixed['sfms'] = {'name': 'linear', 'zslope': 1.05, 'mslope':0.53}
     else: 
         raise NotImplementedError
+
+    return theta_list 
 
 
 def Prior(prior, sumstat, shape='tophat'): 
