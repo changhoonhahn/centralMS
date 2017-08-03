@@ -9,50 +9,22 @@ from abcpmc import mpi_util
 
 # -- local -- 
 import observables as Obvs
+import models
 
 # --- plotting --- 
 import matplotlib.pyplot as plt 
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
-def BlankTheta(run, *args): 
-    ''' Given the ABC run, specify the blank variables 
-    '''
-    theta_fixed = {} # fixed values 
-    theta_list = [] # list of changing values 
 
-    if run == 'test0': 
-        # these values were set by cenque project's output
-        theta_fixed['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
-        theta_fixed['fq'] = {'name': 'cosmos_tinker'}
-        theta_fixed['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-        
-        # for simple test 
-        theta_fixed['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-        theta_fixed['sfh']['nsnap0'] = 15 
-        theta_fixed['sfh'] = {'name': 'constant_offset'}
-
-        # SFMS slopes can change 
-        theta_fixed['sfms'] = {'name': 'linear', 'zslope': 1.05, 'mslope':0.53}
-    else: 
-        raise NotImplementedError
-
-    return theta_list 
-
-
-def Prior(prior, sumstat, shape='tophat'): 
+def Prior(run, shape='tophat'): 
     ''' Generate ABCPMC prior object given prior name, summary statistics, 
     and prior distribution shape. 
 
     Parameters
     ----------
-    prior : (string)
-        String that specifies the priors
-
-    sumstat : (list) 
-        List of strings that specifies which summary statistics
-        will be used to calculate the distance metric. Options 
-        include: 
+    run : (string)
+        String that specifies the ABC run  
 
     shape : (string)
         Specifies the shape of the prior. Default is tophat. Mainly only 
@@ -61,11 +33,10 @@ def Prior(prior, sumstat, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if prior == 'testing': 
-        prior_min, prior_max = [], [] 
-
-        for stat in sumstat: 
-            if 'smf' 
+    if run == 'test0': 
+        # SFMS_zslope, SFMS_mslope
+        prior_min = [0.8, 0.4]
+        prior_max = [1.2, 0.6]
 
     else:
         raise NotImplementedError
@@ -98,7 +69,44 @@ def SumData(sumstat, **data_kwargs):
     return sums
 
 
-def run_ABC(T, eps0, N_p=1000, sumstat=None, prior=None, run=None, **run_kwargs): 
+def SumSim(sumstat, subcat, **sim_kwargs): 
+    ''' Return summary statistic of the simulation 
+    
+    parameters
+    ----------
+    sumstat : (list) 
+        list of summary statistics to be included
+
+    subcat : (obj)
+        subhalo catalog output from models.model function 
+    '''
+    sums = [] 
+    for stat in sumstat: 
+        if stat == 'smf': # stellar mass function 
+            #####
+            #####
+            #####
+            #####
+            #####
+            #####
+
+            sum = smf[0] # phi 
+        else: 
+            raise NotImplementedError
+        
+        sums.append(sum) 
+
+    return sums
+
+
+def roe_wrap(sum_stat):
+    ''' Get it? Wrapper for Rhos or roe wrap. 
+    '''
+    if sum_stat 
+
+
+
+def run_ABC(T, eps0, run, N_p=1000, sumstat=None, prior=None, **run_kwargs): 
     ''' Main code for running ABC 
 
     Parameters
@@ -125,8 +133,8 @@ def run_ABC(T, eps0, N_p=1000, sumstat=None, prior=None, run=None, **run_kwargs)
     if len(eps0) != len(sumstat): 
         raise ValueError('Epsilon thresholds should correspond to number of summary statistics')
     
-    # prior object
-    prior_obj = Prior(prior, run, shape='tophat')
+    # prior object 
+    prior_obj = Prior(run, shape='tophat')
 
     # summary statistics of data 
     data_kwargs = {} 
@@ -134,9 +142,15 @@ def run_ABC(T, eps0, N_p=1000, sumstat=None, prior=None, run=None, **run_kwargs)
 
     data_sum = SumData(sumstat, **data_kwargs)
 
-
     # summary statistics of simulation 
+    sim_kwargs = {} 
+    sim_kwargs['nsnap0'] = run_kwargs['nsnap0']
+    sim_kwargs['downsampled'] = run_kwargs['downsampled']
 
+    def Sim(tt): 
+        sh_catalog = models.model(run, tt, **sim_kwargs)
+        sums = SumSim(sumstat, subcat)
+        return sums 
 
     # distance metric 
-
+    roe = roe_wrap(sumstat)
