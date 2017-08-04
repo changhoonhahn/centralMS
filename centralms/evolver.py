@@ -169,7 +169,7 @@ class Evolver(object):
 
         keep = np.where(self.SH_catalog['weights'] > 0) # only galaxies that are weighted
     
-        t_s = time.time()
+        #t_s = time.time()
         # assign SFRs at z_star
         sfr_out = assignSFRs(
                 m0[keep], 
@@ -235,7 +235,7 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
     #z_of_t = interp1d(t_table, z_table, kind='cubic') 
     z_of_t = lambda tt: UT.z_of_t(tt, deg=6)
     
-    t_s = time.time()     
+    #t_s = time.time()     
     #dlogmdt_kwargs['dSFR'] = dlogmdt_kwargs['dSFR'][0]
 
     # now solve M*, SFR ODE 
@@ -288,7 +288,7 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
             dlogmdt_kwarg_list.append(dlogmdt_arg)
             del dlogmdt_arg
 
-    t_s = time.time() 
+    #t_s = time.time() 
     for i_n, nn in enumerate(range(nsnapf+1, nsnap0+1)[::-1]): 
         # starts at n_snap = nn 
         isStart = np.where(SHcat['nsnap_start'][isSF] == nn)  
@@ -313,7 +313,7 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
 
     isStart = np.where(SHcat['nsnap_start'][isSF] == 1)  
     logM_integ[isSF[isStart], -1] = SHcat['m.star0'][isSF[isStart]]
-    print time.time() - t_s
+    #print time.time() - t_s
     
     # log(SFR) @ nsnapf
     logSFRs = np.repeat(-999., len(SHcat['gclass']))

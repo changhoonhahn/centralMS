@@ -11,6 +11,7 @@ from abcpmc import mpi_util
 import observables as Obvs
 import models
 import util as UT
+import catalog as Cat
 
 # --- plotting --- 
 import matplotlib.pyplot as plt 
@@ -42,7 +43,7 @@ def Prior(run, shape='tophat'):
     else:
         raise NotImplementedError
 
-    prior = abcpmc.TophatPrior(prior_min, prior_max) 
+    prior_obj = abcpmc.TophatPrior(prior_min, prior_max) 
 
     return prior_obj
 
@@ -58,9 +59,9 @@ def SumData(sumstat, **data_kwargs):
         subhist = Cat.PureCentralHistory(nsnap_ancestor=data_kwargs['nsnap0'])
         subcat = subhist.Read(downsampled=None) # full sample
 
-        smf = Obvs.getMF(subcat['m.sham']) 
+        smf = Obvs.getMF(subcat['m.star']) 
 
-        sum = smf[0] # phi 
+        sum = smf[1] # phi 
         sums.append(sum) 
     else: 
         raise NotImplementedError
@@ -68,7 +69,7 @@ def SumData(sumstat, **data_kwargs):
     return sums
 
 
-def SumSim(sumstat, subcat, **sim_kwargs): 
+def SumSim(sumstat, subcat): #, **sim_kwargs): 
     ''' Return summary statistic of the simulation 
     
     parameters
@@ -82,14 +83,18 @@ def SumSim(sumstat, subcat, **sim_kwargs):
     sums = [] 
     for stat in sumstat: 
         if stat == 'smf': # stellar mass function 
-            #####
-            #####
-            #####
-            #####
-            #####
-            #####
 
-            sum = smf[0] # phi 
+            # combine integrated stellar masses of SF galaxies
+            # with SHAM stellar masses of the rest 
+            # in principle we could compare to the SHAM MF * fQ...
+            isSF = np.where(subcat['gclass'] == 'star-forming')
+            isnotSF = np.where(subcat['gclass'] != 'star-forming')
+
+            m_all = np.concatenate([subcat['m.star'][isSF], subcat['m.sham'][isnotSF]])
+            w_all = np.concatenate([subcat['weights'][isSF], subcat['weights'][isnotSF]]) 
+
+            smf = Obvs.getMF(m_all, weights=w_all)
+            sum = smf[1] # phi 
         else: 
             raise NotImplementedError
         
@@ -101,22 +106,25 @@ def SumSim(sumstat, subcat, **sim_kwargs):
 def roe_wrap(sumstat, type='L2'):
     ''' Get it? Wrapper for Rhos or roe wrap. 
     '''
-    if sumstat == 'smf': # only SMF 
+    if len(sumstat) == 1: # only SMF 
         if type == 'L2': 
-            return Rho_SMF
+            return L2_logSMF
     else: 
         raise NotImplementedError
 
 
 def Writeout(type, run, pool): 
-    ''' Writeout ABC given pool
+    ''' Given abcpmc pool object. Writeout specified ABC pool property
     '''
     file = UT.dat_dir()+'abc/'
 
     if type == 'eps': # threshold writeout 
         file += ''.join(['epsilon.', run, '.dat'])
-        f = open(file, "a") #append 
-        f.write(str(pool.eps)+'\t'+str(pool.ratio)+'\n')
+        if pool is None: # write or overwrite threshold writeout
+            f = open(file, "w")
+        else: 
+            f = open(file, "a") #append 
+            f.write(str(pool.eps)+'\t'+str(pool.ratio)+'\n')
         f.close()
     elif type == 'theta': # particle thetas
         file += ''.join(['theta.t', str(pool.t), '.', run, '.dat']) 
@@ -131,7 +139,7 @@ def Writeout(type, run, pool):
         raise ValueError
 
 
-def run_ABC(T, eps0, run, N_p=1000, sumstat=None, prior=None, **run_kwargs): 
+def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs): 
     ''' Main code for running ABC 
 
     Parameters
@@ -157,6 +165,9 @@ def run_ABC(T, eps0, run, N_p=1000, sumstat=None, prior=None, **run_kwargs):
     # check inputs 
     if len(eps0) != len(sumstat): 
         raise ValueError('Epsilon thresholds should correspond to number of summary statistics')
+
+    # some function here that writes out all the info 
+    # of this particular ABC run. 
     
     # prior object 
     prior_obj = Prior(run, shape='tophat')
@@ -174,7 +185,7 @@ def run_ABC(T, eps0, run, N_p=1000, sumstat=None, prior=None, **run_kwargs):
 
     def Sim(tt): 
         sh_catalog = models.model(run, tt, **sim_kwargs)
-        sums = SumSim(sumstat, subcat)
+        sums = SumSim(sumstat, sh_catalog)
         return sums 
 
     # distance metric 
@@ -185,11 +196,11 @@ def run_ABC(T, eps0, run, N_p=1000, sumstat=None, prior=None, **run_kwargs):
     # implement restart here
 
     # threshold 
-    eps = abcpmc.ConstEps(T, eps_input)
+    eps = abcpmc.ConstEps(T, eps0)
     try:
         mpi_pool = mpi_util.MpiPool()
         abcpmc_sampler = abcpmc.Sampler(
-                N=Npart,                # N_particles
+                N=N_p,                # N_particles
                 Y=data_sum,             # data
                 postfn=Sim,             # simulator 
                 dist=roe,               # distance function  
@@ -197,7 +208,7 @@ def run_ABC(T, eps0, run, N_p=1000, sumstat=None, prior=None, **run_kwargs):
 
     except AttributeError: 
         abcpmc_sampler = abcpmc.Sampler(
-                N=Npart,                # N_particles
+                N=N_p,                # N_particles
                 Y=data_sum,             # data
                 postfn=Sim,            # simulator 
                 dist=roe)           # distance function  
@@ -206,12 +217,10 @@ def run_ABC(T, eps0, run, N_p=1000, sumstat=None, prior=None, **run_kwargs):
     abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
 
     pools = []
-    if init_pool is None: 
-        # initiate epsilon write out
-        f = open(Writeout('eps', run), "w")
-        f.close()
+    if init_pool is None:   # initiate epsilon write out
+        Writeout('eps', run, None)
 
-    for pool in abcpmc_sampler.sample(prior, eps, pool=init_pool):
+    for pool in abcpmc_sampler.sample(prior_obj, eps, pool=init_pool):
         print '----------------------------------------'
         print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
         print eps(pool.t)
@@ -222,12 +231,12 @@ def run_ABC(T, eps0, run, N_p=1000, sumstat=None, prior=None, **run_kwargs):
         # write out theta, weights, and distances to file 
         Writeout('theta', run, pool) 
         Writeout('w', run, pool) 
-        Writeout('dist', run, pool) 
+        Writeout('rho', run, pool) 
             
         # update epsilon based on median thresholding 
-        try eps.eps.shape[1]: 
+        if len(eps0) > 1: 
             eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
-        except IndexError
+        else: 
             eps.eps = np.median(pool.dists)
         print '----------------------------------------'
         pools.append(pool)
@@ -236,10 +245,14 @@ def run_ABC(T, eps0, run, N_p=1000, sumstat=None, prior=None, **run_kwargs):
 
 
 # different distance metric calculations 
-def L2_SMF(simsum, datsum): 
+def L2_logSMF(simsum, datsum): 
     ''' Measure the L2 norm for the case where the summary statistic 
-    is the SMF. 
+    is the log(SMF). 
     '''
     if len(simsum[0]) != len(datsum[0]): 
         raise ValueError
-    return np.sum((simsum[0] - datsum[0])**2)
+
+    nonzero = np.where((simsum[0] > 0.) & (datsum[0] > 0.)) # preventing nans  
+    n_bins = len(nonzero[0]) # number of bins 
+
+    return np.sum((np.log10(simsum[0][nonzero]) - np.log10(datsum[0][nonzero]))**2)/np.float(n_bins)
