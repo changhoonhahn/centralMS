@@ -12,7 +12,7 @@ def model(run, args, **kwargs):
     '''
     theta = {}
 
-    if run == 'test0': 
+    if run in ['test0', 'randomSFH']: 
         # args = SFMS_zslope, SFMS_mslope
 
         # these values were set by cenque project's output

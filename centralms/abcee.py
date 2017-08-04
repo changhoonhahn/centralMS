@@ -3,6 +3,7 @@
 use ABC-PMC 
 
 '''
+import os 
 import numpy as np
 import abcpmc
 from abcpmc import mpi_util
@@ -35,7 +36,7 @@ def Prior(run, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if run == 'test0': 
+    if run in ['test0', 'randomSFH']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [0.8, 0.4]
         prior_max = [1.2, 0.6]
@@ -113,32 +114,6 @@ def roe_wrap(sumstat, type='L2'):
         raise NotImplementedError
 
 
-def Writeout(type, run, pool): 
-    ''' Given abcpmc pool object. Writeout specified ABC pool property
-    '''
-    file = UT.dat_dir()+'abc/'
-
-    if type == 'eps': # threshold writeout 
-        file += ''.join(['epsilon.', run, '.dat'])
-        if pool is None: # write or overwrite threshold writeout
-            f = open(file, "w")
-        else: 
-            f = open(file, "a") #append 
-            f.write(str(pool.eps)+'\t'+str(pool.ratio)+'\n')
-        f.close()
-    elif type == 'theta': # particle thetas
-        file += ''.join(['theta.t', str(pool.t), '.', run, '.dat']) 
-        np.savetxt(file, pool.thetas) 
-    elif type == 'w': # particle weights
-        file += ''.join(['w.t', str(pool.t), '.', run, '.dat']) 
-        np.savetxt(file, pool.ws)
-    elif type == 'rho': # distance
-        file += ''.join(['rho.t', str(pool.t), '.', run, '.dat']) 
-        np.savetxt(file, pool.dists)
-    else: 
-        raise ValueError
-
-
 def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs): 
     ''' Main code for running ABC 
 
@@ -165,9 +140,6 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs):
     # check inputs 
     if len(eps0) != len(sumstat): 
         raise ValueError('Epsilon thresholds should correspond to number of summary statistics')
-
-    # some function here that writes out all the info 
-    # of this particular ABC run. 
     
     # prior object 
     prior_obj = Prior(run, shape='tophat')
@@ -213,6 +185,14 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs):
                 postfn=Sim,            # simulator 
                 dist=roe)           # distance function  
 
+    # Write out all details of the run info 
+    write_kwargs = {} 
+    write_kwargs['Niter'] = T
+    write_kwargs['sumstat'] = sumstat 
+    for key in run_kwargs.keys():
+        write_kwargs[key] = run_kwargs[key]
+    Writeout('init', run, abcpmc_sampler, **write_kwargs)
+
     # particle proposal 
     abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
 
@@ -220,12 +200,10 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs):
     if init_pool is None:   # initiate epsilon write out
         Writeout('eps', run, None)
 
+    print '----------------------------------------'
     for pool in abcpmc_sampler.sample(prior_obj, eps, pool=init_pool):
-        print '----------------------------------------'
         print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
-        print eps(pool.t)
-    
-        print 'eps ', pool.eps
+        print 'eps ', eps(pool.t)
         Writeout('eps', run, pool)
 
         # write out theta, weights, and distances to file 
@@ -256,3 +234,45 @@ def L2_logSMF(simsum, datsum):
     n_bins = len(nonzero[0]) # number of bins 
 
     return np.sum((np.log10(simsum[0][nonzero]) - np.log10(datsum[0][nonzero]))**2)/np.float(n_bins)
+
+
+def Writeout(type, run, pool, **kwargs): 
+    ''' Given abcpmc pool object. Writeout specified ABC pool property
+    '''
+    file = UT.dat_dir()+'abc/'+run+'/'
+
+    if type == 'init': # initialize
+        if not os.path.exists(file): # make directory if it doesn't exist 
+            os.makedirs(file)
+        
+        # write specific info of the run  
+        file += 'info.md'
+        f = open(file, 'w')
+        f.write('# '+run+' run specs \n')
+        f.write(''.join(['N_iter = ', str(kwargs['Niter']), '\n']))
+        f.write(''.join(['N_particles = ', str(pool.N), '\n']))
+        f.write('\n') 
+
+        f.write(''.join(['Initial Snapshot = ', str(kwargs['nsnap0']), '\n']))
+        f.write(''.join(['Downsampled by = ', str(kwargs['downsampled']), '\n']))
+        f.close()
+
+    elif type == 'eps': # threshold writeout 
+        file += ''.join(['epsilon.', run, '.dat'])
+        if pool is None: # write or overwrite threshold writeout
+            f = open(file, "w")
+        else: 
+            f = open(file, "a") #append 
+            f.write(str(pool.eps)+'\t'+str(pool.ratio)+'\n')
+        f.close()
+    elif type == 'theta': # particle thetas
+        file += ''.join(['theta.t', str(pool.t), '.', run, '.dat']) 
+        np.savetxt(file, pool.thetas) 
+    elif type == 'w': # particle weights
+        file += ''.join(['w.t', str(pool.t), '.', run, '.dat']) 
+        np.savetxt(file, pool.ws)
+    elif type == 'rho': # distance
+        file += ''.join(['rho.t', str(pool.t), '.', run, '.dat']) 
+        np.savetxt(file, pool.dists)
+    else: 
+        raise ValueError
