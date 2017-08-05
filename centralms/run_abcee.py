@@ -38,4 +38,6 @@ runABC(abcrun, Niter, eps0, N_p=Npart, sumstat=sum_stat, nsnap0=nsnap0, downsamp
 
 notify = int(sys.argv[5])
 if notify == 1: 
-    codif.notif(subject=run+' FINISHED')
+    codif.notif(subject=abcrun+' FINISHED')
+else: 
+    print 'No notification issued'

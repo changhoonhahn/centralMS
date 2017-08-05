@@ -251,6 +251,7 @@ def Writeout(type, run, pool, **kwargs):
         f.write('# '+run+' run specs \n')
         f.write(''.join(['N_iter = ', str(kwargs['Niter']), '\n']))
         f.write(''.join(['N_particles = ', str(pool.N), '\n']))
+        f.write(''.join(['Distance function = ', pool.dist.__name__ , '\n']))
         f.write('\n') 
 
         f.write(''.join(['Initial Snapshot = ', str(kwargs['nsnap0']), '\n']))
