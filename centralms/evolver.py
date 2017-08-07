@@ -129,6 +129,10 @@ class Evolver(object):
                     UT.z_nsnap(n_snap), **sfr_kwargs)
 
             self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][isSF[isSF_i]] = sfr_tmp[isSF_i]
+        
+        # not star-forming nsnap_f M* is just their SHAM M* 
+        isNotSF = np.where(self.SH_catalog['gclass'] != 'star-forming')
+        subcat['m.star'][isNotSF] = subcat['m.sham'][isNotSF]
 
         return None
 
@@ -167,7 +171,7 @@ class Evolver(object):
         self.SH_catalog['m.star0'] = m0 # initial SHAM stellar mass 
         self.SH_catalog['halo.m0'] = hm0 # initial subhalo mass 
 
-        keep = np.where(self.SH_catalog['weights'] > 0) # only galaxies that are weighted
+        keep = np.where(self.SH_catalog['weights'] > 0.) # only galaxies that are weighted
     
         #t_s = time.time()
         # assign SFRs at z_star
@@ -194,13 +198,13 @@ class Evolver(object):
         #            UT.replicate(sfr_out[key], len(self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham']))
         #    self.SH_catalog['snapshot'+str(self.nsnap0)+'_'+key.lower()] = sfr_out[key][keep] 
         self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.star'] = self.SH_catalog['snapshot'+str(self.nsnap0)+'_m.sham'] 
-        
+
         # Propagate P_Q from z0 to zf and pick out quenching galaxies
         gclass, nsnap_quench = _pickSF(self.SH_catalog, nsnap0=self.nsnap0, theta_fq=self.theta_fq, theta_fpq=self.theta_fpq)
 
         self.SH_catalog['gclass'] = gclass
         self.SH_catalog['nsnap_quench'] = nsnap_quench
-        
+
         return None
     
     def _UnpackTheta(self, theta): 

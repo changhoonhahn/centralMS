@@ -14,11 +14,6 @@ import models
 import util as UT
 import catalog as Cat
 
-# --- plotting --- 
-import matplotlib.pyplot as plt 
-from ChangTools.plotting import prettyplot
-from ChangTools.plotting import prettycolors
-
 
 def Prior(run, shape='tophat'): 
     ''' Generate ABCPMC prior object given prior name, summary statistics, 
@@ -49,20 +44,31 @@ def Prior(run, shape='tophat'):
     return prior_obj
 
 
-def SumData(sumstat, **data_kwargs): 
+def Data(**data_kwargs): 
+    ''' Our 'data'
+    '''
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=data_kwargs['nsnap0'])
+    subcat = subhist.Read(downsampled=None) # full sample
+    return subcat
+
+
+def SumData(sumstat, info=False, **data_kwargs): 
     ''' Return the summary statistics of data 
     '''
+    subcat = Data(**data_kwargs)
+
     sums = [] 
     if 'smf' in sumstat: # stellar mass function 
         if 'nsnap0' not in data_kwargs.keys():
             raise ValueError
-        
-        subhist = Cat.PureCentralHistory(nsnap_ancestor=data_kwargs['nsnap0'])
-        subcat = subhist.Read(downsampled=None) # full sample
 
         smf = Obvs.getMF(subcat['m.star']) 
 
-        sum = smf[1] # phi 
+        if not info: 
+            sum = smf[1] # phi 
+        else: 
+            sum = smf # mass, phi 
+
         sums.append(sum) 
     else: 
         raise NotImplementedError
@@ -70,7 +76,7 @@ def SumData(sumstat, **data_kwargs):
     return sums
 
 
-def SumSim(sumstat, subcat): #, **sim_kwargs): 
+def SumSim(sumstat, subcat, info=False): #, **sim_kwargs): 
     ''' Return summary statistic of the simulation 
     
     parameters
@@ -80,22 +86,22 @@ def SumSim(sumstat, subcat): #, **sim_kwargs):
 
     subcat : (obj)
         subhalo catalog output from models.model function 
+
+    info : (bool)
+        specify extra info. Default is 0 
     '''
     sums = [] 
     for stat in sumstat: 
         if stat == 'smf': # stellar mass function 
+            smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'])
+            if not info: 
+                sum = smf[1] # phi 
+            else: 
+                sum = smf # m_bin, phi 
 
             # combine integrated stellar masses of SF galaxies
             # with SHAM stellar masses of the rest 
             # in principle we could compare to the SHAM MF * fQ...
-            isSF = np.where(subcat['gclass'] == 'star-forming')
-            isnotSF = np.where(subcat['gclass'] != 'star-forming')
-
-            m_all = np.concatenate([subcat['m.star'][isSF], subcat['m.sham'][isnotSF]])
-            w_all = np.concatenate([subcat['weights'][isSF], subcat['weights'][isnotSF]]) 
-
-            smf = Obvs.getMF(m_all, weights=w_all)
-            sum = smf[1] # phi 
         else: 
             raise NotImplementedError
         
@@ -220,6 +226,22 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs):
         pools.append(pool)
 
     return pools 
+
+
+def readABC(run, T): 
+    ''' Read in theta, w, and rho from ABC writeouts
+    '''
+    dir = UT.dat_dir()+'abc/'+run+'/'
+    
+    file = lambda ss, t, r: ''.join([dir, ss, '.t', str(t), '.', r, '.dat'])
+    
+    abc_out = {} 
+    # read in theta, w, rho 
+    abc_out['theta'] = np.loadtxt(file('theta', T, run)) 
+    abc_out['w'] = np.loadtxt(file('w', T, run))
+    abc_out['rho'] = np.loadtxt(file('rho', T, run))
+
+    return abc_out
 
 
 # different distance metric calculations 

@@ -13,11 +13,18 @@ import numpy as np
 from sham_hack import SMFClass 
 
 
-def getMF(masses, weights=None, m_arr=None, dlogm=0.1, box=250, h=0.7): 
+def getMF(masses, weights=None, m_arr=None, box=250, h=0.7): 
     ''' Calculate the Mass Function for a given set of masses.
     '''
     if m_arr is None:  # by default assumes it's calculating SMF
-        m_arr = np.arange(6.0, 12.1, dlogm) 
+        m_arr = np.arange(6.0, 12.1, 0.1) 
+
+    # calculate d logM
+    dm_arr = m_arr[1:] - m_arr[:-1]
+    if np.abs(dm_arr - dm_arr[0]).max() > 0.: 
+        raise ValueError('m_arr has to be evenly spaced!')
+
+    dlogm = dm_arr[0]
 
     if weights is None: 
         w_arr = np.repeat(1.0, len(masses))

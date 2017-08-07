@@ -9,7 +9,21 @@ from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
 
-def test_fit_zoft(): 
+def test_median(): 
+    ''' Test the weighted median 
+    '''
+    w = np.repeat(1., 100)
+    data = np.arange(100)
+    print np.median(data)
+    print UT.median(data, weights=w) 
+
+    if np.median(data) != UT.median(data, weights=w):
+        raise ValueError
+
+    return None 
+
+
+def test_fit_zoft():  
     z_table, t_table = UT.zt_table()
     
     cosmo = FlatLambdaCDM(H0=70, Om0=0.274)
@@ -75,7 +89,7 @@ def test_fit_tofz():
     plt.show()
 
 
-
 if __name__=='__main__':
     #test_fit_zoft()
-    test_fit_tofz()
+    #test_fit_tofz()
+    test_median()

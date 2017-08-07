@@ -4,6 +4,7 @@ General utility functions
 
 '''
 import os
+import sys
 import numpy as np
 from scipy import interpolate
 
@@ -39,6 +40,34 @@ def bar_plot(bin_edges, values):
         yy.append(val)
 
     return [np.array(xx), np.array(yy)]
+
+
+def median(data, weights=None): 
+    ''' Median in case there's weights 
+    '''
+    if weights is None: 
+        return np.median(datas)
+    else:
+        # below is taken from 
+        # www.github.com/tinybike/weightedstats
+        midpoint = 0.5 * sum(weights)
+        
+        if any([j > midpoint for j in weights]):
+            return data[weights.index(max(weights))]
+
+        if any([j > 0 for j in weights]):
+            sorted_data, sorted_weights = zip(*sorted(zip(data, weights)))
+            cumulative_weight = 0
+            below_midpoint_index = 0
+            while cumulative_weight <= midpoint:
+                below_midpoint_index += 1
+                cumulative_weight += sorted_weights[below_midpoint_index-1]
+            cumulative_weight -= sorted_weights[below_midpoint_index-1]
+            if cumulative_weight - midpoint < sys.float_info.epsilon:
+                bounds = sorted_data[below_midpoint_index-2:below_midpoint_index]
+                return sum(bounds) / float(len(bounds))
+
+            return sorted_data[below_midpoint_index-1]
 
 
 def z_from_t(tcosmic): 
