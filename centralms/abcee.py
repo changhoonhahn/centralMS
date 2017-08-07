@@ -8,6 +8,7 @@ import numpy as np
 import abcpmc
 from abcpmc import mpi_util
 import corner as DFM
+import codif
 
 # -- local -- 
 import observables as Obvs
@@ -19,7 +20,7 @@ import matplotlib.pyplot as plt
 
 def Theta(run): 
     tt = {} 
-    if run in ['test0']: 
+    if run in ['test0', 'randomSFH']: 
         tt['variable'] = ['SFMS z slope', 'SFMS m slope']
         tt['label'] = ['$\mathtt{m_{z; SFMS}}$', '$\mathtt{m_{M_*; SFMS}}$']
     
@@ -102,8 +103,18 @@ def model(run, args, **kwargs):
         
         # for simple test 
         theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-        theta['sfh'] = {'name': 'constant_offset'}
-        theta['sfh']['nsnap0'] =  kwargs['nsnap0'] 
+
+        if run == 'test0': 
+            # simplest test with constant offset SFH 
+            theta['sfh'] = {'name': 'constant_offset'}
+            theta['sfh']['nsnap0'] =  kwargs['nsnap0'] 
+        elif run == 'randomSFH':  
+            # random fluctuation SFH where fluctuations 
+            # happen on fixed 0.5 Gyr timescales  
+            theta['sfh'] = {'name': 'random_step_fluct'} 
+            theta['sfh']['dt_min'] = 0.5 
+            theta['sfh']['dt_max'] = 0.5 
+            theta['sfh']['sigma'] = 0.3 
             
         # SFMS slopes can change 
         theta['sfms'] = {'name': 'linear', 'zslope': args[0], 'mslope': args[1]}
@@ -166,7 +177,7 @@ def roe_wrap(sumstat, type='L2'):
         raise NotImplementedError
 
 
-def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs): 
+def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, **run_kwargs): 
     ''' Main code for running ABC 
 
     Parameters
@@ -262,7 +273,9 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs):
         Writeout('theta', run, pool) 
         Writeout('w', run, pool) 
         Writeout('rho', run, pool) 
-            
+        plotABC(run, pool.t) # plot corner plot 
+
+        codif.notif(subject=run+' T = '+pool.t+' FINISHED')
         # update epsilon based on median thresholding 
         if len(eps0) > 1: 
             eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
@@ -271,6 +284,7 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs):
         print '----------------------------------------'
         pools.append(pool)
 
+    codif.notif(subject=run+' ALL FINISHED')
     return pools 
 
 
@@ -304,6 +318,14 @@ def Writeout(type, run, pool, **kwargs):
         f.write(''.join(['N_iter = ', str(kwargs['Niter']), '\n']))
         f.write(''.join(['N_particles = ', str(pool.N), '\n']))
         f.write(''.join(['Distance function = ', pool.dist.__name__ , '\n']))
+        # variables
+        theta_info = Theta(run)
+        f.write(''.join(['Variables = [', ','.join(theta_info['variable']), '] \n']))
+        # prior 
+        prior_obj = Prior(run)
+        f.write('Top Hat Priors \n')
+        f.write(''.join(['Prior Min = [', ','.join([str(prior_obj.min[i]) for i in range(len(prior_obj.min))]), '] \n']))
+        f.write(''.join(['Prior Max = [', ','.join([str(prior_obj.max[i]) for i in range(len(prior_obj.max))]), '] \n']))
         f.write('\n') 
 
         f.write(''.join(['Initial Snapshot = ', str(kwargs['nsnap0']), '\n']))
@@ -329,6 +351,7 @@ def Writeout(type, run, pool, **kwargs):
         np.savetxt(file, pool.dists)
     else: 
         raise ValueError
+    return None 
 
 
 def readABC(run, T): 

@@ -2,7 +2,6 @@
 Simple wrapper for running ABC with commandline arguments 
 '''
 import sys 
-import codif
 from abcee import runABC
 
 #restart = int(sys.argv[1])
@@ -34,10 +33,9 @@ eps0 = [10. for i in range(n_sum)]
 nsnap0=15 # starting snapshot 
 downsampled='14' # downsample amount 
 
-runABC(abcrun, Niter, eps0, N_p=Npart, sumstat=sum_stat, nsnap0=nsnap0, downsampled=downsampled) 
-
 notify = int(sys.argv[5])
 if notify == 1: 
-    codif.notif(subject=abcrun+' FINISHED')
+    runABC(abcrun, Niter, eps0, N_p=Npart, sumstat=sum_stat, notify=True, nsnap0=nsnap0, downsampled=downsampled) 
 else: 
     print 'No notification issued'
+    runABC(abcrun, Niter, eps0, N_p=Npart, sumstat=sum_stat, notify=False, nsnap0=nsnap0, downsampled=downsampled) 
