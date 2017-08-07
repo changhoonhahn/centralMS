@@ -7,12 +7,23 @@ import os
 import numpy as np
 import abcpmc
 from abcpmc import mpi_util
+import corner as DFM
 
 # -- local -- 
 import observables as Obvs
-import models
 import util as UT
 import catalog as Cat
+import evolver as Evol
+
+import matplotlib.pyplot as plt 
+
+def Theta(run): 
+    tt = {} 
+    if run in ['test0']: 
+        tt['variable'] = ['SFMS z slope', 'SFMS m slope']
+        tt['label'] = ['$\mathtt{m_{z; SFMS}}$', '$\mathtt{m_{M_*; SFMS}}$']
+    
+    return tt
 
 
 def Prior(run, shape='tophat'): 
@@ -34,8 +45,7 @@ def Prior(run, shape='tophat'):
     if run in ['test0', 'randomSFH']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [0.8, 0.4]
-        prior_max = [1.2, 0.6]
-
+        prior_max = [1.3, 0.6]
     else:
         raise NotImplementedError
 
@@ -62,7 +72,8 @@ def SumData(sumstat, info=False, **data_kwargs):
         if 'nsnap0' not in data_kwargs.keys():
             raise ValueError
 
-        smf = Obvs.getMF(subcat['m.star']) 
+        marr_fixed = np.arange(9., 12.2, 0.2)
+        smf = Obvs.getMF(subcat['m.star'], m_arr=marr_fixed) 
 
         if not info: 
             sum = smf[1] # phi 
@@ -76,6 +87,40 @@ def SumData(sumstat, info=False, **data_kwargs):
     return sums
 
 
+def model(run, args, **kwargs): 
+    ''' model given the ABC run 
+    '''
+    theta = {}
+
+    if run in ['test0', 'randomSFH']: 
+        # args = SFMS_zslope, SFMS_mslope
+
+        # these values were set by cenque project's output
+        theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
+        theta['fq'] = {'name': 'cosmos_tinker'}
+        theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
+        
+        # for simple test 
+        theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
+        theta['sfh'] = {'name': 'constant_offset'}
+        theta['sfh']['nsnap0'] =  kwargs['nsnap0'] 
+            
+        # SFMS slopes can change 
+        theta['sfms'] = {'name': 'linear', 'zslope': args[0], 'mslope': args[1]}
+
+        # load in Subhalo Catalog (pure centrals)
+        subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'])
+        subcat = subhist.Read(downsampled=kwargs['downsampled']) # full sample
+
+        eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
+        eev.Initiate()
+        eev.Evolve() 
+    else: 
+        raise NotImplementedError
+
+    return eev.SH_catalog
+
+
 def SumSim(sumstat, subcat, info=False): #, **sim_kwargs): 
     ''' Return summary statistic of the simulation 
     
@@ -85,7 +130,7 @@ def SumSim(sumstat, subcat, info=False): #, **sim_kwargs):
         list of summary statistics to be included
 
     subcat : (obj)
-        subhalo catalog output from models.model function 
+        subhalo catalog output from model function 
 
     info : (bool)
         specify extra info. Default is 0 
@@ -93,7 +138,8 @@ def SumSim(sumstat, subcat, info=False): #, **sim_kwargs):
     sums = [] 
     for stat in sumstat: 
         if stat == 'smf': # stellar mass function 
-            smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'])
+            marr_fixed = np.arange(9., 12.2, 0.2)
+            smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], m_arr=marr_fixed)
             if not info: 
                 sum = smf[1] # phi 
             else: 
@@ -162,7 +208,7 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs):
     sim_kwargs['downsampled'] = run_kwargs['downsampled']
 
     def Sim(tt): 
-        sh_catalog = models.model(run, tt, **sim_kwargs)
+        sh_catalog = model(run, tt, **sim_kwargs)
         sums = SumSim(sumstat, sh_catalog)
         return sums 
 
@@ -228,22 +274,6 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, **run_kwargs):
     return pools 
 
 
-def readABC(run, T): 
-    ''' Read in theta, w, and rho from ABC writeouts
-    '''
-    dir = UT.dat_dir()+'abc/'+run+'/'
-    
-    file = lambda ss, t, r: ''.join([dir, ss, '.t', str(t), '.', r, '.dat'])
-    
-    abc_out = {} 
-    # read in theta, w, rho 
-    abc_out['theta'] = np.loadtxt(file('theta', T, run)) 
-    abc_out['w'] = np.loadtxt(file('w', T, run))
-    abc_out['rho'] = np.loadtxt(file('rho', T, run))
-
-    return abc_out
-
-
 # different distance metric calculations 
 def L2_logSMF(simsum, datsum): 
     ''' Measure the L2 norm for the case where the summary statistic 
@@ -299,3 +329,53 @@ def Writeout(type, run, pool, **kwargs):
         np.savetxt(file, pool.dists)
     else: 
         raise ValueError
+
+
+def readABC(run, T): 
+    ''' Read in theta, w, and rho from ABC writeouts
+    '''
+    dir = UT.dat_dir()+'abc/'+run+'/'
+    
+    file = lambda ss, t, r: ''.join([dir, ss, '.t', str(t), '.', r, '.dat'])
+    
+    abc_out = {} 
+    # read in theta, w, rho 
+    abc_out['theta'] = np.loadtxt(file('theta', T, run)) 
+    abc_out['w'] = np.loadtxt(file('w', T, run))
+    abc_out['rho'] = np.loadtxt(file('rho', T, run))
+
+    return abc_out
+
+
+def plotABC(run, T): 
+    ''' Corner plots of ABC runs  
+    '''
+    # thetas
+    abcout = readABC(run, T) 
+    theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+
+    theta_info = Theta(run) 
+    
+    # prior
+    prior_obj = Prior(run)
+    prior_range = [(prior_obj.min[i], prior_obj.max[i]) for i in range(len(prior_obj.min))]
+    
+    # figure name 
+    fig_name = ''.join([UT.dat_dir(), 'abc/', run, '/', 't', str(T), '.', run , '.png'])
+    
+    fig = DFM.corner(abcout['theta'], weights=abcout['w'].flatten(),
+            truths=theta_med, truth_color='#ee6a50', # median theta 
+            labels=theta_info['label'], label_kwargs={'fontsize': 25},
+            range=prior_range,
+            quantiles=[0.16,0.5,0.84],
+            show_titles=True,
+            title_args={"fontsize": 12},
+            plot_datapoints=True,
+            fill_contours=True,
+            levels=[0.68, 0.95], 
+            color='#ee6a50', 
+            bins=20, 
+            smooth=1.0)
+    plt.savefig(fig_name) 
+    plt.close()
+    return None 

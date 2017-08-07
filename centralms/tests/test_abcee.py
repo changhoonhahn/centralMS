@@ -8,8 +8,8 @@ import numpy as np
 # -- local -- 
 import env 
 import abcee
-import models
 import util as UT
+import observables as Obvs
 
 # --- plotting --- 
 import matplotlib.pyplot as plt 
@@ -35,7 +35,7 @@ def test_SumSim():
     '''
     t0 = time.time() 
     # run the model 
-    subcat = models.model('test0', np.array([1.05, 0.53]), nsnap0=15, downsampled='14')
+    subcat = abcee.model('test0', np.array([1.05, 0.53]), nsnap0=15, downsampled='14')
     # get summary statistics 
     output = abcee.SumSim(['smf'], subcat)
     print time.time() - t0, ' seconds'
@@ -94,7 +94,7 @@ def test_ABCsumstat(run, T):#, sumstat=['smf']):
     abcout = abcee.readABC('test0', T)
     theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
     
-    subcat = models.model(run, theta_med, nsnap0=15, downsampled='14')
+    subcat = abcee.model(run, theta_med, nsnap0=15, downsampled='14')
     sumsim = abcee.SumSim(['smf'], subcat, info=True)
 
     fig = plt.figure()
@@ -115,7 +115,7 @@ def test_ABCsumstat(run, T):#, sumstat=['smf']):
 
 
 def test_ABC_SMHMR(run, T):#, sumstat=['smf']): 
-    ''' Compare the summary statistics of the median T-th ABC particle pool with data.
+    ''' Compare the SMHMR the median T-th ABC particle pool with 'data'
     Hardcoded for smf only 
     '''
     # data summary statistic
@@ -125,28 +125,42 @@ def test_ABC_SMHMR(run, T):#, sumstat=['smf']):
     abcout = abcee.readABC('test0', T)
     theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
     
-    subcat_sim = models.model(run, theta_med, nsnap0=15, downsampled='14')
+    # F( median theta) 
+    subcat_sim = abcee.model(run, theta_med, nsnap0=15, downsampled='14')
 
     fig = plt.figure()
     sub = fig.add_subplot(111)
 
-    sub.plot(sumdata[0][0], sumdata[0][1], c='k', ls='--', label='Data')
-    sub.plot(sumsim[0][0], sumsim[0][1], c='b', label='Sim.')
+    smhmr = Obvs.Smhmr()
+    # simulation 
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['m.max'], subcat_sim['m.star'], 
+            dmhalo=0.2, weights=subcat_sim['weights'])
+    sub.fill_between(m_mid, mu_mhalo - sig_mhalo, mu_mhalo + sig_mhalo, color='b', alpha=0.25, linewidth=0, edgecolor=None, 
+            label='Sim.')
+    # data 
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_dat['m.max'], subcat_dat['m.star'], weights=subcat_dat['weights'])
+    sub.errorbar(m_mid, mu_mhalo, yerr=sig_mhalo, color='k', label='Data')
 
-    sub.set_xlim([6., 12.])
-    sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
-    sub.set_ylim([1e-6, 10**-1.75])
-    sub.set_yscale('log')
-    sub.set_ylabel('$\Phi$', fontsize=25)
+    sub.set_xlim([10., 15.])
+    sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+    sub.set_ylim([8., 12.])
+    sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
     sub.legend(loc='upper right') 
     plt.show()
 
     return None 
 
 
+def test_plotABC(run, T): 
+    abcee.plotABC(run, T) 
+    return None 
+
+
 if __name__=='__main__': 
     #print test_SumData()
     #test_runABC()
-    test_ABCsumstat('test0', 9)
-    #for t in range(10)[::-1]: 
+    #test_ABCsumstat('test0', 9)
+    #test_ABC_SMHMR('test0', 9)
+    for t in range(10)[::-1]: 
     #    test_readABC(t)
+        test_plotABC('test0', t)

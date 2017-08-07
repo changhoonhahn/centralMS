@@ -132,7 +132,7 @@ class Evolver(object):
         
         # not star-forming nsnap_f M* is just their SHAM M* 
         isNotSF = np.where(self.SH_catalog['gclass'] != 'star-forming')
-        subcat['m.star'][isNotSF] = subcat['m.sham'][isNotSF]
+        self.SH_catalog['m.star'][isNotSF] = self.SH_catalog['m.sham'][isNotSF]
 
         return None
 
