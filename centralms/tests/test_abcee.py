@@ -103,7 +103,7 @@ def test_ABCsumstat(run, T):#, sumstat=['smf']):
     sub.plot(sumdata[0][0], sumdata[0][1], c='k', ls='--', label='Data')
     sub.plot(sumsim[0][0], sumsim[0][1], c='b', label='Sim.')
 
-    sub.set_xlim([6., 12.])
+    sub.set_xlim([9., 12.])
     sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
     sub.set_ylim([1e-6, 10**-1.75])
     sub.set_yscale('log')
@@ -156,11 +156,16 @@ def test_plotABC(run, T):
     return None 
 
 
+def test_qaplotABC(run, T): 
+    abcee.qaplotABC(run,T)
+
 if __name__=='__main__': 
     #print test_SumData()
     #test_runABC()
-    #test_ABCsumstat('test0', 9)
     #test_ABC_SMHMR('test0', 9)
-    for t in range(10)[::-1]: 
-    #    test_readABC(t)
-        test_plotABC('test0', t)
+
+    #test_plotABC('randomSFH', 1)
+    #test_qaplotABC('test0', 9)
+    #test_ABCsumstat('randomSFH', 7)
+    #for t in range(8)[::-1]: 
+    test_plotABC('randomSFH', 8)

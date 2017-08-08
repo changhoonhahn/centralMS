@@ -273,9 +273,9 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, **run_kwargs):
         Writeout('theta', run, pool) 
         Writeout('w', run, pool) 
         Writeout('rho', run, pool) 
-        plotABC(run, pool.t) # plot corner plot 
+        #plotABC(run, pool.t) # plot corner plot 
 
-        codif.notif(subject=run+' T = '+pool.t+' FINISHED')
+        codif.notif(subject=run+' T = '+str(pool.t)+' FINISHED')
         # update epsilon based on median thresholding 
         if len(eps0) > 1: 
             eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
@@ -402,3 +402,79 @@ def plotABC(run, T):
     plt.savefig(fig_name) 
     plt.close()
     return None 
+
+
+def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'): 
+    ''' Quality assurance plot for ABC runs. Plot summary statistic(s), SMHMR, SFMS
+    '''
+    # first compare data summary statistics to Sim(median theta) 
+    abcout = readABC(run, T)
+    # median theta 
+    theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+
+    subcat_dat = Data(nsnap0=15) # 'data'
+    sumdata = SumData(sumstat, info=True, nsnap0=15)  
+
+    subcat_sim = model(run, theta_med, nsnap0=nsnap0, downsampled=downsampled) 
+    sumsim = SumSim(sumstat, subcat_sim, info=True)
+    
+    fig = plt.figure(figsize=(5, 6*(len(sumstat)+2)))
+    
+    for i_s, stat in enumerate(sumstat): 
+        if stat == 'smf': 
+            sub = fig.add_subplot(1, len(sumstat)+2, i_s+1)
+
+            sub.plot(sumdata[0][0], sumdata[0][1], c='k', ls='--', label='Data')
+            sub.plot(sumsim[0][0], sumsim[0][1], c='b', label='Sim.')
+
+            sub.set_xlim([9., 12.])
+            sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
+            sub.set_ylim([1e-6, 10**-1.75])
+            sub.set_yscale('log')
+            sub.set_ylabel('$\Phi$', fontsize=25)
+            sub.legend(loc='upper right') 
+        else: 
+            raise NotImplementedError
+    
+    # SMHMR panel 
+    sub = fig.add_subplot(1, len(sumstat)+2, len(sumstat)+1)
+    smhmr = Obvs.Smhmr()
+    # simulation 
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['m.max'], subcat_sim['m.star'], 
+            dmhalo=0.2, weights=subcat_sim['weights'])
+    sub.fill_between(m_mid, mu_mhalo - sig_mhalo, mu_mhalo + sig_mhalo, color='b', alpha=0.25, linewidth=0, edgecolor=None, 
+            label='Sim.')
+    # data 
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_dat['m.max'], subcat_dat['m.star'], weights=subcat_dat['weights'])
+    sub.plot(m_mid, mu_mhalo+sig_mhalo, color='k', ls='--', label='Data')
+    sub.plot(m_mid, mu_mhalo-sig_mhalo, color='k', ls='--')
+
+    sub.set_xlim([10., 15.])
+    sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+    sub.set_ylim([8., 12.])
+    sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
+    sub.legend(loc='upper right') 
+
+    # SFMS panel 
+    sub = fig.add_subplot(1, len(sumstat)+2, len(sumstat)+2)
+
+    isSF = np.where(subcat_sim['gclass'] == 'star-forming') # only SF galaxies 
+    DFM.hist2d(
+            subcat_sim['m.star'][isSF], 
+            subcat_sim['sfr'][isSF], 
+            weights=subcat_sim['weights'][isSF], 
+            levels=[0.68, 0.95], range=[[8., 12.], [-4., 2.]], color='#1F77B4', 
+            plot_datapoints=True, fill_contours=False, plot_density=True, ax=sub) 
+
+    # observations 
+    m_arr = np.arange(8., 12.1, 0.1)
+    ssfr_arr = Obvs.SSFR_SFMS(m_arr, UT.z_nsnap(1), theta_SFMS=subcat_sim['theta_sfms'])
+    sub.plot(m_arr, ssfr_arr+m_arr+0.3, ls='--', c='k') 
+    sub.plot(m_arr, ssfr_arr+m_arr-0.3, ls='--', c='k') 
+
+    sub.set_xlim([8., 12.])
+    sub.set_xlabel('$\mathtt{log\;M_*}$', fontsize=25)
+    sub.set_ylim([-4., 2.])
+    sub.set_ylabel('$\mathtt{log\;SFR}$', fontsize=25)
+
+    plt.show() 

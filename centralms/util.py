@@ -22,9 +22,9 @@ def dat_dir():
 
 
 def fig_dir(): 
-    ''' dat directory is symlinked to a local path where the data files are located
+    ''' 
     '''
-    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/fig/'
+    return dat_dir()+'fig/'
 
 
 def bar_plot(bin_edges, values): 
