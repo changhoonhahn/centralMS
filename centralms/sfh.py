@@ -376,7 +376,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                 #, 'dlogSFR_corr': dlogSFR_corr} #'dMhalos': _dMhalos, 
     
     elif theta_sfh['name'] == 'random_step_abias2': 
-        # random steps with assembly bias done in a dumb way 
+        # random steps with assembly bias with control over timescale of halo formation 
         if 'dt_min' not in theta_sfh: 
             raise ValueError
         if 'dt_max' not in theta_sfh: 

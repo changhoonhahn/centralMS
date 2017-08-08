@@ -541,6 +541,42 @@ def SSFR_SFMS(mstar, z_in, theta_SFMS=None):
     return mu_SSFR
 
 
+def SSFR_SFMS_obvs(mstar, z_in, lit='lee'): 
+    ''' SSFR of SFMS derived from best-fit models of the observations 
+    '''
+    if lit == 'lee': # Lee et al. (2015) 
+        if (z_in >= 0.25) and (z_in < 0.46): 
+            S0 = 0.80 
+            M0 = 10.03 
+            gamma = 0.92
+        elif (z_in >= 0.46) and (z_in < 0.63): 
+            S0 = 0.99 
+            M0 = 9.82 
+            gamma = 1.13 
+        elif (z_in >= 0.63) and (z_in < 0.78): 
+            S0 = 1.23 
+            M0 = 9.93 
+            gamma = 1.11 
+        elif (z_in >= 0.78) and (z_in < 0.93): 
+            S0 = 1.35 
+            M0 = 9.96 
+            gamma = 1.28
+        elif (z_in >= 0.93) and (z_in < 1.11): 
+            S0 = 1.53 
+            M0 = 10.10 
+            gamma = 1.26 
+        elif (z_in >= 1.11) and (z_in < 1.30): 
+            S0 = 1.72 
+            M0 = 10.31 
+            gamma = 1.07 
+        else: 
+            raise ValueError
+
+        return S0 - np.log10(1.+(10**(mstar-M0))**(-1.*gamma)) - mstar
+    else: 
+        raise NotImplementedError
+
+
 def sigSSFR_SFMS(mstar): #, z_in, theta_SFMS=None): 
     ''' Scatter of the SFMS logSFR as a function of M* and 
     redshift z_in. Hardcoded at 0.3 

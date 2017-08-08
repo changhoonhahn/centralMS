@@ -45,8 +45,8 @@ def Prior(run, shape='tophat'):
 
     if run in ['test0', 'randomSFH']: 
         # SFMS_zslope, SFMS_mslope
-        prior_min = [0.8, 0.4]
-        prior_max = [1.3, 0.6]
+        prior_min = [1., 0.4]
+        prior_max = [1.6, 0.8]
     else:
         raise NotImplementedError
 
@@ -418,7 +418,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     subcat_sim = model(run, theta_med, nsnap0=nsnap0, downsampled=downsampled) 
     sumsim = SumSim(sumstat, subcat_sim, info=True)
     
-    fig = plt.figure(figsize=(5, 6*(len(sumstat)+2)))
+    fig = plt.figure(figsize=(6*(len(sumstat)+2),5))
     
     for i_s, stat in enumerate(sumstat): 
         if stat == 'smf': 
@@ -476,5 +476,9 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     sub.set_xlabel('$\mathtt{log\;M_*}$', fontsize=25)
     sub.set_ylim([-4., 2.])
     sub.set_ylabel('$\mathtt{log\;SFR}$', fontsize=25)
+    
+    fig_name = ''.join([UT.fig_dir(), 'qaplot_ABC.', run, '.', str(T), '.png'])
+    fig.savefig(fig_name, bbox_inches='tight')
+    plt.close()
+    return None 
 
-    plt.show() 
