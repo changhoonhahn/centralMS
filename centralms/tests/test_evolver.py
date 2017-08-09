@@ -484,12 +484,12 @@ def EvolverPlots(sfh, nsnap0=None):
     return None
 
 
-def test_Evolver_AssemblyBias(sig_corr, nsnap0=None):
-    ''' Test how assembly bias is implemented 
+def test_Evolver_AssemblyBias(sig_corr, nsnap0=None, downsampled=None):
+    ''' Test assembly bias is implementation
     '''
     # load in Subhalo Catalog (pure centrals)
     subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
-    subcat = subhist.Read()
+    subcat = subhist.Read(downsampled=downsampled)
 
     # load in generic theta (parameter values)
     theta = Evol.defaultTheta('random_step_abias') 
@@ -497,15 +497,12 @@ def test_Evolver_AssemblyBias(sig_corr, nsnap0=None):
 
     eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
     eev.Initiate()
-
     eev.Evolve() 
 
     subcat = eev.SH_catalog
 
     prettyplot() 
     pretty_colors = prettycolors() 
-
-    nsnap0 = subcat['nsnap0']
 
     isSF = np.where(subcat['gclass'] == 'star-forming')[0]
         
@@ -584,40 +581,35 @@ def test_Evolver_AssemblyBias(sig_corr, nsnap0=None):
     
     plt.show() 
     return None 
-    #if savefig is not None: 
-    #    fig.savefig(''.join([UT.fig_dir(), sfh+'_eval.png']), bbox_inches='tight')
-    #    plt.close() 
-    #    return None
-    #else: 
-    #    return fig
 
 
-def test_AssemblyBias(sig_corr, nsnap0=None):
-    ''' Test how assembly bias is implemented 
+def test_AssemblyBias(sig_corr, nsnap0=None, downsampled=None):
+    ''' Test how assembly bias is implemented by comparing the distribution of (D SFR, D Mhalo) 
+    for SF galaxies. 
+
+    ################################################
+    test seems successful
+    ################################################
     '''
     # load in Subhalo Catalog (pure centrals)
     subhist = Cat.PureCentralHistory(nsnap_ancestor=nsnap0)
-    subcat = subhist.Read()
+    subcat = subhist.Read(downsampled=downsampled)
 
     # load in generic theta (parameter values)
     theta = Evol.defaultTheta('random_step_abias') 
-    theta['sfh']['sigma_corr'] = sig_corr
+    theta['sfh']['sigma_corr'] = sig_corr # with specified correlation (assembly bias)
 
     eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
     eev.Initiate()
-
     eev.Evolve() 
 
     subcat = eev.SH_catalog
 
-    prettyplot() 
+    #prettyplot() 
     pretty_colors = prettycolors() 
-
-    nsnap0 = subcat['nsnap0']
-
-    isSF = np.where(subcat['gclass'] == 'star-forming')[0]
-        
-    isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == nsnap0))[0]
+    
+    # pick 5000 star forming galaxies with halos since nsnap0
+    isSF = np.where((subcat['gclass'] == 'star-forming') & (subcat['nsnap_start'] == nsnap0) & (subcat['weights'] > 0.))[0]
     i_rand = np.random.choice(isSF, size=5000, replace=False)#[0]
 
     for n in range(1, nsnap0)[::-1]: 
@@ -633,25 +625,16 @@ def test_AssemblyBias(sig_corr, nsnap0=None):
             SFR_n = subcat['snapshot'+str(n)+'_sfr'][i_rand]
         Mstar_n_1 = subcat['snapshot'+str(n+1)+'_m.star'][i_rand]
         Mhalo_n_1 = subcat['snapshot'+str(n+1)+'_halo.m'][i_rand] 
-            
+        
+        # delta SFR 
         mu_sfr = Obvs.SSFR_SFMS(Mstar_n, UT.z_nsnap(n), theta_SFMS=eev.theta_sfms) + Mstar_n
         dsfrs =  SFR_n - mu_sfr
-        
-        #mu_sfr = Obvs.SSFR_SFMS(Mstar_n, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
-        #for nn in range(2, nsnap0)[::-1]: 
-        #    #M_nn = subcat['snapshot'+str(nn)+'_m.star'][isSF[i_rand]]
-        #    mu_sfr = Obvs.SSFR_SFMS(Mstar_n, UT.z_nsnap(nn), theta_SFMS=eev.theta_sfms) + M_nn
-        #    dsfrs.append(subcat['snapshot'+str(nn)+'_sfr'][isSF[i_rand]] - mu_sfr[0])
-
-        #dsfrs = [subcat['sfr0'][isSF[i_rand]] - (Obvs.SSFR_SFMS(
-        #    subcat['m.star0'][isSF[i_rand]], UT.z_nsnap(20), 
-        #    theta_SFMS=eev.theta_sfms) + subcat['m.star0'][isSF[i_rand]])[0]]
         dMstar = Mstar_n - Mstar_n_1
         dMhalo = Mhalo_n - Mhalo_n_1
-        sub.scatter(dMhalo, dMstar, lw=0)
-        #sub.scatter(dMhalo, 0.3 * np.random.randn(len(dMhalo)), c='k')
+        #sub.scatter(dMhalo, dMstar, lw=0)
+        sub.scatter(dMhalo, 0.3 * np.random.randn(len(dMhalo)), c='k')
         #print np.std(dsfrs)
-        #sub.scatter(dMhalo, dsfrs, lw=0)
+        sub.scatter(dMhalo, dsfrs, lw=0)
     
         sub.set_xlim([-0.5, 0.5])
         sub.set_xlabel('$\Delta$ log $M_{halo}$', fontsize=25)
@@ -660,6 +643,7 @@ def test_AssemblyBias(sig_corr, nsnap0=None):
         sub.set_ylabel('$\Delta$ log SFR', fontsize=25)
     
         plt.show() 
+        plt.close() 
     #fig.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
     
     #plt.show() 
@@ -1176,7 +1160,7 @@ if __name__=="__main__":
     #EvolverPlots('constant_offset')
     #EvolverPlots('corr_constant_offset')
     #EvolverPlots('random_step', nsnap0=15)
-    #test_AssemblyBias(0.3, nsnap0=15)
+    test_AssemblyBias(0.0, nsnap0=15, downsampled='14')
     #test_Evolver_AssemblyBias(0.3, nsnap0=15)
     #EvolverPlots('constant_offset', nsnap0=15)
     #EvolverPlots('random_step', nsnap0=15)

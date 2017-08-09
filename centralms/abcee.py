@@ -45,8 +45,8 @@ def Prior(run, shape='tophat'):
 
     if run in ['test0', 'randomSFH']: 
         # SFMS_zslope, SFMS_mslope
-        prior_min = [1., 0.4]
-        prior_max = [1.6, 0.8]
+        prior_min = [0.9, 0.4]
+        prior_max = [1.5, 0.7]
     else:
         raise NotImplementedError
 

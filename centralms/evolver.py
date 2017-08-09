@@ -135,7 +135,7 @@ class Evolver(object):
         self.SH_catalog['m.star'][isNotSF] = self.SH_catalog['m.sham'][isNotSF]
 
         # store theta values 
-        print self.__dict__.keys()
+        #print self.__dict__.keys()
         for k in self.__dict__.keys(): 
             if 'theta_' in k: 
                 self.SH_catalog[k] = getattr(self, k)

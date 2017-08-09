@@ -34,7 +34,9 @@ def getMF(masses, weights=None, m_arr=None, box=250, h=0.7):
     vol = box ** 3  # box volume
     
     if not np.all(np.isfinite(masses)): 
-        print np.sum(np.isfinite(masses)) 
+        notfin = np.where(np.isfinite(masses) == False) 
+        print masses[notfin], weights[notfin]
+        #print np.sum(np.isfinite(masses)) 
         raise ValueError
     
     Ngal, mbin_edges = np.histogram(masses, bins=m_arr, weights=w_arr) # number of galaxies in mass bin  
