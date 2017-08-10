@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 
 def Theta(run): 
     tt = {} 
-    if run in ['test0', 'randomSFH']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_r0.2']: 
         tt['variable'] = ['SFMS z slope', 'SFMS m slope']
         tt['label'] = ['$\mathtt{m_{z; SFMS}}$', '$\mathtt{m_{M_*; SFMS}}$']
     
@@ -43,7 +43,7 @@ def Prior(run, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if run in ['test0', 'randomSFH', 'randomSFH']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_r0.2']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [0.9, 0.4]
         prior_max = [1.5, 0.7]
@@ -93,7 +93,7 @@ def model(run, args, **kwargs):
     '''
     theta = {}
 
-    if run in ['test0', 'randomSFH']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_r0.2']: 
         # args = SFMS_zslope, SFMS_mslope
 
         # these values were set by cenque project's output
@@ -115,6 +115,16 @@ def model(run, args, **kwargs):
             theta['sfh']['dt_min'] = 0.5 
             theta['sfh']['dt_max'] = 0.5 
             theta['sfh']['sigma'] = 0.3 
+        elif run == 'randomSFH_r0.2': 
+            # random fluctuation SFH corrected by r=0.2 with halo aseembly property 
+            # fluctuations happen on fixed 0.5 Gyr timescales  
+            # halo assembly property here is halo mass growth over 2 Gyrs 
+            theta['sfh'] = {'name': 'random_step_fluct'} 
+            theta['sfh']['dt_min'] = 0.5 
+            theta['sfh']['dt_max'] = 0.5 
+            theta['sfh']['t_abias'] = 2. # Gyr
+            theta['sfh']['sigma_tot'] = 0.3 
+            theta['sfh']['sigma_corr'] = 0.2 * 0.3
             
         # SFMS slopes can change 
         theta['sfms'] = {'name': 'linear', 'zslope': args[0], 'mslope': args[1]}
