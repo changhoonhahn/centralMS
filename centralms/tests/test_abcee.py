@@ -202,8 +202,8 @@ if __name__=='__main__':
     #test_SFMS_highz('randomSFH', 9, nsnap=8, lit='lee')
 
     #test_plotABC('randomSFH', 1)
-    test_qaplotABC('test0', 9)
-    test_qaplotABC('randomSFH', 9)
+    #test_qaplotABC('test0', 9)
     #test_ABCsumstat('randomSFH', 7)
-    #for t in range(8)[::-1]: 
-    #test_plotABC('randomSFH', 9)
+    for t in range(9)[::-1]: 
+        #test_plotABC('randomSFH', t)
+        test_qaplotABC('randomSFH', t)

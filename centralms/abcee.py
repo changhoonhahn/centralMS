@@ -43,7 +43,7 @@ def Prior(run, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if run in ['test0', 'randomSFH']: 
+    if run in ['test0', 'randomSFH', 'randomSFH']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [0.9, 0.4]
         prior_max = [1.5, 0.7]
@@ -448,12 +448,22 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_dat['m.max'], subcat_dat['m.star'], weights=subcat_dat['weights'])
     sub.plot(m_mid, mu_mhalo+sig_mhalo, color='k', ls='--', label='Data')
     sub.plot(m_mid, mu_mhalo-sig_mhalo, color='k', ls='--')
+    
+    sig_dat = smhmr.sigma_logMstar(subcat_dat['m.max'], subcat_dat['m.star'], 
+            weights=subcat_dat['weights'])
+    sig_sim = smhmr.sigma_logMstar(subcat_sim['m.max'], subcat_sim['m.star'], 
+            weights=subcat_sim['weights'])
+
+    # mark sigma_M*(M_h = 10^12) 
+    sub.text(0.8, 0.2, 
+            ''.join(['$\sigma^{(s)}_{M_*}(M_h = 10^{12} M_\odot) = ', str(round(sig_sim,2)), '$ \n', 
+                '$\sigma^{(d)}_{M_*}(M_h = 10^{12} M_\odot) = ', str(round(sig_dat,2)), '$']), 
+            fontsize=15, ha='center', va='center', transform=sub.transAxes)
 
     sub.set_xlim([10., 15.])
     sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
     sub.set_ylim([8., 12.])
     sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
-    sub.legend(loc='upper right') 
 
     # SFMS panel 
     sub = fig.add_subplot(1, len(sumstat)+2, len(sumstat)+2)
