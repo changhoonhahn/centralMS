@@ -119,7 +119,7 @@ def model(run, args, **kwargs):
             # random fluctuation SFH corrected by r=0.2 with halo aseembly property 
             # fluctuations happen on fixed 0.5 Gyr timescales  
             # halo assembly property here is halo mass growth over 2 Gyrs 
-            theta['sfh'] = {'name': 'random_step_fluct'} 
+            theta['sfh'] = {'name': 'random_step_abias2'} 
             theta['sfh']['dt_min'] = 0.5 
             theta['sfh']['dt_max'] = 0.5 
             theta['sfh']['t_abias'] = 2. # Gyr
