@@ -334,7 +334,10 @@ def Writeout(type, run, pool, **kwargs):
 
     if type == 'init': # initialize
         if not os.path.exists(file): # make directory if it doesn't exist 
-            os.makedirs(file)
+            try: 
+                os.makedirs(file)
+            except OSError: 
+                pass 
         
         # write specific info of the run  
         file += 'info.md'
