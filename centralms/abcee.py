@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 
 def Theta(run): 
     tt = {} 
-    if run in ['test0', 'randomSFH', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
         tt['variable'] = ['SFMS z slope', 'SFMS m slope']
         tt['label'] = ['$\mathtt{m_{z; SFMS}}$', '$\mathtt{m_{M_*; SFMS}}$']
     
@@ -46,7 +46,7 @@ def Prior(run, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if run in ['test0', 'randomSFH', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [0.9, 0.4]
         prior_max = [1.5, 0.7]
@@ -96,7 +96,7 @@ def model(run, args, **kwargs):
     '''
     theta = {}
 
-    if run in ['test0', 'randomSFH', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
         # args = SFMS_zslope, SFMS_mslope
 
         # these values were set by cenque project's output
@@ -117,6 +117,13 @@ def model(run, args, **kwargs):
             theta['sfh'] = {'name': 'random_step_fluct'} 
             theta['sfh']['dt_min'] = 0.5 
             theta['sfh']['dt_max'] = 0.5 
+            theta['sfh']['sigma'] = 0.3 
+        elif run == 'randomSFH_short':  
+            # random fluctuation SFH where fluctuations 
+            # happen on fixed short 0.1 Gyr timescales  
+            theta['sfh'] = {'name': 'random_step_fluct'} 
+            theta['sfh']['dt_min'] = 0.1 
+            theta['sfh']['dt_max'] = 0.1 
             theta['sfh']['sigma'] = 0.3 
         elif run == 'randomSFH_r0.2': 
             # random fluctuation SFH corrected by r=0.2 with halo aseembly property 

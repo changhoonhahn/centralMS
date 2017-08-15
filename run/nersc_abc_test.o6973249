@@ -1,0 +1,19 @@
+Run  randomSFH_r0.2
+N_iterations =  2
+N_particle =  48
+SMF
+No notification issued
+Traceback (most recent call last):
+  File "/global/homes/c/chahah/projects/centralMS/centralms/run_abcee.py", line 41, in <module>
+    runABC(abcrun, Niter, eps0, N_p=Npart, sumstat=sum_stat, notify=False, nsnap0=nsnap0, downsampled=downsampled) 
+  File "/global/u1/c/chahah/projects/centralMS/centralms/abcee.py", line 280, in runABC
+    Writeout('init', run, abcpmc_sampler, **write_kwargs)
+  File "/global/u1/c/chahah/projects/centralMS/centralms/abcee.py", line 337, in Writeout
+    os.makedirs(file)
+  File "/usr/common/software/python/2.7-anaconda/lib/python2.7/os.py", line 157, in makedirs
+    mkdir(name, mode)
+OSError: [Errno 17] File exists: '/global/u1/c/chahah/projects/centralMS/dat/abc/randomSFH_r0.2/'
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 6973249.0 ON nid03049 CANCELLED AT 2017-08-14T23:36:11 DUE TO TIME LIMIT ***
+srun: got SIGCONT
+srun: forcing job termination

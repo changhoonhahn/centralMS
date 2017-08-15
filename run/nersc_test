@@ -1,0 +1,12 @@
+#!/bin/bash -l 
+#SBATCH -p regular 
+#SBATCH -N 2
+#SBATCH -t 00:15:00
+#SBATCH -J nersc_abc_test
+#SBATCH -o nersc_abc_test.o%j
+#SBATCH -L SCRATCH,project
+
+module load python/2.7-anaconda
+
+srun -n 24 python /global/homes/c/chahah/projects/centralMS/centralms/run_abcee.py randomSFH_r0.2 2 48 1 0
+
