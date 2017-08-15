@@ -8,7 +8,10 @@ import numpy as np
 import abcpmc
 from abcpmc import mpi_util
 import corner as DFM
-import codif
+try: 
+    import codif
+except ImportError: 
+    flag_codif = False
 
 # -- local -- 
 import observables as Obvs
@@ -295,7 +298,8 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, **run_kwargs):
         Writeout('rho', run, pool) 
         #plotABC(run, pool.t) # plot corner plot 
 
-        codif.notif(subject=run+' T = '+str(pool.t)+' FINISHED')
+        if notify and flag_codif: 
+            codif.notif(subject=run+' T = '+str(pool.t)+' FINISHED')
         # update epsilon based on median thresholding 
         if len(eps0) > 1: 
             eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
@@ -304,7 +308,8 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, **run_kwargs):
         print '----------------------------------------'
         pools.append(pool)
 
-    codif.notif(subject=run+' ALL FINISHED')
+    if notify and flag_codif: 
+        codif.notif(subject=run+' ALL FINISHED')
     return pools 
 
 
