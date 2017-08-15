@@ -104,7 +104,6 @@ def model(run, args, **kwargs):
         theta['fq'] = {'name': 'cosmos_tinker'}
         theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
         
-        # for simple test 
         theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
 
         if run == 'test0': 
@@ -124,6 +123,14 @@ def model(run, args, **kwargs):
             theta['sfh'] = {'name': 'random_step_fluct'} 
             theta['sfh']['dt_min'] = 0.1 
             theta['sfh']['dt_max'] = 0.1 
+            theta['sfh']['sigma'] = 0.3 
+            theta['mass']['t_step'] = 0.01 # change timestep 
+        elif run == 'randomSFH_long':  
+            # random fluctuation SFH where fluctuations 
+            # happen on fixed longer 1 Gyr timescales  
+            theta['sfh'] = {'name': 'random_step_fluct'} 
+            theta['sfh']['dt_min'] = 1.
+            theta['sfh']['dt_max'] = 1. 
             theta['sfh']['sigma'] = 0.3 
         elif run == 'randomSFH_r0.2': 
             # random fluctuation SFH corrected by r=0.2 with halo aseembly property 
@@ -447,17 +454,17 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     # median theta 
     theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
 
-    subcat_dat = Data(nsnap0=15) # 'data'
-    sumdata = SumData(sumstat, info=True, nsnap0=15)  
+    subcat_dat = Data(nsnap0=nsnap0) # 'data'
+    sumdata = SumData(sumstat, info=True, nsnap0=nsnap0)  
 
     subcat_sim = model(run, theta_med, nsnap0=nsnap0, downsampled=downsampled) 
     sumsim = SumSim(sumstat, subcat_sim, info=True)
     
-    fig = plt.figure(figsize=(6*(len(sumstat)+2),5))
+    fig = plt.figure(figsize=(6*(len(sumstat)+3),5))
     
     for i_s, stat in enumerate(sumstat): 
         if stat == 'smf': 
-            sub = fig.add_subplot(1, len(sumstat)+2, i_s+1)
+            sub = fig.add_subplot(1, len(sumstat)+3, i_s+1)
 
             sub.plot(sumdata[0][0], sumdata[0][1], c='k', ls='--', label='Data')
             sub.plot(sumsim[0][0], sumsim[0][1], c='b', label='Sim.')
@@ -472,7 +479,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
             raise NotImplementedError
     
     # SMHMR panel 
-    sub = fig.add_subplot(1, len(sumstat)+2, len(sumstat)+1)
+    sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+1)
     smhmr = Obvs.Smhmr()
     # simulation 
     m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['m.max'], subcat_sim['m.star'], 
@@ -501,7 +508,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
 
     # SFMS panel 
-    sub = fig.add_subplot(1, len(sumstat)+2, len(sumstat)+2)
+    sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+2)
 
     isSF = np.where(subcat_sim['gclass'] == 'star-forming') # only SF galaxies 
     DFM.hist2d(
@@ -522,7 +529,47 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     sub.set_ylim([-4., 2.])
     sub.set_ylabel('$\mathtt{log\;SFR}$', fontsize=25)
     
-    fig_name = ''.join([UT.fig_dir(), 'qaplot_ABC.', run, '.', str(T), '.png'])
+    # dSFR as a function of t_cosmic 
+    sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+3)
+    mbins = np.arange(9., 12., 0.5) 
+
+    i_r = [] # select random SF galaxies over mass bins
+    for i_m in range(len(mbins)-1): 
+        inmbin = np.where(
+                (subcat_sim['gclass'] == 'star-forming') & 
+                (subcat_sim['m.star'] > mbins[i_m]) & 
+                (subcat_sim['m.star'] <= mbins[i_m+1]))
+
+        i_r.append(np.random.choice(inmbin[0], size=1)[0])
+    i_r = np.array(i_r)
+
+    # calculate d(logSFR)  = logSFR - logSFR_MS 
+    dlogsfrs = np.zeros((len(i_r), nsnap0-1))
+    for i_snap in range(1, nsnap0): 
+        if i_snap == 1: 
+            sfr = subcat_sim['sfr'][i_r]
+            sfr_ms = Obvs.SSFR_SFMS(subcat_sim['m.star'][i_r], UT.z_nsnap(i_snap), theta_SFMS=subcat_sim['theta_sfms']) + \
+                                    subcat_sim['m.star'][i_r], 
+            dlogsfrs[:,0] =  sfr - sfr_ms 
+        else: 
+            sfr = subcat_sim['snapshot'+str(i_snap)+'_sfr'][i_r]
+            sfr_ms = Obvs.SSFR_SFMS(subcat_sim['snapshot'+str(i_snap)+'_m.star'][i_r], UT.z_nsnap(i_snap), theta_SFMS=subcat_sim['theta_sfms']) + \
+                    subcat_sim['snapshot'+str(i_snap)+'_m.star'][i_r]
+            dlogsfrs[:,i_snap-1] = sfr - sfr_ms 
+
+    for i in range(dlogsfrs.shape[0]): 
+        sub.plot(UT.t_nsnap(range(1, nsnap0)), dlogsfrs[i,:]) 
+    for i in range(1, nsnap0): 
+        sub.vlines(UT.t_nsnap(i), -1., 1., color='k', linestyle='--')
+
+    sub.set_xlim([13.81, 9.])
+    sub.set_xticks([13., 12., 11., 10., 9.])
+    sub.set_xlabel('$\mathtt{t_{cosmic}\;[Gyr]}$', fontsize=25)
+    sub.set_ylim([-1., 1.]) 
+    sub.set_yticks([-0.9, -0.6, -0.3, 0., 0.3, 0.6, 0.9])
+    sub.set_ylabel('$\mathtt{\Delta log\,SFR}$', fontsize=25)
+    
+    fig_name = ''.join([UT.dat_dir()+'abc/'+run+'/', 'qaplot.', str(T), '.png'])
     fig.savefig(fig_name, bbox_inches='tight')
     plt.close()
     return None 

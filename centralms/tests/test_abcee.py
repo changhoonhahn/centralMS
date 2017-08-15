@@ -204,7 +204,8 @@ if __name__=='__main__':
     #test_plotABC('randomSFH', 1)
     #test_qaplotABC('test0', 9)
     #test_ABCsumstat('randomSFH', 7)
-    sfh_name = 'randomSFH_r0.99'
-    for t in range(5):
-        test_plotABC(sfh_name, t)
+    #sfh_name = 'randomSFH_r0.99'
+    sfh_name = 'randomSFH_short'
+    for t in [9]: #range(10): #[5,6]: #range(5):
+        #test_plotABC(sfh_name, t)
         test_qaplotABC(sfh_name, t)
