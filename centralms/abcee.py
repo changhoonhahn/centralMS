@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 
 def Theta(run): 
     tt = {} 
-    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
         tt['variable'] = ['SFMS z slope', 'SFMS m slope']
         tt['label'] = ['$\mathtt{m_{z; SFMS}}$', '$\mathtt{m_{M_*; SFMS}}$']
     
@@ -46,7 +46,7 @@ def Prior(run, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [0.9, 0.4]
         prior_max = [1.5, 0.7]
@@ -96,7 +96,7 @@ def model(run, args, **kwargs):
     '''
     theta = {}
 
-    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
         # args = SFMS_zslope, SFMS_mslope
 
         # these values were set by cenque project's output
