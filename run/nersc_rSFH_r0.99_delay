@@ -1,0 +1,12 @@
+#!/bin/bash -l 
+#SBATCH -p regular 
+#SBATCH -N 1
+#SBATCH -t 03:00:00
+#SBATCH -J nersc_rSFH_r0.99_delay
+#SBATCH -o nersc_rSFH_r0.99_delay.o%j
+#SBATCH -L SCRATCH,project
+
+module load python/2.7-anaconda
+
+srun -n 24 python /global/homes/c/chahah/projects/centralMS/centralms/run_abcee.py rSFH_r0.99_delay 10 240 1 0
+
