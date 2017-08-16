@@ -10,6 +10,7 @@ from abcpmc import mpi_util
 import corner as DFM
 try: 
     import codif
+    flag_codif = True 
 except ImportError: 
     flag_codif = False
 
@@ -96,7 +97,8 @@ def model(run, args, **kwargs):
     '''
     theta = {}
 
-    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
+            'rSFH_r0.66_delay']: 
         # args = SFMS_zslope, SFMS_mslope
 
         # these values were set by cenque project's output
@@ -152,6 +154,14 @@ def model(run, args, **kwargs):
             theta['sfh']['t_abias'] = 2. # Gyr
             theta['sfh']['sigma_tot'] = 0.3 
             theta['sfh']['sigma_corr'] = 0.99 * 0.3
+        elif run == 'rSFH_r0.66_delay': 
+            theta['sfh'] = {'name': 'random_step_abias_delay'}
+            theta['sfh']['dt_min'] = 0.5 
+            theta['sfh']['dt_max'] = 0.5 
+            theta['sfh']['sigma_tot'] = 0.3 
+            theta['sfh']['sigma_corr'] = 0.66 * 0.3
+            theta['sfh']['dt_delay'] = 1. # Gyr 
+            theta['sfh']['dz_dMh'] = 0.5 
             
         # SFMS slopes can change 
         theta['sfms'] = {'name': 'linear', 'zslope': args[0], 'mslope': args[1]}
@@ -510,7 +520,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     # SFMS panel 
     sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+2)
 
-    isSF = np.where(subcat_sim['gclass'] == 'star-forming') # only SF galaxies 
+    isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
     DFM.hist2d(
             subcat_sim['m.star'][isSF], 
             subcat_sim['sfr'][isSF], 
@@ -536,7 +546,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     i_r = [] # select random SF galaxies over mass bins
     for i_m in range(len(mbins)-1): 
         inmbin = np.where(
-                (subcat_sim['gclass'] == 'star-forming') & 
+                (subcat_sim['gclass'] == 'sf') & 
                 (subcat_sim['m.star'] > mbins[i_m]) & 
                 (subcat_sim['m.star'] <= mbins[i_m+1]))
 

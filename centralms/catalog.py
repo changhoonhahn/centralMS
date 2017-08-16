@@ -65,7 +65,8 @@ class SubhaloHistory(object):
         '''Construct the subhalo/SHAM M* history into hdf5 format
         '''
         # import that subhalos
-        sub = subhalo_io.Treepm.read('subhalo', 250, zis=self.snapshots) 
+        snaps_ext = self.snapshots+range(self.nsnap_ancestor+1, self.nsnap_ancestor+10) 
+        sub = subhalo_io.Treepm.read('subhalo', 250, zis=snaps_ext) 
 
         # SHAM stellar masses to each of the subhalo catalogs
         m_kind = 'm.star'
@@ -114,6 +115,34 @@ class SubhaloHistory(object):
             central_history = np.repeat(0, len(sub[1]['halo.m']))
             central_history[hasmatch] = central_snap[index_history[hasmatch]]
             catalog['snapshot'+str(i_snap)+'_central'] = central_history 
+    
+        # save halo.m and m.max in extra snapshots before nsnap_ancestor
+        for i_snap in range(self.nsnap_ancestor+1, self.nsnap_ancestor+10):
+            # find subhalos that correspond to snapshot 1 subhalos 
+            index_history = wetzel_util.utility_catalog.indices_tree(sub, 1, i_snap, range(len(sub[1]['halo.m'])))
+            no_match = np.where(index_history < 0)[0]
+            hasmatch = np.where(index_history > 0)[0]
+            index_history[no_match] = -999  # ones that do not have a match  
+            catalog['snapshot'+str(i_snap)+'_index'] = index_history
+            
+            assert len(index_history) == len(sub[1]['halo.m']) 
+
+            # save specified subhalo properties from the snapshots
+            for gal_prop in ['halo.m', 'm.max']: 
+                if isinstance(sub[i_snap][gal_prop][0], np.float32) or isinstance(sub[i_snap][gal_prop][0], np.float64): 
+                    catalog['snapshot'+str(i_snap)+'_'+gal_prop] = np.repeat(-999., len(catalog['snapshot'+str(i_snap)+'_index']))
+                elif isinstance(sub[i_snap][gal_prop][0], np.int32): 
+                    catalog['snapshot'+str(i_snap)+'_'+gal_prop] = np.repeat(-999, len(catalog['snapshot'+str(i_snap)+'_index']))
+                elif isinstance(sub[i_snap][gal_prop][0], np.ndarray): 
+                    catalog['snapshot'+str(i_snap)+'_'+gal_prop] = np.tile(-999, 
+                            (len(catalog['snapshot'+str(i_snap)+'_index']), sub[i_snap][gal_prop].shape[1]))
+                else: 
+                    print gal_prop
+                    print type(sub[i_snap][gal_prop][0])
+                    raise ValueError
+            
+                catalog['snapshot'+str(i_snap)+'_'+gal_prop][hasmatch] = \
+                        (sub[i_snap][gal_prop])[index_history[hasmatch]]
 
         for gal_prop in ['halo.m', 'm.max', 'm.star', 'pos', 'ilk']: 
             catalog[gal_prop] = sub[1][gal_prop]
@@ -208,7 +237,8 @@ class PureCentralHistory(object):
         # read in the entire subhalo history
         subhist = SubhaloHistory(sigma_smhm=self.sigma_smhm, smf_source=self.smf_source, nsnap_ancestor=self.nsnap_ancestor)
         all_catalog = subhist.Read()
-        
+
+        # subhalos that are central throughout all the snapshots  
         ispure = (all_catalog['central'] == 1)
         n_central = np.sum(ispure)
         print n_central, ' of', len(all_catalog['central']), ' subhalos at nsnap=1 are pure centrals'
@@ -273,7 +303,10 @@ class PureCentralHistory(object):
 
         print 'After downsample; w_tot = ', np.sum(weights)
         
-        assert np.float(len(catalog['halo.m'])) == np.sum(weights)
+        if not np.allclose(np.float(len(catalog['halo.m'])), np.sum(weights)): 
+            print np.float(len(catalog['halo.m'])), np.sum(weights)
+            print np.float(len(catalog['halo.m'])) - np.sum(weights)
+            raise ValueError
         
         # ouptut downsampled catalog to hdf5 file  
         down_file = self.File(downsampled=str(int(round(f_down))))

@@ -53,6 +53,13 @@ def defaultTheta(sfh):
         theta['sfh']['t_abias'] = 2. # Gyr
         theta['sfh']['sigma_tot'] = 0.3 
         theta['sfh']['sigma_corr'] = 0.29
+    elif sfh == 'random_step_abias_delay': 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.2
+        theta['sfh']['dt_delay'] = 1. # Gyr 
+        theta['sfh']['dz_dMh'] = 0.5 
     else: 
         raise NotImplementedError
 
@@ -83,13 +90,16 @@ class Evolver(object):
     
         # store subhalo catalog object described in catalog.py
         self.SH_catalog = PCH_catalog
+        # free up some space
+        del self.SH_catalog['pos']
+        del self.SH_catalog['ilk']
 
     def Evolve(self, forTests=False): 
         ''' Evolve the galaxies from initial conditions specified in self.Initiate()
         '''
         # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
         isSF = np.where(
-                (self.SH_catalog['gclass'] == 'star-forming') & 
+                (self.SH_catalog['gclass'] == 'sf') & 
                 (self.SH_catalog['weights'] > 0.))[0] # only includes galaxies with w > 0 
     
         # initiate logSFR(logM, z) function and keywords
@@ -131,7 +141,7 @@ class Evolver(object):
             self.SH_catalog['snapshot'+str(n_snap)+'_sfr'][isSF[isSF_i]] = sfr_tmp[isSF_i]
         
         # not star-forming nsnap_f M* is just their SHAM M* 
-        isNotSF = np.where(self.SH_catalog['gclass'] != 'star-forming')
+        isNotSF = np.where(self.SH_catalog['gclass'] != 'sf')
         self.SH_catalog['m.star'][isNotSF] = self.SH_catalog['m.sham'][isNotSF]
 
         # store theta values 
@@ -340,7 +350,7 @@ def _pickSF(SHcat, nsnap0=20, theta_fq=None, theta_fpq=None):
     gclass = SHcat['gclass0']
     
     # identify SF galaxies @ nsnap0
-    isSF = np.where((gclass == 'star-forming') & (SHcat['weights'] > 0.))
+    isSF = np.where((gclass == 'sf') & (SHcat['weights'] > 0.))
     
     qf = Obvs.Fq() # qf object
 
@@ -374,10 +384,10 @@ def _pickSF(SHcat, nsnap0=20, theta_fq=None, theta_fpq=None):
         
         # galaxies that quench between snpashots n and n-1 
         quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
-        gclass[isSF[0][hasmass[0][quenches]]] = 'quenching'
+        gclass[isSF[0][hasmass[0][quenches]]] = 'qing'
         nsnap_quench[isSF[0][hasmass[0][quenches]]] = n
         
-        isSF = np.where((gclass == 'star-forming') & (SHcat['weights'] > 0.)) # update is SF
+        isSF = np.where((gclass == 'sf') & (SHcat['weights'] > 0.)) # update is SF
 
     return [gclass, nsnap_quench]
 
@@ -437,7 +447,7 @@ def assignSFRs(masses, zs, ws, theta_GV=None, theta_SFMS=None, theta_FQ=None):
     
     rand = np.random.uniform(0., 1., ngal)
     isgreen = np.where(rand < f_gv(masses))
-    output['Gclass'][isgreen] = 'quenching'
+    output['Gclass'][isgreen] = 'qing'
     output['MQ'][isgreen] = masses[isgreen]         # M* at quenching
     output['SFR'][isgreen] = np.random.uniform(     # sample SSFR from uniform distribution 
             Obvs.SSFR_Qpeak(masses[isgreen]),       # between SSFR_Qpeak
@@ -466,7 +476,7 @@ def assignSFRs(masses, zs, ws, theta_GV=None, theta_SFMS=None, theta_FQ=None):
     isq = isnotgreen[np.where(rand2 < fQ_true[isnotgreen])]
     Nq = len(isq)
 
-    output['Gclass'][isq] = 'quiescent'
+    output['Gclass'][isq] = 'q'
     output['SFR'][isq] = Obvs.SSFR_Qpeak(masses[isq]) + \
             np.random.randn(Nq) * Obvs.sigSSFR_Qpeak(masses[isq]) + masses[isq]
     
@@ -474,7 +484,7 @@ def assignSFRs(masses, zs, ws, theta_GV=None, theta_SFMS=None, theta_FQ=None):
     issf = np.where(output['Gclass'] == '')
     Nsf = len(issf[0])
 
-    output['Gclass'][issf] = 'star-forming'
+    output['Gclass'][issf] = 'sf'
     output['SFR'][issf] = Obvs.SSFR_SFMS(masses[issf], zs[issf], theta_SFMS=theta_SFMS) + \
             np.random.randn(Nsf) * Obvs.sigSSFR_SFMS(masses[issf]) + \
             masses[issf]

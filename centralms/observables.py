@@ -122,7 +122,7 @@ class Fq(object):
             if ngal_mass == 0:  # no galaxy in mass bin 
                 continue 
             
-            isQ = masslim[np.where(sfq[masslim] == 'quiescent')]
+            isQ = masslim[np.where(sfq[masslim] == 'q')]
             f_q[i_m] = np.sum(ws[isQ])/np.sum(ws[masslim])
             count_arr[i_m] = np.sum(ws[masslim])
     
@@ -150,9 +150,9 @@ class Fq(object):
         sfq = np.empty(len(mstar), dtype=(str,16))
 
         sf_index = np.where(sfr[hasw] > sfr_class)
-        sfq[hasw[0][sf_index]] = 'star-forming'
+        sfq[hasw[0][sf_index]] = 'sf'
         q_index = np.where(sfr[hasw] <= sfr_class)
-        sfq[hasw[0][q_index]] = 'quiescent'
+        sfq[hasw[0][q_index]] = 'q'
 
         return sfq 
 

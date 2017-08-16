@@ -61,7 +61,7 @@ def siglogMstar_tduty(nsnap0):
             # galaxy/subhalo catalog
             subcat = eev.SH_catalog
     
-            isSF = np.where(subcat['gclass'] == 'star-forming')[0]
+            isSF = np.where(subcat['gclass'] == 'sf')[0]
     
             smhmr = Obvs.Smhmr()
             m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['halo.m'][isSF], subcat['m.star'][isSF])

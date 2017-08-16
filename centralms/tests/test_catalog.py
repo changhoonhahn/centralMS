@@ -6,6 +6,7 @@
 '''
 import numpy as np 
 
+import env
 import catalog as Cat
 import observables as Obvs
 
@@ -103,14 +104,14 @@ if __name__=='__main__':
     #test_Observations_GroupCat()
     #plotPureCentral_SHMF(nsnap_ancestor=20)
 
-    test_Downsample('smhmr', 15)
+    #test_Downsample('smhmr', 15)
 
-    #for sig in [0.2]:#, 0.]: 
-    #    #subhist = Cat.SubhaloHistory(sigma_smhm=sig, nsnap_ancestor=15)
-    #    #subhist.Build()
-    #    subhist = Cat.PureCentralHistory(sigma_smhm=sig, nsnap_ancestor=15)
-    #    subhist.Build()
-    #    subhist.Downsample()
+    for sig in [0.2]:#, 0.]: 
+        subhist = Cat.SubhaloHistory(sigma_smhm=sig, nsnap_ancestor=15)
+        subhist.Build()
+        subhist = Cat.PureCentralHistory(sigma_smhm=sig, nsnap_ancestor=15)
+        subhist.Build()
+        subhist.Downsample()
 
     #subhist = Cat.SubhaloHistory(nsnap_ancestor=20)
     #subhist.Build()
