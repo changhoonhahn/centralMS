@@ -7,6 +7,7 @@ import time
 from sys import getsizeof
 import numpy as np 
 from scipy.special import erfinv
+from scipy.interpolate import interp1d
 
 # --- local --- 
 import util as UT
@@ -573,43 +574,29 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         f_dMh = np.zeros(tsteps.shape, dtype=np.float32)
         Mh_steps = np.zeros(tsteps.shape, dtype=np.float32) 
         for i_g in range(n_gal): 
-            print '----------'
             insim = np.where(Mh_snaps[i_g,:] > 0.)[0] # some halos did not exist far back
             Mh_snaps_i = 10**(Mh_snaps[i_g,insim] - 10.) # scaled by 10^10 for ease
+            t_snaps_i = t_snaps[insim]
 
             # SFH is correlated with halo growth dt_delay earlier  
             tstep_i = tsteps[i_g,:]
             tdelay_i = tstep_i - theta_sfh['dt_delay']
-
-            print tstep_i
-            print t_snaps[insim].shape
-            print Mh_snaps_i.shape
-            print np.interp(tstep_i, t_snaps[insim], Mh_snaps_i)
-            Mh_steps[i_g,:] = np.interp(tstep_i, t_snaps[insim], Mh_snaps_i)
-
-            print Mh_steps[i_g,:]
-            Mh_delay  = np.interp(tdelay_i, t_snaps[insim], Mh_snaps_i)
-            Mh_delay_dt = np.interp(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'], z_snaps[insim], Mh_snaps_i)
-
-            f_dMh[i_g,:] = 1. - Mh_delay_dt / Mh_delay 
             
-            if i_g > 10: 
-                raise ValueError
+            # note that x has to be monotonically for np.interp 
+            Mh_steps[i_g,:] = np.interp(tstep_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
+            Mh_delay  = np.interp(tdelay_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
+            Mh_delay_dz = np.interp(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'], z_snaps[insim], Mh_snaps_i)
 
-        print 'Mh_steps'
-        print Mh_steps[:10,0]
-        print Mh_steps[:10,1]
-        print Mh_steps[:10,2]
+            f_dMh[i_g,:] = 1. - Mh_delay_dz / Mh_delay 
 
         # calculate the d(log SFR) amplitude at t_steps 
         dlogSFR_amp = np.zeros(f_dMh.shape, dtype=np.float32)
         for ii in range(f_dMh.shape[1]): 
             f_dMh_i = f_dMh[:,ii]
             Mh_step = np.log10(Mh_steps[:,ii]) + 10.
-            print Mh_step 
-            print Mh_step.min(), Mh_step.max()
             mh_bins = np.arange(Mh_step.min(), Mh_step.max()+0.2, 0.2)
             
+            fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
             for i_m in range(len(mh_bins)-1): 
                 inbin = np.where((Mh_step >= mh_bins[i_m]) & 
                         (Mh_step < mh_bins[i_m+1]))
@@ -624,7 +611,17 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                 # x = (SFR - avg_SFR)/sigma_SFR
                 # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
                 dlogSFR_amp[inbin, ii] = \
-                        theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank)
+                        theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank) 
+
+                #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
+                #sub.scatter(f_dMh_i[inbin], 0.3 * np.random.randn(n_bin), c='k')
+                #sub.scatter(f_dMh_i[inbin], dlogSFR_amp[inbin, ii] + \
+                #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
+                #sub.set_xlim([-1., 1.])
+                #sub.set_ylim([-1., 1.])
+
+            #plt.show()
+            #raise ValueError
         del f_dMh
         del Mh_steps
         

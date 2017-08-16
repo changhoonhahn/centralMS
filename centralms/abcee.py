@@ -159,7 +159,7 @@ def model(run, args, **kwargs):
             theta['sfh']['dt_min'] = 0.5 
             theta['sfh']['dt_max'] = 0.5 
             theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.66 * 0.3
+            theta['sfh']['sigma_corr'] = 0.99 * 0.3
             theta['sfh']['dt_delay'] = 1. # Gyr 
             theta['sfh']['dz_dMh'] = 0.5 
             
