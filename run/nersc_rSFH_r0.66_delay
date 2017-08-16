@@ -1,7 +1,7 @@
 #!/bin/bash -l 
 #SBATCH -p regular 
-#SBATCH -N 5
-#SBATCH -t 03:00:00
+#SBATCH -N 1
+#SBATCH -t 15:00:00
 #SBATCH -J nersc_rSFH_r0.66_delay
 #SBATCH -o nersc_rSFH_r0.66_delay.o%j
 #SBATCH -L SCRATCH,project
