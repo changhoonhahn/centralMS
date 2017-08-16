@@ -234,7 +234,8 @@ def roe_wrap(sumstat, type='L2'):
         raise NotImplementedError
 
 
-def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, **run_kwargs): 
+def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, 
+        restart=False, t_restart=None, **run_kwargs): 
     ''' Main code for running ABC 
 
     Parameters
@@ -284,8 +285,12 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, **run_kwargs):
     roe = roe_wrap(sumstat, type='L2')
 
     init_pool = None 
-    # implement restart here
-    # implement restart here
+    # for restarting ABC
+    if restart: 
+        if t_restart is None: 
+            raise ValueError("specify restart iteration number") 
+        abcout = readABC(run, t_restart)
+        init_pool = abcpmc.PoolSpec(t_restart, None, None, abcout['theta'], abcout['rho'], abcout['w'])
 
     # threshold 
     eps = abcpmc.ConstEps(T, eps0)
@@ -311,7 +316,10 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, **run_kwargs):
     write_kwargs['sumstat'] = sumstat 
     for key in run_kwargs.keys():
         write_kwargs[key] = run_kwargs[key]
-    Writeout('init', run, abcpmc_sampler, **write_kwargs)
+    if not restart: 
+        Writeout('init', run, abcpmc_sampler, **write_kwargs)
+    else: 
+        Writeout('restart', run, abcpmc_sampler, **write_kwargs)
 
     # particle proposal 
     abcpmc_sampler.particle_proposal_cls = abcpmc.ParticleProposal
@@ -393,7 +401,31 @@ def Writeout(type, run, pool, **kwargs):
         f.write(''.join(['Initial Snapshot = ', str(kwargs['nsnap0']), '\n']))
         f.write(''.join(['Downsampled by = ', str(kwargs['downsampled']), '\n']))
         f.close()
+    elif type == 'restart': # initialize
+        if not os.path.exists(file): # make directory if it doesn't exist 
+            raise ValueError('cannot find run directory')
+        
+        # write specific info of the run  
+        file += 'info.md'
+        f = open(file, 'a')
+        f.write('# RESTARTING, details below should agree with details above')
+        f.write('# '+run+' run specs \n')
+        f.write(''.join(['N_iter = ', str(kwargs['Niter']), '\n']))
+        f.write(''.join(['N_particles = ', str(pool.N), '\n']))
+        f.write(''.join(['Distance function = ', pool.dist.__name__ , '\n']))
+        # variables
+        theta_info = Theta(run)
+        f.write(''.join(['Variables = [', ','.join(theta_info['variable']), '] \n']))
+        # prior 
+        prior_obj = Prior(run)
+        f.write('Top Hat Priors \n')
+        f.write(''.join(['Prior Min = [', ','.join([str(prior_obj.min[i]) for i in range(len(prior_obj.min))]), '] \n']))
+        f.write(''.join(['Prior Max = [', ','.join([str(prior_obj.max[i]) for i in range(len(prior_obj.max))]), '] \n']))
+        f.write('\n') 
 
+        f.write(''.join(['Initial Snapshot = ', str(kwargs['nsnap0']), '\n']))
+        f.write(''.join(['Downsampled by = ', str(kwargs['downsampled']), '\n']))
+        f.close()
     elif type == 'eps': # threshold writeout 
         file += ''.join(['epsilon.', run, '.dat'])
         if pool is None: # write or overwrite threshold writeout

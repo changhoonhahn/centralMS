@@ -370,10 +370,11 @@ def _pickSF(SHcat, nsnap0=20, theta_fq=None, theta_fpq=None):
         assert np.array_equal(mf[0], dmf_dt[0])
     
         # (P_Q fiducial) * (1-fq) 
-        Pq_M_fid = (qf.dfQ_dz(mf[0], z_i, lit=theta_fq['name']) / UT.dt_dz(z_i) +
-                qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+        notzero = np.where(mf[1] > 0.)
+        Pq_M_fid = (qf.dfQ_dz(mf[0][notzero], z_i, lit=theta_fq['name']) / UT.dt_dz(z_i) +
+                qf.model(mf[0][notzero], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1][notzero])
 
-        Pq_M_fid_interp = interp1d(mf[0], Pq_M_fid, fill_value='extrapolate') # interpolate
+        Pq_M_fid_interp = interp1d(mf[0][notzero], Pq_M_fid, fill_value='extrapolate') # interpolate
 
         Pq_M = lambda mm: t_step * _f_PQ(mm, theta_fpq['slope'], theta_fpq['fidmass'], theta_fpq['offset']) *  \
                 Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
