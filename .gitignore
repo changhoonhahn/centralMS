@@ -3,3 +3,4 @@ dat
 fig/*
 .ipynb_checkpoints/
 *hdf5
+run/*o6*
