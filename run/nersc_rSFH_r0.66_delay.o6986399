@@ -1,0 +1,694 @@
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: invalid value encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:386: RuntimeWarning: invalid value encountered in less
+  quenches = np.where(rand_Pq < Pq_Msham)  # these SFing galaxies quench
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:379: RuntimeWarning: divide by zero encountered in divide
+  Pq_M_fid_interp(mm) / (1. - qf.model(mm, z_i, lit=theta_fq['name']))
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+/global/u1/c/chahah/projects/centralMS/centralms/evolver.py:374: RuntimeWarning: divide by zero encountered in divide
+  qf.model(mf[0], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1])
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+ : cannot connect to X server edison07:13.0
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+Run  rSFH_r0.66_delay
+N_iterations =  10
+N_particle =  240
+SMF
+No notification issued
+----------------------------------------
+srun: error: nid01633: tasks 1-3,5,8: Exited with exit code 1
+srun: Terminating job step 6986399.0
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 6986399.0 ON nid01633 CANCELLED AT 2017-08-16T00:08:13 ***
+srun: error: nid01638: tasks 39-47: Exited with exit code 1
+srun: error: nid01636: tasks 20-29: Exited with exit code 1
+srun: error: nid01637: tasks 30-38: Exited with exit code 1
+srun: error: nid01633: tasks 0,4,6-7,9: Killed
+srun: error: nid01634: tasks 10-19: Exited with exit code 1

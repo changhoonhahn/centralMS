@@ -24,7 +24,8 @@ import matplotlib.pyplot as plt
 
 def Theta(run): 
     tt = {} 
-    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
+            'rSFH_r0.66_delay']: 
         tt['variable'] = ['SFMS z slope', 'SFMS m slope']
         tt['label'] = ['$\mathtt{m_{z; SFMS}}$', '$\mathtt{m_{M_*; SFMS}}$']
     
@@ -47,7 +48,8 @@ def Prior(run, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99']: 
+    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
+            'rSFH_r0.66_delay']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [0.9, 0.4]
         prior_max = [1.5, 0.7]
@@ -159,7 +161,7 @@ def model(run, args, **kwargs):
             theta['sfh']['dt_min'] = 0.5 
             theta['sfh']['dt_max'] = 0.5 
             theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.99 * 0.3
+            theta['sfh']['sigma_corr'] = 0.66 * 0.3
             theta['sfh']['dt_delay'] = 1. # Gyr 
             theta['sfh']['dz_dMh'] = 0.5 
             
