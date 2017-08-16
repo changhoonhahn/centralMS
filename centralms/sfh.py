@@ -596,7 +596,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             Mh_step = np.log10(Mh_steps[:,ii]) + 10.
             mh_bins = np.arange(Mh_step.min(), Mh_step.max()+0.2, 0.2)
             
-            fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
+            #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
             for i_m in range(len(mh_bins)-1): 
                 inbin = np.where((Mh_step >= mh_bins[i_m]) & 
                         (Mh_step < mh_bins[i_m+1]))
