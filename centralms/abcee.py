@@ -285,7 +285,7 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
     roe = roe_wrap(sumstat, type='L2')
 
     init_pool = None 
-    # for restarting ABC
+    # for restarting ABC (use with caution)
     if restart: 
         if t_restart is None: 
             raise ValueError("specify restart iteration number") 
