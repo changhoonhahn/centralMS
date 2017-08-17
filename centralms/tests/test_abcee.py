@@ -201,12 +201,13 @@ if __name__=='__main__':
     #test_SFMS_highz('test0', 9, nsnap=8, lit='lee')
     #test_SFMS_highz('randomSFH', 9, nsnap=8, lit='lee')
 
-    #test_SumSim('rSFH_r0.66_delay')
+    #test_SumSim('rSFH_r1.0_most')
+    abcee.qaplotABC('rSFH_r1.0_most', 10, theta=np.array([1.35, 0.6])) 
     #test_plotABC('randomSFH', 1)
     #test_qaplotABC('test0', 9)
     #test_ABCsumstat('randomSFH', 7)
-    sfh_name = 'randomSFH_r0.99'
+    sfh_name = 'rSFH_r0.99_delay'
     #sfh_name = 'randomSFH_short'
-    for t in range(10): #[5,6]: #range(5):
-        test_plotABC(sfh_name, t)
-        test_qaplotABC(sfh_name, t)
+    #for t in [9]: #range(10)[::-1]: #[5,6]: #range(5):
+    #    #test_plotABC(sfh_name, t)
+    #    test_qaplotABC(sfh_name, t)

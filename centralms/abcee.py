@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 def Theta(run): 
     tt = {} 
     if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
-            'rSFH_r0.66_delay', 'rSFH_r0.99_delay']: 
+            'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         tt['variable'] = ['SFMS z slope', 'SFMS m slope']
         tt['label'] = ['$\mathtt{m_{z; SFMS}}$', '$\mathtt{m_{M_*; SFMS}}$']
     
@@ -49,7 +49,7 @@ def Prior(run, shape='tophat'):
         raise NotImpelementError
 
     if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
-            'rSFH_r0.66_delay', 'rSFH_r0.99_delay']: 
+            'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [0.9, 0.4]
         prior_max = [1.5, 0.7]
@@ -100,7 +100,7 @@ def model(run, args, **kwargs):
     theta = {}
 
     if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
-            'rSFH_r0.66_delay', 'rSFH_r0.99_delay']: 
+            'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         # args = SFMS_zslope, SFMS_mslope
 
         # these values were set by cenque project's output
@@ -136,6 +136,12 @@ def model(run, args, **kwargs):
             theta['sfh']['dt_min'] = 1.
             theta['sfh']['dt_max'] = 1. 
             theta['sfh']['sigma'] = 0.3 
+        elif run == 'rSFH_r1.0_most': 
+            theta['sfh'] = {'name': 'random_step_most_abias'}
+            theta['sfh']['dt_min'] = 5. 
+            theta['sfh']['dt_max'] = 5. 
+            theta['sfh']['sigma_tot'] = 0.3 
+            theta['sfh']['sigma_corr'] = 0.3
         elif run == 'randomSFH_r0.2': 
             # random fluctuation SFH corrected by r=0.2 with halo aseembly property 
             # fluctuations happen on fixed 0.5 Gyr timescales  
@@ -498,13 +504,16 @@ def plotABC(run, T):
     return None 
 
 
-def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'): 
+def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14', theta=None): 
     ''' Quality assurance plot for ABC runs. Plot summary statistic(s), SMHMR, SFMS
     '''
     # first compare data summary statistics to Sim(median theta) 
-    abcout = readABC(run, T)
-    # median theta 
-    theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+    if theta is None:
+        abcout = readABC(run, T)
+        # median theta 
+        theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+    else: 
+        theta_med = theta
 
     subcat_dat = Data(nsnap0=nsnap0) # 'data'
     sumdata = SumData(sumstat, info=True, nsnap0=nsnap0)  
@@ -536,12 +545,11 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     # simulation 
     m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'], subcat_sim['m.star'], 
             dmhalo=0.2, weights=subcat_sim['weights'])
-    sub.fill_between(m_mid, mu_mhalo - sig_mhalo, mu_mhalo + sig_mhalo, color='b', alpha=0.25, linewidth=0, edgecolor=None, 
-            label='Sim.')
+    sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
     # data 
-    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_dat['halo.m'], subcat_dat['m.star'], weights=subcat_dat['weights'])
-    sub.plot(m_mid, mu_mhalo+sig_mhalo, color='k', ls='--', label='Data')
-    sub.plot(m_mid, mu_mhalo-sig_mhalo, color='k', ls='--')
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_dat['halo.m'], subcat_dat['m.star'], 
+            dmhalo=0.2, weights=subcat_dat['weights'])
+    sub.plot(m_mid, sig_mhalo, c='k', ls='--', label='Data') 
     
     sig_dat = smhmr.sigma_logMstar(subcat_dat['halo.m'], subcat_dat['m.star'], 
             weights=subcat_dat['weights'])
@@ -549,15 +557,15 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
             weights=subcat_sim['weights'])
 
     # mark sigma_M*(M_h = 10^12) 
-    sub.text(0.8, 0.2, 
+    sub.text(0.95, 0.9, 
             ''.join(['$\sigma^{(s)}_{M_*}(M_h = 10^{12} M_\odot) = ', str(round(sig_sim,2)), '$ \n', 
                 '$\sigma^{(d)}_{M_*}(M_h = 10^{12} M_\odot) = ', str(round(sig_dat,2)), '$']), 
-            fontsize=15, ha='center', va='center', transform=sub.transAxes)
+            fontsize=15, ha='right', va='top', transform=sub.transAxes)
 
     sub.set_xlim([10., 15.])
     sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
-    sub.set_ylim([8., 12.])
-    sub.set_ylabel('Stellar Mass $(\mathcal{M}_*)$', fontsize=25)
+    sub.set_ylim([0., 0.6])
+    sub.set_ylabel('$\sigma_{log\,M_*}$', fontsize=25)
 
     # SFMS panel 
     sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+2)
@@ -621,8 +629,11 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     sub.set_yticks([-0.9, -0.6, -0.3, 0., 0.3, 0.6, 0.9])
     sub.set_ylabel('$\mathtt{\Delta log\,SFR}$', fontsize=25)
     
-    fig_name = ''.join([UT.dat_dir()+'abc/'+run+'/', 'qaplot.', str(T), '.png'])
-    fig.savefig(fig_name, bbox_inches='tight')
+    if theta is None: 
+        fig_name = ''.join([UT.dat_dir()+'abc/'+run+'/', 'qaplot.t', str(T), '.', run, '.png'])
+        fig.savefig(fig_name, bbox_inches='tight')
+    else: 
+        plt.show() 
     plt.close()
     return None 
 
