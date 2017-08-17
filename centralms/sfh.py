@@ -588,6 +588,13 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             Mh_delay_dz = np.interp(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'], z_snaps[insim], Mh_snaps_i)
 
             f_dMh[i_g,:] = 1. - Mh_delay_dz / Mh_delay 
+            #plt.plot(t_snaps_i[::-1], Mh_snaps_i[::-1], c='k', lw=2, ls='--')
+            #plt.scatter(tdelay_i, Mh_delay, c='b', lw=0, s=40)
+            #plt.scatter(UT.t_of_z(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh']), Mh_delay_dz, c='r', lw=0, s=40) 
+            #plt.show()
+            #if i_g > 10:
+            #    raise ValueError
+
 
         # calculate the d(log SFR) amplitude at t_steps 
         dlogSFR_amp = np.zeros(f_dMh.shape, dtype=np.float32)

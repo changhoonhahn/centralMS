@@ -372,7 +372,7 @@ def _pickSF(SHcat, nsnap0=20, theta_fq=None, theta_fpq=None):
         # (P_Q fiducial) * (1-fq) 
         notzero = np.where(mf[1] > 0.)
         Pq_M_fid = (qf.dfQ_dz(mf[0][notzero], z_i, lit=theta_fq['name']) / UT.dt_dz(z_i) +
-                qf.model(mf[0][notzero], z_i, lit=theta_fq['name']) * dmf_dt[1] / mf[1][notzero])
+                qf.model(mf[0][notzero], z_i, lit=theta_fq['name']) * dmf_dt[1][notzero] / mf[1][notzero])
 
         Pq_M_fid_interp = interp1d(mf[0][notzero], Pq_M_fid, fill_value='extrapolate') # interpolate
 

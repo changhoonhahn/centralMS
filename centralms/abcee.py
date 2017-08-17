@@ -534,18 +534,18 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14'):
     sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+1)
     smhmr = Obvs.Smhmr()
     # simulation 
-    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['m.max'], subcat_sim['m.star'], 
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'], subcat_sim['m.star'], 
             dmhalo=0.2, weights=subcat_sim['weights'])
     sub.fill_between(m_mid, mu_mhalo - sig_mhalo, mu_mhalo + sig_mhalo, color='b', alpha=0.25, linewidth=0, edgecolor=None, 
             label='Sim.')
     # data 
-    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_dat['m.max'], subcat_dat['m.star'], weights=subcat_dat['weights'])
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_dat['halo.m'], subcat_dat['m.star'], weights=subcat_dat['weights'])
     sub.plot(m_mid, mu_mhalo+sig_mhalo, color='k', ls='--', label='Data')
     sub.plot(m_mid, mu_mhalo-sig_mhalo, color='k', ls='--')
     
-    sig_dat = smhmr.sigma_logMstar(subcat_dat['m.max'], subcat_dat['m.star'], 
+    sig_dat = smhmr.sigma_logMstar(subcat_dat['halo.m'], subcat_dat['m.star'], 
             weights=subcat_dat['weights'])
-    sig_sim = smhmr.sigma_logMstar(subcat_sim['m.max'], subcat_sim['m.star'], 
+    sig_sim = smhmr.sigma_logMstar(subcat_sim['halo.m'], subcat_sim['m.star'], 
             weights=subcat_sim['weights'])
 
     # mark sigma_M*(M_h = 10^12) 

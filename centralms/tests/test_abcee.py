@@ -35,7 +35,7 @@ def test_SumSim(run):
     '''
     t0 = time.time() 
     # run the model 
-    subcat = abcee.model(run, np.array([1.05, 0.53]), nsnap0=15, downsampled='14')
+    subcat = abcee.model(run, np.array([1.35, 0.6]), nsnap0=15, downsampled='14')
     # get summary statistics 
     output = abcee.SumSim(['smf'], subcat)
     print time.time() - t0, ' seconds'
@@ -201,12 +201,12 @@ if __name__=='__main__':
     #test_SFMS_highz('test0', 9, nsnap=8, lit='lee')
     #test_SFMS_highz('randomSFH', 9, nsnap=8, lit='lee')
 
-    test_SumSim('rSFH_r0.66_delay')
+    #test_SumSim('rSFH_r0.66_delay')
     #test_plotABC('randomSFH', 1)
     #test_qaplotABC('test0', 9)
     #test_ABCsumstat('randomSFH', 7)
-    #sfh_name = 'randomSFH_r0.99'
+    sfh_name = 'randomSFH_r0.99'
     #sfh_name = 'randomSFH_short'
-    #for t in [9]: #range(10): #[5,6]: #range(5):
-    #    #test_plotABC(sfh_name, t)
-    #    test_qaplotABC(sfh_name, t)
+    for t in range(10): #[5,6]: #range(5):
+        test_plotABC(sfh_name, t)
+        test_qaplotABC(sfh_name, t)
