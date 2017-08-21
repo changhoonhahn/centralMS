@@ -767,7 +767,8 @@ def _logSFR_dSFR(logmm, zz, dSFR=None, theta_sfms=None):
 
 
 def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=None, **other_kwargs): 
-    ''' 
+    ''' Rough test verify that this does indeed produce a step function that 
+    changes at t_steps 
     '''
     # log(SFR) of SF MS 
     logsfr_sfms = Obvs.SSFR_SFMS(logmm, zz, theta_SFMS=theta_sfms) + logmm
@@ -781,7 +782,12 @@ def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=Non
     after = np.where(closest > tt)
     ishift[after] -= 1
     dlogsfr = dlogSFR_amp[range(len(ishift)),ishift]
-
+    ## testing 
+    #gals = np.random.choice(range(len(logmm)), 10) 
+    #for igal in gals: 
+    #    plt.plot(tsteps[igal,:], dlogSFR_amp[igal,:], c='k') 
+    #    plt.scatter(np.repeat(tt, 2), np.repeat(dlogsfr[igal], 2), c='r', lw=0)
+    #    plt.show() 
     return logsfr_sfms + dlogsfr
 
 

@@ -135,8 +135,8 @@ def model(run, args, **kwargs):
             # random fluctuation SFH where fluctuations 
             # happen on fixed longer 1 Gyr timescales  
             theta['sfh'] = {'name': 'random_step_fluct'} 
-            theta['sfh']['dt_min'] = 1.
-            theta['sfh']['dt_max'] = 1. 
+            theta['sfh']['dt_min'] = 10.
+            theta['sfh']['dt_max'] = 10. 
             theta['sfh']['sigma'] = 0.3 
         elif run == 'rSFH_r1.0_most': 
             theta['sfh'] = {'name': 'random_step_most_abias'}
@@ -191,14 +191,21 @@ def model(run, args, **kwargs):
         else: 
             subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'])
         subcat = subhist.Read(downsampled=kwargs['downsampled']) # full sample
+        
+        if 'forTests' not in kwargs.keys(): 
+            eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
+            eev.Initiate()
+            eev.Evolve() 
 
-        eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
-        eev.Initiate()
-        eev.Evolve() 
+            return eev.SH_catalog
+        else: 
+            if kwargs['forTests']: 
+                eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
+                eev.Initiate()
+                eev.Evolve(forTests=True) 
+                return eev.SH_catalog, eev
     else: 
         raise NotImplementedError
-
-    return eev.SH_catalog
 
 
 def SumSim(sumstat, subcat, info=False): #, **sim_kwargs): 

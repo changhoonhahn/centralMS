@@ -106,7 +106,8 @@ class Evolver(object):
         logSFR_logM_z, sfr_kwargs = SFH.logSFR_initiate(self.SH_catalog, isSF, 
                 theta_sfh=self.theta_sfh, theta_sfms=self.theta_sfms)
         if forTests: 
-            self.sfr_kwargs = sfr_kwargs
+            self.dlogSFR_amp = sfr_kwargs['dlogSFR_amp']
+            self.tsteps = sfr_kwargs['tsteps']
             #self.logSFR_logM_z = logSFR_logM_z
 
         # get integrated stellar masses 
@@ -338,7 +339,7 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
     # log(SFR) @ nsnapf
     logSFRs = np.repeat(-999., len(SHcat['gclass']))
     logSFRs[isSF] = logSFR_logM_z(logM_integ[isSF, -1], UT.z_nsnap(nsnapf), **sfr_kwargs) 
-
+    
     return logM_integ, logSFRs
 
 
