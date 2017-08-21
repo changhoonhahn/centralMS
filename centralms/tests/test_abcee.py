@@ -43,6 +43,20 @@ def test_SumSim(run):
     return output 
 
 
+def test_SumSim_sigmaSMHM(run, sigma_smhm=0.2):
+    '''  run model for different sigma_smhm 
+    '''
+    t0 = time.time() 
+    # run the model 
+    subcat = abcee.model(run, np.array([1.35, 0.6]), nsnap0=15, downsampled='14', 
+            sigma_smhm=sigma_smhm)
+    # get summary statistics 
+    output = abcee.SumSim(['smf'], subcat)
+    print time.time() - t0, ' seconds'
+
+    return output 
+
+
 def test_Dist(): 
     ''' Test distance metric 
     '''
@@ -202,11 +216,12 @@ if __name__=='__main__':
     #test_SFMS_highz('randomSFH', 9, nsnap=8, lit='lee')
 
     #test_SumSim('rSFH_r1.0_most')
-    abcee.qaplotABC('rSFH_r1.0_most', 10, theta=np.array([1.35, 0.6])) 
+    #test_SumSim_sigmaSMHM('rSFH_r1.0_most', sigma_smhm=0.0)
+    abcee.qaplotABC('rSFH_r1.0_most', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
     #test_plotABC('randomSFH', 1)
     #test_qaplotABC('test0', 9)
     #test_ABCsumstat('randomSFH', 7)
-    sfh_name = 'rSFH_r0.99_delay'
+    #sfh_name = 'rSFH_r0.99_delay'
     #sfh_name = 'randomSFH_short'
     #for t in [9]: #range(10)[::-1]: #[5,6]: #range(5):
     #    #test_plotABC(sfh_name, t)

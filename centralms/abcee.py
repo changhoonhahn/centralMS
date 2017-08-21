@@ -64,7 +64,8 @@ def Prior(run, shape='tophat'):
 def Data(**data_kwargs): 
     ''' Our 'data'
     '''
-    subhist = Cat.PureCentralHistory(nsnap_ancestor=data_kwargs['nsnap0'])
+    subhist = Cat.PureCentralHistory(nsnap_ancestor=data_kwargs['nsnap0'], 
+            sigma_smhm=data_kwargs['sigma_smhm'])
     subcat = subhist.Read(downsampled=None) # full sample
     return subcat
 
@@ -183,7 +184,11 @@ def model(run, args, **kwargs):
         theta['sfms'] = {'name': 'linear', 'zslope': args[0], 'mslope': args[1]}
 
         # load in Subhalo Catalog (pure centrals)
-        subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'])
+        if 'sigma_smhm' in kwargs.keys(): 
+            subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'], 
+                    sigma_smhm=kwargs['sigma_smhm'])
+        else: 
+            subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'])
         subcat = subhist.Read(downsampled=kwargs['downsampled']) # full sample
 
         eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
@@ -274,6 +279,7 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
     # summary statistics of data 
     data_kwargs = {} 
     data_kwargs['nsnap0'] = run_kwargs['nsnap0']
+    data_kwargs['sigma_smhm'] = run_kwargs['sigma_smhm']
 
     data_sum = SumData(sumstat, **data_kwargs)
 
@@ -504,7 +510,7 @@ def plotABC(run, T):
     return None 
 
 
-def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14', theta=None): 
+def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='14', theta=None): 
     ''' Quality assurance plot for ABC runs. Plot summary statistic(s), SMHMR, SFMS
     '''
     # first compare data summary statistics to Sim(median theta) 
@@ -515,10 +521,11 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14', theta=None):
     else: 
         theta_med = theta
 
-    subcat_dat = Data(nsnap0=nsnap0) # 'data'
-    sumdata = SumData(sumstat, info=True, nsnap0=nsnap0)  
+    subcat_dat = Data(nsnap0=nsnap0, sigma_smhm=sigma_smhm) # 'data'
+    sumdata = SumData(sumstat, info=True, nsnap0=nsnap0, sigma_smhm=sigma_smhm)  
 
-    subcat_sim = model(run, theta_med, nsnap0=nsnap0, downsampled=downsampled) 
+    subcat_sim = model(run, theta_med, 
+            nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
     sumsim = SumSim(sumstat, subcat_sim, info=True)
     
     fig = plt.figure(figsize=(6*(len(sumstat)+3),5))
@@ -531,7 +538,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14', theta=None):
             sub.plot(sumsim[0][0], sumsim[0][1], c='b', label='Sim.')
 
             sub.set_xlim([9., 12.])
-            sub.set_xlabel('Stellar Masses $(\mathcal{M}_*)$', fontsize=25)
+            sub.set_xlabel('$log\;M_*$', fontsize=25)
             sub.set_ylim([1e-6, 10**-1.75])
             sub.set_yscale('log')
             sub.set_ylabel('$\Phi$', fontsize=25)
@@ -539,22 +546,24 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14', theta=None):
         else: 
             raise NotImplementedError
     
-    # SMHMR panel 
+    # SMHMR panel of SF galaxies  
+    isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+
     sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+1)
     smhmr = Obvs.Smhmr()
     # simulation 
-    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'], subcat_sim['m.star'], 
-            dmhalo=0.2, weights=subcat_sim['weights'])
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+            dmhalo=0.2, weights=subcat_sim['weights'][isSF])
     sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
     # data 
-    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_dat['halo.m'], subcat_dat['m.star'], 
-            dmhalo=0.2, weights=subcat_dat['weights'])
-    sub.plot(m_mid, sig_mhalo, c='k', ls='--', label='Data') 
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 
+            dmhalo=0.2, weights=subcat_dat['weights'][isSF])
+    sub.plot(m_mid, sig_mhalo, c='k', ls='--', label='SHAM') 
     
-    sig_dat = smhmr.sigma_logMstar(subcat_dat['halo.m'], subcat_dat['m.star'], 
-            weights=subcat_dat['weights'])
-    sig_sim = smhmr.sigma_logMstar(subcat_sim['halo.m'], subcat_sim['m.star'], 
-            weights=subcat_sim['weights'])
+    sig_dat = smhmr.sigma_logMstar(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 
+            weights=subcat_sim['weights'][isSF], dmhalo=0.2)
+    sig_sim = smhmr.sigma_logMstar(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+            weights=subcat_sim['weights'][isSF], dmhalo=0.2)
 
     # mark sigma_M*(M_h = 10^12) 
     sub.text(0.95, 0.9, 
@@ -563,14 +572,12 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, downsampled='14', theta=None):
             fontsize=15, ha='right', va='top', transform=sub.transAxes)
 
     sub.set_xlim([10., 15.])
-    sub.set_xlabel('Halo Mass $(\mathcal{M}_{halo})$', fontsize=25)
+    sub.set_xlabel('$log\;M_{halo}$', fontsize=25)
     sub.set_ylim([0., 0.6])
     sub.set_ylabel('$\sigma_{log\,M_*}$', fontsize=25)
 
     # SFMS panel 
     sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+2)
-
-    isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
     DFM.hist2d(
             subcat_sim['m.star'][isSF], 
             subcat_sim['sfr'][isSF], 
