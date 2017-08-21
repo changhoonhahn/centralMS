@@ -225,7 +225,6 @@ class PureCentralHistory(object):
         ''' Read in the hdf5 file 
         '''
         f = h5py.File(self.File(downsampled=downsampled), 'r') 
-        print self.File(downsampled=downsampled)
         grp = f['data'] 
         catalog = {} 
         for key in grp.keys():

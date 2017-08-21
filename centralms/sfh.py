@@ -187,17 +187,18 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         del tshift
     
         # M_halo initial 
-        Mh_i = SHsnaps['snapshot'+str(SHsnaps['nsnap0'])+'_halo.m'][indices]
+        Mh_i = SHsnaps['halo.m0'][indices]
         # M_halo final 
         Mh_f = SHsnaps['halo.m'][indices]
         
-        f_dMh = 1. - 10.**(Mh_i - Mh_f)
+        f_dMh = 1. - 10.**(Mh_i - Mh_f) #10.**(Mh_f - Mh_i - 10)
+        #f_dMh = Mh_f - Mh_i
         
         # M_h of the galaxies throughout the snapshots 
         # Mh_snaps = ngal x nsnap0+3 matrix 
-        Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']+9))#, dtype=np.float32)
+        Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']))#, dtype=np.float32)
         Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
-        for isnap in range(2, SHsnaps['nsnap0']+10): 
+        for isnap in range(2, SHsnaps['nsnap0']+1): 
             Mh_snaps[:,isnap-1] = SHsnaps['snapshot'+str(isnap)+'_halo.m'][indices]
         
         z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))

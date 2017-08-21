@@ -66,7 +66,7 @@ def Data(**data_kwargs):
     '''
     subhist = Cat.PureCentralHistory(nsnap_ancestor=data_kwargs['nsnap0'], 
             sigma_smhm=data_kwargs['sigma_smhm'])
-    subcat = subhist.Read(downsampled=None) # full sample
+    subcat = subhist.Read(downsampled='14') # full sample
     return subcat
 
 
@@ -81,7 +81,8 @@ def SumData(sumstat, info=False, **data_kwargs):
             raise ValueError
 
         marr_fixed = np.arange(9., 12.2, 0.2)
-        smf = Obvs.getMF(subcat['m.star'], m_arr=marr_fixed) 
+        smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], 
+                m_arr=marr_fixed) 
 
         if not info: 
             sum = smf[1] # phi 
@@ -139,8 +140,8 @@ def model(run, args, **kwargs):
             theta['sfh']['sigma'] = 0.3 
         elif run == 'rSFH_r1.0_most': 
             theta['sfh'] = {'name': 'random_step_most_abias'}
-            theta['sfh']['dt_min'] = 5. 
-            theta['sfh']['dt_max'] = 5. 
+            theta['sfh']['dt_min'] = 10.0
+            theta['sfh']['dt_max'] = 10.0
             theta['sfh']['sigma_tot'] = 0.3 
             theta['sfh']['sigma_corr'] = 0.3
         elif run == 'randomSFH_r0.2': 
@@ -555,15 +556,17 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
     m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
             dmhalo=0.2, weights=subcat_sim['weights'][isSF])
     sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
+    sig_sim = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
     # data 
     m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 
             dmhalo=0.2, weights=subcat_dat['weights'][isSF])
     sub.plot(m_mid, sig_mhalo, c='k', ls='--', label='SHAM') 
+    sig_dat = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
     
-    sig_dat = smhmr.sigma_logMstar(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 
-            weights=subcat_sim['weights'][isSF], dmhalo=0.2)
-    sig_sim = smhmr.sigma_logMstar(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
-            weights=subcat_sim['weights'][isSF], dmhalo=0.2)
+    #sig_dat = smhmr.sigma_logMstar(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 
+    #        weights=subcat_sim['weights'][isSF], dmhalo=0.2)
+    #sig_sim = smhmr.sigma_logMstar(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+    #        weights=subcat_sim['weights'][isSF], dmhalo=0.2)
 
     # mark sigma_M*(M_h = 10^12) 
     sub.text(0.95, 0.9, 
@@ -635,12 +638,27 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
     sub.set_ylim([-1., 1.]) 
     sub.set_yticks([-0.9, -0.6, -0.3, 0., 0.3, 0.6, 0.9])
     sub.set_ylabel('$\mathtt{\Delta log\,SFR}$', fontsize=25)
-    
+
     if theta is None: 
         fig_name = ''.join([UT.dat_dir()+'abc/'+run+'/', 'qaplot.t', str(T), '.', run, '.png'])
         fig.savefig(fig_name, bbox_inches='tight')
+        plt.close()
     else: 
         plt.show() 
-    plt.close()
+        plt.close() 
+        
+        fig = plt.figure() 
+        sub = fig.add_subplot(111)
+        
+        dMh = subcat_sim['halo.m'][isSF] - subcat_sim['halo.m0'][isSF]
+        dMstar = subcat_sim['m.star'][isSF] - subcat_sim['m.star0'][isSF]
+
+        scat = sub.scatter(dMh, dMstar, lw=0, c=subcat_sim['halo.m'][isSF], cmap='hot') 
+        fig.colorbar(scat, ax=sub)
+        sub.set_xlim([-2., 4])
+        sub.set_ylim([-1, 5])
+        plt.show() 
+
+        plt.close()
     return None 
 

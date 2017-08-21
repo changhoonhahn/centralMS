@@ -480,7 +480,6 @@ class Smhmr(object):
         ''' Calculate sigma_logM* for a specific Mhalo. Default Mhalo is 10**12
         '''
         inbin = np.where((mhalo >= Mhalo-dmhalo) & (mhalo < Mhalo+dmhalo)) 
-        sig_mstar = np.std(mstar[inbin]) 
         if weights is not None: 
             mu_mstar = np.average(mstar[inbin], weights=weights[inbin])
             sig_mstar = np.sqrt(np.average((mstar[inbin]-mu_mstar)**2, weights=weights[inbin]))
