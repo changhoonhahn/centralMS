@@ -217,7 +217,7 @@ if __name__=='__main__':
 
     #test_SumSim('rSFH_r1.0_most')
     #test_SumSim_sigmaSMHM('rSFH_r1.0_most', sigma_smhm=0.0)
-    abcee.qaplotABC('rSFH_r1.0_most', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
+    abcee.qaplotABC('randomSFH_long', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6])) 
     #test_plotABC('randomSFH', 1)
     #test_qaplotABC('test0', 9)
     #test_ABCsumstat('randomSFH', 7)
