@@ -12,6 +12,7 @@ import util as UT
 import observables as Obvs
 
 # --- plotting --- 
+import seaborn as sns 
 import matplotlib.pyplot as plt 
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
@@ -209,6 +210,58 @@ def test_SFMS_highz(run, T, nsnap=15, lit='lee', nsnap0=15, downsampled='14'):
     return None 
 
 
+def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14'): 
+    '''
+    '''
+    subcat_sim = abcee.model(run, theta, 
+            nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
+
+    isSF = np.where((subcat_sim['gclass'] == 'sf') & 
+            (subcat_sim['weights'] > 0.) & 
+            (subcat_sim['nsnap_start'] == nsnap0))[0] # only SF galaxies 
+    assert subcat_sim['m.star'][isSF].min() > 0.
+    #print subcat_sim['m.star'][isSF].min(), subcat_sim['m.star'][isSF].max() 
+    #print subcat_sim['m.star0'][isSF].min(), subcat_sim['m.star0'][isSF].max() 
+
+    dMh = np.log10(10**subcat_sim['halo.m'][isSF] - 10**subcat_sim['halo.m0'][isSF])
+    dMstar = np.log10(10**subcat_sim['m.star'][isSF] - 10**subcat_sim['m.star0'][isSF])
+
+    fig = plt.figure(figsize=(20,6)) 
+    sub = fig.add_subplot(131)
+    scat = sub.scatter(subcat_sim['halo.m0'][isSF], subcat_sim['halo.m'][isSF], 
+            lw=0, s=5, c='k', cmap='hot') 
+    sub.set_xlim([9.75, 14.5])
+    sub.set_xlabel('$\mathtt{log\;M_h(z_0)}$', fontsize=20)
+    sub.set_ylim([9.75, 14.5])
+    sub.set_ylabel('$\mathtt{log\;M_h(z_f \sim 0)}$', fontsize=20)
+    sub = fig.add_subplot(132)
+    scat = sub.scatter(subcat_sim['m.star0'][isSF], subcat_sim['m.star'][isSF], 
+            lw=0, s=5, c='k', cmap='hot') 
+    sub.set_xlim([7., 12.])
+    sub.set_xlabel('$\mathtt{log\;M_*(z_0)}$', fontsize=20)
+    sub.set_ylim([7., 12.])
+    sub.set_ylabel('$\mathtt{log\;M_*(z_f \sim 0)}$', fontsize=20)
+    sub = fig.add_subplot(133)
+    scat = sub.scatter(dMh, dMstar, lw=0, s=5, c=subcat_sim['halo.m'][isSF], cmap='hot') 
+    fig.colorbar(scat, ax=sub)
+    sub.set_xlim([8., 14.5])
+    sub.set_xlabel('$\mathtt{log(\; \Delta M_h\;)}$', fontsize=20)
+    sub.set_ylim([9, 11.25])
+    sub.set_ylabel('$\mathtt{log(\; \Delta M_*\;)}$', fontsize=20)
+    
+    #sub.set_xlim([-2., 4])
+    #sub.set_xlabel('$\mathtt{log(\;M_h(z\sim 0)/M_h(z_0)\;)}$', fontsize=25)
+    #sub.set_ylim([-1, 5])
+    #sub.set_ylabel('$\mathtt{log(\;M_*(z\sim 0)/M_*^{(SHAM)}(z_0)\;)}$', fontsize=25)
+
+    fig.savefig(''.join([UT.fig_dir(), 'dMh_dMstar.', run, '.sig_smhm', str(sigma_smhm), '.png']),
+            bbox_inches='tight')
+    plt.close() 
+
+    return None 
+
+
+
 if __name__=='__main__': 
     #test_SFMS_highz('test0', 9, nsnap=15, lit='lee')
     #test_SFMS_highz('randomSFH', 9, nsnap=15, lit='lee')
@@ -217,7 +270,15 @@ if __name__=='__main__':
 
     #test_SumSim('rSFH_r1.0_most')
     #test_SumSim_sigmaSMHM('rSFH_r1.0_most', sigma_smhm=0.0)
-    abcee.qaplotABC('randomSFH_long', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6])) 
+    #abcee.qaplotABC('randomSFH_short', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
+    test_dMh_dMstar('test0', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    #test_dMh_dMstar('randomSFH_short', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    #test_dMh_dMstar('randomSFH', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    #test_dMh_dMstar('randomSFH_long', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    #test_dMh_dMstar('rSFH_r1.0_most', np.array([1.35, 0.6]), sigma_smhm=0.2)
+
+    #abcee.qaplotABC('randomSFH', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
+    #abcee.qaplotABC('randomSFH_long', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
     #test_plotABC('randomSFH', 1)
     #test_qaplotABC('test0', 9)
     #test_ABCsumstat('randomSFH', 7)

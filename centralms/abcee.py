@@ -654,18 +654,5 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
         plt.show() 
         plt.close() 
         
-        fig = plt.figure() 
-        sub = fig.add_subplot(111)
-        
-        dMh = subcat_sim['halo.m'][isSF] - subcat_sim['halo.m0'][isSF]
-        dMstar = subcat_sim['m.star'][isSF] - subcat_sim['m.star0'][isSF]
-
-        scat = sub.scatter(dMh, dMstar, lw=0, c=subcat_sim['halo.m'][isSF], cmap='hot') 
-        fig.colorbar(scat, ax=sub)
-        sub.set_xlim([-2., 4])
-        sub.set_ylim([-1, 5])
-        plt.show() 
-
-        plt.close()
     return None 
 
