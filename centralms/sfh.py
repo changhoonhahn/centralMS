@@ -818,23 +818,26 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             tstep_i = tsteps[i_g,:]
             tdelay_i = tstep_i - theta_sfh['dt_delay']
             
-            # note that x has to be monotonically for np.interp 
+            # note that x has to be monotonically increasing for np.interp 
             Mh_steps[i_g,:] = np.interp(tstep_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
             Mh_delay  = np.interp(tdelay_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
-            Mh_delay_dt = np.interp(UT.z_of_t(tdelay_i) + theta_sfh['dt_dMh'], z_snaps[insim], Mh_snaps_i)
+            Mh_delay_dt = np.interp(tdelay_i - theta_sfh['dt_dMh'], t_snaps_i[::-1], Mh_snaps_i[::-1])
 
             f_dMh[i_g,:] = 1. - Mh_delay_dt / Mh_delay 
-            #plt.plot(t_snaps_i[::-1], Mh_snaps_i[::-1], c='k', lw=2, ls='--')
-            #plt.scatter(tdelay_i, Mh_delay, c='b', lw=0, s=40)
+            for tt in tstep_i:  
+                plt.vlines(tt, np.log10(Mh_delay_dt.min())+10, 
+                        np.log10(Mh_steps[i_g,:].max())+10, linestyle='--')
+            
             #print 'tdelay = ', tdelay_i, UT.z_of_t(tdelay_i)
             #print 'zdelay+dz = ', UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh']
             #print 't(zdelay+dz) = ', UT.t_of_z(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'])
-
-            #plt.scatter(UT.t_of_z(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh']), Mh_delay_dz, c='r', lw=0, s=40) 
+            #plt.plot(t_snaps_i[::-1], np.log10(Mh_snaps_i[::-1])+10, c='k', lw=2, ls='--', 
+            #        label='$M_h$ snapshots')
+            #plt.scatter(tdelay_i, np.log10(Mh_delay)+10, c='b', lw=0, s=40, label='$M_h(t_{delay})$')
+            #plt.scatter(tdelay_i - theta_sfh['dt_dMh'], np.log10(Mh_delay_dt)+10, c='r', lw=0, s=40, label='$M_h(t_{delay}+\Delta t)$')
             #plt.show()
-            #if i_g > 10:
+            #if i_g > 20:
             #    raise ValueError
-
 
         # calculate the d(log SFR) amplitude at t_steps 
         dlogSFR_amp = np.zeros(f_dMh.shape, dtype=np.float32)

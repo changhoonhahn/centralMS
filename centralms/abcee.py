@@ -192,7 +192,7 @@ def model(run, args, **kwargs):
         theta['sfh']['sigma_tot'] = 0.3 
         theta['sfh']['sigma_corr'] = 0.99 * 0.3
         theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = 2.  # Gyr
+        theta['sfh']['dt_dMh'] = args[2]  # Gyr
     else: 
         raise NotImplementedError
 

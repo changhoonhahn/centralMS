@@ -210,7 +210,7 @@ def test_SFMS_highz(run, T, nsnap=15, lit='lee', nsnap0=15, downsampled='14'):
     return None 
 
 
-def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14'): 
+def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', flag=None): 
     '''
     '''
     subcat_sim = abcee.model(run, theta, 
@@ -250,9 +250,14 @@ def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14'):
     sub.set_xlabel('$\mathtt{log(\; \Delta M_h\;)}$', fontsize=20)
     sub.set_ylim([9, 11.25])
     sub.set_ylabel('$\mathtt{log(\; \Delta M_*\;)}$', fontsize=20)
+
+    if flag is None: 
+        flag_str = ''
+    else: 
+        flag_str = '.'+flag 
     
-    fig.savefig(''.join([UT.fig_dir(), 'dMh_dMstar.', run, '.sig_smhm', str(sigma_smhm), '.png']),
-            bbox_inches='tight')
+    fig.savefig(''.join([UT.fig_dir(), 'dMh_dMstar.', run, '.sig_smhm', str(sigma_smhm), 
+        flag_str, '.png']), bbox_inches='tight')
     plt.close() 
 
     return None 
@@ -270,10 +275,12 @@ if __name__=='__main__':
     #abcee.qaplotABC('randomSFH_short', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
     #test_dMh_dMstar('test0', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_dMh_dMstar('randomSFH_short', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.0)
-    test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.0)
+    #test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, 2.]), sigma_smhm=0.2)
+    #for t in [4, 5]: 
+    #    test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, np.float(t)]), sigma_smhm=0.2, flag='dt'+str(t)+'gyr')
+    #test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.0)
+    #test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.0)
     #test_dMh_dMstar('randomSFH_r0.2',  np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_dMh_dMstar('randomSFH_r0.99',  np.array([1.35, 0.6]), sigma_smhm=0.2)
 
