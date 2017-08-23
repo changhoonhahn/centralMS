@@ -231,29 +231,26 @@ def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14'):
     scat = sub.scatter(subcat_sim['halo.m0'][isSF], subcat_sim['halo.m'][isSF], 
             lw=0, s=5, c='k', cmap='hot') 
     sub.set_xlim([9.75, 14.5])
-    sub.set_xlabel('$\mathtt{log\;M_h(z_0)}$', fontsize=20)
+    sub.set_xlabel('$\mathtt{log\;M_h(z_0 \sim 1)}$', fontsize=20)
     sub.set_ylim([9.75, 14.5])
     sub.set_ylabel('$\mathtt{log\;M_h(z_f \sim 0)}$', fontsize=20)
     sub = fig.add_subplot(132)
     scat = sub.scatter(subcat_sim['m.star0'][isSF], subcat_sim['m.star'][isSF], 
             lw=0, s=5, c='k', cmap='hot') 
     sub.set_xlim([7., 12.])
-    sub.set_xlabel('$\mathtt{log\;M_*(z_0)}$', fontsize=20)
+    sub.set_xlabel('$\mathtt{log\;M_*(z_0 \sim 1)}$', fontsize=20)
     sub.set_ylim([7., 12.])
     sub.set_ylabel('$\mathtt{log\;M_*(z_f \sim 0)}$', fontsize=20)
+
     sub = fig.add_subplot(133)
-    scat = sub.scatter(dMh, dMstar, lw=0, s=5, c=subcat_sim['halo.m'][isSF], cmap='hot') 
+    scat = sub.scatter(dMh, dMstar, lw=0, s=5, c=subcat_sim['halo.m'][isSF], cmap='hot', 
+            vmin=10., vmax=14.5) 
     fig.colorbar(scat, ax=sub)
     sub.set_xlim([8., 14.5])
     sub.set_xlabel('$\mathtt{log(\; \Delta M_h\;)}$', fontsize=20)
     sub.set_ylim([9, 11.25])
     sub.set_ylabel('$\mathtt{log(\; \Delta M_*\;)}$', fontsize=20)
     
-    #sub.set_xlim([-2., 4])
-    #sub.set_xlabel('$\mathtt{log(\;M_h(z\sim 0)/M_h(z_0)\;)}$', fontsize=25)
-    #sub.set_ylim([-1, 5])
-    #sub.set_ylabel('$\mathtt{log(\;M_*(z\sim 0)/M_*^{(SHAM)}(z_0)\;)}$', fontsize=25)
-
     fig.savefig(''.join([UT.fig_dir(), 'dMh_dMstar.', run, '.sig_smhm', str(sigma_smhm), '.png']),
             bbox_inches='tight')
     plt.close() 
@@ -271,10 +268,16 @@ if __name__=='__main__':
     #test_SumSim('rSFH_r1.0_most')
     #test_SumSim_sigmaSMHM('rSFH_r1.0_most', sigma_smhm=0.0)
     #abcee.qaplotABC('randomSFH_short', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
-    test_dMh_dMstar('test0', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    #test_dMh_dMstar('test0', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_dMh_dMstar('randomSFH_short', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    #test_dMh_dMstar('randomSFH', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    #test_dMh_dMstar('randomSFH_long', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.0)
+    test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.0)
+    #test_dMh_dMstar('randomSFH_r0.2',  np.array([1.35, 0.6]), sigma_smhm=0.2)
+    #test_dMh_dMstar('randomSFH_r0.99',  np.array([1.35, 0.6]), sigma_smhm=0.2)
+
+    #test_dMh_dMstar('rSFH_r1.0_most', np.array([1.35, 0.6]), sigma_smhm=0.0)
     #test_dMh_dMstar('rSFH_r1.0_most', np.array([1.35, 0.6]), sigma_smhm=0.2)
 
     #abcee.qaplotABC('randomSFH', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 

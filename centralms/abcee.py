@@ -100,112 +100,125 @@ def model(run, args, **kwargs):
     ''' model given the ABC run 
     '''
     theta = {}
+    # args = SFMS_zslope, SFMS_mslope
 
-    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
-            'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
-        # args = SFMS_zslope, SFMS_mslope
+    # these values were set by cenque project's output
+    theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
+    theta['fq'] = {'name': 'cosmos_tinker'}
+    theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
+    
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
 
-        # these values were set by cenque project's output
-        theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
-        theta['fq'] = {'name': 'cosmos_tinker'}
-        theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-        
-        theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-
-        if run == 'test0': 
-            # simplest test with constant offset SFH 
-            theta['sfh'] = {'name': 'constant_offset'}
-            theta['sfh']['nsnap0'] =  kwargs['nsnap0'] 
-        elif run == 'randomSFH':  
-            # random fluctuation SFH where fluctuations 
-            # happen on fixed 0.5 Gyr timescales  
-            theta['sfh'] = {'name': 'random_step_fluct'} 
-            theta['sfh']['dt_min'] = 0.5 
-            theta['sfh']['dt_max'] = 0.5 
-            theta['sfh']['sigma'] = 0.3 
-        elif run == 'randomSFH_short':  
-            # random fluctuation SFH where fluctuations 
-            # happen on fixed short 0.1 Gyr timescales  
-            theta['sfh'] = {'name': 'random_step_fluct'} 
-            theta['sfh']['dt_min'] = 0.1 
-            theta['sfh']['dt_max'] = 0.1 
-            theta['sfh']['sigma'] = 0.3 
-            theta['mass']['t_step'] = 0.01 # change timestep 
-        elif run == 'randomSFH_long':  
-            # random fluctuation SFH where fluctuations 
-            # happen on fixed longer 1 Gyr timescales  
-            theta['sfh'] = {'name': 'random_step_fluct'} 
-            theta['sfh']['dt_min'] = 10.
-            theta['sfh']['dt_max'] = 10. 
-            theta['sfh']['sigma'] = 0.3 
-        elif run == 'rSFH_r1.0_most': 
-            theta['sfh'] = {'name': 'random_step_most_abias'}
-            theta['sfh']['dt_min'] = 10.0
-            theta['sfh']['dt_max'] = 10.0
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.3
-        elif run == 'randomSFH_r0.2': 
-            # random fluctuation SFH corrected by r=0.2 with halo aseembly property 
-            # fluctuations happen on fixed 0.5 Gyr timescales  
-            # halo assembly property here is halo mass growth over 2 Gyrs 
-            theta['sfh'] = {'name': 'random_step_abias2'} 
-            theta['sfh']['dt_min'] = 0.5 
-            theta['sfh']['dt_max'] = 0.5 
-            theta['sfh']['t_abias'] = 2. # Gyr
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.2 * 0.3
-        elif run == 'randomSFH_r0.99': 
-            # random fluctuation SFH corrected by r=0.99 with halo aseembly property 
-            # fluctuations happen on fixed 0.5 Gyr timescales  
-            # halo assembly property here is halo mass growth over 2 Gyrs 
-            theta['sfh'] = {'name': 'random_step_abias2'} 
-            theta['sfh']['dt_min'] = 0.5 
-            theta['sfh']['dt_max'] = 0.5 
-            theta['sfh']['t_abias'] = 2. # Gyr
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.99 * 0.3
-        elif run == 'rSFH_r0.66_delay': 
-            theta['sfh'] = {'name': 'random_step_abias_delay'}
-            theta['sfh']['dt_min'] = 0.5 
-            theta['sfh']['dt_max'] = 0.5 
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.66 * 0.3
-            theta['sfh']['dt_delay'] = 1. # Gyr 
-            theta['sfh']['dz_dMh'] = 0.5 
-        elif run == 'rSFH_r0.99_delay': 
-            theta['sfh'] = {'name': 'random_step_abias_delay'}
-            theta['sfh']['dt_min'] = 0.5 
-            theta['sfh']['dt_max'] = 0.5 
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.99 * 0.3
-            theta['sfh']['dt_delay'] = 1. # Gyr 
-            theta['sfh']['dz_dMh'] = 0.5 
-
-        # SFMS slopes can change 
-        theta['sfms'] = {'name': 'linear', 'zslope': args[0], 'mslope': args[1]}
-
-        # load in Subhalo Catalog (pure centrals)
-        if 'sigma_smhm' in kwargs.keys(): 
-            subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'], 
-                    sigma_smhm=kwargs['sigma_smhm'])
-        else: 
-            subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'])
-        subcat = subhist.Read(downsampled=kwargs['downsampled']) # full sample
-        
-        if 'forTests' not in kwargs.keys(): 
-            eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
-            eev.Initiate()
-            eev.Evolve() 
-
-            return eev.SH_catalog
-        else: 
-            if kwargs['forTests']: 
-                eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
-                eev.Initiate()
-                eev.Evolve(forTests=True) 
-                return eev.SH_catalog, eev
+    if run == 'test0': 
+        # simplest test with constant offset SFH 
+        theta['sfh'] = {'name': 'constant_offset'}
+        theta['sfh']['nsnap0'] =  kwargs['nsnap0'] 
+    elif run == 'randomSFH':  
+        # random fluctuation SFH where fluctuations 
+        # happen on fixed 0.5 Gyr timescales  
+        theta['sfh'] = {'name': 'random_step_fluct'} 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma'] = 0.3 
+    elif run == 'randomSFH_integtest':  
+        # random fluctuation SFH where fluctuations 
+        # happen on fixed 0.5 Gyr timescales  
+        theta['sfh'] = {'name': 'random_step_fluct'} 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma'] = 0.3 
+        theta['mass']['t_step'] = 0.01 # change timestep 
+    elif run == 'randomSFH_short':  
+        # random fluctuation SFH where fluctuations 
+        # happen on fixed short 0.1 Gyr timescales  
+        theta['sfh'] = {'name': 'random_step_fluct'} 
+        theta['sfh']['dt_min'] = 0.1 
+        theta['sfh']['dt_max'] = 0.1 
+        theta['sfh']['sigma'] = 0.3 
+        theta['mass']['t_step'] = 0.01 # change timestep 
+    elif run == 'randomSFH_long':  
+        # random fluctuation SFH where fluctuations 
+        # happen on fixed longer 1 Gyr timescales  
+        theta['sfh'] = {'name': 'random_step_fluct'} 
+        theta['sfh']['dt_min'] = 10.
+        theta['sfh']['dt_max'] = 10. 
+        theta['sfh']['sigma'] = 0.3 
+    elif run == 'rSFH_r1.0_most': 
+        theta['sfh'] = {'name': 'random_step_most_abias'}
+        theta['sfh']['dt_min'] = 10.0
+        theta['sfh']['dt_max'] = 10.0
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.3
+    elif run == 'randomSFH_r0.2': 
+        # random fluctuation SFH corrected by r=0.2 with halo aseembly property 
+        # fluctuations happen on fixed 0.5 Gyr timescales  
+        # halo assembly property here is halo mass growth over 2 Gyrs 
+        theta['sfh'] = {'name': 'random_step_abias2'} 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['t_abias'] = 2. # Gyr
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.2 * 0.3
+    elif run == 'randomSFH_r0.99': 
+        # random fluctuation SFH corrected by r=0.99 with halo aseembly property 
+        # fluctuations happen on fixed 0.5 Gyr timescales  
+        # halo assembly property here is halo mass growth over 2 Gyrs 
+        theta['sfh'] = {'name': 'random_step_abias2'} 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['t_abias'] = 2. # Gyr
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.99 * 0.3
+    elif run == 'rSFH_r0.66_delay': 
+        theta['sfh'] = {'name': 'random_step_abias_delay_dz'}
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.66 * 0.3
+        theta['sfh']['dt_delay'] = 1. # Gyr 
+        theta['sfh']['dz_dMh'] = 0.5 
+    elif run == 'rSFH_r0.99_delay': 
+        theta['sfh'] = {'name': 'random_step_abias_delay_dz'}
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.99 * 0.3
+        theta['sfh']['dt_delay'] = 1. # Gyr 
+        theta['sfh']['dz_dMh'] = 0.5 
+    elif run == 'rSFH_r0.99_delay_dt_test': 
+        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.99 * 0.3
+        theta['sfh']['dt_delay'] = 0. # Gyr 
+        theta['sfh']['dt_dMh'] = 2.  # Gyr
     else: 
         raise NotImplementedError
+
+    # SFMS slopes can change 
+    theta['sfms'] = {'name': 'linear', 'zslope': args[0], 'mslope': args[1]}
+
+    # load in Subhalo Catalog (pure centrals)
+    if 'sigma_smhm' in kwargs.keys(): 
+        subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'], 
+                sigma_smhm=kwargs['sigma_smhm'])
+    else: 
+        subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'])
+    subcat = subhist.Read(downsampled=kwargs['downsampled']) # full sample
+    
+    if 'forTests' not in kwargs.keys(): 
+        eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
+        eev.Initiate()
+        eev.Evolve() 
+
+        return eev.SH_catalog
+    else: 
+        if kwargs['forTests']: 
+            eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
+            eev.Initiate()
+            eev.Evolve(forTests=True) 
+            return eev.SH_catalog, eev
 
 
 def SumSim(sumstat, subcat, info=False): #, **sim_kwargs): 
