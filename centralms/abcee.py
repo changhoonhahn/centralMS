@@ -191,8 +191,8 @@ def model(run, args, **kwargs):
         theta['sfh']['dt_max'] = 0.5 
         theta['sfh']['sigma_tot'] = 0.3 
         theta['sfh']['sigma_corr'] = 0.99 * 0.3
-        theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = args[2]  # Gyr
+        theta['sfh']['dt_delay'] = args[2] # Gyr 
+        theta['sfh']['dt_dMh'] = args[3]  # Gyr
     else: 
         raise NotImplementedError
 
@@ -531,7 +531,7 @@ def plotABC(run, T):
     return None 
 
 
-def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='14', theta=None): 
+def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='14', theta=None, figure=None): 
     ''' Quality assurance plot for ABC runs. Plot summary statistic(s), SMHMR, SFMS
     '''
     # first compare data summary statistics to Sim(median theta) 
@@ -664,8 +664,11 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
         fig.savefig(fig_name, bbox_inches='tight')
         plt.close()
     else: 
-        plt.show() 
-        plt.close() 
-        
+        if figure is None: 
+            plt.show() 
+            plt.close() 
+        else: 
+            fig.savefig(figure, bbox_inches='tight')
+            plt.close()
     return None 
 

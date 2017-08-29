@@ -770,6 +770,10 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             if theta_sfh['sigma_corr'] <= 0.: 
                 raise ValueError("no assembly bias; dont use this SFH")
 
+        if theta_sfh['dt_dMh'] == 0.: 
+            raise ValueError("no assembly bias; dont use this SFH")
+
+
         if UT.t_nsnap(SHsnaps['nsnap0']) + theta_sfh['dt_dMh'] < UT.t_nsnap(SHsnaps['nsnap0'] + 10):
             print UT.t_nsnap(SHsnaps['nsnap0']) + theta_sfh['dt_dMh'], UT.t_nsnap(SHsnaps['nsnap0'] + 10)
             raise ValueError
@@ -801,7 +805,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']+9))#, dtype=np.float32)
         Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
         for isnap in range(2, SHsnaps['nsnap0']+10): 
-            Mh_snaps[:,isnap-1] = SHsnaps['snapshot'+str(isnap)+'_m.max'][indices]
+            Mh_snaps[:,isnap-1] = SHsnaps['snapshot'+str(isnap)+'_halo.m'][indices]
         
         z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))
         t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+10))

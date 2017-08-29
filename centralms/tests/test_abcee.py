@@ -10,6 +10,8 @@ import env
 import abcee
 import util as UT
 import observables as Obvs
+import corner as DFM 
+import emcee
 
 # --- plotting --- 
 import matplotlib.pyplot as plt 
@@ -262,11 +264,58 @@ def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', fla
     return None 
 
 
+def test_tdelay_dt_grid(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', flag=None): 
+    ''' plot sigma_M* on a grid of t_delay and dt 
+    '''
+    tdelays = np.arange(0., 3., 0.5)
+    dts = np.arange(0., 4.5, 0.5)
+    dts[0] += 0.1 # dt = 0 not allowed
+
+    smhmr = Obvs.Smhmr()
+    sig_Mstars = np.zeros((len(tdelays), len(dts)))
+    #grid of tdelay, dt
+    for i_t, tdelay in enumerate(tdelays): 
+        for i_d, dt in enumerate(dts): 
+            theta_i = np.concatenate([theta, np.array([tdelay, dt])])
+            subcat_sim = abcee.model(run, theta_i, 
+                    nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
+            sumsim = abcee.SumSim(['smf'], subcat_sim, info=True)
+            
+            isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+            # calculate sigma_M* at M_h = 12
+            m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+                    dmhalo=0.2, weights=subcat_sim['weights'][isSF])
+            sig_Mstars[i_t, i_d] = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
+            print 'tdelay = ', tdelay, ', dt = ', dt, ', sigma = ', sig_Mstars[i_t, i_d]
+
+    fig = plt.figure() 
+    sub = fig.add_subplot(111)
+    im = plt.imshow(sig_Mstars, interpolation='None', cmap='hot', extent=(dts.min(), dts.max(), tdelays.min(), tdelays.max()))
+    plt.colorbar(im)
+    sub.set_xticks(dts) 
+    sub.set_xlabel('$\Delta t$ Gyr', fontsize=25)
+    sub.set_yticks(tdelays) 
+    sub.set_ylabel('$t_{delay}$ Gyr', fontsize=25)
+
+    fig_name = ''.join([UT.fig_dir(), run, '.tdelay_dt_grid.png'])
+    fig.savefig(fig_name, bbox_inches='tight') 
+    return None
+
+
+def test_tdelay_dt_mcmc(run):
+    '''
+    '''
+    chain_file = ''.join([UT.fig_dir(), run, '.tdelay_dt_mcmc.chain.dat']) 
+    samples = np.loadtxt(chain_file) 
+    
+    #samples = sampler.chain[:, 5:, :].reshape((-1, Ndim))
+    fig = corner.corner(samples, labels=['$t_{delay}$', '$\Delta t_{bias}$'])
+    fig.savefig(UT.fig_dir()+run+'.tdelay_dt_mcmc.png')
+    return None 
+
+
 if __name__=='__main__': 
     #test_SFMS_highz('test0', 9, nsnap=15, lit='lee')
-    #test_SFMS_highz('randomSFH', 9, nsnap=15, lit='lee')
-    #test_SFMS_highz('test0', 9, nsnap=8, lit='lee')
-    #test_SFMS_highz('randomSFH', 9, nsnap=8, lit='lee')
 
     #test_SumSim('rSFH_r1.0_most')
     #test_SumSim_sigmaSMHM('rSFH_r1.0_most', sigma_smhm=0.0)
@@ -274,16 +323,13 @@ if __name__=='__main__':
     #test_dMh_dMstar('test0', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_dMh_dMstar('randomSFH_short', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    for t in np.arange(0., 5., 1.): 
-        test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, t]), sigma_smhm=0.2, flag='dt'+str(t)+'gyr')
-    #test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.0)
-    #test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.0)
-    #test_dMh_dMstar('randomSFH_r0.2',  np.array([1.35, 0.6]), sigma_smhm=0.2)
-    #test_dMh_dMstar('randomSFH_r0.99',  np.array([1.35, 0.6]), sigma_smhm=0.2)
+    #for t in np.arange(0.1, 4.5, 0.5): 
+        #test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, t]), sigma_smhm=0.2, flag='dt'+str(t)+'gyr')
+    #    abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, t]), figure=UT.fig_dir()+'rSFH_r0.99.delay0.dt'+str(t)+'.png') 
+    #test_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    test_tdelay_dt_mcmc('rSFH_r0.99_delay_dt_test')
 
-    #test_dMh_dMstar('rSFH_r1.0_most', np.array([1.35, 0.6]), sigma_smhm=0.0)
-    #test_dMh_dMstar('rSFH_r1.0_most', np.array([1.35, 0.6]), sigma_smhm=0.2)
-
+    #abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 2.]), figure=UT.fig_dir()+'testing.dMmax.png') 
     #abcee.qaplotABC('randomSFH', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
     #abcee.qaplotABC('randomSFH_long', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
     #test_plotABC('randomSFH', 1)
