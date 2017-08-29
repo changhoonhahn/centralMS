@@ -1,0 +1,11 @@
+#!/bin/bash -l 
+#SBATCH -p regular 
+#SBATCH -N 1
+#SBATCH -t 03:00:00
+#SBATCH -J tdelay_dt_mcmc
+#SBATCH -o tdelay_dt_mcmc.o%j
+#SBATCH -L SCRATCH,project
+
+module load python/2.7-anaconda
+
+srun -n 20 python /global/homes/c/chahah/projects/centralMS/centralms/tests/test_tdelay_dt.py 20020
