@@ -801,7 +801,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']+9))#, dtype=np.float32)
         Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
         for isnap in range(2, SHsnaps['nsnap0']+10): 
-            Mh_snaps[:,isnap-1] = SHsnaps['snapshot'+str(isnap)+'_halo.m'][indices]
+            Mh_snaps[:,isnap-1] = SHsnaps['snapshot'+str(isnap)+'_m.max'][indices]
         
         z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))
         t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+10))
@@ -824,13 +824,13 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             Mh_delay_dt = np.interp(tdelay_i - theta_sfh['dt_dMh'], t_snaps_i[::-1], Mh_snaps_i[::-1])
 
             f_dMh[i_g,:] = 1. - Mh_delay_dt / Mh_delay 
-            for tt in tstep_i:  
-                plt.vlines(tt, np.log10(Mh_delay_dt.min())+10, 
-                        np.log10(Mh_steps[i_g,:].max())+10, linestyle='--')
-            
+
             #print 'tdelay = ', tdelay_i, UT.z_of_t(tdelay_i)
             #print 'zdelay+dz = ', UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh']
             #print 't(zdelay+dz) = ', UT.t_of_z(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'])
+            #for tt in tstep_i:  
+            #    plt.vlines(tt, np.log10(Mh_delay_dt.min())+10, 
+            #            np.log10(Mh_steps[i_g,:].max())+10, linestyle='--')
             #plt.plot(t_snaps_i[::-1], np.log10(Mh_snaps_i[::-1])+10, c='k', lw=2, ls='--', 
             #        label='$M_h$ snapshots')
             #plt.scatter(tdelay_i, np.log10(Mh_delay)+10, c='b', lw=0, s=40, label='$M_h(t_{delay})$')

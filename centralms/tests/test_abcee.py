@@ -12,7 +12,6 @@ import util as UT
 import observables as Obvs
 
 # --- plotting --- 
-import seaborn as sns 
 import matplotlib.pyplot as plt 
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
@@ -263,7 +262,6 @@ def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', fla
     return None 
 
 
-
 if __name__=='__main__': 
     #test_SFMS_highz('test0', 9, nsnap=15, lit='lee')
     #test_SFMS_highz('randomSFH', 9, nsnap=15, lit='lee')
@@ -276,9 +274,8 @@ if __name__=='__main__':
     #test_dMh_dMstar('test0', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_dMh_dMstar('randomSFH_short', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, 2.]), sigma_smhm=0.2)
-    #for t in [4, 5]: 
-    #    test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, np.float(t)]), sigma_smhm=0.2, flag='dt'+str(t)+'gyr')
+    for t in np.arange(0., 5., 1.): 
+        test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, t]), sigma_smhm=0.2, flag='dt'+str(t)+'gyr')
     #test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.0)
     #test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.0)
     #test_dMh_dMstar('randomSFH_r0.2',  np.array([1.35, 0.6]), sigma_smhm=0.2)
