@@ -229,15 +229,15 @@ def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', fla
     dMh = np.log10(10**subcat_sim['halo.m'][isSF] - 10**subcat_sim['halo.m0'][isSF])
     dMstar = np.log10(10**subcat_sim['m.star'][isSF] - 10**subcat_sim['m.star0'][isSF])
 
-    fig = plt.figure(figsize=(20,6)) 
-    sub = fig.add_subplot(131)
+    fig = plt.figure(figsize=(26,6)) 
+    sub = fig.add_subplot(141)
     scat = sub.scatter(subcat_sim['halo.m0'][isSF], subcat_sim['halo.m'][isSF], 
             lw=0, s=5, c='k', cmap='hot') 
     sub.set_xlim([9.75, 14.5])
     sub.set_xlabel('$\mathtt{log\;M_h(z_0 \sim 1)}$', fontsize=20)
     sub.set_ylim([9.75, 14.5])
     sub.set_ylabel('$\mathtt{log\;M_h(z_f \sim 0)}$', fontsize=20)
-    sub = fig.add_subplot(132)
+    sub = fig.add_subplot(142)
     scat = sub.scatter(subcat_sim['m.star0'][isSF], subcat_sim['m.star'][isSF], 
             lw=0, s=5, c='k', cmap='hot') 
     sub.set_xlim([7., 12.])
@@ -245,7 +245,7 @@ def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', fla
     sub.set_ylim([7., 12.])
     sub.set_ylabel('$\mathtt{log\;M_*(z_f \sim 0)}$', fontsize=20)
 
-    sub = fig.add_subplot(133)
+    sub = fig.add_subplot(143)
     scat = sub.scatter(dMh, dMstar, lw=0, s=5, c=subcat_sim['halo.m'][isSF], cmap='hot', 
             vmin=10., vmax=14.5) 
     fig.colorbar(scat, ax=sub)
@@ -262,7 +262,67 @@ def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', fla
     fig.savefig(''.join([UT.fig_dir(), 'dMh_dMstar.', run, '.sig_smhm', str(sigma_smhm), 
         flag_str, '.png']), bbox_inches='tight')
     plt.close() 
+    return None 
 
+
+def test_Mh_Mstar_assembly(sigma_smhm=0.2, nsnap0=15, downsampled='14'): 
+    ''' Compare the assembly history of M_halo and M* for different amounts of assembly
+    bias 
+    '''
+    thetas = [np.array([1.35, 0.6, rr, 0.5, 0., 0.5]) for rr in [0.1, 0.33, 0.66, 0.99]]
+    
+    fig = plt.figure(figsize=(6*len(thetas),6)) 
+    for i_t, theta in enumerate(thetas): 
+        subcat_sim = abcee.model('rSFH_r_delay_dt_test', theta, 
+                nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
+        
+        if i_t == 0: # pick a handful of halos 
+            isSF = np.where((subcat_sim['gclass'] == 'sf') & 
+                    (subcat_sim['weights'] > 0.) & 
+                    (subcat_sim['nsnap_start'] == nsnap0) & 
+                    (subcat_sim['halo.m'] > 13.) & 
+                    (subcat_sim['halo.m'] < 14.))[0] # only SF galaxies 
+            assert subcat_sim['m.star'][isSF].min() > 0.
+
+            i_s = np.random.choice(isSF)#, size=10, replace=False) 
+        
+        Mhs, Mstars = np.zeros(nsnap0), np.zeros(nsnap0)
+        Mhs[0] = subcat_sim['halo.m'][i_s]
+        Mhs[-1]= subcat_sim['halo.m0'][i_s]
+        Mstars[0] = subcat_sim['m.star'][i_s]
+        Mstars[-1]= subcat_sim['m.star0'][i_s]
+        for isnap in range(2,nsnap0):
+            Mhs[isnap-1] = subcat_sim['snapshot'+str(isnap)+'_halo.m'][i_s]
+            Mstars[isnap-1]= subcat_sim['snapshot'+str(isnap)+'_m.star'][i_s]
+
+        if i_t == 0: # plot the halo accretion history 
+            sub = fig.add_subplot(1,len(thetas), 1)
+            
+            f_Mh = (10**Mhs - 10**Mhs[-1])/(10**Mhs[0] - 10**Mhs[-1])
+            #10**(Mhs - Mhs[0])
+
+            sub.plot(UT.t_nsnap(range(1, nsnap0+1))[::-1], f_Mh[::-1])
+            sub.set_xlim([6., 13.5])
+            sub.set_xlabel('$\mathtt{t_{cosmic}}$', fontsize=20)
+            sub.set_ylim([0., 1.])
+            sub.set_ylabel('$\mathtt{f_{M_h} = M_h(t)/M_h(z=0)}$', fontsize=20)
+            print Mhs[::-1]
+        print 'R='+str(theta[2]), subcat_sim['weights'][i_s], subcat_sim['gclass'][i_s]
+        print Mstars[::-1]
+
+    
+        #f_Mstar = 10**(Mstars - Mstars[0])
+        f_Mstar = (10**Mstars - 10**Mstars[-1])/(10**Mstars[0] - 10**Mstars[-1])
+        sub = fig.add_subplot(1,len(thetas)+1,i_t+2)
+        #sub.plot(UT.t_nsnap(range(1, nsnap0+1))[::-1], f_Mstar[::-1])
+        sub.plot(f_Mh[::-1], f_Mstar[::-1])
+        #sub.set_xlim([6., 13.5])
+        #sub.set_xlabel('$\mathtt{t_{cosmic}}$', fontsize=20)
+        #sub.set_ylim([0., 1.])
+        #sub.set_yticklabels([''])
+        #sub.set_ylabel('$\mathtt{f_{M_*} = M_*(t)/M_*(z=0)}$', fontsize=20)
+        sub.set_title('R='+str(theta[2]), fontsize=20)
+    plt.show() 
     return None 
 
 
@@ -365,7 +425,6 @@ def test_tduty_tdelay_dt_grid_best(run):
 
 
 def test_tdelay_dt_grid(run, tduty):
-    
     file_name = ''.join([UT.fig_dir(), 'tduty_tdelay_dt_grid.', run, '.p'])
     grid = pickle.load(open(file_name, 'rb'))
     
@@ -394,15 +453,18 @@ if __name__=='__main__':
 
     #test_SumSim('rSFH_r1.0_most')
     #test_SumSim_sigmaSMHM('rSFH_r1.0_most', sigma_smhm=0.0)
-    #abcee.qaplotABC('randomSFH_short', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
-    #test_dMh_dMstar('test0', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    #test_dMh_dMstar('randomSFH_short', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    #test_dMh_dMstar('randomSFH_r0.99', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    #test_dMh_dMstar('rSFH_r1.0_most', np.array([1.35, 0.6]))
+    #for rr in [0.1, 0.33, 0.66, 0.99]: 
+    #    test_dMh_dMstar('rSFH_r_delay_dt_test', np.array([1.35, 0.6, rr, 0.5, 0., 0.5]), sigma_smhm=0.2, flag='R'+str(rr))
+    #abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.01, 10., 0., 1.])) 
+    abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.99, 0.5, 0., 1.])) 
+    abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.99, 10., 0., 1.])) 
+
     #for t in np.arange(0.1, 4.5, 0.5): 
         #test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, t]), sigma_smhm=0.2, flag='dt'+str(t)+'gyr')
     #    abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, t]), figure=UT.fig_dir()+'rSFH_r0.99.delay0.dt'+str(t)+'.png') 
     #tduty_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
-    test_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', 0.5)
+    #test_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', 0.5)
     #test_tduty_tdelay_dt_grid_best('rSFH_r0.99_delay_dt_test')
 
     #abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 2.]), figure=UT.fig_dir()+'testing.dMmax.png') 
