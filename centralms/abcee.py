@@ -187,12 +187,12 @@ def model(run, args, **kwargs):
         theta['sfh']['dz_dMh'] = 0.5 
     elif run == 'rSFH_r0.99_delay_dt_test': 
         theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['dt_min'] = args[2]
+        theta['sfh']['dt_max'] = args[2] 
         theta['sfh']['sigma_tot'] = 0.3 
         theta['sfh']['sigma_corr'] = 0.99 * 0.3
-        theta['sfh']['dt_delay'] = args[2] # Gyr 
-        theta['sfh']['dt_dMh'] = args[3]  # Gyr
+        theta['sfh']['dt_delay'] = args[3] # Gyr 
+        theta['sfh']['dt_dMh'] = args[4]  # Gyr
     else: 
         raise NotImplementedError
 

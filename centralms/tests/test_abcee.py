@@ -3,6 +3,7 @@
 
 '''
 import time
+import pickle
 import numpy as np 
 
 # -- local -- 
@@ -14,6 +15,8 @@ import emcee
 
 # --- plotting --- 
 import matplotlib.pyplot as plt 
+from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
@@ -263,47 +266,125 @@ def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', fla
     return None 
 
 
-def test_tdelay_dt_grid(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', flag=None): 
+def tduty_tdelay_dt_grid(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', flag=None): 
     ''' plot sigma_M* on a grid of t_delay and dt 
     '''
     delt = 0.5
     tdelays = np.arange(0., 3., delt)
     dts = np.arange(0., 4.5, delt)
     dts[0] += 0.1 # dt = 0 not allowed
+    tdutys = np.array([0.5, 1., 2., 3., 5., 10.])
+
+    subcat_dat = abcee.Data(nsnap0=nsnap0, sigma_smhm=sigma_smhm) # 'data'
+    sumdata = abcee.SumData(['smf'], nsnap0=nsnap0, sigma_smhm=sigma_smhm)  
 
     smhmr = Obvs.Smhmr()
-    sig_Mstars = np.zeros((len(tdelays), len(dts)))
-    #grid of tdelay, dt
-    for i_t, tdelay in enumerate(tdelays): 
-        for i_d, dt in enumerate(dts): 
-            theta_i = np.concatenate([theta, np.array([tdelay, dt])])
-            try: 
+    grid = np.zeros((5, len(tdutys)*len(tdelays)*len(dts)))
+    ii = 0  
+    for i_duty, tduty in enumerate(tdutys):
+        for i_t, tdelay in enumerate(tdelays): 
+            for i_d, dt in enumerate(dts): 
+                theta_i = np.concatenate([theta, np.array([tduty, tdelay, dt])])
+                #try: 
                 subcat_sim = abcee.model(run, theta_i, 
                         nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
-                sumsim = abcee.SumSim(['smf'], subcat_sim, info=True)
+                sumsim = abcee.SumSim(['smf'], subcat_sim)
                 
                 isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
                 # calculate sigma_M* at M_h = 12
-                m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
-                        dmhalo=0.2, weights=subcat_sim['weights'][isSF])
-                sig_Mstars[i_t, i_d] = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
-            except ValueError: 
-                sig_Mstars[i_t, i_d] = -999.
-            print 'tdelay = ', tdelay, ', dt = ', dt, ', sigma = ', sig_Mstars[i_t, i_d]
+                try: 
+                    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+                            dmhalo=0.2, weights=subcat_sim['weights'][isSF])
+                    grid[3,ii] = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
+                    # rho 
+                    grid[4, ii] = abcee.L2_logSMF(sumsim, sumdata)
+                except ValueError: 
+                    grid[3,ii] = -999.
+                    grid[4, ii] = 999. 
+                print 'tduty = ', tduty, 'tdelay = ', tdelay, ', dt = ', dt, ', sigma = ', grid[3, ii]
+                grid[0, ii] = tduty
+                grid[1, ii] = tdelay
+                grid[2, ii] = dt 
+                ii += 1
+
+    # save sig_Mstar values to file  
+    file_name = ''.join([UT.fig_dir(), 'tduty_tdelay_dt_grid.', run, '.p'])
+    pickle.dump(grid, open(file_name, 'wb'))
+    return None 
+
+
+def test_tduty_tdelay_dt_grid(run):
+    '''
+    '''
+    file_name = ''.join([UT.fig_dir(), 'tduty_tdelay_dt_grid.', run, '.p'])
+    grid = pickle.load(open(file_name, 'rb'))
+
+    fig = plt.figure(figsize=(10,10))
+    sub = fig.add_subplot(111, projection='3d')
+    #sub.view_init(45, 60)
+
+    tduty = grid[0,:]
+    tdelay = grid[1,:] 
+    dt_abias = grid[2,:]
+    sigMstar = grid[3,:]
+    l2 = grid[4,:]
+    print 'L2 = ', l2.min(), l2.max() 
+
+    scat = sub.scatter(dt_abias, tdelay, sigMstar, c=tduty)#, facecolors=cm.viridis(tduty))
+    sub.set_xlabel('$\Delta t_{abias}$ Gyr', fontsize=15)
+    sub.set_ylabel('$t_{delay}$ Gyr', fontsize=15)
+    sub.set_zlabel('$\sigma_{log\,M_*}$ Gyr', fontsize=15)
+    fig.colorbar(scat, shrink=0.5, aspect=10, cmap='hot', label='$t_{duty}$ Gyr')
+
+    for angle in range(0, 360):
+        sub.view_init(10, angle)
+        fig_name = ''.join([UT.fig_dir(), 'tduty_tdelay_dt_grid.', run, '.', str(angle), '.png'])
+        fig.savefig(fig_name)
+    return None 
+
+
+def test_tduty_tdelay_dt_grid_best(run):
+    '''
+    '''
+    file_name = ''.join([UT.fig_dir(), 'tduty_tdelay_dt_grid.', run, '.p'])
+    grid = pickle.load(open(file_name, 'rb'))
+    
+    tduty = grid[0,:]
+    tdelay = grid[1,:] 
+    dt_abias = grid[2,:]
+    sigMstar = grid[3,:]
+    l2 = grid[4,:]
+    
+    i_min = np.argmin(sigMstar)
+    print grid[:,i_min]
+
+    abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, 
+            theta=np.array([1.35, 0.6, grid[0,i_min], grid[1,i_min], grid[2,i_min]]), 
+            figure=UT.fig_dir()+'tduty_tdelay_dt_grid_best.rSFH_r0.99.png') 
+    return None
+
+
+def test_tdelay_dt_grid(run, tduty):
+    
+    file_name = ''.join([UT.fig_dir(), 'tduty_tdelay_dt_grid.', run, '.p'])
+    grid = pickle.load(open(file_name, 'rb'))
+    
+    tdutys = grid[0,:]
+    tdelay = grid[1,:] 
+    dt_abias = grid[2,:]
+    sigMstar = grid[3,:]
+    l2 = grid[4,:]
+    
+    duty = np.where(tdutys == tduty)
 
     fig = plt.figure() 
     sub = fig.add_subplot(111)
-    sig_positive = sig_Mstars[np.where(sig_Mstar > 0.)]
-    im = plt.imshow(sig_Mstars, interpolation='None', cmap='hot', 
-            extent=(-0.5*delt, dts.max()+0.5*delt, tdelays.min()-0.5*delt, tdelays.max()+0.5*delt), 
-            vmin=sig_positive.min(), vmax=sig_positive.max())
-    plt.colorbar(im)
-    sub.set_xticks(dts) 
+    scat = sub.scatter(dt_abias[duty], tdelay[duty], c=sigMstar[duty], lw=0, s=100)
+    plt.colorbar(scat)
     sub.set_xlabel('$\Delta t$ Gyr', fontsize=25)
-    sub.set_yticks(tdelays) 
     sub.set_ylabel('$t_{delay}$ Gyr', fontsize=25)
 
-    fig_name = ''.join([UT.fig_dir(), run, '.tdelay_dt_grid.png'])
+    fig_name = ''.join([UT.fig_dir(), 'tdelay_dt_grid.', run, '.tduty', str(tduty), '.png'])
     fig.savefig(fig_name, bbox_inches='tight') 
     return None
 
@@ -320,7 +401,9 @@ if __name__=='__main__':
     #for t in np.arange(0.1, 4.5, 0.5): 
         #test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, t]), sigma_smhm=0.2, flag='dt'+str(t)+'gyr')
     #    abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, t]), figure=UT.fig_dir()+'rSFH_r0.99.delay0.dt'+str(t)+'.png') 
-    test_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    #tduty_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
+    test_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', 0.5)
+    #test_tduty_tdelay_dt_grid_best('rSFH_r0.99_delay_dt_test')
 
     #abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 2.]), figure=UT.fig_dir()+'testing.dMmax.png') 
     #abcee.qaplotABC('randomSFH', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
