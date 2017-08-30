@@ -69,15 +69,18 @@ def tdelay_dt_mcmc(run, theta, Niter=20, Nwalkers=10, Ndim=2, sigma_smhm=0.2, ns
 def sigM(tt, theta=np.array([1.35, 0.6]), sigma_smhm=0.2, nsnap0=15, downsampled='14'):
     smhmr = Obvs.Smhmr()
     theta_i = np.concatenate([theta, np.array([tt[0], tt[1]])])
-    subcat_sim = abcee.model(run, theta_i, 
-            nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
-    sumsim = abcee.SumSim(['smf'], subcat_sim, info=True)
+    try: 
+        subcat_sim = abcee.model(run, theta_i, 
+                nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
+        sumsim = abcee.SumSim(['smf'], subcat_sim, info=True)
 
-    isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
-    #calculate sigma_M* at M_h = 12
-    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
-            dmhalo=0.2, weights=subcat_sim['weights'][isSF])
-    return sig_mhalo[np.argmin(np.abs(m_mid-12.))]
+        isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+        #calculate sigma_M* at M_h = 12
+        m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+                dmhalo=0.2, weights=subcat_sim['weights'][isSF])
+        return sig_mhalo[np.argmin(np.abs(m_mid-12.))]
+    except ValueError: 
+        return 
 
 
 if __name__=='__main__': 
