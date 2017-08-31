@@ -14,6 +14,7 @@ import observables as Obvs
 import emcee
 
 # --- plotting --- 
+import corner as DFM
 import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
@@ -446,6 +447,24 @@ def test_tdelay_dt_grid(run, tduty):
     return None
 
 
+def test_Mh_SFR(run, theta, nsnap0=15, sigma_smhm=0.2, downsampled='14'):
+    ''' Take a look at the M_h SFR relationship 
+    '''
+    subcat_sim = abcee.model(run, theta, 
+            nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
+
+    isSF = np.where(subcat_sim['gclass'] == 'sf') 
+
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    DFM.hist2d(subcat_sim['halo.m'][isSF], subcat_sim['sfr'][isSF], weights=subcat_sim['weights'][isSF], 
+            levels=[0.68, 0.95], range=[[10., 15.], [-4., 2.]], color='#1F77B4', 
+            plot_datapoints=True, fill_contours=False, plot_density=False, ax=sub) 
+    plt.show() 
+
+
+
+
 if __name__=='__main__': 
     #test_SFMS_highz('test0', 9, nsnap=15, lit='lee')
 
@@ -463,7 +482,8 @@ if __name__=='__main__':
     #    abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, t]), figure=UT.fig_dir()+'rSFH_r0.99.delay0.dt'+str(t)+'.png') 
     #tduty_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', 0.5)
-    test_tduty_tdelay_dt_grid_best('rSFH_r0.99_delay_dt_test')
+    #test_tduty_tdelay_dt_grid_best('rSFH_r0.99_delay_dt_test')
+    test_Mh_SFR('rSFH_r_delay_dt_test', np.array([1.35, 0.6, 0.99, 10., 0., 1.])) 
 
     #abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 2.]), figure=UT.fig_dir()+'testing.dMmax.png') 
     #abcee.qaplotABC('randomSFH', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
