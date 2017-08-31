@@ -1,0 +1,70 @@
+\documentclass[iop,apj,tighten,twocolappendix,numberedappendix]{emulateapj}
+\usepackage[breaklinks,colorlinks, urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
+%define general packages
+\usepackage{color}
+\usepackage{epsfig}
+\usepackage{rotating}
+\usepackage{amsmath}
+\usepackage{footnote}
+\usepackage{setspace}
+\usepackage{courier}
+\usepackage{tabularx}
+\usepackage{ctable, dashrule}
+
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+\newcommand{\todo}[1]{{\bf \textcolor{red}{ #1}}}
+\newcommand{\edited}[1]{\textcolor{red}{ #1}}
+\definecolor{amethyst}{rgb}{0.6, 0.4, 0.8}
+\definecolor{dred}{rgb}{0.75, 0., 0.0}
+\definecolor{darkgreen}{rgb}{0., 0.75, 0.0}
+\newcommand{\tocite}[1]{{\em \textcolor{amethyst}{ #1}}}
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+\newcommand{\avgSFR}{\overline{\raisebox{0pt}[1.2\height]{SFR}}}
+\newcommand{\SFR}{\mathrm{SFR}}
+\newcommand{\fq}{f_\mathrm{Q}}
+\newcommand{\fqcen}{f_\mathrm{Q}^\mathrm{cen}}
+\newcommand{\zinit}{z_\mathrm{initial}}
+\newcommand{\taucen}{\tau_\mathrm{Q}^\mathrm{cen}}
+
+\begin{document}
+
+\title{} 
+
+\author{ChangHoon~Hahn\altaffilmark{1}, 
+Jeremy L.~Tinker\altaffilmark{2}, 
+Andrew R.~Wetzel\altaffilmark{3,4,5}}
+\altaffiltext{1}{Lawrence Berkeley National Laboratory, One Cyclotron Road, Berkeley, CA 94720, USA; changhoonhahn@lbl.gov}
+\altaffiltext{2}{Center for Cosmology and Particle Physics, Department of Physics, New York University, 4 Washington Place, New York, NY 10003}
+\altaffiltext{3}{TAPIR, California Institute of Technology, Pasadena, CA USA}
+\altaffiltext{4}{Carnegie Observatories, Pasadena, CA USA}
+\altaffiltext{5}{Department of Physics, University of California, Davis, CA USA}
+\begin{abstract}
+    Insert abstract Here 
+\end{abstract}
+\keywords{methods: numerical -- galaxies: clusters: general -- 
+galaxies: groups: general -- galaxies: evolution -- galaxies: haloes -- 
+galaxies: star formation -- cosmology: observations.}
+
+\section{Introduction}
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\textwidth]{figs/t_quenching_comparison_z0_2.pdf}
+\caption{from morphological quenching is in good agreement with our timescale.}
+\label{fig:tquench_comp}
+\end{center}
+\end{figure}
+
+\subsection{Quenching Star Formation in Central Galaxies}  
+
+\section{Summary} \label{sec:summary}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Acknowledgements
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgements}
+
+\bibliographystyle{yahapj}
+\bibliography{cenque}
+\end{document}
