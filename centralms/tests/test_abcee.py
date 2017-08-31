@@ -254,7 +254,9 @@ def test_dMh_dMstar(run, theta, sigma_smhm=0.2, nsnap0=15, downsampled='14', fla
     sub.set_xlabel('$\mathtt{log(\; \Delta M_h\;)}$', fontsize=20)
     sub.set_ylim([9, 11.25])
     sub.set_ylabel('$\mathtt{log(\; \Delta M_*\;)}$', fontsize=20)
-
+    
+    plt.show()
+    raise ValueError
     if flag is None: 
         flag_str = ''
     else: 
@@ -415,8 +417,11 @@ def test_tduty_tdelay_dt_grid_best(run):
     dt_abias = grid[2,:]
     sigMstar = grid[3,:]
     l2 = grid[4,:]
+
+    lim = np.where(tdelay > 1.)
     
-    i_min = np.argmin(sigMstar)
+    i_min = np.argmin(sigMstar[lim])
+    i_min = lim[0][i_min]
     print grid[:,i_min]
 
     abcee.qaplotABC(run, 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, grid[0,i_min], grid[1,i_min], grid[2,i_min]])) 
@@ -463,6 +468,26 @@ def test_Mh_SFR(run, theta, nsnap0=15, sigma_smhm=0.2, downsampled='14'):
     plt.show() 
 
 
+def test_tduty_tdelay_dt_grid_dtaxis(run, tdutyy, tdelayy):
+    ''' Check the dependence of sigma_logM* to dt_abias. It's weird that 
+    dt_abias has such a significant effect... 
+    '''
+    file_name = ''.join([UT.fig_dir(), 'tduty_tdelay_dt_grid.', run, '.p'])
+    grid = pickle.load(open(file_name, 'rb'))
+    
+    tduty = grid[0,:]
+    tdelay = grid[1,:] 
+    dt_abias = grid[2,:]
+    sigMstar = grid[3,:]
+    l2 = grid[4,:]
+
+    lim = np.where((tdelay == tdelayy) & (tduty == tdutyy))
+        
+    for ii in range(len(lim[0])): 
+        print dt_abias[lim[0][ii]], sigMstar[lim[0][ii]]
+
+    #abcee.qaplotABC(run, 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, grid[0,i_min], grid[1,i_min], grid[2,i_min]])) 
+    return None
 
 
 if __name__=='__main__': 
@@ -470,11 +495,8 @@ if __name__=='__main__':
 
     #test_SumSim('rSFH_r1.0_most')
     #test_SumSim_sigmaSMHM('rSFH_r1.0_most', sigma_smhm=0.0)
-    #test_dMh_dMstar('rSFH_r1.0_most', np.array([1.35, 0.6]))
     #for rr in [0.1, 0.33, 0.66, 0.99]: 
     #    test_dMh_dMstar('rSFH_r_delay_dt_test', np.array([1.35, 0.6, rr, 0.5, 0., 0.5]), sigma_smhm=0.2, flag='R'+str(rr))
-    #abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.01, 10., 0., 1.])) 
-    #abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.99, 0.5, 0., 1.])) 
     #abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.99, 10., 0., 1.])) 
 
     #for t in np.arange(0.1, 4.5, 0.5): 
@@ -483,7 +505,8 @@ if __name__=='__main__':
     #tduty_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', 0.5)
     #test_tduty_tdelay_dt_grid_best('rSFH_r0.99_delay_dt_test')
-    test_Mh_SFR('rSFH_r_delay_dt_test', np.array([1.35, 0.6, 0.99, 10., 0., 1.])) 
+    test_tduty_tdelay_dt_grid_dtaxis('rSFH_r0.99_delay_dt_test', 1., 0.)
+    #test_Mh_SFR('rSFH_r_delay_dt_test', np.array([1.35, 0.6, 0.99, 10., 0., 1.])) 
 
     #abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 2.]), figure=UT.fig_dir()+'testing.dMmax.png') 
     #abcee.qaplotABC('randomSFH', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 
