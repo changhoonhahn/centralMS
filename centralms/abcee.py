@@ -64,7 +64,7 @@ def Prior(run, shape='tophat'):
 def Data(**data_kwargs): 
     ''' Our 'data'
     '''
-    subhist = Cat.PureCentralHistory(nsnap_ancestor=data_kwargs['nsnap0'], 
+    subhist = Cat.PureCentralSubhalos(nsnap0=data_kwargs['nsnap0'], 
             sigma_smhm=data_kwargs['sigma_smhm'])
     subcat = subhist.Read(downsampled='14') # full sample
     return subcat
@@ -209,23 +209,23 @@ def model(run, args, **kwargs):
 
     # load in Subhalo Catalog (pure centrals)
     if 'sigma_smhm' in kwargs.keys(): 
-        subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'], 
+        subhist = Cat.PureCentralSubhalos(nsnap0=kwargs['nsnap0'], 
                 sigma_smhm=kwargs['sigma_smhm'])
     else: 
-        subhist = Cat.PureCentralHistory(nsnap_ancestor=kwargs['nsnap0'])
+        subhist = Cat.PureCentralSubhalos(nsnap0=kwargs['nsnap0'])
     subcat = subhist.Read(downsampled=kwargs['downsampled']) # full sample
     
     if 'forTests' not in kwargs.keys(): 
         eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
-        eev.Initiate()
-        eev.Evolve() 
+        eev.InitSF()
+        eev.newEvolve() 
 
         return eev.SH_catalog
     else: 
         if kwargs['forTests']: 
             eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
-            eev.Initiate()
-            eev.Evolve(forTests=True) 
+            eev.InitSF()
+            eev.newEvolve(forTests=True) 
             return eev.SH_catalog, eev
 
 
@@ -650,9 +650,9 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
                                     subcat_sim['m.star'][i_r], 
             dlogsfrs[:,0] =  sfr - sfr_ms 
         else: 
-            sfr = subcat_sim['snapshot'+str(i_snap)+'_sfr'][i_r]
-            sfr_ms = Obvs.SSFR_SFMS(subcat_sim['snapshot'+str(i_snap)+'_m.star'][i_r], UT.z_nsnap(i_snap), theta_SFMS=subcat_sim['theta_sfms']) + \
-                    subcat_sim['snapshot'+str(i_snap)+'_m.star'][i_r]
+            sfr = subcat_sim['sfr.snap'+str(i_snap)][i_r]
+            sfr_ms = Obvs.SSFR_SFMS(subcat_sim['m.star.snap'+str(i_snap)][i_r], UT.z_nsnap(i_snap), theta_SFMS=subcat_sim['theta_sfms']) + \
+                    subcat_sim['m.star.snap'+str(i_snap)][i_r]
             dlogsfrs[:,i_snap-1] = sfr - sfr_ms 
 
     for i in range(dlogsfrs.shape[0]): 

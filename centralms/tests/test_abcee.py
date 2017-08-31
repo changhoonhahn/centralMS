@@ -418,9 +418,7 @@ def test_tduty_tdelay_dt_grid_best(run):
     i_min = np.argmin(sigMstar)
     print grid[:,i_min]
 
-    abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, 
-            theta=np.array([1.35, 0.6, grid[0,i_min], grid[1,i_min], grid[2,i_min]]), 
-            figure=UT.fig_dir()+'tduty_tdelay_dt_grid_best.rSFH_r0.99.png') 
+    abcee.qaplotABC(run, 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, grid[0,i_min], grid[1,i_min], grid[2,i_min]])) 
     return None
 
 
@@ -457,15 +455,15 @@ if __name__=='__main__':
     #for rr in [0.1, 0.33, 0.66, 0.99]: 
     #    test_dMh_dMstar('rSFH_r_delay_dt_test', np.array([1.35, 0.6, rr, 0.5, 0., 0.5]), sigma_smhm=0.2, flag='R'+str(rr))
     #abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.01, 10., 0., 1.])) 
-    abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.99, 0.5, 0., 1.])) 
-    abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.99, 10., 0., 1.])) 
+    #abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.99, 0.5, 0., 1.])) 
+    #abcee.qaplotABC('rSFH_r_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 0.99, 10., 0., 1.])) 
 
     #for t in np.arange(0.1, 4.5, 0.5): 
         #test_dMh_dMstar('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6, t]), sigma_smhm=0.2, flag='dt'+str(t)+'gyr')
     #    abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, t]), figure=UT.fig_dir()+'rSFH_r0.99.delay0.dt'+str(t)+'.png') 
     #tduty_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', 0.5)
-    #test_tduty_tdelay_dt_grid_best('rSFH_r0.99_delay_dt_test')
+    test_tduty_tdelay_dt_grid_best('rSFH_r0.99_delay_dt_test')
 
     #abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 2.]), figure=UT.fig_dir()+'testing.dMmax.png') 
     #abcee.qaplotABC('randomSFH', 10, sigma_smhm=0.0, theta=np.array([1.35, 0.6])) 

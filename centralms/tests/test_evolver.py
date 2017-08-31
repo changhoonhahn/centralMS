@@ -797,6 +797,74 @@ def test_EvolverInitiate(test, nsnap, nsnap0=20, downsampled=None):
     return None
 
 
+def test_EvolverInitSF(nsnap, nsnap0=20, downsampled=None): 
+    ''' Checks whether or not the SF populations from Evolver.InitSF
+    method correctly produces SFRs on the SFMS. 
+    '''
+    if nsnap > nsnap0: 
+        raise ValueError('nsnap has to be less than or equal to nsnap0')
+
+    # load in Subhalo Catalog (pure centrals)
+    subhist = Cat.PureCentralSubhalos(nsnap0=nsnap0)
+    subcat = subhist.Read(downsampled=downsampled)
+
+    theta = Evol.defaultTheta('constant_offset') # load in generic theta (parameters)
+
+    eev = Evol.Evolver(subcat, theta, nsnap0=nsnap0)
+    eev.InitSF()
+
+    obv_ssfr = Obvs.Ssfr()
+    
+    started = np.where(subcat['nsnap_start'] == nsnap)
+
+    ssfr_bin_mids, ssfr_dists = obv_ssfr.Calculate(
+            subcat['m.star0'][started], 
+            subcat['sfr0'][started]-subcat['m.star0'][started], 
+            weights=subcat['weights'][started])
+
+    fig = plt.figure(figsize=(20, 5))
+    bkgd = fig.add_subplot(111, frameon=False)
+
+    panel_mass_bins = [[9.7, 10.1], [10.1, 10.5], [10.5, 10.9], [10.9, 11.3]]
+    for i_m, mass_bin in enumerate(panel_mass_bins): 
+        sub = fig.add_subplot(1, 4, i_m+1)
+
+        sub.plot(ssfr_bin_mids[i_m], ssfr_dists[i_m], 
+                lw=3, ls='-', c='k')
+        
+        # mark the SSFR of SFMS and Quiescent peak 
+        sub.vlines(Obvs.SSFR_SFMS(0.5 * np.sum(mass_bin), UT.z_nsnap(nsnap), theta_SFMS=theta['sfms']), 0., 1.7, 
+                color='b', linewidth=3)
+        sub.vlines(Obvs.SSFR_Qpeak(0.5 * np.sum(mass_bin)), 0., 1.7, 
+                color='r', linewidth=3)
+
+        massbin_str = ''.join([ 
+            r'$\mathtt{log \; M_{*} = [', 
+            str(mass_bin[0]), ',\;', 
+            str(mass_bin[1]), ']}$'
+            ])
+        sub.text(-12., 1.4, massbin_str, fontsize=20)
+    
+        # x-axis
+        sub.set_xlim([-13., -8.])
+        # y-axis 
+        sub.set_ylim([0.0, 1.7])
+        sub.set_yticks([0.0, 0.5, 1.0, 1.5])
+        if i_m == 0: 
+            sub.set_ylabel(r'$\mathtt{P(log \; SSFR)}$', fontsize=25) 
+        else: 
+            sub.set_yticklabels([])
+        
+        ax = plt.gca()
+        leg = sub.legend(bbox_to_anchor=(-8.5, 1.55), loc='upper right', prop={'size': 20}, borderpad=2, 
+                bbox_transform=ax.transData, handletextpad=0.5)
+    
+    bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    bkgd.set_xlabel(r'$\mathtt{log \; SSFR \;[yr^{-1}]}$', fontsize=25) 
+    plt.show()
+    return None
+
+
 def test_EvolverEvolve(test, nsnap0=20, downsampled=None): 
     ''' Tests for Evolve method in Evolver
     '''
@@ -1160,7 +1228,7 @@ if __name__=="__main__":
     #EvolverPlots('constant_offset')
     #EvolverPlots('corr_constant_offset')
     #EvolverPlots('random_step', nsnap0=15)
-    test_AssemblyBias(0.0, nsnap0=15, downsampled='14')
+    #test_AssemblyBias(0.0, nsnap0=15, downsampled='14')
     #test_Evolver_AssemblyBias(0.3, nsnap0=15)
     #EvolverPlots('constant_offset', nsnap0=15)
     #EvolverPlots('random_step', nsnap0=15)
@@ -1171,4 +1239,5 @@ if __name__=="__main__":
     #test_Evolver_ODEsolver('random_step_fluct', nsnap0=15)
     #test_EvolverEvolve('smf', nsnap0=15, downsampled='14')
     #test_EvolverInitiate('pssfr', 15)
+    test_EvolverInitSF('pssfr', 15, nsnap0=15, downsampled='14')
     #test_assignSFRs() 

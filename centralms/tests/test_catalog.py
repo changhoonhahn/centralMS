@@ -106,10 +106,10 @@ if __name__=='__main__':
 
     #test_Downsample('smhmr', 15)
 
-    for sig in [0.]: 
-        subhist = Cat.SubhaloHistory(sigma_smhm=sig, nsnap_ancestor=15)
-        subhist.Build()
-        subhist = Cat.PureCentralHistory(sigma_smhm=sig, nsnap_ancestor=15)
+    for sig in [0.2, 0.]: 
+        #subhist = Cat.Subhalos(sigma_smhm=sig, nsnap0=15)
+        #subhist.Build()
+        subhist = Cat.PureCentralSubhalos(sigma_smhm=sig, nsnap0=15)
         subhist.Build()
         subhist.Downsample()
 
