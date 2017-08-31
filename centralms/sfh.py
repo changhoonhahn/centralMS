@@ -199,7 +199,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']))#, dtype=np.float32)
         Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
         for isnap in range(2, SHsnaps['nsnap0']+1): 
-            Mh_snaps[:,isnap-1] = SHsnaps['snapshot'+str(isnap)+'_halo.m'][indices]
+            Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
         
         z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))
         t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+10))
@@ -303,8 +303,8 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                 if nsnap == 1: 
                     mhalo_later = SHsnaps['halo.m'][indices]
                 else: 
-                    mhalo_later = SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices]
-                mhalo_early = SHsnaps['snapshot'+str(nsnap+1)+'_halo.m'][indices]
+                    mhalo_later = SHsnaps['halo.m.snap'+str(nsnap)][indices]
+                mhalo_early = SHsnaps['halo.m.snap'+str(nsnap+1)][indices]
                 
                 # log M_h(t_i) - log M_h(t_i+1) = log(M_h(t_i) / M_h(t_i+1))
                 # (M_h(t_i+1)-M_h(t_i))/M_h(t_i+1) = 1. - M_h(t_i)/M_h(t_i+1)
@@ -425,8 +425,8 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                 if nsnap == 1: 
                     mhalo_later = SHsnaps['halo.m'][indices]
                 else: 
-                    mhalo_later = SHsnaps['snapshot'+str(nsnap)+'_halo.m'][indices]
-                mhalo_early = SHsnaps['snapshot'+str(nsnap+1)+'_halo.m'][indices]
+                    mhalo_later = SHsnaps['halo.m.snap'+str(nsnap)][indices]
+                mhalo_early = SHsnaps['halo.m.snap'+str(nsnap+1)][indices]
                 
                 # log M_h(t_i) - log M_h(t_i+1) = log(M_h(t_i) / M_h(t_i+1))
                 # (M_h(t_i+1)-M_h(t_i))/M_h(t_i+1) = 1. - M_h(t_i)/M_h(t_i+1)
@@ -539,7 +539,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             # M_halo of the galaxies in the snapshots 
             Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0'])) 
             for ii, isnap in enumerate(range(2, SHsnaps['nsnap0']+1)[::-1]): 
-                Mh_snaps[:,ii] = SHsnaps['snapshot'+str(isnap)+'_halo.m'][indices]
+                Mh_snaps[:,ii] = SHsnaps['halo.m.snap'+str(isnap)][indices]
             Mh_snaps[:,-1] = SHsnaps['halo.m'][indices]
 
             Mh_abias = np.zeros((n_gal, len(t_step_abias)))
@@ -675,7 +675,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']+9))#, dtype=np.float32)
         Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
         for isnap in range(2, SHsnaps['nsnap0']+10): 
-            Mh_snaps[:,isnap-1] = SHsnaps['snapshot'+str(isnap)+'_halo.m'][indices]
+            Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
         
         z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))
         t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+10))
@@ -805,7 +805,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']+9))#, dtype=np.float32)
         Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
         for isnap in range(2, SHsnaps['nsnap0']+10): 
-            Mh_snaps[:,isnap-1] = SHsnaps['snapshot'+str(isnap)+'_halo.m'][indices]
+            Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
         
         z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))
         t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+10))
