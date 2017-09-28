@@ -213,18 +213,15 @@ def model(run, args, **kwargs):
                 sigma_smhm=kwargs['sigma_smhm'])
     else: 
         subhist = Cat.PureCentralSubhalos(nsnap0=kwargs['nsnap0'])
-    subcat = subhist.Read(downsampled=kwargs['downsampled']) # full sample
+    subcat = subhist.Read(downsampled=kwargs['downsampled']) # halo sample  
     
+    eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
+    eev.InitSF()
     if 'forTests' not in kwargs.keys(): 
-        eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
-        eev.InitSF()
         eev.newEvolve() 
-
         return eev.SH_catalog
     else: 
         if kwargs['forTests']: 
-            eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
-            eev.InitSF()
             eev.newEvolve(forTests=True) 
             return eev.SH_catalog, eev
 
