@@ -1,22 +1,25 @@
-\documentclass[iop,apj,tighten,twocolappendix,numberedappendix]{emulateapj}
-\usepackage[breaklinks,colorlinks, urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
-%define general packages
-\usepackage{color}
-\usepackage{epsfig}
-\usepackage{rotating}
-\usepackage{amsmath}
-\usepackage{footnote}
-\usepackage{setspace}
-\usepackage{courier}
-\usepackage{tabularx}
-\usepackage{ctable, dashrule}
+\documentclass[12pt, letterpaper, preprint]{aastex}
+\usepackage{hyperref}
+\input{vc}
+
+% typesetting shih
+\linespread{1.08} % close to 10/13 spacing
+\setlength{\parindent}{1.08\baselineskip} % Bringhurst
+\setlength{\parskip}{0ex}
+\let\oldbibliography\thebibliography % killin' me.
+\renewcommand{\thebibliography}[1]{%
+  \oldbibliography{#1}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parsep}{0pt}%
+  \setlength{\parskip}{0pt}%
+  \setlength{\bibsep}{0ex}
+  \raggedright
+}
+\setlength{\footnotesep}{0ex} % seriously?
 
 \newcommand\tab[1][1cm]{\hspace*{#1}}
 \newcommand{\todo}[1]{{\bf \textcolor{red}{ #1}}}
 \newcommand{\edited}[1]{\textcolor{red}{ #1}}
-\definecolor{amethyst}{rgb}{0.6, 0.4, 0.8}
-\definecolor{dred}{rgb}{0.75, 0., 0.0}
-\definecolor{darkgreen}{rgb}{0., 0.75, 0.0}
 \newcommand{\tocite}[1]{{\em \textcolor{amethyst}{ #1}}}
 \newcommand{\beq}{\begin{equation}}
 \newcommand{\eeq}{\end{equation}}
@@ -27,19 +30,23 @@
 \newcommand{\fqcen}{f_\mathrm{Q}^\mathrm{cen}}
 \newcommand{\zinit}{z_\mathrm{initial}}
 \newcommand{\taucen}{\tau_\mathrm{Q}^\mathrm{cen}}
+\newcommand{\bitem}{\begin{itemize}}
+\newcommand{\eitem}{\end{itemize}}
 
-\begin{document}
+\begin{document}\sloppy\sloppypar\frenchspacing
 
-\title{} 
-
+\title{Central Galaxies on the Main Sequence} 
+\date{\texttt{DRAFT~---~\githash~---~\gitdate~---~NOT READY FOR DISTRIBUTION}}
 \author{ChangHoon~Hahn\altaffilmark{1}, 
 Jeremy L.~Tinker\altaffilmark{2}, 
 Andrew R.~Wetzel\altaffilmark{3,4,5}}
-\altaffiltext{1}{Lawrence Berkeley National Laboratory, One Cyclotron Road, Berkeley, CA 94720, USA; changhoonhahn@lbl.gov}
+\altaffiltext{1}{Lawrence Berkeley National Laboratory, 1 Cyclotron Road, Berkeley, CA 94720}
 \altaffiltext{2}{Center for Cosmology and Particle Physics, Department of Physics, New York University, 4 Washington Place, New York, NY 10003}
 \altaffiltext{3}{TAPIR, California Institute of Technology, Pasadena, CA USA}
 \altaffiltext{4}{Carnegie Observatories, Pasadena, CA USA}
 \altaffiltext{5}{Department of Physics, University of California, Davis, CA USA}
+\email{changhoon.hahn@lbl.gov}
+
 \begin{abstract}
     Insert abstract Here 
 \end{abstract}
@@ -47,16 +54,65 @@ Andrew R.~Wetzel\altaffilmark{3,4,5}}
 galaxies: groups: general -- galaxies: evolution -- galaxies: haloes -- 
 galaxies: star formation -- cosmology: observations.}
 
-\section{Introduction}
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.45\textwidth]{figs/t_quenching_comparison_z0_2.pdf}
-\caption{from morphological quenching is in good agreement with our timescale.}
-\label{fig:tquench_comp}
-\end{center}
-\end{figure}
 
-\subsection{Quenching Star Formation in Central Galaxies}  
+{\bf Checklist} 
+\bitem
+\item Check the correlation between halo growth rate with different $t_{delay}$ and $\delta t_{abias}$ with the total halo growth rate between $z \sim 0$ and $z \sim 1$. 
+\eitem 
+
+\section{Introduction}
+\bitem 
+\item Motivate why we think SF galaxies evolve along the main sequence  
+\item Discuss the current thought process on galaxy assembly bias 
+\item Explain the limitation of SFH derivable from observations (Claire's fisher matrix paper would be really good; ask her about the details) 
+\item Observations also can't provide detail host dark matter halo properties
+\item So the approach with combining observations with N-body (empirical modeling) is very effective in the context of the halo.
+\item Maybe talk about how the bigger context of why this is important?  
+\eitem 
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=0.45\textwidth]{figs/t_quenching_comparison_z0_2.pdf}
+%\caption{from morphological quenching is in good agreement with our timescale.}
+%\label{fig:tquench_comp}
+%\end{center}
+%\end{figure}
+%
+\section{}  
+
+\section{Star Forming Central Galaxies}  
+\subsection{Selecting $z \sim 0$ Star Forming Central Galaxies}  
+\begin{itemize}
+    \item Describe how $f_{SFMS}$ is calculated. 
+    \item refer to Tjitske in prep 
+    \item Then explain how it's not circular because the integrated $M_*$ has to reproduce the same SMF
+\end{itemize}
+
+\subsection{Evolving along the Main Sequence} 
+\begin{itemize}
+    \item Talk about the SFR and $M_*$ prescriptions 
+    \item Pedagogical figure describing the SFH model: two panel one SFR as a function of time, the other residual log SFR as a funciton of time for different prescriptions
+\end{itemize}
+
+\section{The duty cycle of star formation}
+\bitem
+\item Figure that illustrates the fit to observables 
+\item Figure of sigma M star as a function of duty cycle compared to observations 
+\eitem 
+
+\section{The need for a galaxy assembly bias}
+\bitem
+\item discuss how $t_{duty}$ is not enough to be consistent with $\sigma_{M_*}$. 
+\item first clarify what you mean by galaxy assembly bias 
+\item discuss implementation of galaxy assembly bias
+\item Figure (pedagogical) of dlogSFR versus dMh dt for different correlation amounts 
+\item Figure of different tdelay and dtabias 
+\item Figure of sigma M star as a function of duty cycle and realistic dt abias and t delay 
+\eitem
+
+\section{Rethinking the Main Sequence?}
+\bitem 
+\item Test the SMHMR for Louis's SFHs 
+\eitem 
 
 \section{Summary} \label{sec:summary}
 
