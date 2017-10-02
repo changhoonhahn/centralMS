@@ -88,11 +88,3 @@ def assignHalo(nsnap, halos, method='random', logM_range=[9., 12.], dlogM=0.2, S
             else:
                 raise ValueError
     return index_assign
-
-
-def SFgal(nsnap):
-    ''' Roughly identify star-forming galaxies at a given snapshot 
-    '''
-    mstar, sfr = read_LA(nsnap)
-    
-

@@ -65,7 +65,7 @@ def assignHalo(method='random', SHAM_sig=0.2, nsnap0=15):
     sub.set_ylim([9., 12.])
     sub.set_ylabel('stellar mass', fontsize=25)
     
-    # plot sigma_log M* at z ~ 1
+    # plot sigma_log M* for all galaxies at z ~ 1
     sub = fig.add_subplot(222)
     mh_lows = np.arange(11., 15., 0.5)
     mu_mstar = np.zeros(len(mh_lows))
@@ -83,8 +83,9 @@ def assignHalo(method='random', SHAM_sig=0.2, nsnap0=15):
     sub.set_ylabel('$\sigma_\mathtt{log\;M_*}$', fontsize=25)
 
     mhalo_f = np.array([halos['m.max'][i] for i in i_assign[matched]])
-    mstar_f, _ = LA.read_LA(1)
+    mstar_f, sfr_f = LA.read_LA(1)
     mstar_f = mstar_f[matched]
+    sfr_f = sfr_f[matched]
 
     # plot M* - Mhalo at z ~ 0
     sub = fig.add_subplot(223)
@@ -94,12 +95,12 @@ def assignHalo(method='random', SHAM_sig=0.2, nsnap0=15):
     sub.set_ylim([9., 12.])
     sub.set_ylabel('stellar mass', fontsize=25)
 
-    # plot sigma_log M* at z ~ 0
+    # plot sigma_log M* of SF galaxies at z ~ 0
     sub = fig.add_subplot(224)
     mu_mstar_f = np.zeros(len(mh_lows))
     var_mstar_f = np.zeros(len(mh_lows))
     for im, mh_low in enumerate(mh_lows): 
-        in_mhbin = np.where((mhalo_f >= mh_low) & (mhalo_f < mh_low+0.5))
+        in_mhbin = np.where((mhalo_f >= mh_low) & (mhalo_f < mh_low+0.5) & (sfr_f > 0.5*(mstar_f - 10.5) - 1.))
         if np.sum(ws[in_mhbin]) > 0.: 
             mu_mstar_f[im] = np.sum(mstar_f[in_mhbin] * ws[in_mhbin]) / np.sum(ws[in_mhbin])
             var_mstar_f[im] = np.average((mstar_f[in_mhbin] - mu_mstar[im])**2, weights=ws[in_mhbin])
@@ -117,4 +118,5 @@ def assignHalo(method='random', SHAM_sig=0.2, nsnap0=15):
 
 
 if __name__=="__main__": 
+    assignHalo(method='random')
     assignHalo(method='dmhalo')
