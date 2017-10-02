@@ -21,7 +21,7 @@ def getMF(masses, weights=None, m_arr=None, box=250, h=0.7):
 
     # calculate d logM
     dm_arr = m_arr[1:] - m_arr[:-1]
-    if np.abs(dm_arr - dm_arr[0]).max() > 0.: 
+    if np.abs(dm_arr - dm_arr[0]).max() > 0.001: 
         raise ValueError('m_arr has to be evenly spaced!')
 
     dlogm = dm_arr[0]

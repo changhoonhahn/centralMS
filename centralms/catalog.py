@@ -707,3 +707,4 @@ class Observations(object):
             self._catalog_kwargs['Mrcut'] = Mrcut
             self._catalog_kwargs['masscut'] = masscut 
             self._catalog_kwargs['position'] = kwargs['position']
+
