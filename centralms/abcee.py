@@ -120,6 +120,13 @@ def model(run, args, **kwargs):
         theta['sfh']['dt_min'] = 0.5 
         theta['sfh']['dt_max'] = 0.5 
         theta['sfh']['sigma'] = 0.3 
+    elif run == 'randomSFH_1gyr':  
+        # random fluctuation SFH where fluctuations 
+        # happen on fixed 0.5 Gyr timescales  
+        theta['sfh'] = {'name': 'random_step_fluct'} 
+        theta['sfh']['dt_min'] = 1. 
+        theta['sfh']['dt_max'] = 1. 
+        theta['sfh']['sigma'] = 0.3 
     elif run == 'randomSFH_integtest':  
         # random fluctuation SFH where fluctuations 
         # happen on fixed 0.5 Gyr timescales  
