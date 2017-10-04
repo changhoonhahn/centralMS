@@ -147,8 +147,8 @@ def model(run, args, **kwargs):
         # random fluctuation SFH where fluctuations 
         # happen on fixed longer 1 Gyr timescales  
         theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 10.
-        theta['sfh']['dt_max'] = 10. 
+        theta['sfh']['dt_min'] = 5.
+        theta['sfh']['dt_max'] = 5. 
         theta['sfh']['sigma'] = 0.3 
     elif run == 'rSFH_r1.0_most': 
         theta['sfh'] = {'name': 'random_step_most_abias'}
