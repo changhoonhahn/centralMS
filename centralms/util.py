@@ -27,6 +27,12 @@ def fig_dir():
     return dat_dir()+'fig/'
 
 
+def tex_dir(): 
+    ''' 
+    '''
+    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/tex/'
+
+
 def bar_plot(bin_edges, values): 
     ''' Take outputs from numpy histogram and return pretty bar plot
     '''

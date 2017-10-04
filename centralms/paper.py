@@ -111,7 +111,7 @@ def SFHmodel(nsnap0=15):
     sub2.set_ylabel('$\Delta \mathtt{log(\;SFR\;[M_\odot/yr])}$', fontsize=25)
     sub2.yaxis.tick_right()
     sub2.yaxis.set_label_position("right")
-    fig.savefig(''.join([UT.fig_dir(), 'sfh_pedagogical.png']), bbox_inches='tight') 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/sfh_pedagogical.png']), bbox_inches='tight') 
     return None 
 
 
