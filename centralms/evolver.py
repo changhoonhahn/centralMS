@@ -103,7 +103,6 @@ class Evolver(object):
         if forTests: 
             self.dlogSFR_amp = sfr_kwargs['dlogSFR_amp']
             self.tsteps = sfr_kwargs['tsteps']
-            #self.logSFR_logM_z = logSFR_logM_z
 
         # get integrated stellar masses 
         logM_integ, logSFRs = _MassSFR_Wrapper(self.SH_catalog, self.nsnap0, 1,  
