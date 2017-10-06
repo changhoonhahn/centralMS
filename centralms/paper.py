@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ''' 
 
 Make figures for paper 
@@ -6,14 +7,73 @@ Make figures for paper
 '''
 import numpy as np 
 from scipy.interpolate import interp1d
+import corner as DFM
 
 import util as UT
 import abcee as ABC
+import catalog as Cat
 import observables as Obvs
 
+import matplotlib as mpl 
 import matplotlib.pyplot as plt 
+from cycler import cycler
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
+from matplotlib import rcParams
+
+mpl.rcParams['text.usetex'] = True
+mpl.rcParams['font.family'] = 'serif'
+mpl.rcParams['axes.linewidth'] = 1.5
+mpl.rcParams['axes.xmargin'] = 1
+mpl.rcParams['xtick.labelsize'] = 'large'
+mpl.rcParams['xtick.major.size'] = 5
+mpl.rcParams['xtick.major.width'] = 1.5
+mpl.rcParams['ytick.labelsize'] = 'large'
+mpl.rcParams['ytick.major.size'] = 5
+mpl.rcParams['ytick.major.width'] = 1.5
+
+def groupcatSFMS(mrange=[10.2,10.4]): 
+    '''Figure of the z~0 group catalog. 
+    Panel a) SFR-M* relation 
+    Panel b) P(SSFR) with SFMS fitting 
+    '''
+    # Read in Jeremy's group catalog  with Mr_cut = -18
+    gc = Cat.Observations('group_catalog', Mrcut=18, position='central')
+    gc_cat = gc.Read() 
+    fig = plt.figure(figsize=(10,5)) 
+
+    # log SFR - log M* highlighting where the SFMS lies 
+    sub1 = fig.add_subplot(1,2,1)
+    DFM.hist2d(gc_cat['mass'], gc_cat['sfr'], color='#ee6a50',
+            levels=[0.68, 0.95], range=[[9., 12.], [-3.5, 1.5]], 
+            plot_datapoints=True, fill_contours=False, plot_density=True, ax=sub1) 
+    #sub1.vlines(mrange[0], -5., 2., color='k', linewidth=2, linestyle='--')
+    #sub1.vlines(mrange[1], -5., 2., color='k', linewidth=2, linestyle='--')
+    #sub1.fill_between(mrange, [2.,2.], [-5.,-5], color='#1F77B4', alpha=0.25)
+    sub1.fill_between(mrange, [2.,2.], [-5.,-5], color='k', linewidth=0, alpha=0.25)
+    sub1.set_xticks([9., 10., 11., 12.])
+    sub1.set_xlabel('log$(\; M_*\; [M_\odot]\;)$', fontsize=20)
+    sub1.set_yticks([-3., -2., -1., 0., 1.])
+    sub1.set_ylabel('log$(\; \mathrm{SFR}\; [M_\odot/yr]\;)$', fontsize=20)
+    sub1.text(9.2, 1., 'SDSS central galaxies', fontsize=20) 
+
+    # P(log SSFR) 
+    sub2 = fig.add_subplot(1,2,2)
+    inmbin = np.where((gc_cat['mass'] > mrange[0]) & (gc_cat['mass'] < mrange[1]))
+    bedge, pp = np.histogram(gc_cat['ssfr'][inmbin], range=[-14., -9.], bins=32, normed=True)
+    print bedge.sum()
+    pssfr = UT.bar_plot(pp, bedge)
+    sub2.plot(pssfr[0], pssfr[1], c='k', lw=2) 
+    sub2.set_xlim([-9.5, -13.25]) 
+    sub2.set_xticks([-10., -11., -12., -13.])
+    sub2.set_xlabel('log$(\; \mathrm{SSFR}\; [yr^{-1}]\;)$', fontsize=20)
+    sub2.set_ylim([0., 1.1]) 
+    sub2.set_ylabel('$p(\;log\; \mathrm{SSFR}\;)$', fontsize=20)
+    sub2.text(-10., 0.8, '$f_\mathrm{SFMS}=$', fontsize=20) 
+    fig.subplots_adjust(wspace=.3)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/groupcat.png']), bbox_inches='tight') 
+    plt.close()
+    return None
 
 
 def SFHmodel(nsnap0=15):
@@ -116,4 +176,4 @@ def SFHmodel(nsnap0=15):
 
 
 if __name__=="__main__": 
-    SFHmodel()
+    groupcatSFMS()
