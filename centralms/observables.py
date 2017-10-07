@@ -140,7 +140,7 @@ class Fq(object):
             ws = np.repeat(1., ngal)
         else: 
             ws = weights
-        hasw = np.where(weights > 0.)
+        hasw = np.where(ws > 0.)
         
         if isinstance(z_in, np.ndarray): 
             sfr_class = self.SFRcut(mstar[hasw], z_in[hasw], theta_SFMS=theta_SFMS)

@@ -6,31 +6,31 @@ Make figures for paper
 
 '''
 import numpy as np 
-from scipy.interpolate import interp1d
 import corner as DFM
+from scipy.interpolate import interp1d
+from scipy.stats import multivariate_normal as MNorm
+from letstalkaboutquench.fstarforms import fstarforms
 
 import util as UT
 import abcee as ABC
 import catalog as Cat
 import observables as Obvs
 
-import matplotlib as mpl 
-import matplotlib.pyplot as plt 
-from cycler import cycler
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
-from matplotlib import rcParams
-
+import matplotlib as mpl 
+import matplotlib.pyplot as plt 
 mpl.rcParams['text.usetex'] = True
 mpl.rcParams['font.family'] = 'serif'
 mpl.rcParams['axes.linewidth'] = 1.5
 mpl.rcParams['axes.xmargin'] = 1
-mpl.rcParams['xtick.labelsize'] = 'large'
+mpl.rcParams['xtick.labelsize'] = 'x-large'
 mpl.rcParams['xtick.major.size'] = 5
 mpl.rcParams['xtick.major.width'] = 1.5
-mpl.rcParams['ytick.labelsize'] = 'large'
+mpl.rcParams['ytick.labelsize'] = 'x-large'
 mpl.rcParams['ytick.major.size'] = 5
 mpl.rcParams['ytick.major.width'] = 1.5
+
 
 def groupcatSFMS(mrange=[10.2,10.4]): 
     '''Figure of the z~0 group catalog. 
@@ -41,6 +41,12 @@ def groupcatSFMS(mrange=[10.2,10.4]):
     gc = Cat.Observations('group_catalog', Mrcut=18, position='central')
     gc_cat = gc.Read() 
     fig = plt.figure(figsize=(10,5)) 
+
+    # fit the SFMS using lettalkaboutquench sfms fitting
+    fSFMS = fstarforms() 
+    fit_logm, fit_logsfr = fSFMS.fit(gc_cat['mass'], gc_cat['sfr'], method='gaussmix', fit_range=mrange)
+    _, fit_fsfms = fSFMS.frac_SFMS()
+    i_fit = np.abs(fit_logm - np.mean(mrange)).argmin()
 
     # log SFR - log M* highlighting where the SFMS lies 
     sub1 = fig.add_subplot(1,2,1)
@@ -55,21 +61,35 @@ def groupcatSFMS(mrange=[10.2,10.4]):
     sub1.set_xlabel('log$(\; M_*\; [M_\odot]\;)$', fontsize=20)
     sub1.set_yticks([-3., -2., -1., 0., 1.])
     sub1.set_ylabel('log$(\; \mathrm{SFR}\; [M_\odot/yr]\;)$', fontsize=20)
-    sub1.text(9.2, 1., 'SDSS central galaxies', fontsize=20) 
+    sub1.text(0.95, 0.1, 'SDSS central galaxies',
+            ha='right', va='center', transform=sub1.transAxes, fontsize=20)
 
     # P(log SSFR) 
     sub2 = fig.add_subplot(1,2,2)
     inmbin = np.where((gc_cat['mass'] > mrange[0]) & (gc_cat['mass'] < mrange[1]))
     bedge, pp = np.histogram(gc_cat['ssfr'][inmbin], range=[-14., -9.], bins=32, normed=True)
-    print bedge.sum()
     pssfr = UT.bar_plot(pp, bedge)
     sub2.plot(pssfr[0], pssfr[1], c='k', lw=2) 
+    # overplot GMM component for SFMS
+    gmm_weights = fSFMS._gmix_weights[i_fit]
+    gmm_means = fSFMS._gmix_means[i_fit]
+    gmm_vars = fSFMS._gmix_covariances[i_fit]
+    icomp = gmm_means.argmax()
+    xx = np.linspace(-14., -9, 100)
+    sub2.fill_between(xx, np.zeros(len(xx)), gmm_weights[icomp]*MNorm.pdf(xx, gmm_means[icomp], gmm_vars[icomp]), 
+            color='#1F77B4', linewidth=0)
+
     sub2.set_xlim([-9.5, -13.25]) 
     sub2.set_xticks([-10., -11., -12., -13.])
     sub2.set_xlabel('log$(\; \mathrm{SSFR}\; [yr^{-1}]\;)$', fontsize=20)
-    sub2.set_ylim([0., 1.1]) 
-    sub2.set_ylabel('$p(\;log\; \mathrm{SSFR}\;)$', fontsize=20)
-    sub2.text(-10., 0.8, '$f_\mathrm{SFMS}=$', fontsize=20) 
+    sub2.set_ylim([0., 1.5]) 
+    sub2.set_yticks([0., 0.5, 1., 1.5])
+    sub2.set_ylabel('$p(\;\mathrm{log}\; \mathrm{SSFR}\;)$', fontsize=20)
+    # mass bin 
+    sub2.text(0.5, 0.9, '$'+str(mrange[0])+'< \mathrm{log}\, M_* <'+str(mrange[1])+'$',
+            ha='center', va='center', transform=sub2.transAxes, fontsize=20)
+    sub2.text(0.1, 0.33, '$f_\mathrm{SFMS}='+str(round(fit_fsfms[i_fit],2))+'$',
+            ha='left', va='center', transform=sub2.transAxes, fontsize=20)
     fig.subplots_adjust(wspace=.3)
     fig.savefig(''.join([UT.tex_dir(), 'figs/groupcat.png']), bbox_inches='tight') 
     plt.close()
@@ -176,4 +196,4 @@ def SFHmodel(nsnap0=15):
 
 
 if __name__=="__main__": 
-    groupcatSFMS()
+    groupcatSFMS(mrange=[10.6, 10.8])
