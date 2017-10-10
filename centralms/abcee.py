@@ -51,8 +51,8 @@ def Prior(run, shape='tophat'):
     if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
             'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         # SFMS_zslope, SFMS_mslope
-        prior_min = [0.9, 0.4]
-        prior_max = [1.5, 0.7]
+        prior_min = [1., 0.5, -0.15]
+        prior_max = [1.8, 0.8, -0.06]
     else:
         raise NotImplementedError
 
@@ -212,7 +212,7 @@ def model(run, args, **kwargs):
         raise NotImplementedError
 
     # SFMS slopes can change 
-    theta['sfms'] = {'name': 'linear', 'zslope': args[0], 'mslope': args[1]}
+    theta['sfms'] = {'zslope': args[0], 'mslope': args[1], 'offset': args[2]}
 
     # load in Subhalo Catalog (pure centrals)
     if 'sigma_smhm' in kwargs.keys(): 
@@ -312,7 +312,7 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
     # summary statistics of data 
     data_kwargs = {} 
     data_kwargs['nsnap0'] = run_kwargs['nsnap0']
-    data_kwargs['sigma_smhm'] = run_kwargs['sigma_smhm']
+    data_kwargs['sigma_smhm'] = 0.2 #run_kwargs['sigma_smhm']
 
     data_sum = SumData(sumstat, **data_kwargs)
 
@@ -374,7 +374,7 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
         Writeout('eps', run, None)
 
     print '----------------------------------------'
-    for pool in abcpmc_sampler.sample(prior_obj, eps, pool=init_pool):
+    for pool in abcpmc_sampler.sample(prior_obj, eps):#, pool=init_pool):
         print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
         print 'eps ', eps(pool.t)
         Writeout('eps', run, pool)
@@ -683,4 +683,3 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
             fig.savefig(figure, bbox_inches='tight')
             plt.close()
     return None 
-

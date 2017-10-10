@@ -84,14 +84,14 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     sub2.set_xlabel('log$(\; \mathrm{SSFR}\; [\mathrm{yr}^{-1}]\;)$', fontsize=20)
     sub2.set_ylim([0., 1.5]) 
     sub2.set_yticks([0., 0.5, 1., 1.5])
-    sub2.set_ylabel('$p(\;\mathrm{log}\; \mathrm{SSFR}\;)$', fontsize=20)
+    sub2.set_ylabel('$p\,(\;\mathrm{log}\; \mathrm{SSFR}\;)$', fontsize=20)
     # mass bin 
     sub2.text(0.5, 0.9, '$'+str(mrange[0])+'< \mathrm{log}\, M_* <'+str(mrange[1])+'$',
             ha='center', va='center', transform=sub2.transAxes, fontsize=20)
     sub2.text(0.1, 0.33, '$f_\mathrm{SFMS}='+str(round(fit_fsfms[i_fit],2))+'$',
             ha='left', va='center', transform=sub2.transAxes, fontsize=20)
     fig.subplots_adjust(wspace=.3)
-    fig.savefig(''.join([UT.tex_dir(), 'figs/groupcat.png']), bbox_inches='tight') 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/groupcat.pdf']), bbox_inches='tight', dpi=150) 
     plt.close()
     return None
 
@@ -111,17 +111,18 @@ def fQ_fSFMS():
 
     # now fit a fSFMS(M*) 
     coeff = np.polyfit(fit_logm, fit_fsfms, 1)
-    print coeff
 
     # output f_SFMS to data (for posterity)
     f = open(''.join([UT.tex_dir(), 'dat/fsfms.dat']), 'w') 
     f.write('### header ### \n') 
     f.write('star-formation main sequence (SFMS) fraction: fraction of galaxies \n') 
     f.write('within a log-normal fit of the SFMS. See paper for details.\n') 
+    f.write('best-fit f_SFMS = '+str(round(coeff[0], 3))+' log M* + '+str(round(coeff[1],3))+'\n')
     f.write('columns: log M*, f_SFMS\n') 
     f.write('### header ### \n') 
     for i_m in range(len(fit_logm)): 
         f.write('%f \t %f' % (fit_logm[i_m], fit_fsfms[i_m]))
+        f.write('\n')
     f.close() 
     
     # best-fit quiescent fraction from Hahn et al. (2017) 
@@ -130,17 +131,21 @@ def fQ_fSFMS():
     pretty_colors = prettycolors()  
     fig = plt.figure(figsize=(5,5)) 
     sub = fig.add_subplot(111)
-    sub.scatter(fit_logm, 1. - fit_fsfms, lw=0) 
+    sub.scatter(fit_logm, 1. - fit_fsfms, lw=0, c=pretty_colors[1]) 
     marr = np.linspace(9., 12., 100) 
-    sub.plot(marr, f_Q_cen(marr), c=pretty_colors[3], lw=2,
-            label='Hahn et al.(2017)\n $f_\mathrm{Q}^\mathrm{cen}(M_*, z\sim0)$')
+    fsfms_bf = sub.plot(marr, 1-(coeff[0]*marr + coeff[1]), c=pretty_colors[1], lw=2, ls='-')
+    fq = sub.plot(marr, f_Q_cen(marr), c=pretty_colors[3], lw=1.5, ls='--')
     sub.set_xlim([9., 11.5])
     sub.set_xticks([9., 10., 11.])
     sub.set_xlabel('log$(\; M_*\; [M_\odot]\;)$', fontsize=25)
     sub.set_ylim([0., 1.])
     sub.set_ylabel('$1 - f_\mathrm{SFMS}$', fontsize=25)
-    sub.legend(loc='upper left', prop={'size': 15})
-    fig.savefig(''.join([UT.tex_dir(), 'figs/fq_fsfms.png']), bbox_inches='tight') 
+
+    legend1 = sub.legend(fsfms_bf, ['$1 - f^\mathrm{bestfit}_\mathrm{SFMS}$'], loc='upper left', prop={'size': 20})
+    sub.legend(fq, ['Hahn et al.(2017)\n $f_\mathrm{Q}^\mathrm{cen}(M_*, z\sim0)$'], loc='lower right', prop={'size': 15})
+    plt.gca().add_artist(legend1)
+
+    fig.savefig(''.join([UT.tex_dir(), 'figs/fq_fsfms.pdf']), bbox_inches='tight', dpi=150) 
     plt.close()
     return None
 
@@ -156,6 +161,7 @@ def SFHmodel(nsnap0=15):
     # Delta log SFR(t) evolution 
     sub2 = fig.add_subplot(122)
     sub2.fill_between([5., 14.], [0.3, 0.3], [-0.3, -0.3], color='k', alpha=0.15, linewidth=0)
+    sub2.fill_between([5., 14.], [0.6, 0.6], [-0.6, -0.6], color='k', alpha=0.05, linewidth=0)
     
     for i_m, method in enumerate(['randomSFH', 'randomSFH_long']): 
         subcat, eev = ABC.model(method, np.array([1.35, 0.6]), nsnap0=nsnap0, 
@@ -250,11 +256,11 @@ def SFHmodel(nsnap0=15):
     #sub2.yaxis.tick_right()
     #sub2.yaxis.set_label_position("right")
     fig.subplots_adjust(wspace=0.4)
-    fig.savefig(''.join([UT.tex_dir(), 'figs/sfh_pedagogical.png']), bbox_inches='tight') 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/sfh_pedagogical.pdf']), bbox_inches='tight', dpi=150) 
     return None 
 
 
 if __name__=="__main__": 
-    #groupcatSFMS(mrange=[10.6,10.8])
-    fQ_fSFMS()
+    groupcatSFMS(mrange=[10.6,10.8])
+    #fQ_fSFMS()
     #SFHmodel(nsnap0=15)

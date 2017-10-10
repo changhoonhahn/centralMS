@@ -504,50 +504,6 @@ def sigSSFR_Qpeak(mstar):
     return 0.18 
 
 
-def SSFR_SFMS(mstar, z_in, theta_SFMS=None): 
-    ''' Model for the average SSFR of the SFMS as a function of M* at redshift z_in.
-    The model takes the functional form of 
-
-    log(SFR) = A * log M* + B * z + C
-
-    '''
-    assert theta_SFMS is not None 
-
-    if theta_SFMS['name'] == 'linear': 
-        # mass slope
-        A_highmass = theta_SFMS['mslope']#0.53
-        A_lowmass = theta_SFMS['mslope']#0.53
-        try: 
-            mslope = np.repeat(A_highmass, len(mstar))
-        except TypeError: 
-            mstar = np.array([mstar])
-            mslope = np.repeat(A_highmass, len(mstar))
-        # z slope
-        zslope = theta_SFMS['zslope']            # 0.76, 1.1
-        # offset 
-        offset = np.repeat(-0.11, len(mstar))
-
-    elif theta_SFMS['name'] == 'kinked': # Kinked SFMS 
-        # mass slope
-        A_highmass = theta_SFMS['mslope_high'] #0.53 
-        A_lowmass = theta_SFMS['mslope_low'] 
-        try: 
-            mslope = np.repeat(A_highmass, len(mstar))
-        except TypeError: 
-            mstar = np.array([mstar])
-            mslope = np.repeat(A_highmass, len(mstar))
-        lowmass = np.where(mstar < 9.5)
-        mslope[lowmass] = A_lowmass
-        # z slope
-        zslope = theta_SFMS['zslope']            # 0.76, 1.1
-        # offset
-        offset = np.repeat(-0.11, len(mstar))
-        offset[lowmass] += A_lowmass - A_highmass 
-
-    mu_SSFR = (mslope * (mstar - 10.5) + zslope * (z_in-0.0502) + offset) - mstar
-    return mu_SSFR
-
-
 def SSFR_SFMS_obvs(mstar, z_in, lit='lee'): 
     ''' SSFR of SFMS derived from best-fit models of the observations 
     '''

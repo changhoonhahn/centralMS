@@ -11,28 +11,22 @@ from scipy.interpolate import interp1d
 
 # --- local --- 
 import util as UT
-import observables as Obvs
-
 import matplotlib.pyplot as plt
 
 
 def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
     ''' initiate log SFR function for Evolver.Evolve() method
     '''
+    mu_sfr0 = SFR_sfms(SHsnaps['m.star0'][indices], UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_sfms)
+
     if theta_sfh['name'] == 'constant_offset':
         # constant d_logSFR 
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
-    
         F_sfr = _logSFR_dSFR 
         sfr_kwargs = {'dSFR': SHsnaps['sfr0'][indices] - mu_sfr0,  # offset
                 'theta_sfms': theta_sfms}
 
     elif theta_sfh['name'] == 'corr_constant_offset': 
         # constant d_logSFR (assigned based on halo accretion rate) 
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
-
         #dSFR0 = SHsnaps['sfr0'][indices] - mu_sfr
 
         # now rank order it based on halo accretion rate
@@ -42,7 +36,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         dm_kind = theta_sfh['dm.kind'] # bins to rank order
     
         # scatter from noise -- subtract intrinsic assembly bias scatter from sig_SFMS 
-        sig_noise = np.sqrt(Obvs.sigSSFR_SFMS(SHsnaps['m.star0'][indices])**2 - theta_sfh['sig_abias']**2)
+        sig_noise = np.sqrt(0.3**2 - theta_sfh['sig_abias']**2)
 
         # slow and inefficient 
 
@@ -80,8 +74,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
         if 'dt_max' not in theta_sfh: 
             raise ValueError
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
                 
         # Random step function duty cycle 
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0']) #'nsnap_start'][indices].max()) 
@@ -116,8 +108,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
         if 'dt_max' not in theta_sfh: 
             raise ValueError
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + SHsnaps['m.star0'][indices]
                 
         # Random step function duty cycle 
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0']) #'nsnap_start'][indices].max()) 
@@ -164,10 +154,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         else: 
             if theta_sfh['sigma_corr'] <= 0.: 
                 raise ValueError("no assembly bias; dont use this SFH")
-
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + \
-                        SHsnaps['m.star0'][indices]
         # first calculate the time at which the SFH changes (random step function duty cycle)
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
         
@@ -267,10 +253,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
         if 'dt_max' not in theta_sfh: 
             raise ValueError
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + \
-                        SHsnaps['m.star0'][indices]
-                
+
         # Random step function duty cycle 
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
         
@@ -385,9 +368,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
         if 'dt_max' not in theta_sfh: 
             raise ValueError
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + \
-                        SHsnaps['m.star0'][indices]
                 
         # Random step function duty cycle 
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
@@ -493,9 +473,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
         if 'dt_max' not in theta_sfh: 
             raise ValueError
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + \
-                        SHsnaps['m.star0'][indices]
                 
         # Random step function duty cycle 
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
@@ -648,9 +625,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             print UT.z_nsnap(SHsnaps['nsnap0']) + theta_sfh['dz_dMh'], UT.z_nsnap(SHsnaps['nsnap0'] + 10)
             raise ValueError
 
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + \
-                        SHsnaps['m.star0'][indices]
         # first calculate the time at which the SFH changes (random step function duty cycle)
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
         
@@ -778,9 +752,6 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             print UT.t_nsnap(SHsnaps['nsnap0']) + theta_sfh['dt_dMh'], UT.t_nsnap(SHsnaps['nsnap0'] + 10)
             raise ValueError
 
-        mu_sfr0 = Obvs.SSFR_SFMS(SHsnaps['m.star0'][indices], 
-                UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_SFMS=theta_sfms) + \
-                        SHsnaps['m.star0'][indices]
         # first calculate the time at which the SFH changes (random step function duty cycle)
         del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
         
@@ -897,7 +868,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
 
 
 def _logSFR_dSFR(logmm, zz, dSFR=None, theta_sfms=None): 
-    return Obvs.SSFR_SFMS(logmm, zz, theta_SFMS=theta_sfms) + logmm + dSFR
+    return SFR_sfms(logmm, zz, theta_sfms) + dSFR
 
 
 def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=None, **other_kwargs): 
@@ -905,7 +876,7 @@ def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=Non
     changes at t_steps 
     '''
     # log(SFR) of SF MS 
-    logsfr_sfms = Obvs.SSFR_SFMS(logmm, zz, theta_SFMS=theta_sfms) + logmm
+    logsfr_sfms = SFR_sfms(logmm, zz, theta_SFMS=theta_sfms)
 
     # dlog(SFR) 
     tt = UT.t_of_z(zz, deg=6) # t_cosmic(zz)
@@ -1032,4 +1003,25 @@ def dlogMdt_scipy(logMstar, t, logsfr_M_z, f_retain, zoft, sfr_kwargs):
     dlogMdz = f_retain * np.power(10, tmp) 
 
     return dlogMdz 
+
+
+def SFR_sfms(logm, z, theta): 
+    ''' Average SFR of the SFMS as a function of logm at redshift z, i.e. log SFR(M*, z).
+    The model takes the functional form of 
+        log(SFR) = A * (log M* - logM_fid) + B * (z - z_fid) + C
+    '''
+    assert theta is not None 
+    
+    if 'mslope' not in theta.keys(): 
+        raise ValueError
+    if 'zslope' not in theta.keys(): 
+        raise ValueError
+    if 'offset' not in theta.keys(): 
+        raise ValueError
+
+    return theta['mslope'] * (logm - 10.5) + theta['zslope'] * (z - 0.0502) + theta['offset'] 
+
+
+def SSFR_sfms(logm, z, theta): 
+    return SFR_sfms(logm, z, theta) - logm 
 

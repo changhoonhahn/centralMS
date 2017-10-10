@@ -49,7 +49,6 @@ Andrew R.~Wetzel\altaffilmark{3,4,5}}
 
 \begin{abstract}
     \todo{motivation, methodology, impact.}
-    
     In observations star forming galaxies form a tight $log\;M_*$ to $log\;SFR$ 
     relation referred to as the {\em star formation main sequence} (SFMS) out to $z\sim2$. 
     Beyond the evolution ``along'' this SFMS, however, the star formation histories of star 
@@ -87,22 +86,27 @@ galaxies: star formation -- cosmology: observations.}
 \item Maybe talk about how the bigger context of why this is important?  
 \item Why only centrals -- because our current best understanding of satellites is that they quench after infall, so it doesn't make sense to look at them
 \eitem 
-\section{sims and obvs}  
+\section{Central Galaxies of SDSS DR7}
+\todo{abridged version of the same section}
 
 \section{Star Forming Central Galaxies}  
 In this section we describe how we 
-\subsection{Selecting $z \sim 0$ Star Forming Central Galaxies}  
+\subsection{Simulated Central Galaxies}
+\todo{abridged version of the same section}
 
-\begin{itemize}
-    \item Describe how $f_{SFMS}$ is calculated. Reference to Tjitske in prep 
-    \item Figure of $f_{Q}$ vs $f_{SFMS}$ to illustrate/sanity-check $f_{SFMS}$ 
-    \item Then explain how it's not circular because the integrated $M_*$ has to reproduce the same SMF
-\end{itemize}
+\subsection{Selecting $z \sim 0$ Star Forming Central Galaxies}  
+\bitem
+\item Describe how $f_{SFMS}$ is calculated. Reference to Tjitske in prep 
+\item Then explain how it's not circular because the integrated $M_*$ has to reproduce the same SMF
+\eitem
 
 \subsection{Evolving along the Main Sequence} 
 \bitem
-    \item Talk about the SFR and $M_*$ prescriptions 
-    \item Pedagogical figure describing the SFH model: two panel one SFR as a function of time, the other residual log SFR as a funciton of time for different prescriptions
+\item Talk about the SFR and $M_*$ prescriptions 
+\item parameterization of SFMS 
+\item explicitly talk about the free parameters of the model. 
+\item priors for $\beta_M$ and $\beta_z$ encompass the observable constraints 
+\item talk about inference using ABC
 \eitem
 
 \section{The duty cycle of star formation}
@@ -126,11 +130,13 @@ In this section we describe how we
 \item Test the SMHMR for Louis's SFHs 
 \eitem 
 
+\section{Discussion} \label{sec:discussion}
+
 \section{Summary} \label{sec:summary}
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\textwidth]{figs/groupcat.png}
+\includegraphics[width=0.9\textwidth]{figs/groupcat.pdf}
 \caption{SDSS DR7 Group Catalog. Fitting of the SFMS.}
 \label{fig:groupcat}
 \end{center}
@@ -138,7 +144,15 @@ In this section we describe how we
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\textwidth]{figs/sfh_pedagogical.png}
+\includegraphics[width=0.5\textwidth]{figs/fq_fsfms.pdf}
+\caption{SFMS fraction versus quiescent fraction from Hahn}
+\label{fig:fq_fsfms}
+\end{center}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figs/sfh_pedagogical.pdf}
 \caption{Pedagogical figure that illustrates how star forming central galaxies in our model
 evolve along the SFMS.}
 \label{fig:sfh_model}

@@ -10,7 +10,6 @@ from scipy.integrate import odeint
 
 import util as UT 
 import sfh as SFH
-import observables as Obvs
 
 
 def defaultTheta(sfh): 
@@ -19,10 +18,7 @@ def defaultTheta(sfh):
     theta = {} 
 
     theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
-    theta['sfms'] = {'name': 'linear', 
-            'zslope': 1.05,#14, 
-            'mslope':0.53}
-    #theta['sfms'] = {'name': 'kinked', 'zslope': 1.1, 'mslope_high':0.53, 'mslope_low': 0.65}
+    theta['sfms'] = {'zslope': 1.05, 'mslope':0.58, 'offset': -0.1}
     theta['fq'] = {'name': 'cosmos_tinker'}
     theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
     theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
@@ -73,7 +69,6 @@ class Evolver(object):
 
         Parameters
         ----------
-
         PCH_catalog : (obj)
             Object with catalog of subhalo accretion histories
     
@@ -92,9 +87,9 @@ class Evolver(object):
         self.SH_catalog = PCH_catalog
 
     def newEvolve(self, forTests=False): 
-        ''' Evolve the galaxies from initial conditions specified in self.Initiate()
+        ''' Evolve the galaxies from initial conditions specified in self.InitSF()
         '''
-        # galaxies in the subhalo snapshots (SHcat) that are SF throughout 
+        # SF galaxies selected by self.InitSF
         isSF = np.where(self.SH_catalog['gclass'] == 'sf')[0] 
     
         # initiate logSFR(logM, z) function and keywords
@@ -151,14 +146,12 @@ class Evolver(object):
 
         ngal = len(self.SH_catalog['m.star'])
         
-        qf = Obvs.Fq() # qf object
-    
         # pick SF subhalos based on f_SFMS(M_SHAM) at snapshot 1 
-        f_sfms = 1. - qf.model(self.SH_catalog['m.star'], UT.z_nsnap(1), lit=self.theta_fq['name']) 
-        rand = np.random.uniform(0., 1., len(self.SH_catalog['m.star'])) 
+        f_sfms = 1. - Fsfms(self.SH_catalog['m.star']) 
+        rand = np.random.uniform(0., 1., ngal) 
         isSF = np.where(rand < f_sfms)
 
-        # first determine initial subhalo and stellar mass
+        # determine initial subhalo and stellar mass
         m0, hm0 = np.zeros(ngal), np.zeros(ngal)
         for i in range(1, self.nsnap0+1): # "m.star" from subhalo catalog is from SHAM
             if i == 1: 
@@ -177,14 +170,11 @@ class Evolver(object):
 
         self.SH_catalog['m.star0'] = m0 # initial SHAM stellar mass 
         self.SH_catalog['halo.m0'] = hm0 # initial subhalo mass 
-
+        
+        # assign initial SFRs
         self.SH_catalog['sfr0'] = np.repeat(-999., ngal)
-        ssfr_sfms = Obvs.SSFR_SFMS(
-                m0[isSF], 
-                UT.z_nsnap(self.SH_catalog['nsnap_start'][isSF]),
-                theta_SFMS=self.theta_sfms)
-
-        self.SH_catalog['sfr0'][isSF] = ssfr_sfms + np.random.randn(len(isSF[0])) * Obvs.sigSSFR_SFMS(m0[isSF]) + m0[isSF]
+        self.SH_catalog['sfr0'][isSF] = SFH.SFR_sfms(m0[isSF], UT.z_nsnap(self.SH_catalog['nsnap_start'][isSF]), 
+                self.theta_sfms) + 0.3 * np.random.randn(len(isSF[0]))
         self.SH_catalog['gclass'] = UT.replicate('', ngal)
         self.SH_catalog['gclass'][isSF] = 'sf'
         return None
@@ -306,3 +296,11 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
     logSFRs[isSF] = logSFR_logM_z(logM_integ[isSF, -1], UT.z_nsnap(nsnapf), **sfr_kwargs) 
     
     return logM_integ, logSFRs
+
+
+def Fsfms(mm): 
+    ''' Star Formation Main Sequence fraction as a function of log M*.
+    See paper.py to see how f_SFMS was estimated for each stellar mass 
+    from the SDSS Group Catalog. 
+    '''
+    return -0.634 * mm + 6.898
