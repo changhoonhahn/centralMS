@@ -1016,12 +1016,10 @@ def SFR_sfms(logm, z, theta):
         raise ValueError
     if 'zslope' not in theta.keys(): 
         raise ValueError
-    if 'offset' not in theta.keys(): 
-        raise ValueError
-
-    return theta['mslope'] * (logm - 10.5) + theta['zslope'] * (z - 0.0502) + theta['offset'] 
+    #if 'offset' not in theta.keys(): 
+    #    raise ValueError
+    return theta['mslope'] * (logm - 10.5) + theta['zslope'] * (z - 0.05) - 0.11 
 
 
 def SSFR_sfms(logm, z, theta): 
     return SFR_sfms(logm, z, theta) - logm 
-
