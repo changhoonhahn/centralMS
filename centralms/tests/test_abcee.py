@@ -505,7 +505,7 @@ if __name__=='__main__':
     #tduty_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', np.array([1.35, 0.6]), sigma_smhm=0.2)
     #test_tdelay_dt_grid('rSFH_r0.99_delay_dt_test', 0.5)
     #test_tduty_tdelay_dt_grid_best('rSFH_r0.99_delay_dt_test')
-    test_tduty_tdelay_dt_grid_dtaxis('rSFH_r0.99_delay_dt_test', 1., 0.)
+    #test_tduty_tdelay_dt_grid_dtaxis('rSFH_r0.99_delay_dt_test', 1., 0.)
     #test_Mh_SFR('rSFH_r_delay_dt_test', np.array([1.35, 0.6, 0.99, 10., 0., 1.])) 
 
     #abcee.qaplotABC('rSFH_r0.99_delay_dt_test', 10, sigma_smhm=0.2, theta=np.array([1.35, 0.6, 2.]), figure=UT.fig_dir()+'testing.dMmax.png') 
@@ -515,7 +515,7 @@ if __name__=='__main__':
     #test_qaplotABC('test0', 9)
     #test_ABCsumstat('randomSFH', 7)
     #sfh_name = 'rSFH_r0.99_delay'
-    #sfh_name = 'randomSFH_short'
+    sfh_name = 'randomSFH_short'
+    test_plotABC(sfh_name, 9)
     #for t in [9]: #range(10)[::-1]: #[5,6]: #range(5):
-    #    #test_plotABC(sfh_name, t)
     #    test_qaplotABC(sfh_name, t)

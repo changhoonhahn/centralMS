@@ -251,7 +251,11 @@ def SumSim(sumstat, subcat, info=False): #, **sim_kwargs):
     for stat in sumstat: 
         if stat == 'smf': # stellar mass function 
             marr_fixed = np.arange(9., 12.2, 0.2)
-            smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], m_arr=marr_fixed)
+            try:
+                smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], m_arr=marr_fixed)
+            except ValueError: 
+                smf = [0.5*(marr_fixed[:-1]+marr_fixed[1:]), np.zeros(len(marr_fixed)-1)]
+
             if not info: 
                 sum = smf[1] # phi 
             else: 
