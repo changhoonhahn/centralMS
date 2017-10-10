@@ -19,6 +19,7 @@ import observables as Obvs
 import util as UT
 import catalog as Cat
 import evolver as Evol
+import sfh as SFH
 
 import matplotlib.pyplot as plt 
 
@@ -626,9 +627,9 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
 
     # observations 
     m_arr = np.arange(8., 12.1, 0.1)
-    ssfr_arr = Obvs.SSFR_SFMS(m_arr, UT.z_nsnap(1), theta_SFMS=subcat_sim['theta_sfms'])
-    sub.plot(m_arr, ssfr_arr+m_arr+0.3, ls='--', c='k') 
-    sub.plot(m_arr, ssfr_arr+m_arr-0.3, ls='--', c='k') 
+    sfr_arr = SFH.SFR_sfms(m_arr, UT.z_nsnap(1), subcat_sim['theta_sfms'])
+    sub.plot(m_arr, sfr_arr+0.3, ls='--', c='k') 
+    sub.plot(m_arr, sfr_arr-0.3, ls='--', c='k') 
 
     sub.set_xlim([8., 12.])
     sub.set_xlabel('$\mathtt{log\;M_*}$', fontsize=25)
@@ -654,13 +655,11 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
     for i_snap in range(1, nsnap0): 
         if i_snap == 1: 
             sfr = subcat_sim['sfr'][i_r]
-            sfr_ms = Obvs.SSFR_SFMS(subcat_sim['m.star'][i_r], UT.z_nsnap(i_snap), theta_SFMS=subcat_sim['theta_sfms']) + \
-                                    subcat_sim['m.star'][i_r], 
+            sfr_ms = SFH.SFR_sfms(subcat_sim['m.star'][i_r], UT.z_nsnap(i_snap), subcat_sim['theta_sfms']) 
             dlogsfrs[:,0] =  sfr - sfr_ms 
         else: 
             sfr = subcat_sim['sfr.snap'+str(i_snap)][i_r]
-            sfr_ms = Obvs.SSFR_SFMS(subcat_sim['m.star.snap'+str(i_snap)][i_r], UT.z_nsnap(i_snap), theta_SFMS=subcat_sim['theta_sfms']) + \
-                    subcat_sim['m.star.snap'+str(i_snap)][i_r]
+            sfr_ms = SFH.SFR_sfms(subcat_sim['m.star.snap'+str(i_snap)][i_r], UT.z_nsnap(i_snap), subcat_sim['theta_sfms']) 
             dlogsfrs[:,i_snap-1] = sfr - sfr_ms 
 
     for i in range(dlogsfrs.shape[0]): 
