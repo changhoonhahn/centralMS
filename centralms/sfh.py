@@ -876,7 +876,7 @@ def _logSFR_dSFR_tsteps(logmm, zz, tsteps=None, dlogSFR_amp=None, theta_sfms=Non
     changes at t_steps 
     '''
     # log(SFR) of SF MS 
-    logsfr_sfms = SFR_sfms(logmm, zz, theta_SFMS=theta_sfms)
+    logsfr_sfms = SFR_sfms(logmm, zz, theta_sfms)
 
     # dlog(SFR) 
     tt = UT.t_of_z(zz, deg=6) # t_cosmic(zz)

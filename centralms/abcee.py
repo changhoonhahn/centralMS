@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 
 def Theta(run): 
     tt = {} 
-    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
+    if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
             'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         tt['variable'] = ['SFMS z slope', 'SFMS m slope']#, 'SFMS offset']
         tt['label'] = ['$m_{z; SFMS}$', '$m_{M_*; SFMS}$']#, '$c_\mathrm{SFMS}$']
@@ -49,7 +49,7 @@ def Prior(run, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if run in ['test0', 'randomSFH', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
+    if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
             'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [1., 0.4]#, -0.15]
