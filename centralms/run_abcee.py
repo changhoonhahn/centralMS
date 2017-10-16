@@ -27,7 +27,7 @@ if n_sum == 1:       # SSFR only distance metric
 else: 
     raise ValueError 
     
-eps0 = [10. for i in range(n_sum)]
+eps0 = [1.e5 for i in range(n_sum)]
 
 # plus some hardcoded kwargs
 nsnap0=15 # starting snapshot 

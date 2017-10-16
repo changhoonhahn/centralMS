@@ -350,8 +350,8 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
     def Rho(simsum, datsum): 
         nonzero = np.where((simsum[0] > 0.) & (datsum[0] > 0.)) # preventing nans  
         n_bins = len(nonzero[0]) # number of bins 
-
-        return np.sum((simsum[0][nonzero] - datsum[0][nonzero])**2)/float(n_bins)/(phi_err**2)
+	#print np.sum((simsum[0][nonzero] - datsum[0][nonzero])**2/(phi_err[nonzero]**2))/float(n_bins)
+        return np.sum((simsum[0][nonzero] - datsum[0][nonzero])**2/(phi_err[nonzero]**2))/float(n_bins)
 
     init_pool = None 
     # for restarting ABC (use with caution)
