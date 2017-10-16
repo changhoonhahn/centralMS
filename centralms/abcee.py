@@ -344,7 +344,7 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
     # get uncertainties of central SMF
     _, _, phi_err = Obvs.MF_data(source='li-white', m_arr=m_arr)
     # now scale err by f_cen 
-    phi_err *= np.sqrt(1./(1.-Obvs.f_sat(m_arr, 0.05)))
+    phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in m_arr])))
 
     # distance metric 
     def Rho(simsum, datsum): 

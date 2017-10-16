@@ -23,11 +23,11 @@ def f_sat(logm, z):
     '''
     if logm < 10.: 
         b0, b1 = 0.33, -0.055
-    elif 10. < logm < 10.5: 
+    elif 10. <= logm < 10.5: 
         b0, b1 = 0.3, -0.073
-    elif 10.5 < logm < 11.: 
+    elif 10.5 <= logm < 11.: 
         b0, b1 = 0.25, -0.11
-    elif 11. < logm: 
+    elif 11. <= logm : 
         b0, b1 = 0.17, -0.1
     return b0 + b1 * z
 
