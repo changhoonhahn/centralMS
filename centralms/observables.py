@@ -82,7 +82,7 @@ def getMF(masses, weights=None, m_arr=None, box=250, h=0.7):
     dlogm = dm_arr[0]
 
     # calculate logM bin edges
-    mbin_edges = np.append(m_arr - 0.5*dlogm, marr[-1] + 0.5*dlogm) 
+    mbin_edges = np.append(m_arr - 0.5*dlogm, m_arr[-1] + 0.5*dlogm) 
 
     Ngal,_ = np.histogram(masses, bins=mbin_edges, weights=w_arr) # number of galaxies in mass bin  
 
