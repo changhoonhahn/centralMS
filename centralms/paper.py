@@ -12,6 +12,7 @@ from scipy.stats import multivariate_normal as MNorm
 from letstalkaboutquench.fstarforms import fstarforms
 
 import util as UT
+import sfh as SFH 
 import abcee as ABC
 import catalog as Cat
 import observables as Obvs
@@ -260,7 +261,94 @@ def SFHmodel(nsnap0=15):
     return None 
 
 
+def qaplotABC(run, T):
+    ''' 
+    '''
+    nsnap0 = 15
+    sigma_smhm = 0.2
+    sumstat = ['smf']
+    # get median theta from ABC runs 
+    abcout = ABC.readABC(run, T)
+    theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+
+    subcat_dat = ABC.Data(nsnap0=nsnap0, sigma_smhm=sigma_smhm) # 'data'
+    sumdata = ABC.SumData(sumstat, info=True, nsnap0=nsnap0, sigma_smhm=sigma_smhm)  
+
+    subcat_sim = ABC.model(run, theta_med, 
+            nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+    sumsim = ABC.SumSim(sumstat, subcat_sim, info=True)
+
+    fig = plt.figure(figsize=(16,5))
+    # get uncertainties of central SMF
+    _, _, phi_err = Obvs.MF_data(source='li-white', m_arr=sumdata[0][0])
+    # now scale err by f_cen 
+    phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in sumdata[0][0]])))
+    
+    # SMF panel 
+    sub = fig.add_subplot(1,3,1)
+    sub.errorbar(sumdata[0][0], sumdata[0][1], yerr=phi_err, fmt='.k', label='$f_\mathrm{cen} \Phi^{\mathrm{Li}\&\mathrm{White}(2009)}$')
+    sub.plot(sumsim[0][0], sumsim[0][1], label='Model')
+    sub.set_xlim([9.5, 12.])
+    sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
+    sub.set_ylim([1e-6, 10**-1.75])
+    sub.set_yscale('log')
+    sub.set_ylabel('log $(\;\Phi\;)$', fontsize=25)
+    sub.legend(loc='lower left', prop={'size':20}) 
+
+    # SFMS panel 
+    isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+
+    sub = fig.add_subplot(1,3,2)
+    DFM.hist2d(
+            subcat_sim['m.star'][isSF], 
+            subcat_sim['sfr'][isSF], 
+            weights=subcat_sim['weights'][isSF], 
+            levels=[0.68, 0.95], range=[[9., 12.], [-3., 1.]], color='#1F77B4', 
+            bins=16, plot_datapoints=False, fill_contours=False, plot_density=True, ax=sub) 
+    # observations 
+    #m_arr = np.arange(8., 12.1, 0.1)
+    #sfr_arr = SFH.SFR_sfms(m_arr, UT.z_nsnap(1), subcat_sim['theta_sfms'])
+    #sub.plot(m_arr, sfr_arr+0.3, ls='--', c='k') 
+    #sub.plot(m_arr, sfr_arr-0.3, ls='--', c='k') 
+    sub.set_xlim([9., 12.])
+    sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
+    sub.set_ylim([-3., 1.])
+    sub.set_yticks([-3., -2., -1., 0., 1.])
+    sub.set_ylabel('log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}])$', fontsize=25)
+
+    sub = fig.add_subplot(1,3,3)
+    smhmr = Obvs.Smhmr()
+    # simulation 
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+            dmhalo=0.5, weights=subcat_sim['weights'][isSF])
+    sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
+    #sub.scatter(m_mid, sig_mhalo, c='#1F77B4', label='Model') 
+    #sig_sim = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
+    # data 
+    #m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 
+    #        dmhalo=0.2, weights=subcat_dat['weights'][isSF])
+    #sub.plot(m_mid, sig_mhalo, c='k', ls='--', label='SHAM') 
+    #sig_dat = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
+    
+    # mark sigma_M*(M_h = 10^12) 
+    #sub.text(0.95, 0.9, 
+    #        ''.join(['$\sigma^{(s)}_{M_*}(M_h = 10^{12} M_\odot) = ', str(round(sig_sim,2)), '$ \n', 
+    #            '$\sigma^{(d)}_{M_*}(M_h = 10^{12} M_\odot) = ', str(round(sig_dat,2)), '$']), 
+    #        fontsize=15, ha='right', va='top', transform=sub.transAxes)
+
+    sub.set_xlim([10., 15.])
+    sub.set_xlabel('log $(\; M_\mathrm{halo}\; [M_\odot]\;)$', fontsize=25)
+    sub.set_ylim([0., 0.6])
+    sub.set_ylabel('$\sigma_{\mathrm{log}\,M_*}$', fontsize=25)
+
+    fig.subplots_adjust(wspace=0.3)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/qaplot_abc_', run, '_t', str(T), '.pdf']), bbox_inches='tight', dpi=150) 
+    plt.close()
+    return None 
+
+
 if __name__=="__main__": 
-    groupcatSFMS(mrange=[10.6,10.8])
+    qaplotABC('randomSFH_short', 9)
+    #groupcatSFMS(mrange=[10.6,10.8])
     #fQ_fSFMS()
     #SFHmodel(nsnap0=15)
