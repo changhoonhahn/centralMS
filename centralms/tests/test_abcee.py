@@ -15,10 +15,21 @@ import emcee
 
 # --- plotting --- 
 import corner as DFM
-import matplotlib.pyplot as plt 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
-from ChangTools.plotting import prettyplot
+import matplotlib as mpl 
+import matplotlib.pyplot as plt 
+mpl.rcParams['text.usetex'] = True
+mpl.rcParams['font.family'] = 'serif'
+mpl.rcParams['axes.linewidth'] = 1.5
+mpl.rcParams['axes.xmargin'] = 1
+mpl.rcParams['xtick.labelsize'] = 'x-large'
+mpl.rcParams['xtick.major.size'] = 5
+mpl.rcParams['xtick.major.width'] = 1.5
+mpl.rcParams['ytick.labelsize'] = 'x-large'
+mpl.rcParams['ytick.major.size'] = 5
+mpl.rcParams['ytick.major.width'] = 1.5
+mpl.rcParams['legend.frameon'] = False
 from ChangTools.plotting import prettycolors
 
 
@@ -26,11 +37,29 @@ def test_SumData():
     ''' Make sure abcee.SumData returns something sensible with some hardcoded values 
      
     Takes roughly 0.7 seconds 
+    
+    Notes
+    -----
+    * SumData returns sensible SMFs when compared to Li & White (2009) scaled by 
+    1-f_sat from Wetzel et al.(2013).  
     '''
     t0 = time.time() 
-    output = abcee.SumData(['smf'], nsnap0=15, downsampled='14') 
-    print time.time() - t0 , ' seconds'
-    return output
+    output = abcee.SumData(['smf'], info=True, nsnap0=15, sigma_smhm=0.2) 
+    m_arr, phi_arr, err_arr = Obvs.MF_data()
+
+    fcen = np.array([1. - Obvs.f_sat(mm, 0.05) for mm in m_arr]) 
+
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    sub.plot(output[0][0], output[0][1]) 
+    sub.errorbar(m_arr, fcen * phi_arr, yerr=err_arr*np.sqrt(1./fcen)) 
+    sub.set_xlim([9., 12.])
+    sub.set_xlabel('$log\;M_*$', fontsize=25)
+    sub.set_ylim([1e-6, 10**-1.75])
+    sub.set_yscale('log')
+    sub.set_ylabel('$\Phi$', fontsize=25)
+    fig.savefig(''.join([UT.fig_dir(), 'tests/test.SumData.smf.png']), bbox_inches='tight') 
+    return None 
 
 
 def test_SumSim(run):
