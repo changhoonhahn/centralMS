@@ -147,7 +147,7 @@ class Evolver(object):
         ngal = len(self.SH_catalog['m.star'])
         
         # pick SF subhalos based on f_SFMS(M_SHAM) at snapshot 1 
-        f_sfms = 1. - Fsfms(self.SH_catalog['m.star']) 
+        f_sfms = Fsfms(self.SH_catalog['m.star']) 
         rand = np.random.uniform(0., 1., ngal) 
         isSF = np.where(rand < f_sfms)
 
