@@ -14,7 +14,6 @@ import observables as Obvs
 import util as UT
 
 import matplotlib.pyplot as plt 
-import bovy_plot as bovy
 import corner as DFM
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
@@ -100,6 +99,7 @@ def test_Catalog_Downsample(test_type, nsnap0, downsampled='14'):
         
         sub.set_ylim([8., 12.])
     plt.show() 
+    return None 
 
 
 def test_EvolverInitiate_downsample(test, nsnap, nsnap0=20, downsampled=None): 
@@ -560,6 +560,6 @@ def test_EvolverEvolve_downsample(test, nsnap0=20, downsampled=None, sfh='consta
 
 if __name__=="__main__": 
     #test_EvolverEvolve_downsample('smhmr', nsnap0=15, downsampled='14')
-    test_EvolverEvolve_downsample('smf', nsnap0=15, downsampled='14', sfh='random_step_abias2')
+    #test_EvolverEvolve_downsample('smf', nsnap0=15, downsampled='14', sfh='random_step_abias2')
     #for i in [15, 10, 5, 1]: 
     #    test_EvolverInitiate_downsample('sfms', i, nsnap0=15, downsampled='14')
