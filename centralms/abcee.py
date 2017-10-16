@@ -23,6 +23,7 @@ import sfh as SFH
 
 import matplotlib.pyplot as plt 
 
+
 def Theta(run): 
     tt = {} 
     if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
@@ -67,11 +68,11 @@ def Data(**data_kwargs):
     '''
     subhist = Cat.PureCentralSubhalos(nsnap0=data_kwargs['nsnap0'], 
             sigma_smhm=data_kwargs['sigma_smhm'])
-    subcat = subhist.Read(downsampled='14') # full sample
+    subcat = subhist.Read(downsampled='14') # full/downsampled does not make a difference 
     return subcat
 
 
-def SumData(sumstat, info=False, **data_kwargs): 
+def SumData(sumstat, m_arr=np.linspace(9.5, 12.0, 11), info=False, **data_kwargs): 
     ''' Return the summary statistics of data 
     '''
     subcat = Data(**data_kwargs)
@@ -81,9 +82,7 @@ def SumData(sumstat, info=False, **data_kwargs):
         if 'nsnap0' not in data_kwargs.keys():
             raise ValueError
 
-        marr_fixed = np.arange(9., 12.2, 0.2)
-        smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], 
-                m_arr=marr_fixed) 
+        smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], m_arr=m_arr) 
 
         if not info: 
             sum = smf[1] # phi 
@@ -234,7 +233,7 @@ def model(run, args, **kwargs):
             return eev.SH_catalog, eev
 
 
-def SumSim(sumstat, subcat, info=False): #, **sim_kwargs): 
+def SumSim(sumstat, subcat, info=False, m_arr=np.linspace(9.5, 12.0, 11)): #, **sim_kwargs): 
     ''' Return summary statistic of the simulation 
     
     parameters
@@ -251,11 +250,10 @@ def SumSim(sumstat, subcat, info=False): #, **sim_kwargs):
     sums = [] 
     for stat in sumstat: 
         if stat == 'smf': # stellar mass function 
-            marr_fixed = np.arange(9., 12.2, 0.2)
             try:
-                smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], m_arr=marr_fixed)
+                smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], m_arr=m_arr)
             except ValueError: 
-                smf = [0.5*(marr_fixed[:-1]+marr_fixed[1:]), np.zeros(len(marr_fixed)-1)]
+                smf = [m_arr, np.zeros(len(m_arr))]
 
             if not info: 
                 sum = smf[1] # phi 
@@ -269,10 +267,10 @@ def SumSim(sumstat, subcat, info=False): #, **sim_kwargs):
             raise NotImplementedError
         
         sums.append(sum) 
-
     return sums
 
 
+# different distance metric calculations 
 def roe_wrap(sumstat, type='L2'):
     ''' Get it? Wrapper for Rhos or roe wrap. 
     '''
@@ -281,6 +279,19 @@ def roe_wrap(sumstat, type='L2'):
             return L2_logSMF
     else: 
         raise NotImplementedError
+
+
+def L2_logSMF(simsum, datsum): 
+    ''' Measure the L2 norm for the case where the summary statistic 
+    is the log(SMF). 
+    '''
+    if len(simsum[0]) != len(datsum[0]): 
+        raise ValueError
+
+    nonzero = np.where((simsum[0] > 0.) & (datsum[0] > 0.)) # preventing nans  
+    n_bins = len(nonzero[0]) # number of bins 
+
+    return np.sum((np.log10(simsum[0][nonzero]) - np.log10(datsum[0][nonzero]))**2)/np.float(n_bins)
 
 
 def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, 
@@ -315,24 +326,32 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
     prior_obj = Prior(run, shape='tophat')
 
     # summary statistics of data 
+    m_arr = np.linspace(9.5, 12.0, 11) 
     data_kwargs = {} 
     data_kwargs['nsnap0'] = run_kwargs['nsnap0']
     data_kwargs['sigma_smhm'] = 0.2 #run_kwargs['sigma_smhm']
-
-    data_sum = SumData(sumstat, **data_kwargs)
+    data_sum = SumData(sumstat, m_arr=m_arr, **data_kwargs)
 
     # summary statistics of simulation 
     sim_kwargs = {} 
     sim_kwargs['nsnap0'] = run_kwargs['nsnap0']
     sim_kwargs['downsampled'] = run_kwargs['downsampled']
-
     def Sim(tt): 
         sh_catalog = model(run, tt, **sim_kwargs)
-        sums = SumSim(sumstat, sh_catalog)
+        sums = SumSim(sumstat, sh_catalog, m_arr=m_arr)
         return sums 
 
+    # get uncertainties of central SMF
+    _, _, phi_err = MF_data(source='li-white', m_arr=m_arr)
+    # now scale err by f_cen 
+    phi_err *= np.sqrt(1./(1.-Obvs.f_sat(m_arr, 0.05)))
+
     # distance metric 
-    roe = roe_wrap(sumstat, type='L2')
+    def Rho(simsum, datsum): 
+        nonzero = np.where((simsum[0] > 0.) & (datsum[0] > 0.)) # preventing nans  
+        n_bins = len(nonzero[0]) # number of bins 
+
+        return np.sum((simsum[0][nonzero] - datsum[0][nonzero])**2)/float(n_bins)/(phi_err**2)
 
     init_pool = None 
     # for restarting ABC (use with caution)
@@ -350,7 +369,7 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
                 N=N_p,                # N_particles
                 Y=data_sum,             # data
                 postfn=Sim,             # simulator 
-                dist=roe,               # distance function  
+                dist=Rho,               # distance function  
                 pool=mpi_pool)  
 
     except AttributeError: 
@@ -358,7 +377,7 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
                 N=N_p,                # N_particles
                 Y=data_sum,             # data
                 postfn=Sim,            # simulator 
-                dist=roe)           # distance function  
+                dist=Rho)           # distance function  
 
     # Write out all details of the run info 
     write_kwargs = {} 
@@ -403,20 +422,6 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
     if notify and flag_codif: 
         codif.notif(subject=run+' ALL FINISHED')
     return pools 
-
-
-# different distance metric calculations 
-def L2_logSMF(simsum, datsum): 
-    ''' Measure the L2 norm for the case where the summary statistic 
-    is the log(SMF). 
-    '''
-    if len(simsum[0]) != len(datsum[0]): 
-        raise ValueError
-
-    nonzero = np.where((simsum[0] > 0.) & (datsum[0] > 0.)) # preventing nans  
-    n_bins = len(nonzero[0]) # number of bins 
-
-    return np.sum((np.log10(simsum[0][nonzero]) - np.log10(datsum[0][nonzero]))**2)/np.float(n_bins)
 
 
 def Writeout(type, run, pool, **kwargs): 
