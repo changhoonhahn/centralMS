@@ -24,7 +24,7 @@ def dat_dir():
 def fig_dir(): 
     ''' 
     '''
-    return dat_dir()+'fig/'
+    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/fig/'
 
 
 def tex_dir(): 
