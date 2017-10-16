@@ -7,15 +7,71 @@ The main observables are:
 
 
 '''
+import util as UT 
 import numpy as np 
-
 # --- local --- 
 from sham_hack import SMFClass 
 
 
-def getMF(masses, weights=None, m_arr=None, box=250, h=0.7): 
-    ''' Calculate the Mass Function for a given set of masses.
+def f_sat(logm, z): 
+    ''' satellite fraction (Figure 3 b)
+    parameterized as 
+
+    f_sat = B0(logm) + B1(logm) * z 
+
+    Source: Wetzel et al.(2013)
     '''
+    if logm < 10.: 
+        b0, b1 = 0.33, -0.055
+    elif 10. < logm < 10.5: 
+        b0, b1 = 0.3, -0.073
+    elif 10.5 < logm < 11.: 
+        b0, b1 = 0.25, -0.11
+    elif 11. < logm: 
+        b0, b1 = 0.17, -0.1
+    return b0 + b1 * z
+
+
+def MF_data(source='li-white', m_arr=None):
+    ''' Read in observed MFs
+    '''
+    if source == 'li-white': 
+        f = ''.join([UT.dat_dir(), 'observations/li_white_2009.smf.dat'])
+        mlow, mhigh, mmid, phi, err = np.loadtxt(f, unpack=True, usecols=[0,1,2,3,4]) 
+        mlow -= 2.*np.log10(0.7)
+        mhigh -= 2.*np.log10(0.7)
+        mmid -= 2.*np.log10(0.7)
+        phi *= 0.7**3
+        err *= 0.7**3
+        
+        if m_arr is not None: # rebin 
+            phi_arr = np.zeros(len(m_arr))
+            err_arr = np.zeros(len(m_arr))
+            for i, mm in enumerate(m_arr): 
+                phi_arr[i] = phi[(np.abs(mmid - mm)).argmin()] 
+                err_arr[i] = err[(np.abs(mmid - mm)).argmin()] 
+        else: 
+            m_arr = mmid
+            phi_arr = phi
+            err_arr = err
+    return [m_arr, phi_arr, err_arr]
+
+
+def getMF(masses, weights=None, m_arr=None, box=250, h=0.7): 
+    ''' Calculate the Mass Function phi for a given set of masses.
+    Return Phi(m_arr) 
+    '''
+    if not np.all(np.isfinite(masses)): 
+        notfin = np.where(np.isfinite(masses) == False) 
+        print masses[notfin], weights[notfin]
+        #print np.sum(np.isfinite(masses)) 
+        raise ValueError
+    
+    if weights is None: 
+        w_arr = np.repeat(1.0, len(masses))
+    else: 
+        w_arr = weights
+
     if m_arr is None:  # by default assumes it's calculating SMF
         m_arr = np.arange(6.0, 12.1, 0.1) 
 
@@ -23,28 +79,17 @@ def getMF(masses, weights=None, m_arr=None, box=250, h=0.7):
     dm_arr = m_arr[1:] - m_arr[:-1]
     if np.abs(dm_arr - dm_arr[0]).max() > 0.001: 
         raise ValueError('m_arr has to be evenly spaced!')
-
     dlogm = dm_arr[0]
 
-    if weights is None: 
-        w_arr = np.repeat(1.0, len(masses))
-    else: 
-        w_arr = weights
+    # calculate logM bin edges
+    mbin_edges = np.append(m_arr - 0.5*dlogm, marr[-1] + 0.5*dlogm) 
+
+    Ngal,_ = np.histogram(masses, bins=mbin_edges, weights=w_arr) # number of galaxies in mass bin  
 
     vol = box ** 3  # box volume
-    
-    if not np.all(np.isfinite(masses)): 
-        notfin = np.where(np.isfinite(masses) == False) 
-        print masses[notfin], weights[notfin]
-        #print np.sum(np.isfinite(masses)) 
-        raise ValueError
-    
-    Ngal, mbin_edges = np.histogram(masses, bins=m_arr, weights=w_arr) # number of galaxies in mass bin  
-
-    mbin = 0.5 * (mbin_edges[:-1] + mbin_edges[1:]) 
     phi = Ngal.astype('float') / vol /dlogm * h**3
 
-    return [mbin, phi]
+    return [m_arr, phi]
 
 
 def analyticSMF(redshift, m_arr=None, dlogm=0.1, source='li-drory-march'): 
@@ -489,21 +534,6 @@ class Smhmr(object):
         return sig_mstar
 
 
-def SSFR_Qpeak(mstar):  
-    ''' Roughly the average of the log(SSFR) of the quiescent peak 
-    of the SSFR distribution. This is designed to reproduce the 
-    Brinchmann et al. (2004) SSFR limits.
-    '''
-    #return -0.4 * (mstar - 11.1) - 12.61
-    return 0.4 * (mstar - 10.5) - 1.73 - mstar 
-
-
-def sigSSFR_Qpeak(mstar):  
-    ''' Scatter of the log(SSFR) quiescent peak of the SSFR distribution 
-    '''
-    return 0.18 
-
-
 def SSFR_SFMS_obvs(mstar, z_in, lit='lee'): 
     ''' SSFR of SFMS derived from best-fit models of the observations 
     '''
@@ -540,70 +570,5 @@ def SSFR_SFMS_obvs(mstar, z_in, lit='lee'):
         raise NotImplementedError
 
 
-def sigSSFR_SFMS(mstar): #, z_in, theta_SFMS=None): 
-    ''' Scatter of the SFMS logSFR as a function of M* and 
-    redshift z_in. Hardcoded at 0.3 
-    '''
-    return 0.3 
-
-
-def tauQ(mstar, theta_tau={'name': 'instant'}): 
-    ''' Quenching efold models as a function of stellar mass
-    '''
-    type = theta_tau['name']
-
-    if type == 'constant':      # constant tau 
-
-        n_arr = len(mstar) 
-        tau = np.array([0.5 for i in xrange(n_arr)]) 
-
-    elif type == 'linear':      # lienar tau(mass) 
-
-        tau = -(0.8 / 1.67) * ( mstar - 9.5) + 1.0
-        #if np.min(tau) < 0.1: #    tau[ tau < 0.1 ] = 0.1
-         
-    elif type == 'instant':     # instant quenching 
-
-        n_arr = len(mstar) 
-        tau = np.array([0.001 for i in range(n_arr)]) 
-
-    elif type == 'discrete': 
-        # param will give 4 discrete tau at the center of mass bins 
-        masses = np.array([9.75, 10.25, 10.75, 11.25]) 
-
-        tau = np.interp(mstar, masses, param) 
-        tau[ tau < 0.05 ] = 0.05
-
-    elif type == 'linear': 
-        # param will give slope and yint of pivoted tau line 
-        tau = theta_tau['slope'] * (mstar - theta_tau['fid_mass']) + theta_tau['yint']
-        try: 
-            if np.min(tau) < 0.001: 
-                tau[np.where( tau < 0.001 )] = 0.001
-        except ValueError: 
-            pass 
-
-    elif type == 'satellite':   # quenching e-fold of satellite
-
-        tau = -0.57 * ( mstar - 9.78) + 0.8
-        if np.min(tau) < 0.001:     
-            tau[np.where( tau < 0.001 )] = 0.001
-
-    elif type == 'satellite_upper': 
-        tau = -0.57 * ( mstar - 9.78) + 0.8 + 0.15
-        if np.min(tau) < 0.001:     
-            tau[np.where( tau < 0.001 )] = 0.001
-
-    elif type == 'satellite_lower': 
-        tau = -0.57 * ( mstar - 9.78) + 0.8 - 0.15
-        if np.min(tau) < 0.001:     
-            tau[np.where( tau < 0.001 )] = 0.001
-    elif type == 'long':      # long quenching (for qa purposes)
-
-        n_arr = len(mstar) 
-        tau = np.array([2.5 for i in xrange(n_arr)]) 
-
-    else: 
-        raise NotImplementedError('asdf')
-
-    return tau 
+if __name__=="__main__": 
+    print MF_data(source='li-white', m_arr=np.linspace(9., 12., 20))
