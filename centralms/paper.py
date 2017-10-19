@@ -262,7 +262,7 @@ def SFHmodel(nsnap0=15):
 
 
 def qaplotABC(run, T):
-    ''' 
+    ''' Figure that illustrates how the ABC fitting works.
     '''
     nsnap0 = 15
     sigma_smhm = 0.2
@@ -321,7 +321,17 @@ def qaplotABC(run, T):
     # simulation 
     m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
             dmhalo=0.5, weights=subcat_sim['weights'][isSF])
-    sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
+    sub.plot(m_mid, sig_mhalo, c='k', lw=2, label='Model') 
+    
+    for i in range(5): 
+        theta_i = abcout['theta'][i,:]
+        subcat_sim = ABC.model(run, theta_i, 
+                nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+        sumsim = ABC.SumSim(sumstat, subcat_sim, info=True)
+        m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+                dmhalo=0.5, weights=subcat_sim['weights'][isSF])
+        sub.plot(m_mid, sig_mhalo, c='k', lw=1, alpha=0.1) 
+
     #sub.scatter(m_mid, sig_mhalo, c='#1F77B4', label='Model') 
     #sig_sim = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
     # data 

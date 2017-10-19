@@ -546,6 +546,6 @@ if __name__=='__main__':
     #sfh_name = 'rSFH_r0.99_delay'
     sfh_name = 'randomSFH_1gyr' # 'randomSFH_short'
     #test_qaplotABC(sfh_name, 9)
-    for t in range(3)[::-1]: #[5,6]: #range(5):
+    for t in range(7,13)[::-1]: #[5,6]: #range(5):
         test_plotABC(sfh_name, t)
         test_qaplotABC(sfh_name, t)
