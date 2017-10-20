@@ -209,6 +209,12 @@ def test_qaplotABC(run, T):
     return None
 
 
+def test_model_ABCparticle(run, T):  
+    '''
+    '''
+    abcee.model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2)
+    return None 
+
 def test_SFMS_highz(run, T, nsnap=15, lit='lee', nsnap0=15, downsampled='14'): 
     ''' Compare the best-fit SFMS parameters from ABC to literature at high z  
     '''
@@ -545,7 +551,8 @@ if __name__=='__main__':
     #test_ABCsumstat('randomSFH', 7)
     #sfh_name = 'rSFH_r0.99_delay'
     sfh_name = 'randomSFH_1gyr' # 'randomSFH_short'
+    test_model_ABCparticle(sfh_name, 12)
     #test_qaplotABC(sfh_name, 9)
-    for t in range(7,13)[::-1]: #[5,6]: #range(5):
-        test_plotABC(sfh_name, t)
-        test_qaplotABC(sfh_name, t)
+    #for t in range(7,13)[::-1]: #[5,6]: #range(5):
+    #    test_plotABC(sfh_name, t)
+    #    test_qaplotABC(sfh_name, t)

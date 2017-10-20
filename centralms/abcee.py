@@ -4,6 +4,7 @@ use ABC-PMC
 
 '''
 import os 
+import pickle
 import numpy as np
 import abcpmc
 from abcpmc import mpi_util
@@ -523,15 +524,12 @@ def readABC(run, T):
     ''' Read in theta, w, and rho from ABC writeouts
     '''
     dir = UT.dat_dir()+'abc/'+run+'/'
-    
     file = lambda ss, t, r: ''.join([dir, ss, '.t', str(t), '.', r, '.dat'])
     
-    abc_out = {} 
-    # read in theta, w, rho 
+    abc_out = {}    # read in theta, w, rho 
     abc_out['theta'] = np.loadtxt(file('theta', T, run)) 
     abc_out['w'] = np.loadtxt(file('w', T, run))
     abc_out['rho'] = np.loadtxt(file('rho', T, run))
-
     return abc_out
 
 
@@ -707,3 +705,19 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
             fig.savefig(figure, bbox_inches='tight')
             plt.close()
     return None 
+
+
+def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2): 
+    ''' Evaluate and save the forward model evaluated for each of the 
+    particles in the T-th iteration of the ABC run.  
+    '''
+    # read in the abc particles 
+    abcout = readABC(run, T)
+    abc_dir = UT.dat_dir()+'abc/'+run+'/' # directory where all the ABC files are stored
+    
+    # save the median theta separately
+    theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+    subcat_sim = model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+    f = ''.join([abc_dir, 'model.theta_median.t', str(T), '.p'])
+    pickle.dump(subcat_sim, open(f, 'wb'))
+    return None  

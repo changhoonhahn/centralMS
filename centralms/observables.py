@@ -490,15 +490,19 @@ class Smhmr(object):
     def __init__(self, **kwargs): 
         self.kwargs = kwargs.copy()
     
-    def Calculate(self, mhalo, mstar, dmhalo=0.1, weights=None, bells=None, whistles=None):
+    def Calculate(self, mhalo, mstar, dmhalo=0.1, weights=None, m_bin=None, bells=None, whistles=None):
         ''' 
         ''' 
         if weights is not None: 
             if len(mhalo) != len(weights): 
                 raise ValueError('lenghts of mhalo and weights do not match!')
-
-        m_low = np.arange(mhalo.min(), mhalo.max(), dmhalo)
-        m_high = m_low + dmhalo
+        
+        if m_bin is None: 
+            m_low = np.arange(mhalo.min(), mhalo.max(), dmhalo)
+            m_high = m_low + dmhalo
+        else: 
+            m_low = m_bin[:-1]
+            m_high = m_bin[1:]
 
         mu_mstar = np.zeros(len(m_low)) 
         sig_mstar = np.zeros(len(m_low))
