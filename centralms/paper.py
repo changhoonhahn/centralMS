@@ -341,8 +341,8 @@ def qaplotABC(run, T):
         subcat_sim_i = {} 
         for key in f.keys(): 
             subcat_sim_i[key] = f[key].value
-        subcat_sim_i = ABC.model(run, theta_i, 
-                nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+        #subcat_sim_i = ABC.model(run, theta_i, 
+        #        nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
         isSF = np.where(subcat_sim_i['gclass'] == 'sf') # only SF galaxies 
         m_mid_i, _, sig_mhalo_i, cnt_i = smhmr.Calculate(subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
                 dmhalo=0.5, weights=subcat_sim_i['weights'][isSF], m_bin=mhalo_bin)
