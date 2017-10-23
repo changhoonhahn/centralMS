@@ -278,7 +278,7 @@ def qaplotABC(run, T):
     abcout = ABC.readABC(run, T)
     theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
     # read in Model(theta_med) 
-    abc_dir = UT.dat_dir()+'abc/'+run+'/' # directory where all the ABC files are stored
+    abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # directory where all the ABC files are stored
     f = h5py.File(''.join([abc_dir, 'model.theta_median.t', str(T), '.hdf5']), 'r') 
     subcat_sim = {} 
     for key in f.keys(): 

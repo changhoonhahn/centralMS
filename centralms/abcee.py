@@ -713,7 +713,7 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2):
     '''
     # read in the abc particles 
     abcout = readABC(run, T)
-    abc_dir = UT.dat_dir()+'abc/'+run+'/' # directory where all the ABC files are stored
+    abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # directory where all the ABC files are stored
     
     # save the median theta separately
     #theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
