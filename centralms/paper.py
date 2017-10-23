@@ -291,7 +291,7 @@ def qaplotABC(run, T):
     _, _, phi_err = Obvs.MF_data(source='li-white', m_arr=sumdata[0][0]) # get uncertainties of central SMF
     phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in sumdata[0][0]]))) # now scale err by f_cen 
     
-    # SMF panel 
+    # --- SMF panel ---
     sub = fig.add_subplot(1,3,1)
     sub.errorbar(sumdata[0][0], sumdata[0][1], yerr=phi_err, fmt='.k', label='$f_\mathrm{cen} \Phi^{\mathrm{Li}\&\mathrm{White}(2009)}$')
     sub.plot(sumsim[0][0], sumsim[0][1], label=r'model($\theta_\mathrm{median}$)')
@@ -302,14 +302,13 @@ def qaplotABC(run, T):
     sub.set_ylabel('log $(\;\Phi\;)$', fontsize=25)
     sub.legend(loc='lower left', prop={'size':20}) 
 
-    # SFMS panel 
-    isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
-    
-    gc = Cat.Observations('group_catalog', Mrcut=18, position='central')
-    gc_cat = gc.Read() 
-    sub.scatter(gc_cat['mass'], gc_cat['sfr'], s=2)
-
+    # --- SFMS panel ---
     sub = fig.add_subplot(1,3,2)
+
+    isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+    #gc = Cat.Observations('group_catalog', Mrcut=18, position='central')
+    #gc_cat = gc.Read() 
+    #sub.scatter(gc_cat['mass'], gc_cat['sfr'], s=2)
     DFM.hist2d(
             subcat_sim['m.star'][isSF], 
             subcat_sim['sfr'][isSF], 
@@ -366,7 +365,6 @@ def qaplotABC(run, T):
     fig.savefig(''.join([UT.tex_dir(), 'figs/qaplot_abc_', run, '_t', str(T), '.pdf']), bbox_inches='tight', dpi=150) 
     plt.close()
     return None 
-
 
 
 if __name__=="__main__": 
