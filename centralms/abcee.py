@@ -731,7 +731,7 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2):
         subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
         fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
         f = h5py.File(fname, 'w') 
-        for key in ['m.star', 'halo.m', 'm.max', 'weights', 'gclass']: 
+        for key in ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'gclass']: 
             f.create_dataset(key, data=subcat_sim_i[key])
         f.close()
     return None  

@@ -5,6 +5,7 @@ Make figures for paper
 
 
 '''
+import h5py
 import numpy as np 
 import corner as DFM
 from scipy.interpolate import interp1d
@@ -369,7 +370,7 @@ def qaplotABC(run, T):
 
 
 if __name__=="__main__": 
-    qaplotABC('randomSFH_1gyr', 12)
+    qaplotABC('randomSFH_1gyr', 13)
     #groupcatSFMS(mrange=[10.6,10.8])
     #fQ_fSFMS()
     #SFHmodel(nsnap0=15)
