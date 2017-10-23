@@ -367,8 +367,76 @@ def qaplotABC(run, T):
     return None 
 
 
+def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
+    ''' Figure plotting sigmaMstar at M_halo = Mhalo for different 
+    duty cycle time (t_duty). 
+    '''
+    runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr']
+    tduties = [0.5, 1., 2.]  #hardcoded
+    iters = [9, 13, 12] # iterations of ABC
+    nparticles = [1000, 1000, 1000]
+    
+    smhmr = Obvs.Smhmr()
+    
+    sigMstar_med, sigMstar_low, sigMstar_high = [], [], [] 
+    for i_t, tduty in enumerate(tduties): 
+        abc_dir = UT.dat_dir()+'abc/'+runs[i_t]+'/model/' # ABC directory 
+        # theta median
+        f = h5py.File(''.join([abc_dir, 'model.theta_median.t', str(iters[i_t]), '.hdf5']), 'r') 
+        subcat_sim = {} 
+        for key in f.keys(): 
+            subcat_sim[key] = f[key].value
+        isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+
+        sig_mstar_med = smhmr.sigma_logMstar(
+                subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+                weights=subcat_sim['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
+
+        # other thetas  
+        sig_mstars = [] 
+        for i in range(100): 
+            f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
+            subcat_sim_i = {} 
+            for key in f.keys(): 
+                subcat_sim_i[key] = f[key].value
+            
+            isSF = np.where(subcat_sim_i['gclass'] == 'sf') # only SF galaxies 
+
+            sig_mstar_i = smhmr.sigma_logMstar(
+                    subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
+                    weights=subcat_sim_i['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
+            sig_mstars.append(sig_mstar_i)  
+
+        sig_mstar_low, sig_mstar_high = np.percentile(np.array(sig_mstars), [16, 84]) 
+        sigMstar_med.append(sig_mstar_med)
+        sigMstar_low.append(sig_mstar_low) 
+        sigMstar_high.append(sig_mstar_high) 
+    sigMstar_med = np.array(sigMstar_med) 
+    sigMstar_low = np.array(sigMstar_low) 
+    sigMstar_high = np.array(sigMstar_high) 
+    
+    # make figure 
+    fig = plt.figure(figsize=(5,5)) 
+    sub = fig.add_subplot(111)
+    sub.errorbar(tduties, sigMstar_med, 
+            yerr=[sigMstar_med-sigMstar_low, sigMstar_high-sigMstar_med], fmt='.k') 
+    # x-axis
+    sub.set_xlabel('$t_\mathrm{duty}$ [Gyr]', fontsize=20)
+    sub.set_xlim([0., 3.]) 
+    
+    # y-axis
+    sub.set_ylabel('$\sigma_{M_*}(M_\mathrm{halo} = 10^{'+str(Mhalo)+'} M_\odot)$', fontsize=20)
+    sub.set_ylim([0., 1.]) 
+    
+    fig.savefig(''.join([UT.tex_dir(), 'figs/sigMstar_tduty.pdf']), 
+            bbox_inches='tight', dpi=150) 
+    plt.close()
+    return None 
+
+
 if __name__=="__main__": 
-    qaplotABC('randomSFH_1gyr', 13)
+    sigMstar_tduty(Mhalo=12, dMhalo=0.25)
+    #qaplotABC('randomSFH_1gyr', 13)
     #groupcatSFMS(mrange=[10.6,10.8])
     #fQ_fSFMS()
     #SFHmodel(nsnap0=15)
