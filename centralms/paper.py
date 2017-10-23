@@ -269,15 +269,21 @@ def qaplotABC(run, T):
     nsnap0 = 15
     sigma_smhm = 0.2
     sumstat = ['smf']
-    # get median theta from ABC runs 
-    abcout = ABC.readABC(run, T)
-    #theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
-    theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
 
+    # summary statistics of data (i.e. the SMF) 
     subcat_dat = ABC.Data(nsnap0=nsnap0, sigma_smhm=sigma_smhm) # 'data'
     sumdata = ABC.SumData(sumstat, info=True, nsnap0=nsnap0, sigma_smhm=sigma_smhm)  
 
-    subcat_sim = ABC.model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+    # get median theta from ABC runs 
+    abcout = ABC.readABC(run, T)
+    theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
+    # read in Model(theta_med) 
+    abc_dir = UT.dat_dir()+'abc/'+run+'/' # directory where all the ABC files are stored
+    f = h5py.File(''.join([abc_dir, 'model.theta_median.t', str(T), '.hdf5']), 'r') 
+    subcat_sim = {} 
+    for key in f.keys(): 
+        subcat_sim[key] = f[key].value
+    #subcat_sim = ABC.model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
     sumsim = ABC.SumSim(sumstat, subcat_sim, info=True)
 
     fig = plt.figure(figsize=(16,5))
@@ -329,8 +335,11 @@ def qaplotABC(run, T):
             dmhalo=0.5, weights=subcat_sim['weights'][isSF], m_bin=mhalo_bin)
     #sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
     sig_mhalos, counts = [], [] 
-    for i in np.random.choice(range(abcout['theta'].shape[0]), size=1000, replace=False): 
-        theta_i = abcout['theta'][i,:]
+    for i in range(1000): 
+        f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5']), 'r') 
+        subcat_sim_i = {} 
+        for key in f.keys(): 
+            subcat_sim_i[key] = f[key].value
         subcat_sim_i = ABC.model(run, theta_i, 
                 nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
         isSF = np.where(subcat_sim_i['gclass'] == 'sf') # only SF galaxies 
@@ -347,7 +356,6 @@ def qaplotABC(run, T):
         if len(above_zero[0]) > 0: 
             sig_mhalo_low[im], sig_mhalo_high[im] = np.percentile((np.array(sig_mhalos)[:,im])[above_zero], [16, 84])#, axis=0)
     sub.fill_between(m_mid, sig_mhalo_low, sig_mhalo_high, color='#1F77B4', linewidth=0, alpha=0.3) 
-
     sub.set_xlim([11.5, 15.])
     sub.set_xlabel('log $(\; M_\mathrm{halo}\; [M_\odot]\;)$', fontsize=25)
     sub.set_ylim([0., 0.6])

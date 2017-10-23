@@ -721,19 +721,17 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2):
     subcat_sim = model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
 
     fname = ''.join([abc_dir, 'model.theta_median.t', str(T), '.hdf5'])
-    print fname 
     f = h5py.File(fname, 'w') 
     for key in ['m.star', 'halo.m', 'm.max', 'weights', 'gclass']: 
         f.create_dataset(key, data=subcat_sim[key])
     f.close()
-    '''
+
     # now save the rest 
     for i in range(len(abcout['w'])): 
         subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
-        out_dict = {} 
+        fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
+        f = h5py.File(fname, 'w') 
         for key in ['m.star', 'halo.m', 'm.max', 'weights', 'gclass']: 
-            out_dict[key] = subcat_sim_i[key]
-        f = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.p'])
-        pickle.dump(out_dict, open(f, 'wb'))
-    '''
+            f.create_dataset(key, data=subcat_sim_i[key])
+        f.close()
     return None  
