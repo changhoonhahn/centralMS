@@ -4,7 +4,7 @@ use ABC-PMC
 
 '''
 import os 
-import pickle
+import h5py 
 import numpy as np
 import abcpmc
 from abcpmc import mpi_util
@@ -708,16 +708,32 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
 
 
 def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2): 
-    ''' Evaluate and save the forward model evaluated for each of the 
-    particles in the T-th iteration of the ABC run.  
+    ''' Evaluate and save specific columns of the forward model evaluated for each of the 
+    particles in the T-th iteration of the ABC run. Takes... a while 
     '''
     # read in the abc particles 
     abcout = readABC(run, T)
     abc_dir = UT.dat_dir()+'abc/'+run+'/' # directory where all the ABC files are stored
     
     # save the median theta separately
-    theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+    #theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+    theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
     subcat_sim = model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
-    f = ''.join([abc_dir, 'model.theta_median.t', str(T), '.p'])
-    pickle.dump(subcat_sim, open(f, 'wb'))
+
+    fname = ''.join([abc_dir, 'model.theta_median.t', str(T), '.hdf5'])
+    print fname 
+    f = h5py.File(fname, 'w') 
+    for key in ['m.star', 'halo.m', 'm.max', 'weights', 'gclass']: 
+        f.create_dataset(key, data=subcat_sim[key])
+    f.close()
+    '''
+    # now save the rest 
+    for i in range(len(abcout['w'])): 
+        subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+        out_dict = {} 
+        for key in ['m.star', 'halo.m', 'm.max', 'weights', 'gclass']: 
+            out_dict[key] = subcat_sim_i[key]
+        f = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.p'])
+        pickle.dump(out_dict, open(f, 'wb'))
+    '''
     return None  
