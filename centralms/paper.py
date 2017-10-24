@@ -32,6 +32,7 @@ mpl.rcParams['ytick.labelsize'] = 'x-large'
 mpl.rcParams['ytick.major.size'] = 5
 mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
+mpl.rcParams['hatch.linewidth'] = 0.3  
 
 
 def groupcatSFMS(mrange=[10.6,10.8]): 
@@ -470,9 +471,27 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
     # make figure 
     fig = plt.figure(figsize=(5,5)) 
     sub = fig.add_subplot(111)
-    sub.errorbar(tduties, sigMstar_med, 
+
+    # plot constraints from literature
+    # More et al. (2011) SMHMR of starforming centrals!
+    more2011 = sub.fill_between([0., 10.], [0.14, 0.14], [0.21, 0.21], label='More+(2011)', facecolor="none", hatch='/', edgecolor='b', linewidth=0.5)
+    # Leauthaud et al. (2012) 
+    leauthaud2012 = sub.fill_between([0., 10.], [0.191-0.031, 0.191-0.031], [0.191+0.031, 0.191+0.031], alpha=0.2, label='Leauthaud+(2012)', linewidth=0)
+    # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
+    reddick2013 = sub.fill_between([0., 10.], [0.187, 0.187], [0.233, 0.233], label='Reddick+(2013)', facecolor="none", hatch='\\', edgecolor='k', linewidth=0.5)
+    # Tinker et al. (2013) for star-forming galaxies
+    tinker2013 = sub.fill_between([0., 10.], [0.15, 0.15], [0.27, 0.27], alpha=0.1, label='Tinker+(2013)', linewidth=0) 
+    # Meng Gu et al. (2016) 
+    #gu2016, = sub.plot([0., 10.], [0.32, 0.32], ls='--', c='k') 
+
+    abc_post = sub.errorbar(tduties, sigMstar_med, 
             yerr=[sigMstar_med-sigMstar_low, sigMstar_high-sigMstar_med], fmt='.k') 
     #sub.scatter(tduties, sigMstar_med, c='k') 
+
+    #legend1 = sub.legend([more2011, leauthaud2012, gu2016], ['More+(2011)', 'Leauthaud+(2012)', 'Gu+(2016)'], loc='upper left', prop={'size': 15})
+    legend1 = sub.legend([abc_post, more2011, leauthaud2012], ['ABC Posteriors', 'More+(2011)', 'Leauthaud+(2012)'], loc='upper left', prop={'size': 15})
+    sub.legend([reddick2013, tinker2013], ['Reddick+(2013)', 'Tinker+(2013)'], loc='lower right', prop={'size': 15})
+    plt.gca().add_artist(legend1)
     # x-axis
     sub.set_xlabel('$t_\mathrm{duty}$ [Gyr]', fontsize=20)
     sub.set_xlim([0., 7.8]) 
