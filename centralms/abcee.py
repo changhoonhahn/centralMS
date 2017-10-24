@@ -27,7 +27,8 @@ import matplotlib.pyplot as plt
 
 def Theta(run): 
     tt = {} 
-    if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_2gyr', 'randomSFH_0.5gyr', 
+    if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_2gyr', 
+            'randomSFH_0.5gyr', 'randomSFH_5gyr', 'randomSFH_10gyr',
 	    'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
             'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         tt['variable'] = ['SFMS z slope', 'SFMS m slope']#, 'SFMS offset']
@@ -52,7 +53,9 @@ def Prior(run, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_0.5gyr', 'randomSFH_2gyr', 'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
+    if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_0.5gyr', 
+            'randomSFH_2gyr', 'randomSFH_5gyr', 'randomSFH_10gyr',
+            'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
             'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         # SFMS_zslope, SFMS_mslope
         prior_min = [1., 0.4]#, -0.15]
@@ -135,6 +138,20 @@ def model(run, args, **kwargs):
         theta['sfh'] = {'name': 'random_step_fluct'} 
         theta['sfh']['dt_min'] = 2. 
         theta['sfh']['dt_max'] = 2. 
+        theta['sfh']['sigma'] = 0.3 
+    elif run == 'randomSFH_5gyr':  
+        # random fluctuation SFH where fluctuations 
+        # happen on fixed 2 Gyr timescales  
+        theta['sfh'] = {'name': 'random_step_fluct'} 
+        theta['sfh']['dt_min'] = 5. 
+        theta['sfh']['dt_max'] = 5. 
+        theta['sfh']['sigma'] = 0.3 
+    elif run == 'randomSFH_10gyr':  
+        # random fluctuation SFH where fluctuations 
+        # happen on fixed 2 Gyr timescales  
+        theta['sfh'] = {'name': 'random_step_fluct'} 
+        theta['sfh']['dt_min'] = 10. 
+        theta['sfh']['dt_max'] = 10. 
         theta['sfh']['sigma'] = 0.3 
     elif run == 'randomSFH_0.5gyr':  
         # random fluctuation SFH where fluctuations 

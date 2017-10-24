@@ -264,6 +264,58 @@ def SFHmodel(nsnap0=15):
     return None 
 
 
+def SFMSprior_z1():
+    ''' Compare SFMS from literature at z~1 with the prior of 
+    the SFMS in our ABC
+    '''
+    prior_min = [1., 0.4]
+    prior_max = [2., 0.8]
+
+    # Lee et al. (2015)
+    logSFR_lee = lambda mm: 1.53 - np.log10(1 + (10**mm/10**(10.10))**-1.26)
+    # Noeske et al. (2007) 0.85 < z< 1.10 (by eye)
+    logSFR_noeske = lambda mm: (1.580 - 1.064)/(11.229 - 10.029)*(mm - 10.0285) + 1.0637
+    # Moustakas et al. (2013) 0.8 < z < 1. (by eye)  
+    logSFR_primus = lambda mm: (1.3320 - 1.296)/(10.49 - 9.555) * (mm-9.555) + 1.297
+    # Hahn et al. (2017)  
+    logSFR_hahn = lambda mm: 0.53*(mm-10.5) + 1.1*(1.-0.05) - 0.11
+    
+    def logSFR_prior_min(mm): 
+        sfr1 = SFH.SFR_sfms(mm, 1., {'zslope': prior_min[0], 'mslope': prior_min[1]})
+        sfr2 = SFH.SFR_sfms(mm, 1., {'zslope': prior_min[0], 'mslope': prior_max[1]})
+        sfr3 = SFH.SFR_sfms(mm, 1., {'zslope': prior_max[0], 'mslope': prior_min[1]})
+        sfr4 = SFH.SFR_sfms(mm, 1., {'zslope': prior_max[0], 'mslope': prior_max[1]})
+        return np.min([sfr1, sfr2, sfr3, sfr4]) 
+    
+    def logSFR_prior_max(mm): 
+        sfr1 = SFH.SFR_sfms(mm, 1., {'zslope': prior_min[0], 'mslope': prior_min[1]})
+        sfr2 = SFH.SFR_sfms(mm, 1., {'zslope': prior_min[0], 'mslope': prior_max[1]})
+        sfr3 = SFH.SFR_sfms(mm, 1., {'zslope': prior_max[0], 'mslope': prior_min[1]})
+        sfr4 = SFH.SFR_sfms(mm, 1., {'zslope': prior_max[0], 'mslope': prior_max[1]})
+        return np.max([sfr1, sfr2, sfr3, sfr4]) 
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    marr = np.linspace(9., 12., 100)
+    sub.plot(marr, logSFR_noeske(marr), label='Noeske et al.(2007)')
+    sub.plot(marr, logSFR_primus(marr), label='Moustakas et al.(2013)')
+    sub.plot(marr, logSFR_lee(marr), label='Lee et al.(2015)')
+    sub.plot(marr, logSFR_hahn(marr), label='Hahn et al.(2017)')
+    sub.fill_between(marr, 
+            [logSFR_prior_min(m) for m in marr], 
+            [logSFR_prior_max(m) for m in marr], 
+            label='Prior', alpha=0.5)
+    sub.legend(loc='lower right') 
+    sub.set_xlim([9.75, 11.5])
+    sub.set_xticks([10., 10.5, 11., 11.5])
+    sub.set_xlabel('log$(\; M_*\; [M_\odot]\;)$', fontsize=20)
+    sub.set_ylim([0., 3.])
+    sub.set_ylabel('log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}])$', fontsize=20)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/SFMSprior.z1.pdf']), 
+            bbox_inches='tight', dpi=150) 
+    plt.close() 
+    return None
+
+
 def qaplotABC(run, T):
     ''' Figure that illustrates how the ABC fitting works.
     '''
@@ -371,10 +423,10 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
     ''' Figure plotting sigmaMstar at M_halo = Mhalo for different 
     duty cycle time (t_duty). 
     '''
-    runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr']
-    tduties = [0.5, 1., 2.]  #hardcoded
-    iters = [9, 13, 12] # iterations of ABC
-    nparticles = [1000, 1000, 1000]
+    runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr', 'test0']
+    tduties = [0.5, 1., 2., 7.47]  #hardcoded
+    iters = [9, 13, 12, 14] # iterations of ABC
+    nparticles = [1000, 1000, 1000, 1000]
     
     smhmr = Obvs.Smhmr()
     
@@ -394,7 +446,7 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
 
         # other thetas  
         sig_mstars = [] 
-        for i in range(100): 
+        for i in range(20): 
             f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
             subcat_sim_i = {} 
             for key in f.keys(): 
@@ -420,13 +472,14 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
     sub = fig.add_subplot(111)
     sub.errorbar(tduties, sigMstar_med, 
             yerr=[sigMstar_med-sigMstar_low, sigMstar_high-sigMstar_med], fmt='.k') 
+    #sub.scatter(tduties, sigMstar_med, c='k') 
     # x-axis
     sub.set_xlabel('$t_\mathrm{duty}$ [Gyr]', fontsize=20)
-    sub.set_xlim([0., 3.]) 
+    sub.set_xlim([0., 7.8]) 
     
     # y-axis
     sub.set_ylabel('$\sigma_{M_*}(M_\mathrm{halo} = 10^{'+str(Mhalo)+'} M_\odot)$', fontsize=20)
-    sub.set_ylim([0., 1.]) 
+    sub.set_ylim([0., 0.5]) 
     
     fig.savefig(''.join([UT.tex_dir(), 'figs/sigMstar_tduty.pdf']), 
             bbox_inches='tight', dpi=150) 
@@ -434,9 +487,59 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
     return None 
 
 
+def sigMstar_tduty_fid(Mhalo=12, dMhalo=0.5):
+    ''' Figure plotting sigmaMstar at M_halo = Mhalo for different 
+    duty cycle time (t_duty) with fiducial SFMS parameter values rather 
+    than ABC values. 
+    '''
+    # read in parameter values for randomSFH_1gyr
+    abcout = ABC.readABC('randomSFH_1gyr', 13)
+    # the median theta will be designated the fiducial parameter values 
+    theta_fid = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) 
+            for i in range(len(abcout['theta'][0]))]
+    
+    runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr', 'randomSFH_5gyr', 'randomSFH_10gyr']
+    tduties = [0.5, 1., 2., 5., 10.]  #hardcoded
+    
+    smhmr = Obvs.Smhmr()
+
+    sigMstar_fid = []
+    for i_t, tduty in enumerate(tduties): 
+        subcat_sim = ABC.model(runs[i_t], theta_fid, 
+                nsnap0=15, sigma_smhm=0.2, downsampled='14') 
+        isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+
+        sig_mstar_fid = smhmr.sigma_logMstar(
+                subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+                weights=subcat_sim['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
+
+        sigMstar_fid.append(sig_mstar_fid)
+    sigMstar_fid = np.array(sigMstar_fid)
+    
+    # make figure 
+    fig = plt.figure(figsize=(5,5)) 
+    sub = fig.add_subplot(111)
+    sub.scatter(tduties, sigMstar_fid) 
+    # x-axis
+    sub.set_xlabel('$t_\mathrm{duty}$ [Gyr]', fontsize=20)
+    sub.set_xlim([0., 10.]) 
+    
+    # y-axis
+    sub.set_ylabel('$\sigma_{M_*}(M_\mathrm{halo} = 10^{'+str(Mhalo)+'} M_\odot)$', fontsize=20)
+    sub.set_ylim([0., 0.5]) 
+    
+    fig.savefig(''.join([UT.tex_dir(), 'figs/sigMstar_tduty_fid.pdf']), 
+            bbox_inches='tight', dpi=150) 
+    plt.close()
+    return None 
+
+
 if __name__=="__main__": 
-    sigMstar_tduty(Mhalo=12, dMhalo=0.25)
+    #SFMSprior_z1()
+    #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
+    sigMstar_tduty(Mhalo=12, dMhalo=0.1)
     #qaplotABC('randomSFH_1gyr', 13)
+    #qaplotABC('test0', 14)
     #groupcatSFMS(mrange=[10.6,10.8])
     #fQ_fSFMS()
     #SFHmodel(nsnap0=15)
