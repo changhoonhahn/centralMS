@@ -424,10 +424,10 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
     ''' Figure plotting sigmaMstar at M_halo = Mhalo for different 
     duty cycle time (t_duty). 
     '''
-    runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr', 'test0']
-    tduties = [0.5, 1., 2., 7.47]  #hardcoded
-    iters = [9, 13, 12, 14] # iterations of ABC
-    nparticles = [1000, 1000, 1000, 1000]
+    runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr', 'randomSFH_5gyr', 'test0']
+    tduties = [0.5, 1., 2., 5., 7.47]  #hardcoded
+    iters = [11, 13, 12, 11, 14] # iterations of ABC
+    nparticles = [1000, 1000, 1000, 1000, 1000]
     
     smhmr = Obvs.Smhmr()
     
@@ -447,7 +447,7 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
 
         # other thetas  
         sig_mstars = [] 
-        for i in range(20): 
+        for i in range(100): 
             f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
             subcat_sim_i = {} 
             for key in f.keys(): 

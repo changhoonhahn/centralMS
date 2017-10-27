@@ -732,17 +732,19 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2):
     abcout = readABC(run, T)
     abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # directory where all the ABC files are stored
     
-    # save the median theta separately
+    # save the median theta separately (evaluate it a bunch of times) 
     #theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
     theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
-    subcat_sim = model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+    for i in range(10):  
+        subcat_sim = model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
 
-    fname = ''.join([abc_dir, 'model.theta_median.t', str(T), '.hdf5'])
-    f = h5py.File(fname, 'w') 
-    for key in ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'gclass']: 
-        f.create_dataset(key, data=subcat_sim[key])
-    f.close()
-
+        fname = ''.join([abc_dir, 'model.theta_median', str(i), '.t', str(T), '.hdf5'])
+        f = h5py.File(fname, 'w') 
+        for key in ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'gclass']: 
+            f.create_dataset(key, data=subcat_sim[key])
+        f.close()
+    return None  
+'''
     # now save the rest 
     for i in range(len(abcout['w'])): 
         subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
@@ -752,3 +754,4 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2):
             f.create_dataset(key, data=subcat_sim_i[key])
         f.close()
     return None  
+'''
