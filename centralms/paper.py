@@ -333,7 +333,7 @@ def qaplotABC(run, T):
     theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
     # read in Model(theta_med) 
     abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # directory where all the ABC files are stored
-    f = h5py.File(''.join([abc_dir, 'model.theta_median.t', str(T), '.hdf5']), 'r') 
+    f = h5py.File(''.join([abc_dir, 'model.theta_median0.t', str(T), '.hdf5']), 'r') 
     subcat_sim = {} 
     for key in f.keys(): 
         subcat_sim[key] = f[key].value
@@ -346,18 +346,19 @@ def qaplotABC(run, T):
     
     # --- SMF panel ---
     sub = fig.add_subplot(1,3,1)
-    sub.errorbar(sumdata[0][0], sumdata[0][1], yerr=phi_err, fmt='.k', label='$f_\mathrm{cen} \Phi^{\mathrm{Li}\&\mathrm{White}(2009)}$')
+    sub.errorbar(sumdata[0][0], sumdata[0][1], yerr=phi_err, fmt='.k', 
+            label=r'$\Phi_\mathrm{cen}^{\footnotesize \mathrm{Li}\&\mathrm{White}(2009)}$') 
+    #label='$f_\mathrm{cen} \Phi^{\mathrm{Li}\&\mathrm{White}(2009)}$')
     sub.plot(sumsim[0][0], sumsim[0][1], label=r'model($\theta_\mathrm{median}$)')
     sub.set_xlim([9.5, 12.])
     sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
     sub.set_ylim([1e-6, 10**-1.75])
     sub.set_yscale('log')
-    sub.set_ylabel('log $(\;\Phi\;)$', fontsize=25)
+    sub.set_ylabel('log $(\;\Phi\; / \mathrm{Mpc}^{-3}\,\mathrm{dex}^{-1})$', fontsize=25)
     sub.legend(loc='lower left', prop={'size':20}) 
 
     # --- SFMS panel ---
     sub = fig.add_subplot(1,3,2)
-
     isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
     #gc = Cat.Observations('group_catalog', Mrcut=18, position='central')
     #gc_cat = gc.Read() 
@@ -374,10 +375,11 @@ def qaplotABC(run, T):
     #sfr_arr = SFH.SFR_sfms(m_arr, UT.z_nsnap(1), subcat_sim['theta_sfms'])
     #sub.plot(m_arr, sfr_arr+0.3, ls='--', c='k') 
     #sub.plot(m_arr, sfr_arr-0.3, ls='--', c='k') 
-    sub.set_xlim([9., 12.])
+    sub.set_xlim([9., 11.5])
+    sub.set_xticks([9., 10., 11.]) 
     sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
-    sub.set_ylim([-3., 1.])
-    sub.set_yticks([-3., -2., -1., 0., 1.])
+    sub.set_ylim([-2.5, 1.])
+    sub.set_yticks([-2., -1., 0., 1.])
     sub.set_ylabel('log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}])$', fontsize=25)
 
     sub = fig.add_subplot(1,3,3)
@@ -435,15 +437,18 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
     for i_t, tduty in enumerate(tduties): 
         abc_dir = UT.dat_dir()+'abc/'+runs[i_t]+'/model/' # ABC directory 
         # theta median
-        f = h5py.File(''.join([abc_dir, 'model.theta_median.t', str(iters[i_t]), '.hdf5']), 'r') 
-        subcat_sim = {} 
-        for key in f.keys(): 
-            subcat_sim[key] = f[key].value
-        isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+        sig_mstar_meds = np.zeros(10) 
+        for i in range(10): 
+            f = h5py.File(''.join([abc_dir, 'model.theta_median', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
+            subcat_sim = {} 
+            for key in f.keys(): 
+                subcat_sim[key] = f[key].value
+            isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
 
-        sig_mstar_med = smhmr.sigma_logMstar(
-                subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
-                weights=subcat_sim['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
+            sig_mstar_meds[i] = smhmr.sigma_logMstar(
+                    subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+                    weights=subcat_sim['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
+        sig_mstar_med = np.average(sig_mstar_meds)
 
         # other thetas  
         sig_mstars = [] 
@@ -468,19 +473,20 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
     sigMstar_low = np.array(sigMstar_low) 
     sigMstar_high = np.array(sigMstar_high) 
     
+    pretty_colors = prettycolors() 
     # make figure 
     fig = plt.figure(figsize=(5,5)) 
     sub = fig.add_subplot(111)
 
     # plot constraints from literature
-    # More et al. (2011) SMHMR of starforming centrals!
-    more2011 = sub.fill_between([0., 10.], [0.14, 0.14], [0.21, 0.21], label='More+(2011)', facecolor="none", hatch='/', edgecolor='b', linewidth=0.5)
-    # Leauthaud et al. (2012) 
-    leauthaud2012 = sub.fill_between([0., 10.], [0.191-0.031, 0.191-0.031], [0.191+0.031, 0.191+0.031], alpha=0.2, label='Leauthaud+(2012)', linewidth=0)
-    # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
-    reddick2013 = sub.fill_between([0., 10.], [0.187, 0.187], [0.233, 0.233], label='Reddick+(2013)', facecolor="none", hatch='\\', edgecolor='k', linewidth=0.5)
     # Tinker et al. (2013) for star-forming galaxies
-    tinker2013 = sub.fill_between([0., 10.], [0.15, 0.15], [0.27, 0.27], alpha=0.1, label='Tinker+(2013)', linewidth=0) 
+    tinker2013 = sub.fill_between([0., 10.], [0.15, 0.15], [0.27, 0.27], alpha=0.1, label='Tinker+(2013)', color=pretty_colors[7], linewidth=0) 
+    # More et al. (2011) SMHMR of starforming centrals!
+    more2011 = sub.fill_between([0., 10.], [0.14, 0.14], [0.21, 0.21], label='More+(2011)', facecolor="none", hatch='/', edgecolor='k', linewidth=0.5)
+    # Leauthaud et al. (2012) 
+    leauthaud2012 = sub.fill_between([0., 10.], [0.191-0.031, 0.191-0.031], [0.191+0.031, 0.191+0.031], alpha=0.2, label='Leauthaud+(2012)', color=pretty_colors[1], linewidth=0)
+    # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
+    reddick2013 = sub.fill_between([0., 10.], [0.187, 0.187], [0.233, 0.233], label='Reddick+(2013)', facecolor="none", hatch='X', edgecolor='k', linewidth=0.25)
     # Meng Gu et al. (2016) 
     #gu2016, = sub.plot([0., 10.], [0.32, 0.32], ls='--', c='k') 
 
@@ -497,7 +503,7 @@ def sigMstar_tduty(Mhalo=12, dMhalo=0.5):
     sub.set_xlim([0., 7.8]) 
     
     # y-axis
-    sub.set_ylabel('$\sigma_{M_*}(M_\mathrm{halo} = 10^{'+str(Mhalo)+'} M_\odot)$', fontsize=20)
+    sub.set_ylabel(r'$\sigma_{M_*} \Big(M_\mathrm{halo} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=20)
     sub.set_ylim([0., 0.5]) 
     
     fig.savefig(''.join([UT.tex_dir(), 'figs/sigMstar_tduty.pdf']), 
@@ -556,9 +562,8 @@ def sigMstar_tduty_fid(Mhalo=12, dMhalo=0.5):
 if __name__=="__main__": 
     #SFMSprior_z1()
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
-    sigMstar_tduty(Mhalo=12, dMhalo=0.1)
-    #qaplotABC('randomSFH_1gyr', 13)
-    #qaplotABC('test0', 14)
+    #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
+    qaplotABC('test0', 14)
     #groupcatSFMS(mrange=[10.6,10.8])
     #fQ_fSFMS()
     #SFHmodel(nsnap0=15)

@@ -86,13 +86,51 @@ galaxies: star formation -- cosmology: observations.}
 \item Maybe talk about how the bigger context of why this is important?  
 \item Why only centrals -- because our current best understanding of satellites is that they quench after infall, so it doesn't make sense to look at them
 \eitem 
-\section{Central Galaxies of SDSS DR7}
-\todo{abridged version of the same section}
 
-\section{Star Forming Central Galaxies}  
-In this section we describe how we 
+\section{Central Galaxies of SDSS DR7}
+We construct our galaxy sample following the sample selection of \cite{tinker2011}. 
+We select a volume-limited sample of galaxies with $M_r −5 log(h) < −18$ and complete in
+$M_* > 10^{9.4} M_\odot$ from the NYU Value-Added Galaxy Catalog \citep[VAGC;][]{blanton2005}
+of the Sloan Digital Sky Survey Data Release 7~\citep[SDSS DR7;][]{abazajian2009} at 
+$z \approx 0.04$. The stellar masses of these galaxies are estimated using the
+$\mathtt{kcorrect}$ code~\citep{blanton2007} assuming a~\cite{chabrier2003} initial
+mass function. The star formation of the galaxies are estimated spectroscopically using the
+specific star formation rates (SSFR) from the current release of the MPA-JHU spectral 
+reductions\footnote{http://wwwmpa.mpa-garching.mpg.de/SDSS/DR7/}~\citep{brinchmann2004}.
+Generally speaking, $\mathrm{SSFR} > 10^{-11}\mathrm{yr}^{-1}$ are derived from 
+$\mathrm{H}_\alpha$ emission, $10^{-11} > \mathrm{SSFR} > 10^{-12}\mathrm{yr}^{-1}$
+are derived from a combination of emission lines, and $\mathrm{SSFR} < 10^{-12}\mathrm{yr}^{-1}$
+are based on $D_n 4000$~\citep[see discussion in][]{wetzel2013}. We note that 
+$\mathrm{SSFR} < 10^{-12}\mathrm{yr}^{-1}$ should only be considered upper limits 
+to the true galaxy SSFR~\citep{salim2007}.
+
+From our galaxy sample, we identify the central galaxies using the \cite{tinker2011} halo-based 
+group-finding algorithm, which is based on the~\cite{yang2005} algorithm and tested 
+in~\cite{campbell2015}. The algorithm assigns a probability of being a satellite 
+galaxy, $P_\mathrm{sat}$, to each galaxy in the sample. Galaxies with $P_\mathrm{sat} \geq 0.5$ 
+are classified as satellites and $P_\mathrm{sat} < 0.5$ are classified as centrals. 
+In this paper we focus on central galaxies. In any group finding algorithm, galaxies are 
+misassigned due to projection effects and redshift space distortions. The purity 
+of the full central galaxy sample is $\sim 90\%$ with a completeness of $\sim 95\%$~\citep{tinker2017}.
+Furthermore, \cite{campbell2015} find that the algorithm robustly identifies red and blue centrals
+as a function of stellar mass, which is highly relevant to our analysis.  
+
+In the left panel of Figure~\ref{fig:groupcat}, we plot the distribution of SFR versus $M_*$ 
+of the central galaxies of SDSS DR7. 
+
 \subsection{Simulated Central Galaxies}
 \todo{abridged version of the same section}
+\cite{davis1985}
+\cite{hahn2017a}
+\cite{li2009}
+%If we are to understand how central galaxies and their star formation evolve, we require simulations over a wide redshift range that allows us to examine and track cen- tral galaxies within the heirarchical growth of their host halos. To do this robustly, we require a cosmological N- body simulation that accounts for the complex dynami- cal processes that govern galaxy host halos. In this pa- per, we use the dissipationless, N-body simulation from Wetzel et al. (2013) generated using the White (2002) TreePM code with flat, ΛCDM cosmology: Ωm = 0.274, Ωb =0.0457,h=0.7,n=0.95,andσ8 =0.8. 20483 particles are evolved in a 250 Mpc/h box with particle mass of 1.98 × 108M⊙ and with a Plummer equivalent smoothing of 2.5 kpc/h. The initial conditions of the simulation at z = 150 are generated using second-order Lagrangian Perturbation Theory. We refer readers to Wetzel et al. (2013) and Wetzel et al. (2014) for a more detailed description of the simulation.
+%From the TreePM simulation, Wetzel et al. (2013) iden- tify ‘host halos’ using the Friends-of-Friends (FoF) algo- rithm of Davis et al. (1985) with linking length b = 0.168 times the mean inter-particle spacing. This groups thesimulation particles bound by an isodensity contour of ∼ 100× the mean matter density. Within the identified host halos, the simulation identifies ‘subhalos’ as over- densities in phase space through a 6-dimensional FoF algorithm (White et al. 2010). Wetzel et al. (2013) then track the host halos and subhalos across the simulation outputs in order to build merger trees. Next, Wetzel et al. (2013) designate the most massive subhalo in a newly-formed host halo at a given simulation out as the ‘central’ subhalo. A subhalo remains central until it falls into a more massive host halo, at which point it becomes a ‘satellite’ subhalo. Each subhalo is also assigned a max- imum mass Mpeak, the maximum host halo mass the sub- halo has had in its history.
+%Using the Wetzel et al. (2013) simulation, we obtain a galaxy catalog from the subhalo catalog by assum- ing that galaxies reside at the centers of the subhalos and through subhalo abundance matching (SHAM; Vale & Ostriker 2006; Conroy et al. 2006; Yang et al. 2009; Wetzel et al. 2012; Leja et al. 2013; Wetzel et al. 2013, 2014) to assign them stellar masses. SHAM assumes a one-to-one mapping that preserves the rank ordering be- tween subhalo Mpeak and stellar mass, M∗ of its galaxy: n(> Mpeak) = n(> M∗). Through SHAM, we can as- sign galaxy stellar masses to subhalos based on observed stellar mass function (SMF) at the redshifts of the sim- ulation outputs. Galaxy stellar masses independently at each snapshot. This allows us to not only track the his- tory of the subhalo, but also track the evolution of galaxy stellar masses through their SHAM stellar masses at each snapshot.
+
+%For our SHAM prescription, we use the SMF of Li & White (2009) at the lowest redshift z = 0.05. Li & White (2009) is based on the same SDSS NYU-VAGC sample as the SDSS DR7 group catalog we describe in §2. At higher redshifts, we interpolate between the Li & White (2009) SMF and the Marchesini et al. (2009) SMF at z = 1.6 to obtain the SMF at the simulation output redshifts. This produces SMFs that increase significantly and monotoni- cally over z < 1 for M∗ < 1011M⊙ but insignificantly for M∗ > 1011M⊙. We choose the Marchesini et al. (2009) SMF, amongst others, because it produces interpolated SMFs that monotonically increase at z < 1. At z ∼ 1, the interpolated SMF we use is consistent (within the 1σ uncertainties) with more recent measurements from Muzzin et al. (2013) and Ilbert et al. (2013).
+%In Figure 1, we illustrate the evolution of the SMFs that we use for our SHAM prescription (solid) for z = 0.05, 0.5, and 0.9. Recently, using PRIMUS, Moustakas et al. (2013) found little evolution in the SMF for z < 1 at all mass ranges. Although previous works such as Bundy et al. (2006) find otherwise. To ensure that our results do not depend on our choice of the SMFs, later in §5.2, we repeat our analysis using SMFs with no evolution (i.e. Li & White 2009 SMF throughout 0 < z < 1) and with “extreme” evolution for z > 0.05 (dash-dotted in Fig- ure 1), in which the amplitude of the SMF at z = 1.2 is approximately half the amplitude of the fiducial SMF at z = 1.2. Furthermore, while the simplest version of SHAM assumes a one-to-one correspondence between Mpeak and M∗, observations suggest that there is a scat- ter of ∼ 0.2 dex in this relation (Zheng et al. 2007; Yang et al. 2008; More et al. 2009; Gu et al. 2016). Hence, we apply a 0.2 dex log-normal scatter in M∗ at fixed Mpeak in our SHAM prescription at each snapshot inde-
+%pendently.
+%So far, we have subhalos populated with galaxies and their stellar mass at each of the 15 simulation outputs spanning the redshift 0.05 < z < 1. For our sample, we restrict ourselves to galaxies classified as centrals by the simulation. And also to ones that are in both the z ∼ 0.05 and z ∼ 1 snapshots. This removes < 3% of central galaxies with M∗ > 109.5 M⊙ in the z ∼ 0.05 snapshot. Our sample inevitably includes “back splash” or “ejected” satellite galaxies (Wetzel et al. 2014), mis- classified as centrals. Excluding these galaxies, however, has a negligible impact on our results. We also note that while we do not have an explicit prescription for stellar mass growth from mergers, based on SHAM, the stellar mass growth traces the merger induced subhalo growth. As we discuss later in detail, mounting evidence disfavor merger driven quenching as the trigger of star formation quenching, so our treatment of mergers do not impact our quenching timescale results. In summary, we con- struct from our simulation a catalog of central galaxies whose stellar mass and halo mass is be traced through the redshift range 0.05 < z < 1.
 
 \subsection{Selecting $z \sim 0$ Star Forming Central Galaxies}  
 \bitem
@@ -109,13 +147,14 @@ In this section we describe how we
 \item talk about inference using ABC
 \eitem
 
-\section{The duty cycle of star formation}
+\section{Results}
+\subsection{The duty cycle of star formation}
 \bitem
 \item Figure that illustrates the fit to observables 
 \item Figure of sigma M star as a function of duty cycle compared to observations 
 \eitem 
 
-\section{The need for a galaxy assembly bias}
+\subsection{The need for a galaxy assembly bias}
 \bitem
 \item discuss how $t_{duty}$ is not enough to be consistent with $\sigma_{M_*}$. 
 \item first clarify what you mean by galaxy assembly bias 
@@ -125,12 +164,11 @@ In this section we describe how we
 \item Figure of sigma M star as a function of duty cycle and realistic dt abias and t delay 
 \eitem
 
-\section{Rethinking the Main Sequence?}
+\section{Discussion} \label{sec:discussion}
+\subsection{Rethinking the Main Sequence?}
 \bitem 
 \item Test the SMHMR for Louis's SFHs 
 \eitem 
-
-\section{Discussion} \label{sec:discussion}
 
 \section{Summary} \label{sec:summary}
 
@@ -161,18 +199,27 @@ evolve along the SFMS.}
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\textwidth]{figs/qaplot_abc_randomSFH_short_t9.pdf}
+\includegraphics[width=0.9\textwidth]{figs/qaplot_abc_test0_t14.pdf}
+%qaplot_abc_test0_t14.pdfqaplot_abc_randomSFH_short_t9.pdf}
 \caption{}
 \label{fig:abc_demo}
 \end{center}
 \end{figure}
 
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{figs/sigMstar_tduty.pdf}
+\caption{}
+\label{fig:abc_demo}
+\end{center}
+\end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Acknowledgements
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgements}
+Louis Abramson
 
-%\bibliographystyle{yahapj}
+\bibliographystyle{yahapj}
 \bibliography{centralMS}
 \end{document}
