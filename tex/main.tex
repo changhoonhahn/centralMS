@@ -87,7 +87,7 @@ galaxies: star formation -- cosmology: observations.}
 \item Why only centrals -- because our current best understanding of satellites is that they quench after infall, so it doesn't make sense to look at them
 \eitem 
 
-\section{Central Galaxies of SDSS DR7}
+\section{Central Galaxies of SDSS DR7} \label{sec:sdss}
 We construct our galaxy sample following the sample selection of \cite{tinker2011}. 
 We select a volume-limited sample of galaxies with $M_r −5 log(h) < −18$ and complete in
 $M_* > 10^{9.4} M_\odot$ from the NYU Value-Added Galaxy Catalog \citep[VAGC;][]{blanton2005}
@@ -115,19 +115,65 @@ of the full central galaxy sample is $\sim 90\%$ with a completeness of $\sim 95
 Furthermore, \cite{campbell2015} find that the algorithm robustly identifies red and blue centrals
 as a function of stellar mass, which is highly relevant to our analysis.  
 
-In the left panel of Figure~\ref{fig:groupcat}, we plot the distribution of SFR versus $M_*$ 
-of the central galaxies of SDSS DR7. 
+In the left panel of Figure~\ref{fig:groupcat}, we plot the SFR-$M_*$ distribution of
+the SDSS DR7 central galaxies. In the right panel, we plot the distribution of SSFR, 
+$p(\log \mathrm{SSFR})$, for galaxies with $10.6 < \log \,M_* < 10.8$ (stellar mass range 
+highlighted on the left panel). Both panels of Figure~\ref{fig:groupcat} illustrate the 
+bimodality in the galaxy sample. The SFR-$M_*$ distribution also illustrate the correlation
+between SFR and $M_*$ in star-forming galaxies \emph{i.e.} the star-formation main sequence 
+(SFMS).
 
 \subsection{Simulated Central Galaxies}
-\todo{abridged version of the same section}
-\cite{davis1985}
-\cite{hahn2017a}
-\cite{li2009}
-%If we are to understand how central galaxies and their star formation evolve, we require simulations over a wide redshift range that allows us to examine and track cen- tral galaxies within the heirarchical growth of their host halos. To do this robustly, we require a cosmological N- body simulation that accounts for the complex dynami- cal processes that govern galaxy host halos. In this pa- per, we use the dissipationless, N-body simulation from Wetzel et al. (2013) generated using the White (2002) TreePM code with flat, ΛCDM cosmology: Ωm = 0.274, Ωb =0.0457,h=0.7,n=0.95,andσ8 =0.8. 20483 particles are evolved in a 250 Mpc/h box with particle mass of 1.98 × 108M⊙ and with a Plummer equivalent smoothing of 2.5 kpc/h. The initial conditions of the simulation at z = 150 are generated using second-order Lagrangian Perturbation Theory. We refer readers to Wetzel et al. (2013) and Wetzel et al. (2014) for a more detailed description of the simulation.
-%From the TreePM simulation, Wetzel et al. (2013) iden- tify ‘host halos’ using the Friends-of-Friends (FoF) algo- rithm of Davis et al. (1985) with linking length b = 0.168 times the mean inter-particle spacing. This groups thesimulation particles bound by an isodensity contour of ∼ 100× the mean matter density. Within the identified host halos, the simulation identifies ‘subhalos’ as over- densities in phase space through a 6-dimensional FoF algorithm (White et al. 2010). Wetzel et al. (2013) then track the host halos and subhalos across the simulation outputs in order to build merger trees. Next, Wetzel et al. (2013) designate the most massive subhalo in a newly-formed host halo at a given simulation out as the ‘central’ subhalo. A subhalo remains central until it falls into a more massive host halo, at which point it becomes a ‘satellite’ subhalo. Each subhalo is also assigned a max- imum mass Mpeak, the maximum host halo mass the sub- halo has had in its history.
-%Using the Wetzel et al. (2013) simulation, we obtain a galaxy catalog from the subhalo catalog by assum- ing that galaxies reside at the centers of the subhalos and through subhalo abundance matching (SHAM; Vale & Ostriker 2006; Conroy et al. 2006; Yang et al. 2009; Wetzel et al. 2012; Leja et al. 2013; Wetzel et al. 2013, 2014) to assign them stellar masses. SHAM assumes a one-to-one mapping that preserves the rank ordering be- tween subhalo Mpeak and stellar mass, M∗ of its galaxy: n(> Mpeak) = n(> M∗). Through SHAM, we can as- sign galaxy stellar masses to subhalos based on observed stellar mass function (SMF) at the redshifts of the sim- ulation outputs. Galaxy stellar masses independently at each snapshot. This allows us to not only track the his- tory of the subhalo, but also track the evolution of galaxy stellar masses through their SHAM stellar masses at each snapshot.
+We're interesting in constructing a model that tracks central galaxies and their star 
+formation within the heirarchical growth of their host halos. This requires a cosmological 
+$N$-body simulation that accounts for the complex dynamical processes that govern the host 
+halos of galaxies. In this paper we use the high resolution $N$-body simulation 
+from~\cite{wetzel2013} generated using the \cite{white2002} $\mathtt{TreePM}$ code 
+with flat $\Lambda$CDM cosmology 
+($\Omega_m =0.274, \Omega_b = 0.0457, h = 0.7, n=0.95, \mathrm{and} \sigma_8 = 0.8$).
+$2048^3$ particles with mass of $1.98 \times 10^8\,M_\odot$ are evolved in a $250 \mathrm{Mpc}/h$
+with a Plummer equivalent smoothing of $2.5\,\mathrm{kpc}/h$ from initial conditions at $z = 150$ 
+generated using second-order Lagrangian Perturbation Theory. For a more detailed description of 
+the simulation, we refer readers to \cite{wetzel2013, wetzel2014}.
 
-%For our SHAM prescription, we use the SMF of Li & White (2009) at the lowest redshift z = 0.05. Li & White (2009) is based on the same SDSS NYU-VAGC sample as the SDSS DR7 group catalog we describe in §2. At higher redshifts, we interpolate between the Li & White (2009) SMF and the Marchesini et al. (2009) SMF at z = 1.6 to obtain the SMF at the simulation output redshifts. This produces SMFs that increase significantly and monotoni- cally over z < 1 for M∗ < 1011M⊙ but insignificantly for M∗ > 1011M⊙. We choose the Marchesini et al. (2009) SMF, amongst others, because it produces interpolated SMFs that monotonically increase at z < 1. At z ∼ 1, the interpolated SMF we use is consistent (within the 1σ uncertainties) with more recent measurements from Muzzin et al. (2013) and Ilbert et al. (2013).
+From the $\mathrm{TreePM}$ $N$-body simulation, `host halos' are identified using the
+Friends-of-Friends (FoF) algorithm of \cite{davis1985} with linking length of $b = 0.168$
+times the mean inter-partcile spacing. Within these host halos, \cite{wetzel2013} identifies  
+`subhalos' as overdensities in phase space through a six-dimensional FoF 
+algorithm~\citep[FoF6D][]{white2010}. The host halos and subhalos are then tracked across 
+the $45$ simulation outputs from $z = 10$ to $0$ to build merger trees~\citep{wetzel2009,wetzel2010}. 
+The most massive subhalos in newly-formed host halos at a given simulation output are defined 
+as the `central' subhalo. A central subhalo retains its `central' definition until it falls into 
+a more massive host halo. At this point it becomes a `satellite' subhalo. 
+
+Each subhalo is assigned a $M_\mathrm{peak}$, the maxmum host halo mass that a it ever had 
+as a central subhalo. Using $M_\mathrm{peak}$, a galaxy catalog is constructed from 
+the subhalos using subhalo abundance matching~\citep[SHAM;][]{vale2006,yang2009,wetzel2012,wetzel2013,wetzel2014,hahn2017a}\todo{citations conroy2006, leja2013}. 
+In principle, SHAM assumes a one-to-one mapping that preserves the rank ordering between subhalo $M_\mathrm{peak}$
+and galaxy stellar mass $M_*$: $n(> M_\mathrm{peak}) > n(> M_*)$. Using this mapping, we can 
+assign galaxy stellar mass to subhalos based on observed stellar mass functions (SMFs) at the
+redshifts of the simulation outputs (snapshots). By assigning galaxy $M_*$ independently at each 
+snapshot, we not only track the evolution of subhalos, but also the evolution of the galaxies' $M_*$. 
+
+In our SHAM prescription, we use the SMF from \cite{li2009} at $z = 0.05$ and interpolate at
+higher redshifts between the \cite{li2009} SMF and the SMF from \cite{marchesini2009} at 
+$z = 1.6$. We choose the \cite{li2009} SMF because it is based on the same SDSS NYU-VAGC 
+sample as our SDSS DR7 group catalog (see Section~\ref{sec:sdss}). We choose the 
+\cite{marchesini2009} SMF, amongst others, because it produces interpolated SMFs that
+monotonically increase at $z < 1$. As noted in \cite{hahn2017}, 
+at $z \approx 1$, the SMF interpolated between the \cite{li2009} and \cite{marchesini2009} 
+SMFs is consistent with more recent measurements from \cite{muzzin2013} and \cite{ilbert2013}. 
+In this paper, as we describe later in this section, we are only interested in the snapshots 
+at $z \approx 1$ and $0.05$. 
+
+While SHAM in principle assumes a one-to-one mapping, observations find a significant
+scatter in this stellar mass to halo mass mapping ($\sigma_{\log M_*}$). \cite{gu2016} 
+compile 
+Hence, when we use SHAM to construct our galaxy catalogs, we apply a $0.2$ dex log-normal 
+scatter in $M_∗$ at fixed $M_\mathrm{peak}$. 
+
+In Section~\ref{app:z1}, 
+
 %In Figure 1, we illustrate the evolution of the SMFs that we use for our SHAM prescription (solid) for z = 0.05, 0.5, and 0.9. Recently, using PRIMUS, Moustakas et al. (2013) found little evolution in the SMF for z < 1 at all mass ranges. Although previous works such as Bundy et al. (2006) find otherwise. To ensure that our results do not depend on our choice of the SMFs, later in §5.2, we repeat our analysis using SMFs with no evolution (i.e. Li & White 2009 SMF throughout 0 < z < 1) and with “extreme” evolution for z > 0.05 (dash-dotted in Fig- ure 1), in which the amplitude of the SMF at z = 1.2 is approximately half the amplitude of the fiducial SMF at z = 1.2. Furthermore, while the simplest version of SHAM assumes a one-to-one correspondence between Mpeak and M∗, observations suggest that there is a scat- ter of ∼ 0.2 dex in this relation (Zheng et al. 2007; Yang et al. 2008; More et al. 2009; Gu et al. 2016). Hence, we apply a 0.2 dex log-normal scatter in M∗ at fixed Mpeak in our SHAM prescription at each snapshot inde-
 %pendently.
 %So far, we have subhalos populated with galaxies and their stellar mass at each of the 15 simulation outputs spanning the redshift 0.05 < z < 1. For our sample, we restrict ourselves to galaxies classified as centrals by the simulation. And also to ones that are in both the z ∼ 0.05 and z ∼ 1 snapshots. This removes < 3% of central galaxies with M∗ > 109.5 M⊙ in the z ∼ 0.05 snapshot. Our sample inevitably includes “back splash” or “ejected” satellite galaxies (Wetzel et al. 2014), mis- classified as centrals. Excluding these galaxies, however, has a negligible impact on our results. We also note that while we do not have an explicit prescription for stellar mass growth from mergers, based on SHAM, the stellar mass growth traces the merger induced subhalo growth. As we discuss later in detail, mounting evidence disfavor merger driven quenching as the trigger of star formation quenching, so our treatment of mergers do not impact our quenching timescale results. In summary, we con- struct from our simulation a catalog of central galaxies whose stellar mass and halo mass is be traced through the redshift range 0.05 < z < 1.
@@ -171,6 +217,19 @@ of the central galaxies of SDSS DR7.
 \eitem 
 
 \section{Summary} \label{sec:summary}
+
+
+\appendix
+\section{$z \sim 1$ observations} \label{app:z1}
+Much of the results presented in this paper are based on comparison 
+between our model and observations at $z \sim 0.$. Our model is initalized 
+at $z \sim 1$. Therefore, in this section we test some of the choices 
+we make in our intializations. 
+
+\bitem
+\item Test impact of $z \sim 1$ SMF
+\item Test impact of $z \sim 1$ $\sigma_{\log M_*}$ 
+\eitem
 
 \begin{figure}
 \begin{center}
