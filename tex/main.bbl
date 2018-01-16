@@ -66,21 +66,19 @@ Davis, M., Efstathiou, G., Frenk, C.~S., \& White, S. D.~M. 1985,
   \href{http://dx.doi.org/10.1086/163168}{\JournalTitle{The Astrophysical
   Journal}, 292, 371}
 
+\bibitem[{Dempster {et~al.}(1977)Dempster, Laird, \& Rubin}]{dempster1977}
+Dempster, A.~P., Laird, N.~M., \& Rubin, D.~B. 1977, \JournalTitle{Journal of
+  the Royal Statistical Society. Series B (Methodological)}, 39, 1
+
 \bibitem[{Gu {et~al.}(2016)Gu, Conroy, \& Behroozi}]{gu2016}
 Gu, M., Conroy, C., \& Behroozi, P. 2016,
   \href{http://dx.doi.org/10.3847/0004-637X/833/1/2}{\JournalTitle{The
   Astrophysical Journal}, 833, 2}
 
-\bibitem[{Hahn {et~al.}(2017{\natexlab{a}})Hahn, Tinker, \& Wetzel}]{hahn2017a}
-Hahn, C., Tinker, J.~L., \& Wetzel, A.~R. 2017{\natexlab{a}},
+\bibitem[{Hahn {et~al.}(2017)Hahn, Tinker, \& Wetzel}]{hahn2017a}
+Hahn, C., Tinker, J.~L., \& Wetzel, A.~R. 2017,
   \href{http://dx.doi.org/10.3847/1538-4357/aa6d6b}{\JournalTitle{The
   Astrophysical Journal}, 841, 6}
-
-\bibitem[{Hahn {et~al.}(2017{\natexlab{b}})Hahn, Vakili, Walsh, Hearin, Hogg,
-  \& Campbell}]{hahn2017}
-Hahn, C., Vakili, M., Walsh, K., {et~al.} 2017{\natexlab{b}},
-  \href{http://dx.doi.org/10.1093/mnras/stx894}{\JournalTitle{Monthly Notices
-  of the Royal Astronomical Society}, 469, 2791}
 
 \bibitem[{Ilbert {et~al.}(2013)Ilbert, McCracken, Le~F{\`e}vre, Capak, Dunlop,
   Karim, Renzini, Caputi, Boissier, Arnouts, Aussel, Comparat, Guo, Hudelot,
@@ -96,12 +94,23 @@ Li, C., \& White, S. D.~M. 2009,
   \href{http://dx.doi.org/10.1111/j.1365-2966.2009.15268.x}{\JournalTitle{Monthly
   Notices of the Royal Astronomical Society}, 398, 2177}
 
+\bibitem[{Marchesini {et~al.}(2009)Marchesini, {van Dokkum},
+  F{\"o}rster~Schreiber, Franx, Labb{\'e}, \& Wuyts}]{marchesini2009}
+Marchesini, D., {van Dokkum}, P.~G., F{\"o}rster~Schreiber, N.~M., {et~al.}
+  2009, \href{http://dx.doi.org/10.1088/0004-637X/701/2/1765}{\JournalTitle{The
+  Astrophysical Journal}, 701, 1765}
+
 \bibitem[{Muzzin {et~al.}(2013)Muzzin, Marchesini, Stefanon, Franx, McCracken,
   Milvang-Jensen, Dunlop, Fynbo, Brammer, Labb{\'e}, \& {van
   Dokkum}}]{muzzin2013}
 Muzzin, A., Marchesini, D., Stefanon, M., {et~al.} 2013,
   \href{http://dx.doi.org/10.1088/0004-637X/777/1/18}{\JournalTitle{The
   Astrophysical Journal}, 777, 18}
+
+\bibitem[{Neal \& Hinton(1998)}]{neal1998}
+Neal, R.~M., \& Hinton, G.~E. 1998,
+  \href{http://dx.doi.org/10.1007/978-94-011-5014-9_12}{in Learning in
+  {{Graphical Models}}, NATO ASI Series} ({Springer, Dordrecht}), 355
 
 \bibitem[{Salim {et~al.}(2007)Salim, Rich, Charlot, Brinchmann, Johnson,
   Schiminovich, Seibert, Mallery, Heckman, Forster, Friedman, Martin,
@@ -110,6 +119,11 @@ Muzzin, A., Marchesini, D., Stefanon, M., {et~al.} 2013,
 Salim, S., Rich, R.~M., Charlot, S., {et~al.} 2007,
   \href{http://dx.doi.org/10.1086/519218}{\JournalTitle{The Astrophysical
   Journal Supplement Series}, 173, 267}
+
+\bibitem[{Schwarz(1978)}]{schwarz1978}
+Schwarz, G. 1978,
+  \href{http://dx.doi.org/10.1214/aos/1176344136}{\JournalTitle{The Annals of
+  Statistics}, 6, 461}
 
 \bibitem[{Tinker {et~al.}(2011)Tinker, Wetzel, \& Conroy}]{tinker2011}
 Tinker, J., Wetzel, A., \& Conroy, C. 2011, \JournalTitle{ArXiv e-prints},
