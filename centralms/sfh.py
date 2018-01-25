@@ -1012,13 +1012,24 @@ def SFR_sfms(logm, z, theta):
     '''
     assert theta is not None 
     
-    if 'mslope' not in theta.keys(): 
+    if 'name' not in theta.keys(): 
         raise ValueError
-    if 'zslope' not in theta.keys(): 
-        raise ValueError
-    #if 'offset' not in theta.keys(): 
-    #    raise ValueError
-    return theta['mslope'] * (logm - 10.5) + theta['zslope'] * (z - 0.05) - 0.11 
+    
+    if theta['name'] == 'flex': # this is a very flexible SFMS
+        if 'mslope' not in theta.keys(): 
+            raise ValueError
+        if 'zslope' not in theta.keys(): 
+            raise ValueError
+        return theta['mslope'] * (logm - 10.5) + theta['zslope'] * (z - 0.05) - 0.11 
+    elif theta['name'] == 'anchored':
+        if 'amp' not in theta.keys(): 
+            raise ValueError
+        if 'slope' not in theta.keys(): 
+            raise ValueError
+
+        # in this prescription, log SFR_MS is anchored at z = 0 from SDSS DR7 central galaxy SFMS
+        return (0.5757 * (logm - 10.5) - 0.13868) + \
+                (z - 0.05) * (theta['slope'] * (logm - 10.5) + theta['amp']) 
 
 
 def SSFR_sfms(logm, z, theta): 

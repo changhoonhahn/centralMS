@@ -31,8 +31,10 @@ def Theta(run):
             'randomSFH_0.5gyr', 'randomSFH_5gyr', 'randomSFH_10gyr',
 	    'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
             'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
-        tt['variable'] = ['SFMS z slope', 'SFMS m slope']#, 'SFMS offset']
-        tt['label'] = ['$m_{z; SFMS}$', '$m_{M_*; SFMS}$']#, '$c_\mathrm{SFMS}$']
+        #tt['variable'] = ['SFMS z slope', 'SFMS m slope']#, 'SFMS offset']
+        #tt['label'] = ['$m_{z; SFMS}$', '$m_{M_*; SFMS}$']#, '$c_\mathrm{SFMS}$']
+        tt['variable'] = ['SFMS amp z param', 'SFMS slope z param']
+        tt['label'] = ['$m_{z; amp}$', '$m_{z; slope}$']
     
     return tt
 
@@ -58,8 +60,13 @@ def Prior(run, shape='tophat'):
             'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
             'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         # SFMS_zslope, SFMS_mslope
-        prior_min = [1., 0.4]#, -0.15]
-        prior_max = [1.8, 0.8]#, -0.06]
+        #prior_min = [1., 0.4]#, -0.15]
+        #prior_max = [1.8, 0.8]#, -0.06]
+    
+        # new priors since we implemented "anchored" SFMS  
+        # SFMS amplitude z-dep parameter, SFMS slope z-dep parameter
+        prior_min = [1., -0.5]#, -0.15]
+        prior_max = [2., 0.5]#, -0.06]
     else:
         raise NotImplementedError
 
@@ -246,7 +253,8 @@ def model(run, args, **kwargs):
         raise NotImplementedError
 
     # SFMS slopes can change 
-    theta['sfms'] = {'zslope': args[0], 'mslope': args[1]}#, 'offset': args[2]}
+    #theta['sfms'] = {'zslope': args[0], 'mslope': args[1]}#, 'offset': args[2]}
+    theta['sfms'] = {'name': 'anchored', 'amp': args[0], 'slope': args[1]}
 
     # load in Subhalo Catalog (pure centrals)
     if 'sigma_smhm' in kwargs.keys(): 

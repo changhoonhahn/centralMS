@@ -2,6 +2,7 @@
 Simple wrapper for running ABC with commandline arguments 
 '''
 import sys 
+import env 
 from abcee import runABC
 
 #restart = int(sys.argv[1])
@@ -21,7 +22,7 @@ print 'N_particle = ', Npart
 
 # number of summary statistics 
 n_sum = int(sys.argv[4]) 
-if n_sum == 1:       # SSFR only distance metric
+if n_sum == 1:       # SMF only distance metric
     print 'SMF'
     sum_stat = ['smf'] 
 else: 

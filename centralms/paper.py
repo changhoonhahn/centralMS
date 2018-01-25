@@ -46,8 +46,14 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     fig = plt.figure(figsize=(10,5)) 
 
     # fit the SFMS using lettalkaboutquench sfms fitting
+    _fSFMS = fstarforms() 
+    _fit_logm, _fit_logsfr = _fSFMS.fit(gc_cat['mass'], gc_cat['sfr'], method='gaussmix', fit_range=None)
+    logsfr_ms = _fSFMS.powerlaw(logMfid=10.5) 
+    print _fSFMS._powerlaw_m
+    print _fSFMS._powerlaw_c
+
     fSFMS = fstarforms() 
-    fit_logm, fit_logsfr = fSFMS.fit(gc_cat['mass'], gc_cat['sfr'], method='gaussmix', fit_range=mrange)
+    fit_logm, _ = fSFMS.fit(gc_cat['mass'], gc_cat['sfr'], method='gaussmix', fit_range=mrange)
     _, fit_fsfms = fSFMS.frac_SFMS()
     i_fit = np.abs(fit_logm - np.mean(mrange)).argmin()
 
@@ -62,6 +68,8 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     #sub1.vlines(mrange[1], -5., 2., color='k', linewidth=2, linestyle='--')
     #sub1.fill_between(mrange, [2.,2.], [-5.,-5], color='#1F77B4', alpha=0.25)
     sub1.fill_between(mrange, [2.,2.], [-5.,-5], color='k', linewidth=0, alpha=0.25)
+    print _fit_logm, _fit_logsfr
+    sub1.plot(np.linspace(9.8, 11., 10), logsfr_ms(np.linspace(9.8, 11., 10)), c='k', linestyle='--') 
     sub1.set_xticks([9., 10., 11., 12.])
     sub1.set_xlabel('log$(\; M_*\; [M_\odot]\;)$', fontsize=20)
     sub1.set_yticks([-3., -2., -1., 0., 1.])
@@ -83,6 +91,14 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     xx = np.linspace(-14., -9, 100)
     sub2.fill_between(xx, np.zeros(len(xx)), gmm_weights[icomp]*MNorm.pdf(xx, gmm_means[icomp], gmm_vars[icomp]), 
             color='#1F77B4', linewidth=0)
+
+    for i_comp in range(len(gmm_vars)): 
+        if i_comp == 0: 
+            gmm_tot = gmm_weights[i_comp]*MNorm.pdf(xx, gmm_means[i_comp], gmm_vars[i_comp])
+        else: 
+            gmm_tot += gmm_weights[i_comp]*MNorm.pdf(xx, gmm_means[i_comp], gmm_vars[i_comp])
+    
+    #sub2.plot(xx, gmm_tot, color='r', linewidth=2)
 
     sub2.set_xlim([-13.25, -9.5]) 
     sub2.set_xticks([-10., -11., -12., -13.][::-1])
@@ -577,10 +593,10 @@ def sigMstar_tduty_fid(Mhalo=12, dMhalo=0.5):
 
 
 if __name__=="__main__": 
-    #groupcatSFMS(mrange=[10.6,10.8])
+    groupcatSFMS(mrange=[10.6,10.8])
     #SFMSprior_z1()
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
     #qaplotABC()
-    fQ_fSFMS()
+    #fQ_fSFMS()
     #SFHmodel(nsnap0=15)
