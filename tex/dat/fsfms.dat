@@ -1,12 +1,12 @@
 ### header ### 
 star-formation main sequence (SFMS) fraction: fraction of galaxies 
 within a log-normal fit of the SFMS. See paper for details.
-best-fit f_SFMS = -0.623 log M* + 6.898
+best-fit f_SFMS = -0.628 (log M* - 10.5) + 0.353
 columns: log M*, f_SFMS
 ### header ### 
-9.809937 	 0.741191
+9.809937 	 0.744339
 10.009212 	 0.681056
 10.209961 	 0.630153
 10.402542 	 0.342565
-10.600155 	 0.281746
-10.791300 	 0.180821
+10.600155 	 0.281733
+10.791300 	 0.177005

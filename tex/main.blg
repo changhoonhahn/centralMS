@@ -1,47 +1,58 @@
 This is BibTeX, Version 0.99d (TeX Live 2015)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: main.aux
-I found no \citation commands---while reading file main.aux
-I found no \bibstyle command---while reading file main.aux
-You've used 0 entries,
-            0 wiz_defined-function locations,
-            84 strings with 491 characters,
-and the built_in function-call counts, 0 in all, are:
-= -- 0
-> -- 0
-< -- 0
-+ -- 0
-- -- 0
-* -- 0
-:= -- 0
-add.period$ -- 0
-call.type$ -- 0
-change.case$ -- 0
-chr.to.int$ -- 0
-cite$ -- 0
-duplicate$ -- 0
-empty$ -- 0
-format.name$ -- 0
-if$ -- 0
-int.to.chr$ -- 0
+The style file: yahapj.bst
+Database file #1: centralMS.bib
+Warning--I didn't find a database entry for "hahn2017"
+Warning--I didn't find a database entry for "baldry2006"
+Warning--I didn't find a database entry for "drory2009"
+Warning--I didn't find a database entry for "cooper2010"
+Warning--I didn't find a database entry for "iovino2010"
+Warning--I didn't find a database entry for "peng2010"
+Warning--I didn't find a database entry for "geha2012"
+Warning--I didn't find a database entry for "moustakas2012"
+Warning--I didn't find a database entry for "kovac2014"
+Warning--I didn't find a database entry for "hahn2015"
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 29 entries,
+            3215 wiz_defined-function locations,
+            869 strings with 16229 characters,
+and the built_in function-call counts, 18746 in all, are:
+= -- 1316
+> -- 1690
+< -- 8
++ -- 655
+- -- 595
+* -- 1831
+:= -- 3431
+add.period$ -- 29
+call.type$ -- 29
+change.case$ -- 199
+chr.to.int$ -- 29
+cite$ -- 29
+duplicate$ -- 828
+empty$ -- 1044
+format.name$ -- 631
+if$ -- 3654
+int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 0
-newline$ -- 0
-num.names$ -- 0
-pop$ -- 0
-preamble$ -- 0
-purify$ -- 0
+missing$ -- 28
+newline$ -- 92
+num.names$ -- 116
+pop$ -- 305
+preamble$ -- 1
+purify$ -- 199
 quote$ -- 0
-skip$ -- 0
+skip$ -- 495
 stack$ -- 0
-substring$ -- 0
-swap$ -- 0
+substring$ -- 791
+swap$ -- 26
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 0
+type$ -- 261
 warning$ -- 0
-while$ -- 0
+while$ -- 138
 width$ -- 0
-write$ -- 0
-(There were 2 error messages)
+write$ -- 295
+(There were 10 warnings)

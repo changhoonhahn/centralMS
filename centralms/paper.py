@@ -46,8 +46,14 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     fig = plt.figure(figsize=(10,5)) 
 
     # fit the SFMS using lettalkaboutquench sfms fitting
+    _fSFMS = fstarforms() 
+    _fit_logm, _fit_logsfr = _fSFMS.fit(gc_cat['mass'], gc_cat['sfr'], method='gaussmix', fit_range=None)
+    logsfr_ms = _fSFMS.powerlaw(logMfid=10.5) 
+    print _fSFMS._powerlaw_m
+    print _fSFMS._powerlaw_c
+
     fSFMS = fstarforms() 
-    fit_logm, fit_logsfr = fSFMS.fit(gc_cat['mass'], gc_cat['sfr'], method='gaussmix', fit_range=mrange)
+    fit_logm, _ = fSFMS.fit(gc_cat['mass'], gc_cat['sfr'], method='gaussmix', fit_range=mrange)
     _, fit_fsfms = fSFMS.frac_SFMS()
     i_fit = np.abs(fit_logm - np.mean(mrange)).argmin()
 
@@ -62,6 +68,8 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     #sub1.vlines(mrange[1], -5., 2., color='k', linewidth=2, linestyle='--')
     #sub1.fill_between(mrange, [2.,2.], [-5.,-5], color='#1F77B4', alpha=0.25)
     sub1.fill_between(mrange, [2.,2.], [-5.,-5], color='k', linewidth=0, alpha=0.25)
+    print _fit_logm, _fit_logsfr
+    sub1.plot(np.linspace(9.8, 11., 10), logsfr_ms(np.linspace(9.8, 11., 10)), c='k', linestyle='--') 
     sub1.set_xticks([9., 10., 11., 12.])
     sub1.set_xlabel('log$(\; M_*\; [M_\odot]\;)$', fontsize=20)
     sub1.set_yticks([-3., -2., -1., 0., 1.])
@@ -84,8 +92,18 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     sub2.fill_between(xx, np.zeros(len(xx)), gmm_weights[icomp]*MNorm.pdf(xx, gmm_means[icomp], gmm_vars[icomp]), 
             color='#1F77B4', linewidth=0)
 
-    sub2.set_xlim([-9.5, -13.25]) 
-    sub2.set_xticks([-10., -11., -12., -13.])
+    for i_comp in range(len(gmm_vars)): 
+        if i_comp == 0: 
+            gmm_tot = gmm_weights[i_comp]*MNorm.pdf(xx, gmm_means[i_comp], gmm_vars[i_comp])
+        else: 
+            gmm_tot += gmm_weights[i_comp]*MNorm.pdf(xx, gmm_means[i_comp], gmm_vars[i_comp])
+    
+    #sub2.plot(xx, gmm_tot, color='r', linewidth=2)
+
+    sub2.set_xlim([-13.25, -9.5]) 
+    sub2.set_xticks([-10., -11., -12., -13.][::-1])
+    #sub2.set_xlim([-9.5, -13.25]) 
+    #sub2.set_xticks([-10., -11., -12., -13.])
     sub2.set_xlabel('log$(\; \mathrm{SSFR}\; [\mathrm{yr}^{-1}]\;)$', fontsize=20)
     sub2.set_ylim([0., 1.5]) 
     sub2.set_yticks([0., 0.5, 1., 1.5])
@@ -93,15 +111,15 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     # mass bin 
     sub2.text(0.5, 0.9, '$'+str(mrange[0])+'< \mathrm{log}\, M_* <'+str(mrange[1])+'$',
             ha='center', va='center', transform=sub2.transAxes, fontsize=20)
-    sub2.text(0.1, 0.33, '$f_\mathrm{SFMS}='+str(round(fit_fsfms[i_fit],2))+'$',
-            ha='left', va='center', transform=sub2.transAxes, fontsize=20)
+    sub2.text(0.9, 0.33, '$f_\mathrm{SFMS}='+str(round(fit_fsfms[i_fit],2))+'$',
+            ha='right', va='center', transform=sub2.transAxes, fontsize=20)
     fig.subplots_adjust(wspace=.3)
     fig.savefig(''.join([UT.tex_dir(), 'figs/groupcat.pdf']), bbox_inches='tight', dpi=150) 
     plt.close()
     return None
 
 
-def fQ_fSFMS(): 
+def fQ_fSFMS(logMfid=10.5): 
     ''' Figure comparing the quiescent fraction based on "traditional" SFMS cut 
     to the SFMS fraction. 
     '''
@@ -115,14 +133,14 @@ def fQ_fSFMS():
     _, fit_fsfms = fSFMS.frac_SFMS()
 
     # now fit a fSFMS(M*) 
-    coeff = np.polyfit(fit_logm, fit_fsfms, 1)
+    coeff = np.polyfit(fit_logm-logMfid, fit_fsfms, 1)
 
     # output f_SFMS to data (for posterity)
     f = open(''.join([UT.tex_dir(), 'dat/fsfms.dat']), 'w') 
     f.write('### header ### \n') 
     f.write('star-formation main sequence (SFMS) fraction: fraction of galaxies \n') 
     f.write('within a log-normal fit of the SFMS. See paper for details.\n') 
-    f.write('best-fit f_SFMS = '+str(round(coeff[0], 3))+' log M* + '+str(round(coeff[1],3))+'\n')
+    f.write('best-fit f_SFMS = '+str(round(coeff[0], 3))+' (log M* - '+str(logMfid)+') + '+str(round(coeff[1],3))+'\n')
     f.write('columns: log M*, f_SFMS\n') 
     f.write('### header ### \n') 
     for i_m in range(len(fit_logm)): 
@@ -138,7 +156,7 @@ def fQ_fSFMS():
     sub = fig.add_subplot(111)
     sub.scatter(fit_logm, 1. - fit_fsfms, lw=0, c=pretty_colors[1]) 
     marr = np.linspace(9., 12., 100) 
-    fsfms_bf = sub.plot(marr, 1-(coeff[0]*marr + coeff[1]), c=pretty_colors[1], lw=2, ls='-')
+    fsfms_bf = sub.plot(marr, 1-(coeff[0]*(marr-logMfid) + coeff[1]), c=pretty_colors[1], lw=2, ls='-')
     fq = sub.plot(marr, f_Q_cen(marr), c=pretty_colors[3], lw=1.5, ls='--')
     sub.set_xlim([9., 11.5])
     sub.set_xticks([9., 10., 11.])
@@ -317,8 +335,9 @@ def SFMSprior_z1():
     return None
 
 
-def qaplotABC(run, T):
-    ''' Figure that illustrates how the ABC fitting works.
+def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]): 
+    ''' Figure that illustrates how the ABC fitting works using two different
+    runs overplotted on it each other
     '''
     nsnap0 = 15
     sigma_smhm = 0.2
@@ -327,18 +346,22 @@ def qaplotABC(run, T):
     # summary statistics of data (i.e. the SMF) 
     subcat_dat = ABC.Data(nsnap0=nsnap0, sigma_smhm=sigma_smhm) # 'data'
     sumdata = ABC.SumData(sumstat, info=True, nsnap0=nsnap0, sigma_smhm=sigma_smhm)  
-
-    # get median theta from ABC runs 
-    abcout = ABC.readABC(run, T)
-    theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
-    # read in Model(theta_med) 
-    abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # directory where all the ABC files are stored
-    f = h5py.File(''.join([abc_dir, 'model.theta_median0.t', str(T), '.hdf5']), 'r') 
-    subcat_sim = {} 
-    for key in f.keys(): 
-        subcat_sim[key] = f[key].value
-    #subcat_sim = ABC.model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
-    sumsim = ABC.SumSim(sumstat, subcat_sim, info=True)
+    
+    subcat_sims, sumsims = [], [] 
+    for run, T in zip(runs, Ts): 
+        # get median theta from ABC runs 
+        abcout = ABC.readABC(run, T)
+        theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
+        # read in Model(theta_med) 
+        abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # directory where all the ABC files are stored
+        f = h5py.File(''.join([abc_dir, 'model.theta_median0.t', str(T), '.hdf5']), 'r') 
+        subcat_sim = {} 
+        for key in f.keys(): 
+            subcat_sim[key] = f[key].value
+        subcat_sims.append(subcat_sim)
+        sumsims.append(ABC.SumSim(sumstat, subcat_sim, info=True))
+    colors = ['#EE6A50', '#1F77B4']
+    labels = [r'model($\theta_\mathrm{median}$)', r'model($\theta_\mathrm{median}$)']
 
     fig = plt.figure(figsize=(16,5))
     _, _, phi_err = Obvs.MF_data(source='li-white', m_arr=sumdata[0][0]) # get uncertainties of central SMF
@@ -349,7 +372,11 @@ def qaplotABC(run, T):
     sub.errorbar(sumdata[0][0], sumdata[0][1], yerr=phi_err, fmt='.k', 
             label=r'$\Phi_\mathrm{cen}^{\footnotesize \mathrm{Li}\&\mathrm{White}(2009)}$') 
     #label='$f_\mathrm{cen} \Phi^{\mathrm{Li}\&\mathrm{White}(2009)}$')
-    sub.plot(sumsim[0][0], sumsim[0][1], label=r'model($\theta_\mathrm{median}$)')
+    for i_s, sumsim in enumerate(sumsims): 
+        if i_s == len(sumsims)-1: 
+            sub.plot(sumsim[0][0], sumsim[0][1], c=colors[i_s], ls='--')#, label=r'model($\theta_\mathrm{median}$)')
+        else: 
+            sub.plot(sumsim[0][0], sumsim[0][1], c=colors[i_s])#, label=r'model($\theta_\mathrm{median}$)')
     sub.set_xlim([9.5, 12.])
     sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
     sub.set_ylim([1e-6, 10**-1.75])
@@ -359,16 +386,17 @@ def qaplotABC(run, T):
 
     # --- SFMS panel ---
     sub = fig.add_subplot(1,3,2)
-    isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
     #gc = Cat.Observations('group_catalog', Mrcut=18, position='central')
     #gc_cat = gc.Read() 
     #sub.scatter(gc_cat['mass'], gc_cat['sfr'], s=2)
-    DFM.hist2d(
-            subcat_sim['m.star'][isSF], 
-            subcat_sim['sfr'][isSF], 
-            weights=subcat_sim['weights'][isSF], 
-            levels=[0.68, 0.95], range=[[9., 12.], [-3., 1.]], color='#1F77B4', 
-            bins=16, plot_datapoints=False, fill_contours=False, plot_density=True, ax=sub) 
+    for i_s, subcat_sim in enumerate(subcat_sims): 
+        isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+        DFM.hist2d(
+                subcat_sim['m.star'][isSF], 
+                subcat_sim['sfr'][isSF], 
+                weights=subcat_sim['weights'][isSF], 
+                levels=[0.68, 0.95], range=[[9., 12.], [-3., 1.]], color=colors[i_s], 
+                bins=16, plot_datapoints=False, fill_contours=False, plot_density=True, ax=sub) 
     
     # observations 
     #m_arr = np.arange(8., 12.1, 0.1)
@@ -382,42 +410,47 @@ def qaplotABC(run, T):
     sub.set_yticks([-2., -1., 0., 1.])
     sub.set_ylabel('log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}])$', fontsize=25)
 
+    # --- sigma_logM* panel ---
     sub = fig.add_subplot(1,3,3)
     smhmr = Obvs.Smhmr()
     # simulation 
     mhalo_bin = np.linspace(10., 15., 11)
-    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
-            dmhalo=0.5, weights=subcat_sim['weights'][isSF], m_bin=mhalo_bin)
-    #sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
-    sig_mhalos, counts = [], [] 
-    for i in range(1000): 
-        f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5']), 'r') 
-        subcat_sim_i = {} 
-        for key in f.keys(): 
-            subcat_sim_i[key] = f[key].value
-        #subcat_sim_i = ABC.model(run, theta_i, 
-        #        nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
-        isSF = np.where(subcat_sim_i['gclass'] == 'sf') # only SF galaxies 
-        m_mid_i, _, sig_mhalo_i, cnt_i = smhmr.Calculate(subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
-                dmhalo=0.5, weights=subcat_sim_i['weights'][isSF], m_bin=mhalo_bin)
-        #sub.plot(m_mid_i, sig_mhalo_i, c='k', lw=1, alpha=0.1) 
-        counts.append(cnt_i)
-        sig_mhalos.append(sig_mhalo_i)
-    
-    sig_mhalo_low = np.zeros(len(m_mid))
-    sig_mhalo_high = np.zeros(len(m_mid))
-    for im in range(len(m_mid)): 
-        above_zero = np.where(np.array(counts)[:,im] > 0) 
-        if len(above_zero[0]) > 0: 
-            sig_mhalo_low[im], sig_mhalo_high[im] = np.percentile((np.array(sig_mhalos)[:,im])[above_zero], [16, 84])#, axis=0)
-    sub.fill_between(m_mid, sig_mhalo_low, sig_mhalo_high, color='#1F77B4', linewidth=0, alpha=0.3) 
-    sub.set_xlim([11.5, 15.])
+    for i_s, subcat_sim in enumerate(subcat_sims): 
+        abc_dir = UT.dat_dir()+'abc/'+runs[i_s]+'/model/' # directory where all the ABC files are stored
+        isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+        m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+                dmhalo=0.5, weights=subcat_sim['weights'][isSF], m_bin=mhalo_bin)
+        #sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
+        sig_mhalos, counts = [], [] 
+        for i in range(1000): 
+            f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(Ts[i_s]), '.hdf5']), 'r') 
+            subcat_sim_i = {} 
+            for key in f.keys(): 
+                subcat_sim_i[key] = f[key].value
+            #subcat_sim_i = ABC.model(run, theta_i, 
+            #        nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+            isSF = np.where(subcat_sim_i['gclass'] == 'sf') # only SF galaxies 
+            m_mid_i, _, sig_mhalo_i, cnt_i = smhmr.Calculate(subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
+                    dmhalo=0.5, weights=subcat_sim_i['weights'][isSF], m_bin=mhalo_bin)
+            #sub.plot(m_mid_i, sig_mhalo_i, c='k', lw=1, alpha=0.1) 
+            counts.append(cnt_i)
+            sig_mhalos.append(sig_mhalo_i)
+        
+        sig_mhalo_low = np.zeros(len(m_mid))
+        sig_mhalo_high = np.zeros(len(m_mid))
+        for im in range(len(m_mid)): 
+            above_zero = np.where(np.array(counts)[:,im] > 0) 
+            if len(above_zero[0]) > 0: 
+                sig_mhalo_low[im], sig_mhalo_high[im] = np.percentile((np.array(sig_mhalos)[:,im])[above_zero], [16, 84])#, axis=0)
+        sub.fill_between(m_mid, sig_mhalo_low, sig_mhalo_high, color=colors[i_s], linewidth=0, alpha=0.3, label=labels[i_s]) 
+    sub.set_xlim([11.5, 14.])
     sub.set_xlabel('log $(\; M_\mathrm{halo}\; [M_\odot]\;)$', fontsize=25)
     sub.set_ylim([0., 0.6])
-    sub.set_ylabel('$\sigma_{\mathrm{log}\,M_*}$', fontsize=25)
+    sub.set_ylabel('$\sigma_{\mathrm{log}\,M_*}$', fontsize=27)
+    sub.legend(loc='upper right', prop={'size': 20}) 
 
     fig.subplots_adjust(wspace=0.3)
-    fig.savefig(''.join([UT.tex_dir(), 'figs/qaplot_abc_', run, '_t', str(T), '.pdf']), bbox_inches='tight', dpi=150) 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/qaplot_abc.pdf']), bbox_inches='tight', dpi=150) 
     plt.close()
     return None 
 
@@ -560,10 +593,10 @@ def sigMstar_tduty_fid(Mhalo=12, dMhalo=0.5):
 
 
 if __name__=="__main__": 
+    groupcatSFMS(mrange=[10.6,10.8])
     #SFMSprior_z1()
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
-    qaplotABC('test0', 14)
-    #groupcatSFMS(mrange=[10.6,10.8])
+    #qaplotABC()
     #fQ_fSFMS()
     #SFHmodel(nsnap0=15)
