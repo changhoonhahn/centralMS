@@ -94,7 +94,9 @@ galaxies: star formation -- cosmology: observations.}
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.9\textwidth]{figs/groupcat.pdf}
-\caption{SDSS DR7 Group Catalog. Fitting of the SFMS.}
+    \caption{Central galaxies in the SDSS DR7 group catalog. \emph{Left:} . 
+    \emph{Right:}
+    Fitting of the SFMS.}
 \label{fig:groupcat}
 \end{center}
 \end{figure}
@@ -146,20 +148,21 @@ using the \cite{white2002} $\mathtt{TreePM}$ code with flat $\Lambda$CDM cosmolo
 ($\Omega_m =0.274, \Omega_b = 0.0457, h = 0.7, n=0.95, \mathrm{and} \sigma_8 = 0.8$).
 From initial conditions at $z = 150$ generated from second-order Lagrangian 
 Perturbation Theory, $2048^3$ particles with mass of $1.98 \times 10^8\,M_\odot$ are 
-evolved in a $250 \mathrm{Mpc}/h$ box with a Plummer equivalent smoothing of $2.5\,\mathrm{kpc}/h$. 
-For a more detailed description of the simulation, we refer readers to~\cite{wetzel2013, wetzel2014}.
+evolved in a $250 \mathrm{Mpc}/h$ box with a Plummer equivalent smoothing of 
+$2.5\,\mathrm{kpc}/h$. For a more detailed description of the simulation, we 
+refer readers to~\cite{wetzel2013, wetzel2014}.
 
-From the $\mathrm{TreePM}$ $N$-body simulation, `host halos' are identified using the
-Friends-of-Friends (FoF) algorithm of \cite{davis1985} with linking length of $b = 0.168$
-times the mean inter-partcile spacing. Within these host halos, \cite{wetzel2013} identifies  
-`subhalos' as overdensities in phase space through a six-dimensional FoF 
-algorithm~\citep[FoF6D][]{white2010}. The host halos and subhalos are 
-then tracked across the $45$ simulation outputs from $z = 10$ to $0$ to 
-build merger trees~\citep{wetzel2009,wetzel2010}. The most massive 
-subhalos in newly-formed host halos at a given simulation output are defined 
-as the `central' subhalo. A central subhalo retains its `central' definition 
-until it falls into a more massive host halo, at which point it becomes a 
-`satellite' subhalo. 
+From the $\mathrm{TreePM}$ $N$-body simulation, `host halos' are identified 
+using the Friends-of-Friends (FoF) algorithm of \cite{davis1985} with 
+linking length of $b = 0.168$ times the mean inter-partcile spacing. Within 
+these host halos, \cite{wetzel2013} identifies `subhalos' as overdensities 
+in phase space through a six-dimensional FoF algorithm~\citep[FoF6D][]{white2010}. 
+The host halos and subhalos are then tracked across the $45$ simulation 
+outputs from $z = 10$ to $0$ to build merger trees~\citep{wetzel2009,wetzel2010}. 
+The most massive subhalos in newly-formed host halos at a given simulation 
+output are defined as the `central' subhalo. A central subhalo retains its 
+`central' definition until it falls into a more massive host halo, at which 
+point it becomes a `satellite' subhalo. 
 
 Each subhalo is assigned a $M_\mathrm{peak}$, the maxmum host halo mass that 
 it ever had as a central subhalo. Using $M_\mathrm{peak}$, we construct a galaxy 
@@ -173,108 +176,113 @@ compile empirical constraints on the scatter of this stellar mass to halo
 mass relation ($\sigma_{\log M_*}$). Using the SHAM mapping, we can 
 assign galaxy stellar mass to subhalos based on observed stellar mass 
 functions (SMFs) at the redshifts of the simulation outputs (snapshots). 
-By assigning galaxy $M_*$ independently at each snapshot, we not only track 
-the evolution of subhalos, but also the evolution of the galaxies' $M_*$. 
 
-In our SHAM prescription, we use the SMF from \cite{li2009} at $z = 0.05$ 
-and interpolate at higher redshifts between the \cite{li2009} SMF and the 
-SMF from \cite{marchesini2009} at $z = 1.6$. We choose the \cite{li2009} 
-SMF because it is based on the same SDSS NYU-VAGC sample as our SDSS DR7 
-group catalog (see Section~\ref{sec:sdss}). We choose the \cite{marchesini2009} 
-SMF, amongst others, because it produces interpolated SMFs that monotonically 
-increase at $z < 1$. As noted in \cite{hahn2017}, at $z \approx 1$, the 
-SMF interpolated between the \cite{li2009} and \cite{marchesini2009} SMFs 
-is consistent with more recent measurements from \cite{muzzin2013} and \cite{ilbert2013}. 
-As we describe later in this section, we are only interested in the snapshots 
-at $z \approx 0.05$ and $1$.
-
-\todo{need another paragraph; no clue what to say atm} 
+We use the SMF from \cite{li2009} at $z = 0.05$ and at higher redshifts 
+interpolate between the \cite{li2009} SMF and the SMF from \cite{marchesini2009} 
+at $z = 1.6$. We choose the \cite{li2009} SMF because it is based on the 
+same SDSS NYU-VAGC sample as our SDSS DR7 group catalog (Section~\ref{sec:sdss}). 
+We choose the \cite{marchesini2009} SMF, amongst others, because it produces 
+interpolated SMFs that monotonically increase at $z < 1$. As noted in 
+\cite{hahn2017}, at $z \approx 1$, the SMF interpolated between the 
+\cite{li2009} and \cite{marchesini2009} SMFs is consistent with more 
+recent measurements from \cite{muzzin2013} and \cite{ilbert2013}. 
+At each snapshot, we independently use SHAM to assign galaxy $M_*$. 
+This way, we not only track the evolution of subhalos, but also the 
+the galaxies' $M_*$. As we desribe later in this section, however, we're 
+only interested in the snapshots at $z \approx 0.05$ and $1$, respectively. 
+Next we describe how we select star forming central galaxies
+in our model and how we initalize them. 
 
 %In Section~\ref{app:z1}, 
-
-%In Figure 1, we illustrate the evolution of the SMFs that we use for our SHAM prescription (solid) for z = 0.05, 0.5, and 0.9. Recently, using PRIMUS, Moustakas et al. (2013) found little evolution in the SMF for z < 1 at all mass ranges. Although previous works such as Bundy et al. (2006) find otherwise. To ensure that our results do not depend on our choice of the SMFs, later in §5.2, we repeat our analysis using SMFs with no evolution (i.e. Li & White 2009 SMF throughout 0 < z < 1) and with “extreme” evolution for z > 0.05 (dash-dotted in Fig- ure 1), in which the amplitude of the SMF at z = 1.2 is approximately half the amplitude of the fiducial SMF at z = 1.2. Furthermore, while the simplest version of SHAM assumes a one-to-one correspondence between Mpeak and M∗, observations suggest that there is a scat- ter of ∼ 0.2 dex in this relation (Zheng et al. 2007; Yang et al. 2008; More et al. 2009; Gu et al. 2016). Hence, we apply a 0.2 dex log-normal scatter in M∗ at fixed Mpeak in our SHAM prescription at each snapshot inde-
-%pendently.
-%So far, we have subhalos populated with galaxies and their stellar mass at each of the 15 simulation outputs spanning the redshift 0.05 < z < 1. For our sample, we restrict ourselves to galaxies classified as centrals by the simulation. And also to ones that are in both the z ∼ 0.05 and z ∼ 1 snapshots. This removes < 3% of central galaxies with M∗ > 109.5 M⊙ in the z ∼ 0.05 snapshot. Our sample inevitably includes “back splash” or “ejected” satellite galaxies (Wetzel et al. 2014), mis- classified as centrals. Excluding these galaxies, however, has a negligible impact on our results. We also note that while we do not have an explicit prescription for stellar mass growth from mergers, based on SHAM, the stellar mass growth traces the merger induced subhalo growth. As we discuss later in detail, mounting evidence disfavor merger driven quenching as the trigger of star formation quenching, so our treatment of mergers do not impact our quenching timescale results. In summary, we con- struct from our simulation a catalog of central galaxies whose stellar mass and halo mass is be traced through the redshift range 0.05 < z < 1.
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 2 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.5\textwidth]{figs/fq_fsfms.pdf}
-\caption{SFMS fraction versus quiescent fraction from Hahn}
-\label{fig:fq_fsfms}
-\end{center}
-\end{figure}
+%\begin{figure}
+%\begin{center}
+%\includegraphics[width=0.5\textwidth]{figs/fq_fsfms.pdf}
+%\caption{SFMS fraction versus quiescent fraction from Hahn}
+%\label{fig:fq_fsfms}
+%\end{center}
+%\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Selecting $z \sim 0$ Star Forming Central Galaxies}  
-In order to examine the evolution of star-forming central galaxies, we need
-a model that tracks the SFR and stellar mass of SF galaxies. 
-To construct such a model, we first need to select star-forming galaxies 
-from the central galaxies in our simulation (Section~\ref{sec:sim}). Since 
-we're ultimately interested in comparing our model to observation, our 
-selection is based on $f^\mathrm{cen}_\mathrm{SFMS}(M_*)$, the fraction 
-of central galaxies within the star-forming main sequence, measured 
-from the SDSS DR7 VAGC (Section~\ref{sec:sdss}). Below, we 
-describe how we derive this $f^\mathrm{cen}_\mathrm{SFMS}(M_*)$ and use it 
-to select star-forming central galaxies in our model. 
+In our model, we're interested in tracking the evolution of the
+SFR and stellar mass of SF central galaxies. To construct such a model, 
+we first need to select star-forming galaxies from the central galaxies 
+in our simulation described earlier in this section. Since we later 
+compare our model to observation, our selection is based on 
+$f^\mathrm{cen}_\mathrm{SFMS}(M_*)$, the fraction of central galaxies 
+within the star-forming main sequence, measured from the SDSS DR7 VAGC 
+(Section~\ref{sec:sdss}). Below, we describe how we derive this 
+$f^\mathrm{cen}_\mathrm{SFMS}(M_*)$ and use it to select star-forming 
+central galaxies in our model. Afterwards we describe how we initalize 
+the SFRs and $M_*$ of these galaxies in our model.
 
 Often in the literature, an empirical color-color or SFR-$M_*$ cut 
 that separates the two main modes (red/blue or star-forming/quiescent) 
-in the distribution is chosen to classify galaxies 
-(\todo{Baldry et al. 2006; Drory et al. 2009; Cooper et al. 2010; Iovino et al. 2010; Peng et al. 2010; Geha et al. 2012; Kovaˇc et al. 2014; Hahn et al. 2015., moustakas2012,hahn2015}). 
+in the distribution is chosen to classify 
+galaxies~\citep{baldry2006, drory2009, cooper2010, iovino2010, peng2010, geha2012, moustakas2012, kovac2014, hahn2015}.
 The red/quiescent or blue/star-forming fractions derived from this sort of 
 classification, by construction, depend on the choice of cut and neglect the 
 transitioning galaxies~\emph{i.e.} the galaxies in the ``green valley''. 
-For our $f^\mathrm{cen}_\mathrm{SFMS}(M_*)$ measurement, we instead use a 
-method based on the SFMS fitting method from Tjitske et al.~(in prep). 
+For our $f^\mathrm{cen}_\mathrm{SFMS}(M_*)$ measurement, we instead use a
+method frm Tjitske et al.~(in prep), which is based on fitting the 
+SFMS from the SFR-$M_*$ distribution 
 
-The SFMS fitting scheme first divides the SDSS DR7 VAGC central galaxy 
-sample (Section~\ref{sec:sdss}) into stellar mass bins of 
+The SFMS fitting scheme first divides the SDSS DR7 VAGC central 
+galaxy sample (Section~\ref{sec:sdss}) into stellar mass bins of 
 width $\Delta \log M_* = 0.2~\mathrm{dex}$. We then fit the SSFR 
 distribution of each bin using Gaussian mixture models (GMMs) with 
 $1 - 3$ components using the expectation-maximization 
-algorithm~\citep[EM;][]{dempster1977, neal1998}. We restrict the 
-models to a maximum of $3$ components for the three possible
-galaxy classifications: quiescent, star-forming, and green valley populations. 
-Among the GMMs, we select the model with the lowest Bayesian Information 
-Criteria~\citep[BIC][]{schwarz1978}. We then designate the Gaussian component 
-of this GMM with mean $\log \mathrm{SSFR} > -11$ as the SFMS. In the 
-rare cases when more than one GMM component has mean 
-$\log \mathrm{SSFR} > -11$, we compare the weights of the components. 
-If the weight of one component is less than a third of the other, 
-we take the component with the higher weight to represent the SFMS; 
-otherwise, we omit the stellar mass bin altogether. The weight of the 
-SFMS GMM component provides an estimate of $f^\mathrm{cen}_\mathrm{SFMS}$ 
-for the given stellar mass bin. 
+algorithm~\citep[EM;][]{dempster1977, neal1998}. We restrict 
+ourselves to models with a maximum of $3$ components for the three 
+possible galaxy classifications: quiescent, star-forming, and green 
+valley populations. From the three GMMs, we select the model with 
+the lowest Bayesian Information Criteria~\citep[BIC][]{schwarz1978}. 
+The Gaussian component of this GMM with mean $\log \mathrm{SSFR} > -11$ 
+is identified as the SFMS. In the rare cases when more than one GMM 
+component has mean $\log \mathrm{SSFR} > -11$, we compare the weights 
+of the components.  If the weight of one component is less than a 
+third of the other, we take the component with the higher weight to 
+represent the SFMS. Otherwise, we omit the stellar mass bin altogether. 
+The weight of the SFMS GMM component provides an estimate of 
+$f^\mathrm{cen}_\mathrm{SFMS}$ for the given stellar mass bin. 
+In the right panel of Figure~\ref{fig:groupcat}, we plot the SFMS 
+GMM component (blue shaded region) of the $p(\log \mathrm{SSFR})$ 
+for the SDSS DR7 central galaxies within $10.6 < \log M_* < 10.8$. 
+The SFMS constitutes $f^\mathrm{cen}_\mathrm{SFMS} = 0.21$ of the 
+SDSS central galaxies in this stellar mass bin. 
 
-In the right panel of Figure~\ref{fig:groupcat}, we plot the SFMS GMM component
-(blue shaded region) of the $p(\log \mathrm{SSFR})$ for the SDSS DR7 central 
-galaxies within $10.6 < \log M_* < 10.8$. The SFMS constitutes 
-$f^\mathrm{cen}_\mathrm{SFMS} = 0.21$ of the SDSS central galaxies in 
-this stellar mass bin. \todo{Maybe put the GMM fit?} 
-Next, using $f^\mathrm{cen}_\mathrm{SFMS}$ spanning 
+Next, with the $f^\mathrm{cen}_\mathrm{SFMS}$ values spanning 
 the different stellar mass bins, we fit $f^\mathrm{cen}_\mathrm{SFMS}$ as 
 a function of $\log\,M_*$. Using a fiducial stellar mass of 
 $\log\,M_\mathrm{fid} = 10.5$, we derive the following best-fit 
 \beq \label{eq:f_cen_sfms}
 f^\mathrm{cen}_\mathrm{SFMS, bestfit}(M_*) = -0.627\,(\log\,M_* - 10.5) + 0.354. 
 \eeq
-In Figure~\ref{fig:fq_fsfms}, we compare $1 - f^\mathrm{cen}_\mathrm{SFMS}(M_*)$ 
-(blue solid) to $f_\mathrm{Q}^\mathrm{cen}(M_*; z\sim0)$ fit from \cite{hahn2017a} 
-(orange dashed). \todo{sentence about how the quiescent fractions are more or less in
-good agreement and that's good.} 
-Finally, with the parameterized $f^\mathrm{cen}_\mathrm{SFMS}(M_*)$ in 
-Eq.~\ref{eq:f_cen_sfms}, we randomly classify central galaxies from our simulation 
-as star-forming at $z \sim 0$.
+We note that this $f^\mathrm{cen}_\mathrm{SFMS, bestfit}(M_*)$ is 
+in good agreement with the $f_\mathrm{Q}^\mathrm{cen}(M_*; z\sim0)$ 
+fit from \cite{hahn2017a}. For each central galaxy in our simulation, 
+we assign a probability of it being on the SFMS, using 
+$f^\mathrm{cen}_\mathrm{SFMS, bestfit}(M_*)$ with $M_*$ at $z \sim 0$ 
+assigned through SHAM. Based on these probablities, we randomly 
+identify central galaxies from our simulation as star-forming at 
+$z \sim 0$.
 
-\bitem
-\item Then explain how it's not circular because the integrated $M_*$ has to reproduce the same SMF?
-\eitem
+At this point we make the assumption that once a SF galaxy quenches 
+its SF, it remains quiescent on long timescales. In other words, 
+all of the central galaxies that we place on the SFMS at $z \sim 0$, 
+were also on the SFMS at $z \sim 1$ --- the initial redshift of our
+model. 
+
+
+%\bitem
+%\item Then explain how it's not circular because the integrated $M_*$ has to reproduce the same SMF?
+%\eitem
+
 \subsection{Evolving along the Main Sequence} 
 \bitem
-\item talk about the assumption that no quiescent galaxy rejuvinates their star-formation 
 \item talk about how we assign the initial SFR using the SHAM M*
 \item Talk about the SFR and $M_*$ prescriptions 
 \item parameterization of SFMS 

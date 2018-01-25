@@ -4,10 +4,19 @@ The top-level auxiliary file: main.aux
 The style file: yahapj.bst
 Database file #1: centralMS.bib
 Warning--I didn't find a database entry for "hahn2017"
+Warning--I didn't find a database entry for "baldry2006"
+Warning--I didn't find a database entry for "drory2009"
+Warning--I didn't find a database entry for "cooper2010"
+Warning--I didn't find a database entry for "iovino2010"
+Warning--I didn't find a database entry for "peng2010"
+Warning--I didn't find a database entry for "geha2012"
+Warning--I didn't find a database entry for "moustakas2012"
+Warning--I didn't find a database entry for "kovac2014"
+Warning--I didn't find a database entry for "hahn2015"
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 You've used 29 entries,
             3215 wiz_defined-function locations,
-            860 strings with 16144 characters,
+            869 strings with 16229 characters,
 and the built_in function-call counts, 18746 in all, are:
 = -- 1316
 > -- 1690
@@ -46,4 +55,4 @@ warning$ -- 0
 while$ -- 138
 width$ -- 0
 write$ -- 295
-(There was 1 warning)
+(There were 10 warnings)
