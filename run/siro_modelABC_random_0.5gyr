@@ -4,4 +4,4 @@
 cd $PBS_O_WORKDIR
 export NPROCS=`wc -l $PBS_NODEFILE |gawk '//{print $1}'`
 export PATH="/home/users/hahn/anaconda2/bin:$PATH"
-python /home/users/hahn/projects/centralMS/centralms/run_modelABC.py randomSFH_0.5gyr 11 
+python /home/users/hahn/projects/centralMS/centralms/run_modelABC.py randomSFH_0.5gyr 14 
