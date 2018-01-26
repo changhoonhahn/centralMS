@@ -32,6 +32,17 @@ Abazajian, K.~N., Adelman-McCarthy, J.~K., Ag{\"u}eros, M.~A., {et~al.} 2009,
   \href{http://dx.doi.org/10.1088/0067-0049/182/2/543}{\JournalTitle{The
   Astrophysical Journal Supplement Series}, 182, 543}
 
+\bibitem[{Baldry {et~al.}(2006)Baldry, Balogh, Bower, Glazebrook, Nichol,
+  Bamford, \& Budavari}]{baldry2006}
+Baldry, I.~K., Balogh, M.~L., Bower, R.~G., {et~al.} 2006,
+  \href{http://dx.doi.org/10.1111/j.1365-2966.2006.11081.x}{\JournalTitle{Monthly
+  Notices of the Royal Astronomical Society}, 373, 469}
+
+\bibitem[{Blanton \& Moustakas(2009)}]{blanton2009}
+Blanton, M.~R., \& Moustakas, J. 2009,
+  \href{http://dx.doi.org/10.1146/annurev-astro-082708-101734}{\JournalTitle{Annual
+  Review of Astronomy and Astrophysics}, 47, 159}
+
 \bibitem[{Blanton \& Roweis(2007)}]{blanton2007}
 Blanton, M.~R., \& Roweis, S. 2007,
   \href{http://dx.doi.org/10.1086/510127}{\JournalTitle{The Astronomical
@@ -61,6 +72,11 @@ Chabrier, G. 2003,
   \href{http://dx.doi.org/10.1086/376392}{\JournalTitle{Publications of the
   Astronomical Society of the Pacific}, 115, 763}
 
+\bibitem[{Conroy {et~al.}(2006)Conroy, Wechsler, \& Kravtsov}]{conroy2006}
+Conroy, C., Wechsler, R.~H., \& Kravtsov, A.~V. 2006,
+  \href{http://dx.doi.org/10.1086/503602}{\JournalTitle{The Astrophysical
+  Journal}, 647, 201}
+
 \bibitem[{Davis {et~al.}(1985)Davis, Efstathiou, Frenk, \& White}]{davis1985}
 Davis, M., Efstathiou, G., Frenk, C.~S., \& White, S. D.~M. 1985,
   \href{http://dx.doi.org/10.1086/163168}{\JournalTitle{The Astrophysical
@@ -69,6 +85,13 @@ Davis, M., Efstathiou, G., Frenk, C.~S., \& White, S. D.~M. 1985,
 \bibitem[{Dempster {et~al.}(1977)Dempster, Laird, \& Rubin}]{dempster1977}
 Dempster, A.~P., Laird, N.~M., \& Rubin, D.~B. 1977, \JournalTitle{Journal of
   the Royal Statistical Society. Series B (Methodological)}, 39, 1
+
+\bibitem[{Drory {et~al.}(2009)Drory, Bundy, Leauthaud, Scoville, Capak, Ilbert,
+  Kartaltepe, Kneib, McCracken, Salvato, Sanders, Thompson, \&
+  Willott}]{drory2009}
+Drory, N., Bundy, K., Leauthaud, A., {et~al.} 2009,
+  \href{http://dx.doi.org/10.1088/0004-637X/707/2/1595}{\JournalTitle{The
+  Astrophysical Journal}, 707, 1595}
 
 \bibitem[{Gu {et~al.}(2016)Gu, Conroy, \& Behroozi}]{gu2016}
 Gu, M., Conroy, C., \& Behroozi, P. 2016,
@@ -80,6 +103,12 @@ Hahn, C., Tinker, J.~L., \& Wetzel, A.~R. 2017,
   \href{http://dx.doi.org/10.3847/1538-4357/aa6d6b}{\JournalTitle{The
   Astrophysical Journal}, 841, 6}
 
+\bibitem[{Hahn {et~al.}(2015)Hahn, Blanton, Moustakas, Coil, Cool, Eisenstein,
+  Skibba, Wong, \& Zhu}]{hahn2015}
+Hahn, C., Blanton, M.~R., Moustakas, J., {et~al.} 2015,
+  \href{http://dx.doi.org/10.1088/0004-637X/806/2/162}{\JournalTitle{The
+  Astrophysical Journal}, 806, 162}
+
 \bibitem[{Ilbert {et~al.}(2013)Ilbert, McCracken, Le~F{\`e}vre, Capak, Dunlop,
   Karim, Renzini, Caputi, Boissier, Arnouts, Aussel, Comparat, Guo, Hudelot,
   Kartaltepe, Kneib, Krogager, Le~Floc'h, Lilly, Mellier, Milvang-Jensen,
@@ -88,6 +117,11 @@ Hahn, C., Tinker, J.~L., \& Wetzel, A.~R. 2017,
 Ilbert, O., McCracken, H.~J., Le~F{\`e}vre, O., {et~al.} 2013,
   \href{http://dx.doi.org/10.1051/0004-6361/201321100}{\JournalTitle{Astronomy
   and Astrophysics}, 556, A55}
+
+\bibitem[{Leja {et~al.}(2013)Leja, {van Dokkum}, \& Franx}]{leja2013}
+Leja, J., {van Dokkum}, P., \& Franx, M. 2013,
+  \href{http://dx.doi.org/10.1088/0004-637X/766/1/33}{\JournalTitle{The
+  Astrophysical Journal}, 766}
 
 \bibitem[{Li \& White(2009)}]{li2009}
 Li, C., \& White, S. D.~M. 2009,
@@ -99,6 +133,12 @@ Li, C., \& White, S. D.~M. 2009,
 Marchesini, D., {van Dokkum}, P.~G., F{\"o}rster~Schreiber, N.~M., {et~al.}
   2009, \href{http://dx.doi.org/10.1088/0004-637X/701/2/1765}{\JournalTitle{The
   Astrophysical Journal}, 701, 1765}
+
+\bibitem[{Moustakas {et~al.}(2013)Moustakas, Coil, Aird, Blanton, Cool,
+  Eisenstein, Mendez, Wong, Zhu, \& Arnouts}]{moustakas2013}
+Moustakas, J., Coil, A.~L., Aird, J., {et~al.} 2013,
+  \href{http://dx.doi.org/10.1088/0004-637X/767/1/50}{\JournalTitle{The
+  Astrophysical Journal}, 767, 50}
 
 \bibitem[{Muzzin {et~al.}(2013)Muzzin, Marchesini, Stefanon, Franx, McCracken,
   Milvang-Jensen, Dunlop, Fynbo, Brammer, Labb{\'e}, \& {van
@@ -112,6 +152,19 @@ Neal, R.~M., \& Hinton, G.~E. 1998,
   \href{http://dx.doi.org/10.1007/978-94-011-5014-9_12}{in Learning in
   {{Graphical Models}}, NATO ASI Series} ({Springer, Dordrecht}), 355
 
+\bibitem[{Peng {et~al.}(2010)Peng, Lilly, Kova{\v c}, Bolzonella, Pozzetti,
+  Renzini, Zamorani, Ilbert, Knobel, Iovino, Maier, Cucciati, Tasca, Carollo,
+  Silverman, Kampczyk, {de Ravel}, Sanders, Scoville, Contini, Mainieri,
+  Scodeggio, Kneib, Le~F{\`e}vre, Bardelli, Bongiorno, Caputi, Coppa, {de la
+  Torre}, Franzetti, Garilli, Lamareille, Le~Borgne, Le~Brun, Mignoli,
+  Perez~Montero, Pello, Ricciardelli, Tanaka, Tresse, Vergani, Welikala, Zucca,
+  Oesch, Abbas, Barnes, Bordoloi, Bottini, Cappi, Cassata, Cimatti, Fumana,
+  Hasinger, Koekemoer, Leauthaud, Maccagni, Marinoni, McCracken, Memeo, Meneux,
+  Nair, Porciani, Presotto, \& Scaramella}]{peng2010}
+Peng, Y.-j., Lilly, S.~J., Kova{\v c}, K., {et~al.} 2010,
+  \href{http://dx.doi.org/10.1088/0004-637X/721/1/193}{\JournalTitle{The
+  Astrophysical Journal}, 721, 193}
+
 \bibitem[{Salim {et~al.}(2007)Salim, Rich, Charlot, Brinchmann, Johnson,
   Schiminovich, Seibert, Mallery, Heckman, Forster, Friedman, Martin,
   Morrissey, Neff, Small, Wyder, Bianchi, Donas, Lee, Madore, Milliard, Szalay,
@@ -124,6 +177,12 @@ Salim, S., Rich, R.~M., Charlot, S., {et~al.} 2007,
 Schwarz, G. 1978,
   \href{http://dx.doi.org/10.1214/aos/1176344136}{\JournalTitle{The Annals of
   Statistics}, 6, 461}
+
+\bibitem[{Speagle {et~al.}(2014)Speagle, Steinhardt, Capak, \&
+  Silverman}]{speagle2014}
+Speagle, J.~S., Steinhardt, C.~L., Capak, P.~L., \& Silverman, J.~D. 2014,
+  \href{http://dx.doi.org/10.1088/0067-0049/214/2/15}{\JournalTitle{The
+  Astrophysical Journal Supplement Series}, 214, 15}
 
 \bibitem[{Tinker {et~al.}(2011)Tinker, Wetzel, \& Conroy}]{tinker2011}
 Tinker, J., Wetzel, A., \& Conroy, C. 2011, \JournalTitle{ArXiv e-prints},

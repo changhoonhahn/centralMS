@@ -3,56 +3,45 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: main.aux
 The style file: yahapj.bst
 Database file #1: centralMS.bib
-Warning--I didn't find a database entry for "hahn2017"
-Warning--I didn't find a database entry for "baldry2006"
-Warning--I didn't find a database entry for "drory2009"
-Warning--I didn't find a database entry for "cooper2010"
-Warning--I didn't find a database entry for "iovino2010"
-Warning--I didn't find a database entry for "peng2010"
-Warning--I didn't find a database entry for "geha2012"
-Warning--I didn't find a database entry for "moustakas2012"
-Warning--I didn't find a database entry for "kovac2014"
-Warning--I didn't find a database entry for "hahn2015"
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
-You've used 29 entries,
+You've used 38 entries,
             3215 wiz_defined-function locations,
-            869 strings with 16229 characters,
-and the built_in function-call counts, 18746 in all, are:
-= -- 1316
-> -- 1690
-< -- 8
-+ -- 655
-- -- 595
-* -- 1831
-:= -- 3431
-add.period$ -- 29
-call.type$ -- 29
-change.case$ -- 199
-chr.to.int$ -- 29
-cite$ -- 29
-duplicate$ -- 828
-empty$ -- 1044
-format.name$ -- 631
-if$ -- 3654
+            913 strings with 19840 characters,
+and the built_in function-call counts, 24416 in all, are:
+= -- 1709
+> -- 2219
+< -- 9
++ -- 849
+- -- 784
+* -- 2401
+:= -- 4484
+add.period$ -- 38
+call.type$ -- 38
+change.case$ -- 258
+chr.to.int$ -- 38
+cite$ -- 38
+duplicate$ -- 1069
+empty$ -- 1353
+format.name$ -- 830
+if$ -- 4755
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 28
-newline$ -- 92
-num.names$ -- 116
-pop$ -- 305
+missing$ -- 37
+newline$ -- 119
+num.names$ -- 152
+pop$ -- 394
 preamble$ -- 1
-purify$ -- 199
+purify$ -- 258
 quote$ -- 0
-skip$ -- 495
+skip$ -- 641
 stack$ -- 0
-substring$ -- 791
-swap$ -- 26
+substring$ -- 1002
+swap$ -- 35
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 261
+type$ -- 342
 warning$ -- 0
-while$ -- 138
+while$ -- 177
 width$ -- 0
-write$ -- 295
-(There were 10 warnings)
+write$ -- 385

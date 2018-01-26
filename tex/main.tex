@@ -71,6 +71,10 @@ Andrew R.~Wetzel\altaffilmark{3,4,5}}
 galaxies: groups: general -- galaxies: evolution -- galaxies: haloes -- 
 galaxies: star formation -- cosmology: observations.}
 
+We find that by decreasing the timescale of stochasticity on a simple SFH model that traces the overall 
+SFMS evolution does in fact decrease the scatter seen in the SMHMR. However, even with timescales less
+than XXXX, we cannot reproduce observations. Ultimately to reproduce observations, we need to add in 
+assembly bias. 
 
 {\bf Checklist} 
 \bitem
@@ -86,6 +90,7 @@ galaxies: star formation -- cosmology: observations.}
 \item So the approach with combining observations with N-body (empirical modeling) is very effective in the context of the halo.
 \item Maybe talk about how the bigger context of why this is important?  
 \item Why only centrals -- because our current best understanding of satellites is that they quench after infall, so it doesn't make sense to look at them
+\item our model goes from $z < 1$ because beyond that the observations are statistically meaningless.  
 \eitem 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -166,7 +171,8 @@ point it becomes a `satellite' subhalo.
 
 Each subhalo is assigned a $M_\mathrm{peak}$, the maxmum host halo mass that 
 it ever had as a central subhalo. Using $M_\mathrm{peak}$, we construct a galaxy 
-catalog from the subhalos using subhalo abundance matching~\citep[SHAM;][]{vale2006,yang2009,wetzel2012,wetzel2013,wetzel2014,hahn2017a}\todo{citations conroy2006, leja2013}. 
+catalog from the subhalos using subhalo abundance 
+matching~\citep[SHAM;][]{conroy2006,vale2006,yang2009,wetzel2012,leja2013,wetzel2013,wetzel2014,hahn2017a}. 
 In principle, SHAM assumes a one-to-one mapping between subhalo 
 $M_\mathrm{peak}$ and galaxy stellar mass $M_*$: $n(> M_\mathrm{peak}) > n(> M_*)$
 that preserves the rank ordering. In practice, we apply a $0.2$ dex log-normal 
@@ -183,17 +189,19 @@ at $z = 1.6$. We choose the \cite{li2009} SMF because it is based on the
 same SDSS NYU-VAGC sample as our SDSS DR7 group catalog (Section~\ref{sec:sdss}). 
 We choose the \cite{marchesini2009} SMF, amongst others, because it produces 
 interpolated SMFs that monotonically increase at $z < 1$. As noted in 
-\cite{hahn2017}, at $z \approx 1$, the SMF interpolated between the 
+\cite{hahn2017a}, at $z \approx 1$, the SMF interpolated between the 
 \cite{li2009} and \cite{marchesini2009} SMFs is consistent with more 
 recent measurements from \cite{muzzin2013} and \cite{ilbert2013}. 
 At each snapshot, we independently use SHAM to assign galaxy $M_*$. 
 This way, we not only track the evolution of subhalos, but also the 
-the galaxies' $M_*$. As we desribe later in this section, however, we're 
-only interested in the snapshots at $z \approx 0.05$ and $1$, respectively. 
-Next we describe how we select star forming central galaxies
-in our model and how we initalize them. 
+the galaxies' $M_*$. With the $45$ snapshots outputs from our simulation, 
+we can in principle track the central galaxies back to $z \sim 10$. 
+However, we restrict ourselves to snapshots at $z \lesssim 1$, where we 
+have the most statistically meaningful observations. We next describe
+how we select star forming central galaxies in our model and initalize them. 
+%As we desribe later in this section, however, we're only interested in the snapshots at $z \approx 0.05$ and $1$, respectively. 
+\todo{TBD: Perhaps mention in appendix how we test different SMF assumptions}% (In Section~\ref{app:z1},)
 
-%In Section~\ref{app:z1}, 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 2 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -206,7 +214,7 @@ in our model and how we initalize them.
 %\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Selecting $z \sim 0$ Star Forming Central Galaxies}  
+\subsection{Selecting Star Forming Central Galaxies}  
 In our model, we're interested in tracking the evolution of the
 SFR and stellar mass of SF central galaxies. To construct such a model, 
 we first need to select star-forming galaxies from the central galaxies 
@@ -222,7 +230,7 @@ the SFRs and $M_*$ of these galaxies in our model.
 Often in the literature, an empirical color-color or SFR-$M_*$ cut 
 that separates the two main modes (red/blue or star-forming/quiescent) 
 in the distribution is chosen to classify 
-galaxies~\citep{baldry2006, drory2009, cooper2010, iovino2010, peng2010, geha2012, moustakas2012, kovac2014, hahn2015}.
+galaxies~\citep[\emph{e.g.}][]{baldry2006, blanton2009, drory2009, peng2010, moustakas2013, hahn2015}.
 The red/quiescent or blue/star-forming fractions derived from this sort of 
 classification, by construction, depend on the choice of cut and neglect the 
 transitioning galaxies~\emph{i.e.} the galaxies in the ``green valley''. 
@@ -271,10 +279,38 @@ identify central galaxies from our simulation as star-forming at
 $z \sim 0$.
 
 At this point we make the assumption that once a SF galaxy quenches 
-its SF, it remains quiescent on long timescales. In other words, 
-all of the central galaxies that we place on the SFMS at $z \sim 0$, 
-were also on the SFMS at $z \sim 1$ --- the initial redshift of our
-model. 
+its star formation, it remains quiescent. This means that all of the 
+central galaxies that we place on the SFMS at $z \sim 0$, were also 
+on the SFMS at $z \sim 1$ --- the initial redshift of our model. From 
+SHAM we have the initial $M_*$s of our SF centrals at $z \sim 1$. We 
+also need initial SFRs of these galaxies, which we can get from the 
+SFR of the SFMS. The measurements of the SFMS in the literature, however,
+have significant discrepancies. In \cite{speagle2014}, they compile 
+SFRs of the SFMS from 25 studies in the literature, each with different 
+methods of deriving galaxy SFR and $M_*$. Even after calibrating, the 
+SFRs of the SFMS from different analyses at $z \sim 1$ for $M_* = 10^{10.5}\, M_\odot$ 
+vary by more than a factor of 2~\citep[see Figure 2 of][]{speagle2014}. 
+This is particularly concerning since the amplitude and slope of the SFMS 
+significantly dictate the SFR and $M_*$ evolution of SF centrals in our 
+model. In order to deal with this uncertainty, we use the following 
+prescription for the SFMS SFR: $\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z)$. 
+
+At $z \sim 0$, we fix $\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z=0)$ to the 
+$\log\, \mathrm{SFR}(M_*)$ relation derived from fitting the SFMS 
+of the SDSS DR 7 centrals. \todo{details} 
+For $z > 0$, we include two free parameters to dictate the redshift
+evolution of the amplitude and slope of the SFMS SFR-$M_*$ relation: 
+\todo{param}, respectively. 
+\beq
+\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z) = 
+\eeq
+Later in our analysis, we set the following
+priors for \todo{params}: \todo{prior}. These priors are conservatively 
+chosen to encompass the best-fit SFMS  from \cite{speagle2014} and also 
+\todo{others}. 
+
+%In order to initialize the SFRs of SF centrals at z~1 we refer to observations from XXXXX. These observations however derived their galaxy properties from various different methods than the VAGC.  Instead of dealing with the differences in observations, we include two free parameters to dictate the redshift evolution of the amplitude and slope of the SFMS. 
+
 
 
 %\bitem
