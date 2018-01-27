@@ -4,44 +4,44 @@ The top-level auxiliary file: main.aux
 The style file: yahapj.bst
 Database file #1: centralMS.bib
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
-You've used 38 entries,
+You've used 39 entries,
             3215 wiz_defined-function locations,
-            913 strings with 19840 characters,
-and the built_in function-call counts, 24416 in all, are:
-= -- 1709
-> -- 2219
+            919 strings with 20352 characters,
+and the built_in function-call counts, 25071 in all, are:
+= -- 1749
+> -- 2287
 < -- 9
-+ -- 849
-- -- 784
-* -- 2401
-:= -- 4484
-add.period$ -- 38
-call.type$ -- 38
-change.case$ -- 258
-chr.to.int$ -- 38
-cite$ -- 38
-duplicate$ -- 1069
-empty$ -- 1353
-format.name$ -- 830
-if$ -- 4755
++ -- 874
+- -- 808
+* -- 2471
+:= -- 4609
+add.period$ -- 39
+call.type$ -- 39
+change.case$ -- 263
+chr.to.int$ -- 39
+cite$ -- 39
+duplicate$ -- 1095
+empty$ -- 1387
+format.name$ -- 855
+if$ -- 4880
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 37
-newline$ -- 119
-num.names$ -- 152
-pop$ -- 394
+missing$ -- 38
+newline$ -- 122
+num.names$ -- 156
+pop$ -- 402
 preamble$ -- 1
-purify$ -- 258
+purify$ -- 263
 quote$ -- 0
-skip$ -- 641
+skip$ -- 657
 stack$ -- 0
-substring$ -- 1002
-swap$ -- 35
+substring$ -- 1025
+swap$ -- 36
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 342
+type$ -- 351
 warning$ -- 0
-while$ -- 177
+while$ -- 181
 width$ -- 0
-write$ -- 385
+write$ -- 395
