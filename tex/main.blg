@@ -3,45 +3,49 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: main.aux
 The style file: yahapj.bst
 Database file #1: centralMS.bib
+Warning--I didn't find a database entry for "elbaz2007"
+Warning--I didn't find a database entry for "daddi2007"
+Warning--I didn't find a database entry for "whitaker2012"
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
-You've used 39 entries,
+You've used 40 entries,
             3215 wiz_defined-function locations,
-            919 strings with 20352 characters,
-and the built_in function-call counts, 25071 in all, are:
-= -- 1749
-> -- 2287
+            929 strings with 21133 characters,
+and the built_in function-call counts, 25896 in all, are:
+= -- 1791
+> -- 2391
 < -- 9
-+ -- 874
-- -- 808
-* -- 2471
-:= -- 4609
-add.period$ -- 39
-call.type$ -- 39
-change.case$ -- 263
-chr.to.int$ -- 39
-cite$ -- 39
-duplicate$ -- 1095
-empty$ -- 1387
-format.name$ -- 855
-if$ -- 4880
++ -- 910
+- -- 844
+* -- 2566
+:= -- 4772
+add.period$ -- 40
+call.type$ -- 40
+change.case$ -- 268
+chr.to.int$ -- 40
+cite$ -- 40
+duplicate$ -- 1123
+empty$ -- 1422
+format.name$ -- 892
+if$ -- 5033
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 38
-newline$ -- 122
-num.names$ -- 156
-pop$ -- 402
+missing$ -- 39
+newline$ -- 125
+num.names$ -- 160
+pop$ -- 411
 preamble$ -- 1
-purify$ -- 263
+purify$ -- 268
 quote$ -- 0
-skip$ -- 657
+skip$ -- 673
 stack$ -- 0
-substring$ -- 1025
-swap$ -- 36
+substring$ -- 1050
+swap$ -- 37
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 351
+type$ -- 360
 warning$ -- 0
-while$ -- 181
+while$ -- 185
 width$ -- 0
-write$ -- 395
+write$ -- 405
+(There were 3 warnings)

@@ -278,49 +278,45 @@ assigned through SHAM. Based on these probablities, we randomly
 identify central galaxies from our simulation as star-forming at 
 $z \sim 0$.
 
-At this point we make the assumption that once a SF galaxy quenches 
-its star formation, it remains quiescent. This means that all of the 
-central galaxies that we place on the SFMS at $z \sim 0$, were also 
-on the SFMS at $z \sim 1$ --- the initial redshift of our model. From 
-SHAM we have the initial $M_*$s of our SF centrals at $z \sim 1$. Their
-initial SFRs, we can assign based on observed SFR-$M_*$ relation of the 
-SFMS. The SFMS in the literature, however, have significant discrepancies. 
-In \cite{speagle2014}, 
-they compile SFRs of the SFMS from 25 studies in the literature, each 
-with different methods of deriving galaxy SFR and $M_*$. Even after 
-the calibration, the SFRs of the SFMS from different analyses at $z \sim 1$ 
-for $M_* = 10^{10.5}\, M_\odot$ vary by more than a factor of 
+At this point, to initialize our SF centrals,  we make the assumption 
+that once a SF galaxy quenches its star formation, it remains quiescent. 
+\todo{maybe something about rejuvenation?} 
+Without any quenched galaxies rejuvenating their star formation, the central galaxies that 
+we place on the SFMS at $z \sim 0$ were also on the SFMS at $z \sim 1$ --- 
+the initial redshift of our model. At $z \sim 1$, we initialize the SF centrals
+with SHAM $M_*$s and assign their initial SFRs based on the observed SFR-$M_*$ 
+relation of the SFMS. Observations in the literature at these redshifts, 
+however, not only use galaxy properties derived differently from the SDSS VAGC
+but they also find SFMS with significant discrepancies from one another. 
+In \cite{speagle2014}, they compile the SFR-$M_*$ relation of the SFMS 
+from 25 studies in the literature, each with different methods of deriving 
+galaxy properties. Even after the calibration, for a fixed $M_* = 10^{10.5}\, M_\odot$, 
+the SFRs of the SFMS from different analyses at $z \sim 1$ vary by more than a factor of 
 2~\citep[see Figure 2 of][]{speagle2014}. This is particularly concerning 
-since the amplitude and slope of the SFMS significantly dictate the SFR 
-and $M_*$ evolution of SF centrals in our model. In order to deal with 
-this uncertainty, we use the following prescription for the SFMS SFR: 
-$\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z)$. 
+since the redshift evolution of the SFMS dictate the SFR and $M_*$ evolution 
+of SF centrals in our model. So to deal with this uncertainty, we parameterize 
+the SFMS SFR ($\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z)$) with free parameters 
+that characterize the redshift dependence and marginalize over them later in 
+the analysis. 
 
-At $z \sim 0$, the central galaxies of the SDSS DR7 group catalog 
-provide an anchoring measurement of the SFMS. We therefore fix 
-$\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z=0)$ to $\log\, \mathrm{SFR}(M_*)$ 
-of the SDSS central galaxy SFMS. To obtain the SFMS $\log\, \mathrm{SFR}(M_*)$ 
-of the SDSS centrals, we again take the SFMS GMM components, used to 
-estimate $f^\mathrm{cen}_\mathrm{SFMS}$, at each stellar mass bin and 
-linearly fit their mean $\log\, \mathrm{SFR}$ as a function of $M_*$. 
-For $z > 0$, we include two free parameters to dictate the redshift
-evolution of the amplitude and slope of the SFMS SFR-$M_*$ relation: 
-$A_z$ and $m_z$, respectively. 
-\beq
+For our $\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z)$, at $z \sim 0$ we anchor our 
+SFMS to the SFMS of the SDSS central galaxies, which we obtain from the 
+SFMS GMM components used to estimate $f^\mathrm{cen}_\mathrm{SFMS}$. Using 
+the mean $\log\, \mathrm{SFR}$ of the SFMS GMM component at each stellar 
+mass bin, we linearly fit $\log\, \mathrm{SFR}(M_*)$. Then for $z > 0$, we 
+include two free parameters to account for the redshift evolution of the 
+amplitude and slope of the SFMS SFR-$M_*$ relation: $A_z$ and $m_z$, respectively. 
+\beq \label{eq:logsfr_ms}
 \log\,\mathrm{SFR}_\mathrm{MS}(M_*, z) = 
 \eeq
-Later in our analysis, we set the following priors for $A_z$ and $m_z$: 
-\todo{prior}. These priors are conservatively chosen to encompass the 
-best-fit SFMS from \cite{speagle2014} and also measurements from 
-\cite{moustakas2013,lee2015}. 
-
-%In order to initialize the SFRs of SF centrals at z~1 we refer to observations from XXXXX. These observations however derived their galaxy properties from various different methods than the VAGC.  Instead of dealing with the differences in observations, we include two free parameters to dictate the redshift evolution of the amplitude and slope of the SFMS. 
-
-
-
-%\bitem
-%\item Then explain how it's not circular because the integrated $M_*$ has to reproduce the same SMF?
-%\eitem
+Later, we conservatively choose the priors for $A_z$ and $m_z$ that encompass 
+the best-fit SFMS from~\cite{speagle2014} and measurements from~\cite{moustakas2013} 
+and~\cite{lee2015}. Using Eq.~\ref{eq:logsfr_ms}, we initialize the $z \sim 1$ 
+$\log\, \mathrm{SFR}$s of our SF centrals by randomly sampling a log-normal distribution 
+centered about our $\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z=1)$ with a constant scatter 
+of $0.3\,\mathrm{dex}$, motivated from observations~\citep{noeske2007, elbaz2007, daddi2007, salim2007, whitaker2012, lee2015}. 
+With our SF centrals initalized at $z \sim 1$, next we describe how 
+we evolve their SFR and $M_*$ in our model.
 
 \subsection{Evolving along the Main Sequence} 
 \bitem
