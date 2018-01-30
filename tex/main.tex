@@ -30,6 +30,7 @@
 \newcommand{\fqcen}{f_\mathrm{Q}^\mathrm{cen}}
 \newcommand{\zinit}{z_\mathrm{initial}}
 \newcommand{\taucen}{\tau_\mathrm{Q}^\mathrm{cen}}
+\newcommand{\logsfr}{\log \, \mathrm{SFR}}
 \newcommand{\bitem}{\begin{itemize}}
 \newcommand{\eitem}{\end{itemize}}
 
@@ -99,7 +100,10 @@ assembly bias.
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.9\textwidth]{figs/groupcat.pdf}
-    \caption{Central galaxies in the SDSS DR7 group catalog. \emph{Left:} . 
+    \caption{Central galaxies of the SDSS DR7 group catalog. \emph{Left panel:} We plot 
+    the SFR-$M_*$ relation of the SDSS central galaxies. The contours illustrate the bimodal
+    distribution of the galaxy properties. The dashed line represents the linear fit to the 
+    SFMS as described in Section~\ref{sec:sfcen}. 
     \emph{Right:}
     Fitting of the SFMS.}
 \label{fig:groupcat}
@@ -214,7 +218,7 @@ how we select star forming central galaxies in our model and initalize them.
 %\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Selecting Star Forming Central Galaxies}  
+\subsection{Selecting Star Forming Central Galaxies}  \label{sec:sfcen}
 In our model, we're interested in tracking the evolution of the
 SFR and stellar mass of SF central galaxies. To construct such a model, 
 we first need to select star-forming galaxies from the central galaxies 
@@ -303,29 +307,102 @@ For our $\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z)$, at $z \sim 0$ we anchor our
 SFMS to the SFMS of the SDSS central galaxies, which we obtain from the 
 SFMS GMM components used to estimate $f^\mathrm{cen}_\mathrm{SFMS}$. Using 
 the mean $\log\, \mathrm{SFR}$ of the SFMS GMM component at each stellar 
-mass bin, we linearly fit $\log\, \mathrm{SFR}(M_*)$. Then for $z > 0$, we 
-include two free parameters to account for the redshift evolution of the 
-amplitude and slope of the SFMS SFR-$M_*$ relation: $A_z$ and $m_z$, respectively. 
+mass bin, we linearly fit $\log\, \mathrm{SFR}(M_*)$ (see dashed line in 
+Figure~\ref{fig:groupcat}). Then for $z > 0$, we include two free 
+parameters to account for the redshift evolution of the amplitude and 
+slope of the SFMS SFR-$M_*$ relation: $A_z$ and $m_z$, respectively. 
+We parameterize the mean $\log\,\mathrm{SFR}$ of the SFMS as, 
 \beq \label{eq:logsfr_ms}
-\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z) = 
+\log\,\overline{\mathrm{SFR}}_\mathrm{MS}(M_*, z) = . 
 \eeq
-Later, we conservatively choose the priors for $A_z$ and $m_z$ that encompass 
-the best-fit SFMS from~\cite{speagle2014} and measurements from~\cite{moustakas2013} 
-and~\cite{lee2015}. Using Eq.~\ref{eq:logsfr_ms}, we initialize the $z \sim 1$ 
-$\log\, \mathrm{SFR}$s of our SF centrals by randomly sampling a log-normal distribution 
-centered about our $\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z=1)$ with a constant scatter 
-of $0.3\,\mathrm{dex}$, motivated from observations~\citep{noeske2007, elbaz2007, daddi2007, salim2007, whitaker2012, lee2015}. 
-With our SF centrals initalized at $z \sim 1$, next we describe how 
-we evolve their SFR and $M_*$ in our model.
+Then we initialize the $z \sim 1$ SFRs of our SF centrals by randomly sampling 
+a log-normal distribution centered about $\log\,\overline{\mathrm{SFR}}_\mathrm{MS}(M_*, z=1)$ 
+with a constant scatter of $0.3\,\mathrm{dex}$, motivated from 
+observations~\citep{noeske2007, elbaz2007, daddi2007, whitaker2012}. 
+Later in our analysis, when we choose priors for $A_z$ and $m_z$, we conservatively 
+choose a range that encompass the best-fit SFMS from~\cite{speagle2014} and measurements from~\cite{moustakas2013} 
+and~\cite{lee2015}. With our SF centrals initalized at $z \sim 1$, next, we 
+describe how we evolve their SFR and $M_*$ in our model.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure 3 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figs/sfh_pedagogical.pdf}
+\caption{Pedagogical figure that illustrates how star forming central galaxies in our model
+evolve along the SFMS.}
+\label{fig:sfh_model}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Evolving along the Main Sequence} 
+The tight correlation between the SFRs and stellar masses of star-forming 
+galaxies (\emph{i.e.} SFMS) spans over four orders of magnitude in stellar 
+mass and extends well beyond the local universe out to $z > 2$ 
+(\emph{e.g.}~\citealt{noeske2007,daddi2007,elbaz2007,salim2007,santini2009,karim2011,whitaker2012,moustakas2013,lee2015}; see also references in \citealt{speagle2014}). 
+The SFMS, as mentioned earlier, is even observed to have a constant scatter
+of $0.3\,\mathrm{dex}$. Given its persistence, the SFMS provides a straightforward
+relationship to characterize the SFRs and $M_*$s of star-forming galaxies 
+throughout $z < 1$. In the previous section, we initalized the SF central 
+galaxies of our model based on the SFMS at $z \sim 1$. Eq.~\ref{logsfr_ms}, 
+however, is the mean $\logsfr$ of the SFMS; the offset between each SF 
+central's $\logsfr$ and $\log\,\overline{\mathrm{SFR}}_\mathrm{MS}$, 
+\beq \label{eq:logsfr_sf} 
+\logsfr(M_*, t) = \log\,\overline{\mathrm{SFR}}_\mathrm{MS}(M_*, t) + \Delta \logsfr,
+\eeq
+$\Delta \logsfr$, remains to be specified.  
+
+In the most naive model, we fix $\Delta \logsfr$s to the initial randomly 
+sampled offsets at $z \sim 1$. SF centrals with higher than average 
+initial SFRs continue above the average SFMS, while SF centrals 
+with lower than average initial SFRs continue below the average SFRs. 
+With such star formation histories (SFHs), as we demonstrate later in detail, 
+the scatter in stellar mass at fixed halo mass of the SF centrals diverges 
+substantially over cosmic time. We therefore introduce the ``\emph{star formation duty 
+cycle}''. Rather than staying fixed, the amplitude of $\Delta \logsfr$ randomly 
+fluctuates on some specified timescale $t_\mathrm{duty}$. 
+\todo{something about how 
+we do not expect such a simplified prescription for SFH to precisely reflect 
+reality. However, we expect it to loosely encapsulate the stochasticity of 
+star formation (some physical interpretation and motivation for the duty cycle). 
+Furthermore, such SFHs reproduce the log normal SFR distribution of the SFMS 
+at any point}. 
+In the left panel of Figure~\ref{fig:sfh_model}, we 
+present the time evolution of $\Delta \logsfr$ for two pedagogical SFHs of SF 
+centrals in our model with $t_\mathrm{duty} = 0.5$ Gyr (blue) and $5$ Gyr (orange).  
+The shaded region represents the $0.3\,\mathrm{dex}$ $1\sigma$ log normal 
+scatter of the SFMS SFR.  
+
+With a prescription for $\Delta \logsfr$, we can now evolve both the 
+SFR and $M_*$ of our SF centrals along the main sequence. As Eq.~\ref{eq:logsfr_sf}
+reveals, SFR of our SF centrals is function of $M_*$. Meanwhile, $M_*$ is the
+integral of the SFR over time: 
+\beq \label{eq:integ_mass} 
+M_*(t) = f_\mathrm{retain} \int\limits_{t_0}^{t} \mathrm{SFR(M_*, t)}\,\mathrm{d}t + M_0. 
+\eeq
+$f_\mathrm{retain}$ here is the fraction of stellar mass that is retained after 
+supernovae and stellar winds; we use $f_\mathrm{retain} = 0.6$~\citep{wetzel2013}. 
+$t_0$ and $M_0$ are the initial cosmic time and stellar mass at $z \sim 1$, respectively. 
+Combining Eqs.~\ref{eq:logsfr_sf} and~\ref{eq:integ_mass}, we get a different 
+equation, which we solve to evolve the SFR and $M_*$ of our SF centrals.  
+The right panel of Figure~\ref{fig:sfh_model} presents the SFR and $M_*$ 
+evolutions of the two pedagogical SF centrals from the left panel. The dotted 
+lines represent $\log\,\overline{\mathrm{SFR}}_\mathrm{MS}$ of the SFMS at different 
+redshifts starting from $z = 1$ to $0.05$. %We also $\log\,\overline{\mathrm{SFR}}_\mathrm{MS}$
+
+Now that we have a model that evolves the SFR and $M_*$ of the SF centrals, 
+we want to compare our model to observations. Our model is constructed using 
+the SMF and SMHMR at $z = 1$ and based on the observed evolution of the SFMS. 
+It has two free parameters $A_z$ and $m_z$, which allow for a flexible redshift 
+dependence of the SFMS. At the final snapshot $z \sim 0$, besides the SFR distribution,
+which our model reproduces by construction, we want our model to reproduce both 
+the observed SMF and the scatter in SMHMR. 
+
+
 \bitem
-\item talk about how we assign the initial SFR using the SHAM M*
-\item Talk about the SFR and $M_*$ prescriptions 
-\item parameterization of SFMS 
-\item explicitly talk about the free parameters of the model. 
-\item priors for $\beta_M$ and $\beta_z$ encompass the observable constraints 
-\item talk about inference using ABC
+\item brief paragraph about inference using ABC
 \eitem
 
 \section{Results}
@@ -365,16 +442,6 @@ we make in our intializations.
 \item Test impact of $z \sim 1$ SMF
 \item Test impact of $z \sim 1$ $\sigma_{\log M_*}$ 
 \eitem
-
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.9\textwidth]{figs/sfh_pedagogical.pdf}
-\caption{Pedagogical figure that illustrates how star forming central galaxies in our model
-evolve along the SFMS.}
-\label{fig:sfh_model}
-\end{center}
-\end{figure}
-
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.9\textwidth]{figs/qaplot_abc.pdf}

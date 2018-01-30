@@ -6,10 +6,12 @@ Database file #1: centralMS.bib
 Warning--I didn't find a database entry for "elbaz2007"
 Warning--I didn't find a database entry for "daddi2007"
 Warning--I didn't find a database entry for "whitaker2012"
+Warning--I didn't find a database entry for "santini2009"
+Warning--I didn't find a database entry for "karim2011"
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 You've used 40 entries,
             3215 wiz_defined-function locations,
-            929 strings with 21133 characters,
+            931 strings with 21153 characters,
 and the built_in function-call counts, 25896 in all, are:
 = -- 1791
 > -- 2391
@@ -48,4 +50,4 @@ warning$ -- 0
 while$ -- 185
 width$ -- 0
 write$ -- 405
-(There were 3 warnings)
+(There were 5 warnings)
