@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  29 JAN 2018 22:38
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  5 FEB 2018 10:14
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -369,74 +369,77 @@ Package pdftex.def Info: figs/sfh_pedagogical.pdf used on input line 332.
 (pdftex.def)             Requested size: 422.77661pt x 227.64659pt.
 
 
+LaTeX Warning: Reference `sec:' on page 7 undefined on input line 335.
+
+
 Package natbib Warning: Citation `daddi2007' on page 7 undefined on input line 
-344.
+345.
 
 
 Package natbib Warning: Citation `elbaz2007' on page 7 undefined on input line 
-344.
+345.
 
 
 Package natbib Warning: Citation `santini2009' on page 7 undefined on input lin
-e 344.
+e 345.
 
 
 Package natbib Warning: Citation `karim2011' on page 7 undefined on input line 
-344.
+345.
 
 
 Package natbib Warning: Citation `whitaker2012' on page 7 undefined on input li
-ne 344.
+ne 345.
 
 
-LaTeX Warning: Reference `logsfr_ms' on page 7 undefined on input line 349.
+LaTeX Warning: Reference `logsfr_ms' on page 7 undefined on input line 350.
 
 [7]
 
 Package natbib Warning: Citation `cameron2012' on page 8 undefined on input lin
-e 406.
+e 408.
 
 
 Package natbib Warning: Citation `weyant2013' on page 8 undefined on input line
- 406.
+ 408.
 
 
 Package natbib Warning: Citation `ishida2015' on page 8 undefined on input line
- 406.
+ 408.
 
 
 Package natbib Warning: Citation `hahn2016' on page 8 undefined on input line 4
-08.
+10.
 
 
 Package natbib Warning: Citation `hahn2017' on page 8 undefined on input line 4
-08.
+10.
 
 [8]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 439.
+(hyperref)                removing `math shift' on input line 444.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\sim' on input line 439.
+(hyperref)                removing `\sim' on input line 444.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 439.
+(hyperref)                removing `math shift' on input line 444.
 
-<figs/qaplot_abc.pdf, id=322, 990.69456pt x 348.01567pt>
+<figs/qaplot_abc.pdf, id=329, 990.69456pt x 348.01567pt>
 File: figs/qaplot_abc.pdf Graphic file (type pdf)
 
 <use figs/qaplot_abc.pdf>
-Package pdftex.def Info: figs/qaplot_abc.pdf used on input line 451.
+Package pdftex.def Info: figs/qaplot_abc.pdf used on input line 456.
 (pdftex.def)             Requested size: 422.77661pt x 148.51273pt.
 
-<figs/sigMstar_tduty.pdf, id=323, 351.34497pt x 343.76328pt>
+<figs/sigMstar_tduty.pdf, id=330, 351.34497pt x 343.76328pt>
 File: figs/sigMstar_tduty.pdf Graphic file (type pdf)
 
 <use figs/sigMstar_tduty.pdf>
-Package pdftex.def Info: figs/sigMstar_tduty.pdf used on input line 460.
+Package pdftex.def Info: figs/sigMstar_tduty.pdf used on input line 465.
 (pdftex.def)             Requested size: 234.87749pt x 229.80614pt.
  (./main.bbl [9] [10 <./figs/sfh_pedagogical.pdf> <./figs/qaplot_abc.pdf
 
@@ -451,12 +454,12 @@ l.267 \end{thebibliography}
 
 Package natbib Warning: There were undefined citations.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 474.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 479.
 [12] [13 <./figs/sigMstar_tduty.pdf>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 474.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 479.
  (./main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 474.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 474.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 479.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 479.
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: E233F68C306FCBAE0AEB87CF74799418;774.
 
@@ -466,16 +469,16 @@ LaTeX Warning: There were undefined references.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 474.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 479.
  ) 
 Here is how much of TeX's memory you used:
- 6628 strings out of 493089
- 94765 string characters out of 6134842
- 187638 words of memory out of 5000000
- 9959 multiletter control sequences out of 15000+600000
+ 6629 strings out of 493089
+ 94771 string characters out of 6134842
+ 187670 words of memory out of 5000000
+ 9960 multiletter control sequences out of 15000+600000
  13195 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 34i,8n,31p,1989b,469s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 34i,8n,31p,1989b,463s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
@@ -493,10 +496,10 @@ e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive
 /texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2015/
 texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2015/t
 exmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on main.pdf (13 pages, 426133 bytes).
+Output written on main.pdf (13 pages, 427153 bytes).
 PDF statistics:
- 532 PDF objects out of 1000 (max. 8388607)
- 485 compressed objects within 5 object streams
+ 541 PDF objects out of 1000 (max. 8388607)
+ 494 compressed objects within 5 object streams
  78 named destinations out of 1000 (max. 500000)
  117 words of extra memory for PDF output out of 10000 (max. 10000000)
 

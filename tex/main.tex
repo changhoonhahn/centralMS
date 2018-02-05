@@ -330,7 +330,8 @@ describe how we evolve their SFR and $M_*$ in our model.
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.9\textwidth]{figs/sfh_pedagogical.pdf}
-\caption{Pedagogical figure that illustrates how star forming central galaxies in our model
+    \caption{Pedagogical illustration of our model described in Sections~\ref{sec:}
+    how star forming central galaxies in our model
 evolve along the SFMS.}
 \label{fig:sfh_model}
 \end{center}
@@ -393,20 +394,24 @@ lines represent $\log\,\overline{\mathrm{SFR}}_\mathrm{MS}$ of the SFMS at diffe
 redshifts starting from $z = 1$ to $0.05$. %We also $\log\,\overline{\mathrm{SFR}}_\mathrm{MS}$
 
 Now that we have a model that evolves the SFR and $M_*$ of the SF centrals, 
-we compare our model to observations. Our model is constructed using the SMF 
+we can compare our model to observations. Our model is constructed using the SMF 
 and SMHMR at $z = 1$ and based on the observed evolution of the SFMS. 
 It has two free parameters $A_z$ and $m_z$, which allow for a flexible redshift 
-dependence of the SFMS. At the final snapshot $z \sim 0$, our model reproduces 
-the SFR distribution by construction. Therefore, we compare our model the SMF of our 
-model at $z \sim 0$ to the SDSS DR7 VAGC SMF from \cite{li2009}. For the parameter 
-estimation, we use Approximate Bayesian Computation (ABC). ABC has the advantage over standard approaches to parameter inference in that it does not 
+dependence of the SFMS. At the final snapshot, $z \sim 0$, our model reproduces 
+the observed SFR distribution by construction. We also want our model to reproduce 
+the SDSS DR7 VAGC $z \sim 0$~\cite{li2009} SMF. To compare our model to observation
+we use the parameter estimation framework of Approximate Bayesian Computation (ABC). 
+ABC has the advantage over standard approaches to parameter inference in that it does not 
 require evaluating the likelihood. It relies only on a simulation of the observed 
 data and a distance metric to quantify the ``closeness'' between the observed data
 and simulation. Many variations of ABC has been used in astronomy and 
-cosmology~\citep[\emph{e.g.}][]{cameron2012,weyant2013,ishida2015,alsing2018}, 
-however we use ABC in conjunction with the efficient Population Monte Carlo (PMC)
-importance sampling as in~\citep{hahn2016,hahn2017}. 
-
+cosmology~\citep[\emph{e.g.}][]{cameron2012,weyant2013,ishida2015,alsing2018}; 
+we use ABC in conjunction with the efficient Population Monte Carlo (PMC)
+importance sampling as in~\citep{hahn2016, hahn2017}. For the priors of $A_z$ and $m_z$, 
+we uniform distributions spanning \todo{numbers} and \todo{numbers}, respectively. As we 
+mentioned in Section~\ref{sec:sfcen}, the range of the prior were conservatively chosen
+to encompass the best-fit SFMS from~\cite{speagle2014} and measurements 
+from~\cite{moustakas2013} and~\cite{lee2015} at $z \sim 1$. 
 \todo{describe the distance metric and the priors} 
 
 \section{Results}
