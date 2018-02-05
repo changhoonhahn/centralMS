@@ -551,8 +551,9 @@ if __name__=='__main__':
     #test_qaplotABC('test0', 9)
     #test_ABCsumstat('randomSFH', 7)
     #sfh_name = 'rSFH_r0.99_delay'
+    #sfh_name = 'test0' # 'randomSFH_short'
     sfh_name = 'randomSFH_1gyr' # 'randomSFH_short'
-    test_model_ABCparticle(sfh_name, 13)
-    #for t in range(1,12)[::-1]: #[5,6]: #range(5):
-    #    test_plotABC(sfh_name, t)
-    #    test_qaplotABC(sfh_name, t)
+    #test_model_ABCparticle(sfh_name, 13)
+    for t in [11]: #range(1,12)[::-1]: #[5,6]: #range(5):
+        test_plotABC(sfh_name, t)
+        test_qaplotABC(sfh_name, t)

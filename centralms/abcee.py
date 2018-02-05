@@ -65,7 +65,7 @@ def Prior(run, shape='tophat'):
     
         # new priors since we implemented "anchored" SFMS  
         # SFMS amplitude z-dep parameter, SFMS slope z-dep parameter
-        prior_min = [1., -0.5]#, -0.15]
+        prior_min = [0.5, -0.5]#, -0.15]
         prior_max = [2., 0.5]#, -0.06]
     else:
         raise NotImplementedError
@@ -751,8 +751,7 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2):
         for key in ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'gclass']: 
             f.create_dataset(key, data=subcat_sim[key])
         f.close()
-    return None  
-'''
+    #return None  
     # now save the rest 
     for i in range(len(abcout['w'])): 
         subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
@@ -762,4 +761,3 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2):
             f.create_dataset(key, data=subcat_sim_i[key])
         f.close()
     return None  
-'''

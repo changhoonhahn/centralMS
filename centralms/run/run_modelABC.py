@@ -1,6 +1,7 @@
 '''
 wrapper for evaluating Model(ABC particle)
 '''
+import env 
 import sys 
 from abcee import model_ABCparticle 
 
