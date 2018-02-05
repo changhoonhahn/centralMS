@@ -4,4 +4,4 @@
 cd $PBS_O_WORKDIR
 export NPROCS=`wc -l $PBS_NODEFILE |gawk '//{print $1}'`
 export PATH="/home/users/hahn/anaconda2/bin:$PATH"
-/usr/local/openmpi-1.10.7/bin/mpiexec -np $NPROCS -npernode 24 python /home/users/hahn/projects/centralMS/centralms/run_abcee.py test0 15 1000 1 0 
+/usr/local/openmpi-1.10.7/bin/mpiexec -np $NPROCS -npernode 24 python /home/users/hahn/projects/centralMS/centralms/run/run_abcee.py test0 15 1000 1 0 
