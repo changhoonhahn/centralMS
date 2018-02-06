@@ -180,14 +180,19 @@ def SFHmodel(nsnap0=15):
     pretty_colors = prettycolors()  
     fig = plt.figure(figsize=(10,5))
     # log SFR - log M* galaxy evolution 
-    sub1 = fig.add_subplot(121)
+    sub1 = fig.add_subplot(122)
     # Delta log SFR(t) evolution 
-    sub2 = fig.add_subplot(122)
+    sub2 = fig.add_subplot(121)
     sub2.fill_between([5., 14.], [0.3, 0.3], [-0.3, -0.3], color='k', alpha=0.15, linewidth=0)
-    sub2.fill_between([5., 14.], [0.6, 0.6], [-0.6, -0.6], color='k', alpha=0.05, linewidth=0)
+    #sub2.fill_between([5., 14.], [0.6, 0.6], [-0.6, -0.6], color='k', alpha=0.05, linewidth=0)
     
-    for i_m, method in enumerate(['randomSFH', 'randomSFH_long']): 
-        subcat, eev = ABC.model(method, np.array([1.35, 0.6]), nsnap0=nsnap0, 
+    for i_m, method in enumerate(['randomSFH_1gyr', 'randomSFH_5gyr']): 
+        #if method == 'randomSFH_1gyr': 
+        #    theta = [1.21, -0.06]
+        #elif method == 'randomSFH_5gyr': 
+        #    theta = [0.91, -0.24]
+        theta = [1., -0.15]
+        subcat, eev = ABC.model(method, np.array(theta), nsnap0=nsnap0, 
                 downsampled='14', sigma_smhm=0.2, forTests=True)
 
         # randomly pick a galaxy that match the below criteria
@@ -210,14 +215,12 @@ def SFHmodel(nsnap0=15):
         sfr_hist = np.array(sfr_hist)
         
         # SFMS 
-        sfr_sfms = [Obvs.SSFR_SFMS(mstar_hist[0], UT.z_nsnap(nsnap0), 
-            theta_SFMS=subcat['theta_sfms']) + mstar_hist[0]]
+        sfr_sfms = [SFH.SFR_sfms(mstar_hist[0], UT.z_nsnap(nsnap0), subcat['theta_sfms'])]
         for ii, isnap in enumerate(range(2,nsnap0)[::-1]): 
-            sfr_sfms.append(Obvs.SSFR_SFMS(mstar_hist[ii+1], UT.z_nsnap(isnap), 
-                theta_SFMS=subcat['theta_sfms']) + mstar_hist[ii+1])
-        sfr_sfms.append(Obvs.SSFR_SFMS(mstar_hist[-1], UT.z_nsnap(1), 
-                theta_SFMS=subcat['theta_sfms']) + mstar_hist[-1])
-        sfr_sfms = np.array(sfr_sfms)[:,0]
+            sfr_sfms.append(SFH.SFR_sfms(mstar_hist[ii+1], UT.z_nsnap(isnap), 
+                subcat['theta_sfms']))
+        sfr_sfms.append(SFH.SFR_sfms(mstar_hist[-1], UT.z_nsnap(1), subcat['theta_sfms']))
+        sfr_sfms = np.array(sfr_sfms)
         f_sfms = interp1d(mstar_hist, sfr_sfms, kind='slinear') #smooth
         t_mstar = interp1d(mstar_hist, UT.t_nsnap(range(1,nsnap0+1)[::-1]))
 
@@ -241,13 +244,16 @@ def SFHmodel(nsnap0=15):
         m_arr = np.linspace(9., 12., 100)
         zs = np.arange(0., 1.2, 0.25)
         zs[0] = 0.05
-        for z in zs: 
-            sub1.plot(m_arr, Obvs.SSFR_SFMS(m_arr, z, theta_SFMS=subcat['theta_sfms']) + m_arr,
-                    c='k', ls=':', lw=0.75)
-            sub1.text(10.05, Obvs.SSFR_SFMS(10.05, z, theta_SFMS=subcat['theta_sfms'])+10.05, 
-                    '$z = '+str(z)+'$', 
-                    rotation=0.5*np.arctan(subcat['theta_sfms']['mslope'])*180./np.pi, 
-                    fontsize=12, va='bottom')
+        if i_m == 0: 
+            for z in zs: 
+                mslope = SFH.SFR_sfms(11., z, subcat['theta_sfms']) - \
+                        SFH.SFR_sfms(10., z, subcat['theta_sfms'])
+                sub1.plot(m_arr, SFH.SFR_sfms(m_arr, z, subcat['theta_sfms']),
+                        c='k', ls=':', lw=0.75)
+                sub1.text(10.05, SFH.SFR_sfms(10.05, z, subcat['theta_sfms']), 
+                        '$z = '+str(z)+'$', 
+                        rotation=0.5*np.arctan(mslope)*180./np.pi, 
+                        fontsize=12, va='bottom')
         
         xx, yy = [], []
         for i in range(len(eev.dlogSFR_amp[i_random][0])-1):
@@ -257,9 +263,9 @@ def SFHmodel(nsnap0=15):
             yy.append(eev.dlogSFR_amp[i_random][0][i])
         if i_m == 0: 
             sub2.plot([UT.t_nsnap(nsnap0), UT.t_nsnap(1)], [0.,0.], ls='--', c='k')
-        if method == 'randomSFH': 
+        if method == 'randomSFH_1gyr': 
             lbl = '$t_\mathrm{duty} = 0.5\,\mathrm{Gyr}$'
-        elif method == 'randomSFH_long':
+        elif method == 'randomSFH_5gyr':
             lbl = '$t_\mathrm{duty} = 5\,\mathrm{Gyr}$'
             
         sub2.plot(xx, yy, c=pretty_colors[2*i_m+1], label=lbl)
@@ -593,10 +599,10 @@ def sigMstar_tduty_fid(Mhalo=12, dMhalo=0.5):
 
 
 if __name__=="__main__": 
-    groupcatSFMS(mrange=[10.6,10.8])
+    #groupcatSFMS(mrange=[10.6,10.8])
     #SFMSprior_z1()
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
     #qaplotABC()
     #fQ_fSFMS()
-    #SFHmodel(nsnap0=15)
+    SFHmodel(nsnap0=15)
