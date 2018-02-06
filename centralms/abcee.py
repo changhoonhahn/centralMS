@@ -29,13 +29,15 @@ def Theta(run):
     tt = {} 
     if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_2gyr', 
             'randomSFH_0.5gyr', 'randomSFH_5gyr', 'randomSFH_10gyr',
+            'randomSFH_5gyr_narrSFMS', 
 	    'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
             'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         #tt['variable'] = ['SFMS z slope', 'SFMS m slope']#, 'SFMS offset']
         #tt['label'] = ['$m_{z; SFMS}$', '$m_{M_*; SFMS}$']#, '$c_\mathrm{SFMS}$']
         tt['variable'] = ['SFMS amp z param', 'SFMS slope z param']
         tt['label'] = ['$m_{z; amp}$', '$m_{z; slope}$']
-    
+    else: 
+        raise ValueError
     return tt
 
 
@@ -57,6 +59,7 @@ def Prior(run, shape='tophat'):
 
     if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_0.5gyr', 
             'randomSFH_2gyr', 'randomSFH_5gyr', 'randomSFH_10gyr',
+            'randomSFH_5gyr_narrSFMS', 
             'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
             'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
         # SFMS_zslope, SFMS_mslope
