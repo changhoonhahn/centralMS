@@ -142,10 +142,11 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         
         # make sure that nsnap0 is consistent with initial conditions!
         dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
-        for i in range(dlogSFR_amp.shape[1]): 
-            print np.std(dlogSFR_amp[:,i])
-            plt.hist(dlogSFR_amp[:,i]) 
-            plt.show() 
+        # testing the distribution of delta SFR
+        #for i in range(dlogSFR_amp.shape[1]): 
+        #    print np.std(dlogSFR_amp[:,i])
+        #    plt.hist(dlogSFR_amp[:,i]) 
+        #    plt.show() 
 
         F_sfr = _logSFR_dSFR_tsteps
         
