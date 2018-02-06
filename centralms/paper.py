@@ -289,6 +289,99 @@ def SFHmodel(nsnap0=15):
     return None 
 
 
+def Illustris_SFH(): 
+    ''' Figure that uses Illustris SFHs to justify our model of galaxies 
+    '''
+    # read in illustris SFH file from Tijske
+    dat = h5py.File(UT.dat_dir()+'binsv2all1e8Msunh_z0.hdf5', 'r')
+
+    # formed stellar mass is in a grid of time bins and metallicity
+    t_bins = np.array([0.0, 0.005, 0.015, 0.025, 0.035, 0.045, 0.055, 0.065, 0.075, 0.085, 0.095, 0.125,0.175,0.225,0.275,0.325,0.375,0.425,0.475,0.55,0.65,0.75,0.85,0.95,1.125,1.375,1.625,1.875,2.125,2.375,2.625,2.875,3.125,3.375,3.625,3.875,4.25,4.75,5.25,5.75,6.25,6.75,7.25,7.75,8.25,8.75,9.25,9.75,10.25,10.75,11.25,11.75,12.25,12.75,13.25,13.75])
+    
+    galpop = {}
+    galpop['M*'] = dat['CurrentStellarMass'].value.flatten() * 1e10 # current stellar mass
+    # calculate SFRs
+    # first sum up all the metallicities so you have delta M* in a grid of galaxies and time 
+    # then average SFR over the 0.015 Gyr time period 
+    sfh_grid = dat['FormedStellarMass'].value
+    dM_t = np.sum(sfh_grid, axis=1) 
+
+    #galpop['sfr'] = (1e10 * (dM_t[:,0] + dM_t[:,1])/(0.015 * 1e9)).flatten() 
+    sfhs = np.zeros((len(galpop['M*']), len(t_bins)-2))
+    t_mid = np.zeros(len(t_bins)-2)
+    # z=0 SFR averaged over 150Myr
+    sfhs[:,0] = (1e10 * (dM_t[:,0] + dM_t[:,1])/(0.015 * 1e9)).flatten() 
+    sfhs[:,1:] = 10.*(dM_t[:,2:-1]/(t_bins[3:] - t_bins[2:-1]))
+    t_mid[0] = 0.0075
+    t_mid[1:] = 0.5 *(t_bins[3:] + t_bins[2:-1])
+
+    # stellar mass one timestep ago 
+    M_t_1 = np.zeros((len(galpop['M*']), len(t_bins)-1))
+    M_t_1[:,0] = galpop['M*'] - 1e10 * (dM_t[:,0] + dM_t[:,1]) 
+    for i in range(1,M_t_1.shape[1]): 
+        M_t_1[:,i] = M_t_1[:,i-1] - 1e10 * dM_t[:,i+1]
+    # stellar mass history at t_mid 
+    Msh = 0.5 * (M_t_1[:,:-1] + M_t_1[:,1:]) 
+    
+    # calculate delta log SFR for galaxies by fitting SFMS every 10 time bins 
+    dlogsfrs, t_skip = [], [] 
+    for i in range(len(t_mid)-12): 
+        fSFMS = fstarforms() 
+        fit_logm_i, fit_logsfr_i = fSFMS.fit(np.log10(Msh[:,i]), np.log10(sfhs[:,i]),
+                method='gaussmix', fit_range=[9.0, 10.5], dlogm=0.2)
+        sfms_fit_i = fSFMS.powerlaw(logMfid=10.5)
+
+        fig = plt.figure() 
+        sub = fig.add_subplot(111)
+        DFM.hist2d(np.log10(Msh[:,i]), np.log10(sfhs[:,i]),
+                levels=[0.68, 0.95], range=[[9., 12.], [-3., 2.]], 
+                bins=16, ax=sub) 
+        sub.scatter(fit_logm_i, fit_logsfr_i, c='r', marker='x')
+        sub.text(0.95, 0.1, '$t_\mathrm{cosmic} = '+str(13.75 - t_mid[i])+'$',
+                ha='right', va='center', transform=sub.transAxes, fontsize=20)
+
+        m_arr = np.linspace(9.0, 12.0, 20) 
+        sub.plot(m_arr, sfms_fit_i(m_arr), c='k', lw=2, ls='--') 
+        fig.savefig(''.join([UT.fig_dir(), 'illustris.sfms.', str(i), '.png']), 
+                bbox_inches='tight') 
+        plt.close() 
+
+        if fSFMS._powerlaw_m < 0.5 or fSFMS._powerlaw_m > 1.5 or len(fit_logm_i) < 3: 
+            continue
+
+        dlogsfrs.append(np.log10(sfhs[:,i]) - sfms_fit_i(np.log10(Msh[:,i]))) 
+        t_skip.append(t_mid[i]) 
+
+    # now fit SFMS at z ~ 0  
+    fSFMS = fstarforms() 
+    fit_logm, fit_logsfr = fSFMS.fit(np.log10(galpop['M*']), np.log10(sfhs[:,0]), 
+            method='gaussmix', fit_range=[9.0, 10.5], dlogm=0.2)
+    sfms_fit = fSFMS.powerlaw(logMfid=10.5)
+
+    # star-forming galaxies at z ~ 0 
+    z0sf = ((np.log10(sfhs[:,0]) > sfms_fit(np.log10(galpop['M*']))-0.5) & 
+            (np.log10(galpop['M*']) > 10.5) &  (np.log10(galpop['M*']) < 10.6)) 
+    #z0q = ((np.log10(sfhs[:,0]) < sfms_fit(np.log10(galpop['M*']))-0.9) & 
+    #        (np.log10(galpop['M*']) > 10.5) &  (np.log10(galpop['M*']) < 10.6)) 
+
+    fig = plt.figure()
+    sub = fig.add_subplot(111)
+    for i in np.arange(len(z0sf))[z0sf]: 
+        sub.plot(t_bins[-1] - t_skip, np.array(dlogsfrs)[:,i], c='k', alpha=0.1, lw=0.1) 
+    z0sf = ((np.log10(sfhs[:,0]) > sfms_fit(np.log10(galpop['M*']))-0.1) & 
+            (np.log10(galpop['M*']) > 10.5) &  (np.log10(galpop['M*']) < 10.6)) 
+    for ii, i in enumerate(np.random.choice(np.arange(len(z0sf))[z0sf], 10)): 
+        sub.plot(t_bins[-1] - t_skip, np.array(dlogsfrs)[:,i], lw=1, c='C'+str(ii)) 
+    sub.set_xlim([11., 13.75]) 
+    sub.set_xlabel('$t_\mathrm{cosmic}$ [Gyr]', fontsize=20) 
+    sub.set_ylim([-.6, .6]) 
+    sub.set_yticks([-0.4, 0., 0.4]) 
+    sub.set_ylabel('$\Delta$ log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}])$', fontsize=20)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/illustris.sfh.pdf']), bbox_inches='tight', dpi=150) 
+    plt.close() 
+    return None 
+
+
 def SFMSprior_z1():
     ''' Compare SFMS from literature at z~1 with the prior of 
     the SFMS in our ABC
@@ -605,4 +698,5 @@ if __name__=="__main__":
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
     #qaplotABC()
     #fQ_fSFMS()
-    SFHmodel(nsnap0=15)
+    #SFHmodel(nsnap0=15)
+    Illustris_SFH()
