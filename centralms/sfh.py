@@ -101,7 +101,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
     
     elif theta_sfh['name'] == 'random_step_fluct': 
-        # completely random amplitude that is sampled from a Gaussian with sig_logSFR = 0.3 
+        # completely random amplitude that is sampled from a Gaussian with sig_logSFR
         # EXCEPT each adjacent timesteps have alternating sign amplitudes
         # time steps are sampled randomly from a unifrom distribution [dt_min, dt_max]
         if 'dt_min' not in theta_sfh: 
@@ -110,8 +110,8 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
                 
         # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0']) #'nsnap_start'][indices].max()) 
-        
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0']) #'nsnap_start'][indices].max())
+
         # the range of the steps 
         tshift_min = theta_sfh['dt_min'] 
         tshift_max = theta_sfh['dt_max'] 
@@ -130,12 +130,22 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         dlogSFR_amp = np.abs(np.random.randn(n_gal, n_col)) * theta_sfh['sigma']
         # now make every other time step negative!
         plusminus = np.ones((n_gal, n_col))
+        rrr = np.random.uniform(0., 1., n_gal)
+        even = np.where(rrr < 0.5) 
+        odd = np.where(rrr > 0.5) 
+
         for i in range(np.int(np.ceil(np.float(n_col)/2.))): 
-            plusminus[:, 2*i] *= -1. 
+            plusminus[even, 2*i] *= -1. 
+            if 2*i+1 < n_col: 
+                plusminus[odd, 2*i+1] *= -1. 
         dlogSFR_amp *= plusminus
         
         # make sure that nsnap0 is consistent with initial conditions!
         dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+        for i in range(dlogSFR_amp.shape[1]): 
+            print np.std(dlogSFR_amp[:,i])
+            plt.hist(dlogSFR_amp[:,i]) 
+            plt.show() 
 
         F_sfr = _logSFR_dSFR_tsteps
         

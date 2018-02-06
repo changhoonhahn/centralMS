@@ -69,7 +69,7 @@ def test_SumSim(run):
     '''
     t0 = time.time() 
     # run the model 
-    subcat = abcee.model(run, np.array([1.35, 0.6]), nsnap0=15, downsampled='14')
+    subcat = abcee.model(run, np.array([1., -0.15]), nsnap0=15, downsampled='14')
     # get summary statistics 
     output = abcee.SumSim(['smf'], subcat)
     print time.time() - t0, ' seconds'
@@ -552,6 +552,7 @@ if __name__=='__main__':
     #test_ABCsumstat('randomSFH', 7)
     #sfh_name = 'rSFH_r0.99_delay'
     #sfh_name = 'test0' # 'randomSFH_short'
+
     sfh_name = 'randomSFH_1gyr' # 'randomSFH_short'
     #test_model_ABCparticle(sfh_name, 13)
     for t in [11]: #range(1,12)[::-1]: #[5,6]: #range(5):

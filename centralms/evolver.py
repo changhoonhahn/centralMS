@@ -173,8 +173,7 @@ class Evolver(object):
         
         # assign initial SFRs
         self.SH_catalog['sfr0'] = np.repeat(-999., ngal)
-        self.SH_catalog['sfr0'][isSF] = SFH.SFR_sfms(m0[isSF], UT.z_nsnap(self.SH_catalog['nsnap_start'][isSF]), 
-                self.theta_sfms) + 0.3 * np.random.randn(len(isSF[0]))
+        self.SH_catalog['sfr0'][isSF] = SFH.SFR_sfms(m0[isSF], UT.z_nsnap(self.SH_catalog['nsnap_start'][isSF]), self.theta_sfms) + self.theta_sfms['sigma'] * np.random.randn(len(isSF[0]))
         self.SH_catalog['gclass'] = UT.replicate('', ngal)
         self.SH_catalog['gclass'][isSF] = 'sf'
         return None

@@ -121,6 +121,10 @@ def model(run, args, **kwargs):
     
     theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
 
+    # SFMS slopes can change 
+    #theta['sfms'] = {'zslope': args[0], 'mslope': args[1]}#, 'offset': args[2]}
+    theta['sfms'] = {'name': 'anchored', 'amp': args[0], 'slope': args[1], 'sigma': 0.3}
+
     if run == 'test0': 
         # simplest test with constant offset SFH 
         theta['sfh'] = {'name': 'constant_offset'}
@@ -249,12 +253,16 @@ def model(run, args, **kwargs):
         theta['sfh']['sigma_corr'] = args[2] * 0.3
         theta['sfh']['dt_delay'] = args[4] # Gyr 
         theta['sfh']['dt_dMh'] = args[5]  # Gyr
+    elif run == 'randomSFH_5gyr_narrSFMS':  
+        # random fluctuation SFH where fluctuations happen on fixed 5 Gyr timescales  
+        # we also use a 0.2 dex scatter SFMS. 
+        theta['sfh'] = {'name': 'random_step_fluct'} 
+        theta['sfh']['dt_min'] = 5. 
+        theta['sfh']['dt_max'] = 5. 
+        theta['sfh']['sigma'] = 0.2  # note narrower SFMS
+        theta['sfms']['sigma'] = 0.2 # note narrower SFMS
     else: 
         raise NotImplementedError
-
-    # SFMS slopes can change 
-    #theta['sfms'] = {'zslope': args[0], 'mslope': args[1]}#, 'offset': args[2]}
-    theta['sfms'] = {'name': 'anchored', 'amp': args[0], 'slope': args[1]}
 
     # load in Subhalo Catalog (pure centrals)
     if 'sigma_smhm' in kwargs.keys(): 
