@@ -226,7 +226,17 @@ def model(run, args, **kwargs):
         theta['sfh']['sigma_corr'] = 0.99 * 0.3
         theta['sfh']['dt_delay'] = 1. # Gyr 
         theta['sfh']['dz_dMh'] = 0.5 
-    elif run == 'rSFH_r0.99_tdyn_0.5Gyr': 
+    elif run == 'rSFH_r0.99_tdyn_5gyr': 
+        # random SFH with 0.99 correlation with halo growth 
+        # over t_dyn and duty cycle of 5 Gyr 
+        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
+        theta['sfh']['dt_min'] = 5. 
+        theta['sfh']['dt_max'] = 5. 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.99 * 0.3
+        theta['sfh']['dt_delay'] = 0. # Gyr 
+        theta['sfh']['dt_dMh'] = 2.5 # Gyr
+    elif run == 'rSFH_r0.99_tdyn_0.5gyr': 
         # random SFH with 0.99 correlation with halo growth 
         # over t_dyn and duty cycle of 0.5 Gyr 
         theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
