@@ -280,7 +280,7 @@ def SFHmodel(nsnap0=15):
     sub2.set_xlabel('$t_\mathrm{cosmic}\;[\mathrm{Gyr}]$', fontsize=25)
     sub2.set_ylim([-1., 1.]) 
     sub2.set_yticks([-1., -0.5, 0., 0.5, 1.])
-    sub2.set_ylabel('$\Delta$ log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}])$', fontsize=25)
+    sub2.set_ylabel('$\Delta$ log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}]\;)$', fontsize=25)
     sub2.legend(loc='lower right', prop={'size':15})
     #sub2.yaxis.tick_right()
     #sub2.yaxis.set_label_position("right")
@@ -373,11 +373,11 @@ def Illustris_SFH():
     for ii, i in enumerate(np.random.choice(np.arange(len(z0sf))[z0sf], 10)): 
         sub.plot(t_bins[-1] - t_skip, np.array(dlogsfrs)[:,i], lw=1, c='C'+str(ii)) 
     sub.set_xlim([11., 13.75]) 
-    sub.set_xlabel('$t_\mathrm{cosmic}$ [Gyr]', fontsize=20) 
+    sub.set_xlabel('$t_\mathrm{cosmic}$ [Gyr]', fontsize=25) 
     sub.set_ylim([-.6, .6]) 
     sub.set_yticks([-0.4, 0., 0.4]) 
-    sub.set_ylabel('$\Delta$ log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}])$', fontsize=20)
-    fig.savefig(''.join([UT.tex_dir(), 'figs/illustris.sfh.pdf']), bbox_inches='tight', dpi=150) 
+    sub.set_ylabel('$\Delta$ log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}]\;)$', fontsize=25)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/illustris_sfh.pdf']), bbox_inches='tight', dpi=150) 
     plt.close() 
     return None 
 
@@ -460,7 +460,14 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
         subcat_sims.append(subcat_sim)
         sumsims.append(ABC.SumSim(sumstat, subcat_sim, info=True))
     colors = ['#EE6A50', '#1F77B4']
-    labels = [r'model($\theta_\mathrm{median}$)', r'model($\theta_\mathrm{median}$)']
+    #labels = [r'model($\theta_\mathrm{median}$)', r'model($\theta_\mathrm{median}$)']
+    labels = [None for r in runs]
+    if 'test0' in runs: 
+        labels[runs.index('test0')] = '$t_\mathrm{duty} > 8$ Gyr'
+    if 'randomSFH_1gyr' in runs: 
+        labels[runs.index('randomSFH_1gyr')] = '$t_\mathrm{duty} = 1$ Gyr'
+    if 'randomSFH_0.5gyr' in runs: 
+        labels[runs.index('randomSFH_0.5gyr')] = '$t_\mathrm{duty} = 0.5$ Gyr'
 
     fig = plt.figure(figsize=(16,5))
     _, _, phi_err = Obvs.MF_data(source='li-white', m_arr=sumdata[0][0]) # get uncertainties of central SMF
@@ -478,9 +485,9 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
             sub.plot(sumsim[0][0], sumsim[0][1], c=colors[i_s])#, label=r'model($\theta_\mathrm{median}$)')
     sub.set_xlim([9.5, 12.])
     sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
-    sub.set_ylim([1e-6, 10**-1.75])
+    sub.set_ylim([1e-5, 10**-1.75])
     sub.set_yscale('log')
-    sub.set_ylabel('log $(\;\Phi\; / \mathrm{Mpc}^{-3}\,\mathrm{dex}^{-1})$', fontsize=25)
+    sub.set_ylabel('log $(\;\Phi\; / \mathrm{Mpc}^{-3}\,\mathrm{dex}^{-1}\;)$', fontsize=25)
     sub.legend(loc='lower left', prop={'size':20}) 
 
     # --- SFMS panel ---
@@ -546,7 +553,9 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
     sub.set_xlabel('log $(\; M_\mathrm{halo}\; [M_\odot]\;)$', fontsize=25)
     sub.set_ylim([0., 0.6])
     sub.set_ylabel('$\sigma_{\mathrm{log}\,M_*}$', fontsize=27)
-    sub.legend(loc='upper right', prop={'size': 20}) 
+    sub.legend(loc='lower left', prop={'size': 20}) 
+    sub.text(0.95, 0.9, r'model($\theta_\mathrm{median}$)', 
+            ha='right', va='center', transform=sub.transAxes, fontsize=20)
 
     fig.subplots_adjust(wspace=0.3)
     fig.savefig(''.join([UT.tex_dir(), 'figs/qaplot_abc.pdf']), bbox_inches='tight', dpi=150) 
@@ -696,7 +705,7 @@ if __name__=="__main__":
     #SFMSprior_z1()
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
-    #qaplotABC()
+    qaplotABC(runs=['test0', 'randomSFH_1gyr'], Ts=[14, 14])
     #fQ_fSFMS()
     #SFHmodel(nsnap0=15)
-    Illustris_SFH()
+    #Illustris_SFH()
