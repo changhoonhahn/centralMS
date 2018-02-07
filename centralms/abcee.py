@@ -27,17 +27,10 @@ import matplotlib.pyplot as plt
 
 def Theta(run): 
     tt = {} 
-    if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_2gyr', 
-            'randomSFH_0.5gyr', 'randomSFH_5gyr', 'randomSFH_10gyr',
-            'randomSFH_5gyr_narrSFMS', 
-	    'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
-            'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
-        #tt['variable'] = ['SFMS z slope', 'SFMS m slope']#, 'SFMS offset']
-        #tt['label'] = ['$m_{z; SFMS}$', '$m_{M_*; SFMS}$']#, '$c_\mathrm{SFMS}$']
-        tt['variable'] = ['SFMS amp z param', 'SFMS slope z param']
-        tt['label'] = ['$m_{z; amp}$', '$m_{z; slope}$']
-    else: 
-        raise ValueError
+    #tt['variable'] = ['SFMS z slope', 'SFMS m slope']#, 'SFMS offset']
+    #tt['label'] = ['$m_{z; SFMS}$', '$m_{M_*; SFMS}$']#, '$c_\mathrm{SFMS}$']
+    tt['variable'] = ['SFMS amp z param', 'SFMS slope z param']
+    tt['label'] = ['$m_{z; amp}$', '$m_{z; slope}$']
     return tt
 
 
@@ -57,21 +50,14 @@ def Prior(run, shape='tophat'):
     if shape != 'tophat': 
         raise NotImpelementError
 
-    if run in ['test0', 'randomSFH', 'randomSFH_1gyr', 'randomSFH_0.5gyr', 
-            'randomSFH_2gyr', 'randomSFH_5gyr', 'randomSFH_10gyr',
-            'randomSFH_5gyr_narrSFMS', 
-            'randomSFH_short', 'randomSFH_long', 'randomSFH_r0.2', 'randomSFH_r0.99', 
-            'rSFH_r0.66_delay', 'rSFH_r0.99_delay', 'rSFH_r1.0_most']: 
-        # SFMS_zslope, SFMS_mslope
-        #prior_min = [1., 0.4]#, -0.15]
-        #prior_max = [1.8, 0.8]#, -0.06]
-    
-        # new priors since we implemented "anchored" SFMS  
-        # SFMS amplitude z-dep parameter, SFMS slope z-dep parameter
-        prior_min = [0.5, -0.5]#, -0.15]
-        prior_max = [2., 0.5]#, -0.06]
-    else:
-        raise NotImplementedError
+    # SFMS_zslope, SFMS_mslope
+    #prior_min = [1., 0.4]#, -0.15]
+    #prior_max = [1.8, 0.8]#, -0.06]
+
+    # new priors since we implemented "anchored" SFMS  
+    # SFMS amplitude z-dep parameter, SFMS slope z-dep parameter
+    prior_min = [0.5, -0.5]#, -0.15]
+    prior_max = [2., 0.5]#, -0.06]
 
     prior_obj = abcpmc.TophatPrior(prior_min, prior_max) 
 
@@ -240,6 +226,16 @@ def model(run, args, **kwargs):
         theta['sfh']['sigma_corr'] = 0.99 * 0.3
         theta['sfh']['dt_delay'] = 1. # Gyr 
         theta['sfh']['dz_dMh'] = 0.5 
+    elif run == 'rSFH_r0.99_tdyn_0.5Gyr': 
+        # random SFH with 0.99 correlation with halo growth 
+        # over t_dyn and duty cycle of 0.5 Gyr 
+        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.99 * 0.3
+        theta['sfh']['dt_delay'] = 0. # Gyr 
+        theta['sfh']['dt_dMh'] = 2.5 # Gyr
     elif run == 'rSFH_r0.99_delay_dt_test': 
         theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
         theta['sfh']['dt_min'] = args[2]

@@ -529,7 +529,7 @@ def test_tduty_tdelay_dt_grid_dtaxis(run, tdutyy, tdelayy):
 if __name__=='__main__': 
     #test_SFMS_highz('test0', 9, nsnap=15, lit='lee')
 
-    #test_SumSim('test0')#'rSFH_r1.0_most')
+    test_SumSim('rSFH_r0.99_tdyn_0.5Gyr')#'rSFH_r1.0_most')
     #test_SumSim_sigmaSMHM('rSFH_r1.0_most', sigma_smhm=0.0)
     #for rr in [0.1, 0.33, 0.66, 0.99]: 
     #    test_dMh_dMstar('rSFH_r_delay_dt_test', np.array([1.35, 0.6, rr, 0.5, 0., 0.5]), sigma_smhm=0.2, flag='R'+str(rr))
@@ -553,8 +553,8 @@ if __name__=='__main__':
     #sfh_name = 'rSFH_r0.99_delay'
     #sfh_name = 'test0' # 'randomSFH_short'
 
-    sfh_name = 'randomSFH_1gyr' # 'randomSFH_short'
+    sfh_name = 'randomSFH_5gyr'#_narrSFMS' # 'randomSFH_short'
     #test_model_ABCparticle(sfh_name, 13)
-    for t in [11]: #range(1,12)[::-1]: #[5,6]: #range(5):
-        test_plotABC(sfh_name, t)
-        test_qaplotABC(sfh_name, t)
+    #for t in [9]: #range(1,12)[::-1]: #[5,6]: #range(5):
+    #    test_plotABC(sfh_name, t)
+    #    test_qaplotABC(sfh_name, t)
