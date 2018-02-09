@@ -553,8 +553,8 @@ if __name__=='__main__':
     #sfh_name = 'rSFH_r0.99_delay'
     #sfh_name = 'test0' # 'randomSFH_short'
 
-    sfh_name = 'randomSFH_0.5gyr'#_narrSFMS' # 'randomSFH_short'
+    sfh_name = 'randomSFH_5gyr' # 'randomSFH_short'
     #test_model_ABCparticle(sfh_name, 13)
-    for t in [9]: #range(1,12)[::-1]: #[5,6]: #range(5):
+    for t in [11]: #range(1,12)[::-1]: #[5,6]: #range(5):
         test_plotABC(sfh_name, t)
         test_qaplotABC(sfh_name, t)
