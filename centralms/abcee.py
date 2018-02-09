@@ -664,12 +664,14 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
     # simulation 
     m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
             dmhalo=0.2, weights=subcat_sim['weights'][isSF])
-    sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
+    enough = (cnts > 50) 
+    sub.plot(m_mid[enough], sig_mhalo[enough], c='#1F77B4', lw=2, label='Model') 
     sig_sim = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
     # data 
     m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 
             dmhalo=0.2, weights=subcat_dat['weights'][isSF])
-    sub.plot(m_mid, sig_mhalo, c='k', ls='--', label='SHAM') 
+    enough = (cnts > 50) 
+    sub.plot(m_mid[enough], sig_mhalo[enough], c='k', ls='--', label='SHAM') 
     sig_dat = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
     
     #sig_dat = smhmr.sigma_logMstar(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 

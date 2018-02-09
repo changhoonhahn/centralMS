@@ -41,18 +41,31 @@ def plotPureCentral_SHMF(nsnap_ancestor=20):
     plt.show() 
 
 
-def plotPureCentral_SMHMR(sigma_smhm=0.2, nsnap_ancestor=20): 
-    subhist = Cat.PureCentralHistory(sigma_smhm=sigma_smhm, nsnap_ancestor=nsnap_ancestor)
+def plotPureCentral_SMHMR(sigma_smhm=0.2, nsnap0=15): 
+    subhist = Cat.PureCentralHistory(sigma_smhm=sigma_smhm, nsnap_ancestor=nsnap0)
     subcat = subhist.Read()
     
     smhmr = Obvs.Smhmr()
     m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['m.max'], subcat['m.star'])
-    plt.errorbar(m_mid, mu_mstar, yerr=sig_mstar) 
+    #plt.errorbar(m_mid, mu_mstar, yerr=sig_mstar) 
+    plt.plot(m_mid, sig_mstar, c='k') 
 
-    m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['snapshot20_m.max'], subcat['snapshot20_m.star'])
-    plt.errorbar(m_mid, mu_mstar, yerr=sig_mstar) 
+    m_mid, mu_mstar, sig_mstar, cnts = smhmr.Calculate(subcat['snapshot'+str(nsnap0)+'_m.max'], 
+            subcat['snapshot'+str(nsnap0)+'_m.star'])
+    plt.plot(m_mid, sig_mstar) 
+    plt.ylim([0., 0.5]) 
+    print subcat['snapshot'+str(nsnap0)+'_m.max'].min() 
+    print subcat['snapshot'+str(nsnap0)+'_m.star'][subcat['snapshot'+str(nsnap0)+'_m.star'] > 0.].min() 
 
+
+    weird = subcat['snapshot'+str(nsnap0)+'_m.star'][subcat['snapshot'+str(nsnap0)+'_m.max']<11.25]
+    print weird.min(), weird.max() 
+    weird = subcat['snapshot'+str(nsnap0)+'_m.star'][subcat['snapshot'+str(nsnap0)+'_m.max']<10.01]
+    print weird.min(), weird.max() 
+
+    #plt.errorbar(m_mid, mu_mstar, yerr=sig_mstar) 
     plt.show() 
+    return None 
 
 
 def Test_nsnap_start(nsnap_ancestor=20):
@@ -98,7 +111,7 @@ def test_Observations_GroupCat():
 
 
 if __name__=='__main__': 
-    #plotPureCentral_SMHMR(sigma_smhm=0.0, nsnap_ancestor=20)
+    plotPureCentral_SMHMR(sigma_smhm=0.2, nsnap0=15)
     #Test_nsnap_start(nsnap_ancestor=20)
 
     #test_Observations_GroupCat()

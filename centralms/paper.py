@@ -464,7 +464,7 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
     #labels = [r'model($\theta_\mathrm{median}$)', r'model($\theta_\mathrm{median}$)']
     labels = [None for r in runs]
     if 'test0' in runs: 
-        labels[runs.index('test0')] = '$t_\mathrm{duty} > 8$ Gyr'
+        labels[runs.index('test0')] = 'no duty cycle'
     if 'randomSFH_1gyr' in runs: 
         labels[runs.index('randomSFH_1gyr')] = '$t_\mathrm{duty} = 1$ Gyr'
     if 'randomSFH_0.5gyr' in runs: 
@@ -484,7 +484,7 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
             sub.plot(sumsim[0][0], sumsim[0][1], c=colors[i_s], ls='--')#, label=r'model($\theta_\mathrm{median}$)')
         else: 
             sub.plot(sumsim[0][0], sumsim[0][1], c=colors[i_s])#, label=r'model($\theta_\mathrm{median}$)')
-    sub.set_xlim([9.5, 12.])
+    sub.set_xlim([9.5, 11.75])
     sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
     sub.set_ylim([1e-5, 10**-1.75])
     sub.set_yscale('log')
@@ -503,7 +503,7 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
                 subcat_sim['sfr'][isSF], 
                 weights=subcat_sim['weights'][isSF], 
                 levels=[0.68, 0.95], range=[[9., 12.], [-3., 1.]], color=colors[i_s], 
-                bins=16, plot_datapoints=False, fill_contours=False, plot_density=True, ax=sub) 
+                bins=16, plot_datapoints=True, fill_contours=False, plot_density=True, ax=sub) 
     
     # observations 
     #m_arr = np.arange(8., 12.1, 0.1)
@@ -528,7 +528,6 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
         m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
                 dmhalo=0.5, weights=subcat_sim['weights'][isSF], m_bin=mhalo_bin)
         #sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
-        sig_mhalos, counts = [], [] 
         for i in range(1000): 
             f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(Ts[i_s]), '.hdf5']), 'r') 
             subcat_sim_i = {} 
@@ -540,17 +539,22 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
             m_mid_i, _, sig_mhalo_i, cnt_i = smhmr.Calculate(subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
                     dmhalo=0.5, weights=subcat_sim_i['weights'][isSF], m_bin=mhalo_bin)
             #sub.plot(m_mid_i, sig_mhalo_i, c='k', lw=1, alpha=0.1) 
-            counts.append(cnt_i)
-            sig_mhalos.append(sig_mhalo_i)
+            if i == 0:  
+                sig_mhalos = np.zeros((1000, len(cnt_i)))
+                counts = np.zeros((1000, len(cnt_i)))
+            sig_mhalos[i,:] = sig_mhalo_i
+            counts[i,:] = cnt_i
         
         sig_mhalo_low = np.zeros(len(m_mid))
         sig_mhalo_high = np.zeros(len(m_mid))
         for im in range(len(m_mid)): 
-            above_zero = np.where(np.array(counts)[:,im] > 0) 
-            if len(above_zero[0]) > 0: 
-                sig_mhalo_low[im], sig_mhalo_high[im] = np.percentile((np.array(sig_mhalos)[:,im])[above_zero], [16, 84])#, axis=0)
-        sub.fill_between(m_mid, sig_mhalo_low, sig_mhalo_high, color=colors[i_s], linewidth=0, alpha=0.3, label=labels[i_s]) 
-    sub.set_xlim([11.5, 14.])
+            if np.mean(counts[:,im]) > 50.: 
+                above_zero = np.where(counts[:,im] > 0) 
+                sig_mhalo_low[im], sig_mhalo_high[im] = np.percentile((sig_mhalos[:,im])[above_zero], [16, 84])#, axis=0)
+
+        above_zero = np.where(sig_mhalo_high > 0) 
+        sub.fill_between(m_mid[above_zero], sig_mhalo_low[above_zero], sig_mhalo_high[above_zero], color=colors[i_s], linewidth=0, alpha=0.3, label=labels[i_s]) 
+    sub.set_xlim([11.5, 13.25])
     sub.set_xlabel('log $(\; M_\mathrm{halo}\; [M_\odot]\;)$', fontsize=25)
     sub.set_ylim([0., 0.6])
     sub.set_ylabel('$\sigma_{\mathrm{log}\,M_*}$', fontsize=27)
