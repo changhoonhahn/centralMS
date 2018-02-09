@@ -12,6 +12,7 @@ import corner as DFM
 from ChangTools.plotting import prettyplot
 from ChangTools.plotting import prettycolors
 
+
 def test_Evolver_time(sfh, nsnap0=None, downsampled=None, tduty=1., abias=0.): 
     ''' Time how long a single run of the evolver takes from start to finish 
     '''
@@ -1223,6 +1224,7 @@ def test_assignSFRs():
 
 
 if __name__=="__main__": 
+    test_CentralSMHMR()
     #test_Evolver_time('random_step_fluct', nsnap0=15, downsampled='14', tduty=1., abias=0.)
     #test_RandomStep_timescale(sig_smhm=0.2, nsnap_ancestor=15)
     #EvolverPlots('constant_offset')
@@ -1239,5 +1241,5 @@ if __name__=="__main__":
     #test_Evolver_ODEsolver('random_step_fluct', nsnap0=15)
     #test_EvolverEvolve('smf', nsnap0=15, downsampled='14')
     #test_EvolverInitiate('pssfr', 15)
-    test_EvolverInitSF('pssfr', 15, nsnap0=15, downsampled='14')
+    #test_EvolverInitSF('pssfr', 15, nsnap0=15, downsampled='14')
     #test_assignSFRs() 

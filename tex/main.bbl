@@ -103,10 +103,16 @@ Gu, M., Conroy, C., \& Behroozi, P. 2016,
   \href{http://dx.doi.org/10.3847/0004-637X/833/1/2}{\JournalTitle{The
   Astrophysical Journal}, 833, 2}
 
-\bibitem[{Hahn {et~al.}(2017)Hahn, Tinker, \& Wetzel}]{hahn2017a}
-Hahn, C., Tinker, J.~L., \& Wetzel, A.~R. 2017,
+\bibitem[{Hahn {et~al.}(2017{\natexlab{a}})Hahn, Tinker, \& Wetzel}]{hahn2017a}
+Hahn, C., Tinker, J.~L., \& Wetzel, A.~R. 2017{\natexlab{a}},
   \href{http://dx.doi.org/10.3847/1538-4357/aa6d6b}{\JournalTitle{The
   Astrophysical Journal}, 841, 6}
+
+\bibitem[{Hahn {et~al.}(2017{\natexlab{b}})Hahn, Vakili, Walsh, Hearin, Hogg,
+  \& Campbell}]{hahn2017b}
+Hahn, C., Vakili, M., Walsh, K., {et~al.} 2017{\natexlab{b}},
+  \href{http://dx.doi.org/10.1093/mnras/stx894}{\JournalTitle{Monthly Notices
+  of the Royal Astronomical Society}, 469, 2791}
 
 \bibitem[{Hahn {et~al.}(2015)Hahn, Blanton, Moustakas, Coil, Cool, Eisenstein,
   Skibba, Wong, \& Zhu}]{hahn2015}
