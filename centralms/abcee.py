@@ -677,6 +677,10 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='1
     enough = (cnts > 50) 
     sub.plot(m_mid[enough], sig_mhalo[enough], c='k', ls='--', label='SHAM') 
     sig_dat = sig_mhalo[np.argmin(np.abs(m_mid-12.))]
+    m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['m.max'][isSF], subcat_sim['m.sham'][isSF], 
+            dmhalo=0.2, weights=subcat_dat['weights'][isSF])
+    enough = (cnts > 50) 
+    sub.plot(m_mid[enough], sig_mhalo[enough], c='k', ls=':') 
     
     #sig_dat = smhmr.sigma_logMstar(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 
     #        weights=subcat_sim['weights'][isSF], dmhalo=0.2)
