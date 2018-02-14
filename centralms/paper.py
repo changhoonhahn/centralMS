@@ -464,7 +464,7 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
     #labels = [r'model($\theta_\mathrm{median}$)', r'model($\theta_\mathrm{median}$)']
     labels = [None for r in runs]
     if 'test0' in runs: 
-        labels[runs.index('test0')] = 'no duty cycle'
+        labels[runs.index('test0')] = 'No duty cycle'
     if 'randomSFH_1gyr' in runs: 
         labels[runs.index('randomSFH_1gyr')] = '$t_\mathrm{duty} = 1$ Gyr'
     if 'randomSFH_0.5gyr' in runs: 
@@ -503,7 +503,7 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
                 subcat_sim['sfr'][isSF], 
                 weights=subcat_sim['weights'][isSF], 
                 levels=[0.68, 0.95], range=[[9., 12.], [-3., 1.]], color=colors[i_s], 
-                bins=16, plot_datapoints=True, fill_contours=False, plot_density=True, ax=sub) 
+                bins=20, plot_datapoints=False, fill_contours=False, plot_density=True, ax=sub) 
     
     # observations 
     #m_arr = np.arange(8., 12.1, 0.1)
@@ -525,11 +525,14 @@ def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]):
     for i_s, subcat_sim in enumerate(subcat_sims): 
         abc_dir = UT.dat_dir()+'abc/'+runs[i_s]+'/model/' # directory where all the ABC files are stored
         isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
-        m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+        m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(
+                subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
                 dmhalo=0.5, weights=subcat_sim['weights'][isSF], m_bin=mhalo_bin)
         #sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
         for i in range(1000): 
-            f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(Ts[i_s]), '.hdf5']), 'r') 
+            f = h5py.File(
+                    ''.join([abc_dir, 'model.theta', str(i), '.t', str(Ts[i_s]), '.hdf5']), 
+                    'r') 
             subcat_sim_i = {} 
             for key in f.keys(): 
                 subcat_sim_i[key] = f[key].value
