@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  13 FEB 2018 17:41
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  14 FEB 2018 16:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -361,108 +361,108 @@ Package natbib Warning: Citation `daddi2007' on page 7 undefined on input line
 Package natbib Warning: Citation `whitaker2012' on page 7 undefined on input li
 ne 316.
 
-<figs/sfh_pedagogical.pdf, id=282, 653.84302pt x 348.01567pt>
-File: figs/sfh_pedagogical.pdf Graphic file (type pdf)
-
-<use figs/sfh_pedagogical.pdf>
-Package pdftex.def Info: figs/sfh_pedagogical.pdf used on input line 327.
-(pdftex.def)             Requested size: 422.77661pt x 225.03392pt.
-
-<figs/illustris_sfh.pdf, id=285, 444.69528pt x 336.88611pt>
+<figs/illustris_sfh.pdf, id=282, 444.69528pt x 336.88611pt>
 File: figs/illustris_sfh.pdf Graphic file (type pdf)
 
 <use figs/illustris_sfh.pdf>
-Package pdftex.def Info: figs/illustris_sfh.pdf used on input line 342.
+Package pdftex.def Info: figs/illustris_sfh.pdf used on input line 327.
 (pdftex.def)             Requested size: 281.85585pt x 213.52448pt.
 
+<figs/sfh_pedagogical.pdf, id=285, 653.84302pt x 348.01567pt>
+File: figs/sfh_pedagogical.pdf Graphic file (type pdf)
 
-LaTeX Warning: Reference `sec:something' on page 7 undefined on input line 350.
+<use figs/sfh_pedagogical.pdf>
+Package pdftex.def Info: figs/sfh_pedagogical.pdf used on input line 346.
+(pdftex.def)             Requested size: 422.77661pt x 225.03392pt.
 
-
-
-LaTeX Warning: Reference `eq:something' on page 7 undefined on input line 350.
-
-<figs/qaplot_abc.pdf, id=286, 983.18018pt x 348.01567pt>
+<figs/qaplot_abc.pdf, id=288, 983.18018pt x 348.01567pt>
 File: figs/qaplot_abc.pdf Graphic file (type pdf)
 
 <use figs/qaplot_abc.pdf>
-Package pdftex.def Info: figs/qaplot_abc.pdf used on input line 361.
+Package pdftex.def Info: figs/qaplot_abc.pdf used on input line 369.
 (pdftex.def)             Requested size: 422.77661pt x 149.64912pt.
 
 
 Package natbib Warning: Citation `daddi2007' on page 7 undefined on input line 
-372.
+380.
 
 
 Package natbib Warning: Citation `elbaz2007' on page 7 undefined on input line 
-372.
+380.
 
 
 Package natbib Warning: Citation `santini2009' on page 7 undefined on input lin
-e 372.
+e 380.
 
 
 Package natbib Warning: Citation `karim2011' on page 7 undefined on input line 
-372.
+380.
 
 
 Package natbib Warning: Citation `whitaker2012' on page 7 undefined on input li
-ne 372.
+ne 380.
 
 
 Package natbib Warning: Citation `vogelsberger2014' on page 7 undefined on inpu
-t line 397.
+t line 405.
 
 
 Package natbib Warning: Citation `genel2014' on page 7 undefined on input line 
-397.
+405.
 
-[7]
+[7] [8 <./figs/illustris_sfh.pdf>] [9 <./figs/sfh_pedagogical.pdf> <./figs/qapl
+ot_abc.pdf
 
-Package natbib Warning: Citation `cameron2012' on page 8 undefined on input lin
-e 450.
+pdfTeX warning: pdflatex (file ./figs/qaplot_abc.pdf): PDF inclusion: multiple 
+pdfs with page group included in a single page
+>]
 
-
-Package natbib Warning: Citation `weyant2013' on page 8 undefined on input line
- 450.
-
-
-Package natbib Warning: Citation `ishida2015' on page 8 undefined on input line
- 450.
+Package natbib Warning: Citation `cameron2012' on page 10 undefined on input li
+ne 464.
 
 
-Package natbib Warning: Citation `hahn2016' on page 8 undefined on input line 4
-52.
+Package natbib Warning: Citation `weyant2013' on page 10 undefined on input lin
+e 464.
 
 
-Package natbib Warning: Citation `hahn2017' on page 8 undefined on input line 4
-52.
+Package natbib Warning: Citation `ishida2015' on page 10 undefined on input lin
+e 464.
 
-[8] <figs/sigMstar_tduty.pdf, id=347, 351.34497pt x 343.76328pt>
+
+Package natbib Warning: Citation `hahn2016' on page 10 undefined on input line 
+466.
+
+
+Package natbib Warning: Citation `hahn2017' on page 10 undefined on input line 
+466.
+
+[10] <figs/sigMstar_tduty.pdf, id=410, 351.34497pt x 343.76328pt>
 File: figs/sigMstar_tduty.pdf Graphic file (type pdf)
 
 <use figs/sigMstar_tduty.pdf>
-Package pdftex.def Info: figs/sigMstar_tduty.pdf used on input line 485.
+Package pdftex.def Info: figs/sigMstar_tduty.pdf used on input line 502.
 (pdftex.def)             Requested size: 234.87749pt x 229.80614pt.
+ [11]
 File: figs/sigMstar_tduty.pdf Graphic file (type pdf)
  <use figs/sigMstar_tduty.pdf>
-Package pdftex.def Info: figs/sigMstar_tduty.pdf used on input line 514.
+Package pdftex.def Info: figs/sigMstar_tduty.pdf used on input line 541.
 (pdftex.def)             Requested size: 234.87749pt x 229.80614pt.
- [9]
-
-Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 541.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\sim' on input line 541.
+(hyperref)                removing `math shift' on input line 568.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 541.
+(hyperref)                removing `\sim' on input line 568.
 
-(./main.bbl [10] [11]pdfTeX warning (ext4): destination with the same identifie
-r (name{Hfootnote.1}) has been already used, duplicate ignored
+
+Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
+(hyperref)                removing `math shift' on input line 568.
+
+[12] [13 <./figs/sigMstar_tduty.pdf>] (./main.bbl [14] [15]pdfTeX warning (ext4
+): destination with the same identifier (name{Hfootnote.1}) has been already us
+ed, duplicate ignored
 <to be read again> 
                    \relax 
 l.273 \end{thebibliography}
@@ -470,36 +470,28 @@ l.273 \end{thebibliography}
 
 Package natbib Warning: There were undefined citations.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 563.
-[12] [13 <./figs/sfh_pedagogical.pdf>] [14 <./figs/illustris_sfh.pdf> <./figs/q
-aplot_abc.pdf
-
-pdfTeX warning: pdflatex (file ./figs/qaplot_abc.pdf): PDF inclusion: multiple 
-pdfs with page group included in a single page
->] [15 <./figs/sigMstar_tduty.pdf>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 563.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 591.
+[16]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 591.
  (./main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 563.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 563.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 591.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 591.
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: E233F68C306FCBAE0AEB87CF74799418;774.
-
-
-LaTeX Warning: There were undefined references.
+(rerunfilecheck)             Checksum: 97FD8DA32AE534246616D73509CE8D7E;771.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 563.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 591.
  ) 
 Here is how much of TeX's memory you used:
- 6649 strings out of 493089
- 95095 string characters out of 6134842
- 192518 words of memory out of 5000000
- 9973 multiletter control sequences out of 15000+600000
+ 6648 strings out of 493089
+ 95073 string characters out of 6134842
+ 192379 words of memory out of 5000000
+ 9971 multiletter control sequences out of 15000+600000
  13195 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 34i,8n,31p,1989b,475s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 34i,8n,31p,1989b,503s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
@@ -517,10 +509,10 @@ e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive
 /texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2015/
 texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2015/t
 exmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on main.pdf (15 pages, 504761 bytes).
+Output written on main.pdf (16 pages, 507912 bytes).
 PDF statistics:
- 588 PDF objects out of 1000 (max. 8388607)
- 537 compressed objects within 6 object streams
- 84 named destinations out of 1000 (max. 500000)
+ 597 PDF objects out of 1000 (max. 8388607)
+ 545 compressed objects within 6 object streams
+ 85 named destinations out of 1000 (max. 500000)
  122 words of extra memory for PDF output out of 10000 (max. 10000000)
 

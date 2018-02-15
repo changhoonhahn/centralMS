@@ -34,6 +34,7 @@
 \newcommand{\bitem}{\begin{itemize}}
 \newcommand{\eitem}{\end{itemize}}
 \newcommand{\musfms}{\log\,\overline{\mathrm{SFR}}_\mathrm{MS}}
+\newcommand{\siglogm}{\sigma_{\log\,M_*}} 
 
 \begin{document}\sloppy\sloppypar\frenchspacing
 
@@ -324,12 +325,16 @@ describe how we evolve their SFR and $M_*$ in our model.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.9\textwidth]{figs/sfh_pedagogical.pdf}
-    \caption{Pedagogical illustration of how our model, described in Sections~\ref{sec:sfcen} 
-    and~\ref{sec:modelevol}, evolves star forming central galaxies.
-    \emph{Left panel}: . 
-    \emph{Right panel}:}
-\label{fig:sfh_model}
+\includegraphics[width=0.6\textwidth]{figs/illustris_sfh.pdf} 
+    \caption{Star formation rate with respect to the $\musfms$ ($\Delta \logsfr$) as 
+    a function of cosmic time for star-forming galaxies in the Illustris simulation. 
+    These galaxies have stellar masses within the range $10^{10.5}-10^{10.6}M_\odot$ 
+    at $z\sim0$. $\musfms$ is fit using the same as the SFMS fits for the SDSS 
+    centrals in Section~\ref{sec:sfcen}. The $\Delta \logsfr(t)$ of these Illustris 
+    star-forming galaxies stochastically fluctuate about the mean SFMS. Our prescription  
+    for the SFHs of the SF centrals in our model (Section~\ref{sec:modelevol}) is based 
+    on this $\Delta \logsfr(t)$ behavior.}
+\label{fig:illsfh}
 \end{center}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -339,19 +344,23 @@ describe how we evolve their SFR and $M_*$ in our model.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.6\textwidth]{figs/illustris_sfh.pdf} 
-    \caption{Star formation rate with respect to the mean SFMS ($\Delta \logsfr$) as 
-    a function of cosmic time for star-forming galaxies in the Illustris simulation. 
-    These galaxies have stellar masses within the range $10^{10.5}-10^{10.6}M_\odot$ 
-    at $z\sim0$. $\musfms$ is fit using the same as the SFMS fits for the SDSS 
-    centrals in Section~\ref{sec:something}. The $\Delta \logsfr(t)$ of these Illustris 
-    star-forming galaxies stochastically fluctuate about the mean SFMS. Our prescription 
-    for the SFRs of our SF centrals in Eq.\ref{eq:something} is modeled to resemble this
-    $\Delta \logsfr(t)$ behavior.}
-\label{fig:illsfh}
+\includegraphics[width=0.9\textwidth]{figs/sfh_pedagogical.pdf}
+    \caption{\emph{Left}: We illustrate the star formation duty 
+    cycle prescription for $\Delta \logsfr(t)$, described 
+    in Section~\ref{sec:modelevol}. The two examples we present have
+    $t_\mathrm{duty} = 0.5$ Gyr (blue) and $5$ Gyr (orange). The star 
+    formation duty cycle $\Delta \logsfr(t)$ combined with Eq.~\ref{eq:logsfr_sf}, 
+    describe the SFHs of the star-forming central galaxies in our model. 
+    \emph{Right}: We present the SFR and $M_*$ evolutions of two SF central 
+    galaxies in our model with $t_\mathrm{duty} = 0.5$ Gyr (blue) and $5$ 
+    Gyr (orange). The $\Delta \logsfr(t)$ for these galaxies correspond 
+    to the left panel and can be seen with respect to the $\musfms(M_*, t)$ 
+    plotted in black. For reference, we include the $\musfms(M_*)$ (dotted 
+    lines) at various redshifts between $z = 1$ to $0.05$.} \label{fig:sfh_model}
 \end{center}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 5 
@@ -379,48 +388,51 @@ throughout $z < 1$. More specifically, we can characterize the star formation
 histories (SFHs) of our star-forming centrals with respect to the  mean 
 $\logsfr$ of the SFMS (Eq.~\ref{eq:logsfr_ms}):
 \beq \label{eq:logsfr_sf} 
-\logsfr(M_*, t) = \log\,\overline{\mathrm{SFR}}_\mathrm{MS}(M_*, t) + \Delta \logsfr.
+\logsfr(M_*, t) = \log\,\overline{\mathrm{SFR}}_\mathrm{MS}(M_*, t) + \Delta \logsfr(t).
 \eeq
 Since SFH determines the $M_*$ growth of a galaxy, in our model, $\Delta \logsfr$
 dictates both the SFHs and $M_*$ evolution of the star-forming centrals in our 
-model. Below, we describe our specific prescription for $\Delta \logsfr$.
+model. Below, we describe our specific prescription for $\Delta \logsfr(t)$.
 
 In the previous section, we selected the initial SFRs of our star-forming
 centrals by sampling the log-normal distribution about the mean SFMS at 
-$z \sim 1$. The most naive prescription for $\Delta \logsfr$, would be to 
-fix $\Delta \logsfr$ based on the initial offsets from the mean. SF centrals 
+$z \sim 1$. One naive prescription for $\Delta \logsfr(t)$, would be to 
+fix $\Delta \logsfr$ based on the initial offsets from the $\musfms$. SF centrals 
 with higher than average initial SFRs continue evolving above the average SFMS, 
 while SF centrals with lower than average initial SFRs continue evolving below 
 the average SFRs. With such SFHs, as we demonstrate later in detail, the scatter 
 in stellar mass of the SF centrals at fixed halo mass diverges substantially 
 with cosmic time. Furthermore, when we examine the SFHs of star-forming galaxies
 of the Illustris simulation~\cite{vogelsberger2014,genel2014}, we find little
-motivation for such prescription. In Figure~\ref{fig:illsfh}, we plot 
+motivation for constant $\Delta \logsfr(t)$. In Figure~\ref{fig:illsfh}, we present 
 $\Delta \logsfr$ of star-forming Illustris galaxies as a function of cosmic time. 
-At $z = 0$, these galaxies have stellar masses within $10^{10.5}-10^{10.6}M_\odot$. 
-When calculating $\Delta \logsfr$, we determine the mean SFMS  at every 
-simulation output using the same fitting method we used for the SDSS centrals 
-in Section~\ref{sec:sfcen}. Rather than staying fixed, Figure~\ref{fig:illsfh} 
-illustrates that the $\Delta \logsfr$s of the Illustris galaxies stochastically 
+These galaxies have stellar masses within $10^{10.5}-10^{10.6}M_\odot$ at $z=0$. 
+At the simultation outputs, we derive $\musfms$ using the same fitting method 
+we used for the SDSS centrals in Section~\ref{sec:sfcen} and use it to calculate
+$\Delta \logsfr$ (Eq.~\ref{eq:logsfr_sf}). Rather than remaining constant, 
+Figure~\ref{fig:illsfh} illustrates that the $\Delta \logsfr(t)$s stochastically 
 vary about SFMS. 
 
-Motivated by the Illustris SFHs, we introduce the ``\emph{star formation 
-duty cycle}'' to our prescription of $\Delta \logsfr$. We parameterize 
+Motivated by the $\Delta \logsfr(t)$ of Illustris galaxies, we introduce the 
+``\emph{star formation duty cycle}'' to our $\Delta \logsfr(t)$. We parameterize 
 $\Delta \logsfr$ to randomly flucutate about the mean SFMS on some duty cycle 
-timescale $t_\mathrm{duty}$. In the left panel of Figure~\ref{fig:sfh_model}, we 
-present the time evolution of $\Delta \logsfr$ for two pedagogical SFHs of SF 
-centrals in our model with $t_\mathrm{duty} = 0.5$ Gyr (blue) and $5$ Gyr (orange).  
-The shaded region represents the $0.3\,\mathrm{dex}$ $1\sigma$ log normal 
-scatter of the SFMS SFR.  
-\todo{A brief comment about how we obviously do not expect such a simplified 
-prescription for SFH to precisely reflect reality. However, we expect it to 
-loosely encapsulate the stochasticity of star formation from accretion and star 
-bursts.} Furthermore, this prescription of $\Delta \logsfr$ produces SFHs that 
-reproduce the log-normal SFR distribution of the SFMS at any point in the model. 
+timescale $t_\mathrm{duty}$. Then the SFR of a given SF central in our model 
+will follow Eq.~\ref{eq:logsfr_sf} where at every timestep $t_\mathrm{duty}$, 
+$\Delta \logsfr$ is randomly sampled from a log-normal distribution with 
+$0.3\,\mathrm{dex}$ scatter. In the left panel of Figure~\ref{fig:sfh_model}, we 
+present $\Delta \logsfr(t)$ of SF centrals in our model with our star formation 
+duty cycle prescription. The two $\Delta \logsfr(t)$s have $t_\mathrm{duty} = 0.5$ 
+Gyr (blue) and $5$ Gyr (orange). The shaded region represents the observed 
+$0.3\,\mathrm{dex}$ $1\sigma$ scatter of the SFMS SFR. \todo{Such a simplified model 
+obviously does not reflect individual SFHs of SF galaxies; however, since 
+$\Delta \logsfr$ is randomly sampled, we expect it capture the stochasticity 
+from gas accretion and star-bursts.} Furthermore, this prescription of $\Delta \logsfr$ 
+produces SFHs that reproduce the log-normal SFR distribution of the SFMS 
+at any point in the model. 
 
-Using our $\Delta \logsfr$ prescription, we can now evolve both the 
-SFR and $M_*$ of our SF centrals along the main sequence. As Eq.~\ref{eq:logsfr_sf}
-reveals, SFR of our SF centrals is function of $M_*$. Meanwhile, $M_*$ is the
+Using our $\Delta \logsfr$ prescription, we now evolve both the SFR and $M_*$ 
+of our SF centrals along the main sequence. Based on Eq.~\ref{eq:logsfr_sf},
+the SFRs of our SF centrals are functions of $M_*$. Meanwhile, $M_*$ is the
 integral of the SFR over time: 
 \beq \label{eq:integ_mass} 
 M_*(t) = f_\mathrm{retain} \int\limits_{t_0}^{t} \mathrm{SFR(M_*, t)}\,\mathrm{d}t + M_0. 
@@ -431,51 +443,57 @@ $t_0$ and $M_0$ are the initial cosmic time and stellar mass at $z \sim 1$, resp
 Combining Eqs.~\ref{eq:logsfr_sf} and~\ref{eq:integ_mass}, we get a different 
 equation, which we solve to evolve the SFR and $M_*$ of our SF centrals.  
 The right panel of Figure~\ref{fig:sfh_model} presents the SFR and $M_*$ 
-evolutions of the two pedagogical SF centrals from the left panel. The dotted 
-lines represent $\log\,\overline{\mathrm{SFR}}_\mathrm{MS}$ of the SFMS at different 
-redshifts starting from $z = 1$ to $0.05$. %We also $\log\,\overline{\mathrm{SFR}}_\mathrm{MS}$
+evolutions for the two SF centrals with different $t_\mathrm{duty}$ from the
+left panel. The behavior of the star formation duty cycle $\Delta \logsfr(t)$ 
+is clearly evident with respect to $\musfms(M_*, t)$ (black solid). 
+For reference, we include the $\musfms$ (dotted lines) at various redshifts 
+between $z = 1$ to $0.05$. 
 
-Now that we have a model that evolves the SFR and $M_*$ of the SF centrals, 
-we can compare our model to observations. Our model is constructed using the 
+Now that we have a model that evolves the SFRs and $M_*$s of SF centrals, 
+we can compare this model to observations. Our model is constructed using the 
 SMF and SMHMR at $z = 1$ and based on the observed evolution of the SFMS. 
 It has two free parameters $A_z$ and $m_z$, which allow for a flexible redshift 
 dependence of the SFMS. At the final snapshot, $z \sim 0$, our model reproduces 
-the observed SFR distribution by construction. We also want our model to reproduce 
-the SDSS DR7 VAGC $z \sim 0$~\cite{li2009} SMF. To compare our model to observation
-we use the parameter estimation framework of Approximate Bayesian Computation (ABC). 
-ABC has the advantage over standard approaches to parameter inference in that it does not 
+the observed SFR distribution by construction. However, we also want our model to 
+reproduce the observed SMF of central galaxies in SDSS. In order to do a principled
+comparison of our model to observation, we use the parameter estimation framework 
+of Approximate Bayesian Computation (ABC). ABC has the advantage over standard 
+approaches to parameter inference in that it does not 
 require evaluating the likelihood. It relies only on a simulation of the observed 
 data and a distance metric to quantify the ``closeness'' between the observed data
 and simulation. Many variations of ABC has been used in astronomy and 
-cosmology~\citep[\emph{e.g.}][]{cameron2012,weyant2013,ishida2015,alsing2018}; 
-we use ABC in conjunction with the efficient Population Monte Carlo (PMC)
+cosmology~\citep[\emph{e.g.}][]{cameron2012,weyant2013,ishida2015,alsing2018}. 
+We use ABC in conjunction with the efficient Population Monte Carlo (PMC)
 importance sampling as in~\citep{hahn2016, hahn2017}. For the priors of $A_z$ and $m_z$, 
-we uniform distributions spanning the ranges \todo{numbers} and \todo{numbers}, 
+we use uniform distributions spanning the ranges \todo{numbers} and \todo{numbers}, 
 respectively. As we mentioned in Section~\ref{sec:sfcen}, the range of the prior 
 were conservatively chosen to encompass the best-fit SFMS from~\cite{speagle2014} 
 and measurements from~\cite{moustakas2013} and~\cite{lee2015} at $z \sim 1$. 
-Finally, to compare the SMF of our model to the SDSS central galaxy SMF, we use the following
-distance metric: 
+Finally, to compare the SMF of our model to the SMF of SDSS central galaxies, 
+we use the following distance metric: 
 \beq
 \rho_\Phi = \sum\limits_{M} \left( \frac{\Phi^\mathrm{sim}(M) - f^\mathrm{cen}(M) \Phi^\mathrm{SDSS}(M)}{\sigma_\Phi(M)}\right)^2.
 \eeq
-$\Phi^\mathrm{sim}(M)$ is the SMF of our model, $\Phi^\mathrm{SDSS}(M)$ is 
+$\Phi^\mathrm{sim}(M)$ is the SMF of our model, $f^\mathrm{cen}(M)$ is the
+central galaxy fraction~\cite{wetzel2013}, $\Phi^\mathrm{SDSS}(M)$ is 
 the~\cite{li2009} SDSS DR7 SMF, and $\sigma_\Phi(M)$ is the SMF uncertainty 
 derived using mock catalogs from~\cite{li2009}. For the rest of our ABC-PMC 
 implementation, we strictly follow the implementation of \cite{hahn2017b} 
 and~\cite{hahn2017a}. We refer reader to those papers for further details.
 
 In Figure~\ref{fig:abc_demo}, we present the SMFs (left), SFMSs (center), and 
-$\sigma_{\log\,M_*}(\mathrm{log}\,M_\mathrm{halo}$ (right) for the ABC outputs 
-of two different SFR prescriptions, one with no duty cycle (red) and the other 
-with $t_\mathrm{duty} = 1\,\mathrm{Gyr}$. The left panel illustrates that the 
-ABC output of our model successfully reproduces the $z \sim 0$ SMF of SDSS 
-centrals. The center panel illustrates
-Lastly, the right panel demonstrates that different SFR prescriptions for  
-SF galaxies produce different uncertainty in the SMHMR relation. Since we have
-observed constaints on the uncertainty of the SMHMR relation, this gives us
-insight into the SF. In the next section we discuss the implications of 
-these constraints in more detail. 
+$\sigma_{\log\,M_*}(\mathrm{log}\,M_\mathrm{halo})$ (right) of the resulting
+ABC posterior distributions of $A_z$ and $m_z$ for two models with different 
+SFH prescriptions: one with no star formation duty cycle (red) and the other 
+with star formation duty cycle $t_\mathrm{duty} = 1\,\mathrm{Gyr}$ (blue). 
+On the left, we illustrate that the ABC posteriors successfully reproduce
+the $z \sim 0$ SMF of SDSS centrals. In the center, we demonstrate how our 
+models by construction, reproduce the $z\sim0$ SFMS. Lastly, on the right, 
+we demonstrate that different prescriptions for SFHs in our model produce significantly
+different scatter in $\log\,M_*$ for a given $\log\,M_\mathrm{halo}$ --- 
+\emph{i.e.} scatter in the SMHMR. Since there are observation constraints on 
+the SMHMR, this means that we can them to better understand and constrain 
+the SFHs of star forming galaxies. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 5 
@@ -490,18 +508,28 @@ these constraints in more detail.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Results}
-\subsection{The duty cycle of star formation}
+\subsection{The Star Formation Duty Cycle}
+Our model, described in the previous section, tracks the SFR and $M_*$ 
+evolutions of SF central galaxies. After using ABC, 
+
+%Now that we have a model that evolves the SFRs and $M_*$s of SF centrals, we can compare this model to observations. Our model is constructed using the SMF and SMHMR at $z = 1$ and based on the observed evolution of the SFMS.  It has two free parameters $A_z$ and $m_z$, which allow for a flexible redshift dependence of the SFMS. At the final snapshot, $z \sim 0$, our model reproduces the observed SFR distribution by construction. However, we also want our model to 
+
+
 In the previous section we describe our model constructed from blah with different
 prescriptions for the star formation histories of star-forming galaxies. As the 
 right panel of Figure~\ref{fig:abc_demo} demonstrates, different prescriptions for 
 the star-forming galaxy star formation predicts different $\sigma_{\log\,M_*}$ 
 
 \bitem
+\item Explain how the posteriors from ABC ultimately marginalize over the parameters that incorporate the 
+    uncertainty in the SFMS 
+\item As Figure~\ref{fig:abc_demo} already demonstrates, different prescriptions lead to different scatter in the SMHMR. 
+\item No duty cycle model obviously ruled out 
+\item In Figure~\ref{fig:sigMstar_duty} we present the scatter in $\sigma_{\log\,M_*}$
 \item We find that by decreasing the timescale of stochasticity on a simple SFH model that traces the overall 
 SFMS evolution does in fact decrease the scatter seen in the SMHMR. However, even with timescales less
 than XXXX, we cannot reproduce observations. Ultimately to reproduce observations, we need to add in 
 assembly bias. 
-
 \eitem
 
 Figure~\ref{fig:sigMstar_duty} 
@@ -555,6 +583,7 @@ we make in our intializations.
 \section*{Acknowledgements}
 It's a pleasure to thank 
     Louis Abramson, 
+    Shy Genel, 
     \todo{more acknowledgements} 
 for valueable discussions. 
 
