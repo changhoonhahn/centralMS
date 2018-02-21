@@ -1,6 +1,6 @@
 # !/bin/bash
-# PBS -l nodes=1:ppn=1
-# PBS -N ABC_randomSFH_1gyr 
+# PBS -l nodes=c8.ib.local:ppn=1
+# PBS -N modelABC_random_2gyr 
 cd $PBS_O_WORKDIR
 export NPROCS=`wc -l $PBS_NODEFILE |gawk '//{print $1}'`
 export PATH="/home/users/hahn/anaconda2/bin:$PATH"
