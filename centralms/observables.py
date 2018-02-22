@@ -536,6 +536,18 @@ class Smhmr(object):
             mu_mstar = np.mean(mstar[inbin])
             sig_mstar = np.std(mstar[inbin])
         return sig_mstar
+    
+    def sigma_logMhalo(self, mhalo, mstar, weights=None, Mstar=10.5, dmstar=0.1): 
+        ''' Calculate sigma_logMhalo for a specific stellar mass. Default Mstar is 10**10.5
+        '''
+        inbin = np.where((mstar >= Mstar-dmstar) & (mstar < Mstar+dmstar)) 
+        if weights is not None: 
+            mu_mhalo = np.average(mhalo[inbin], weights=weights[inbin])
+            sig_mhalo = np.sqrt(np.average((mhalo[inbin]-mu_mhalo)**2, weights=weights[inbin]))
+        else: 
+            mu_mhalo = np.mean(mhalo[inbin])
+            sig_mhalo = np.std(mhalo[inbin])
+        return sig_mhalo
 
 
 def SSFR_SFMS_obvs(mstar, z_in, lit='lee'): 
