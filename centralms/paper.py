@@ -595,28 +595,19 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     lit_siglogMs_lower = [0.08, 0.192-0.031, 0.15, 0.17, 0.20] 
 
     # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 (COSMOS)
-    #tinker2013 = sub.fill_between([0., 10.], [0.15, 0.15], [0.27, 0.27], alpha=0.1, label='Tinker+(2013)', color=pretty_colors[7], linewidth=0) 
     # More et al. (2011) SMHMR of starforming centrals (SDSS)
-    #more2011 = sub.fill_between([0., 10.], [0.07, 0.07], [0.26, 0.26], label='More+(2011)', facecolor="none", hatch='/', edgecolor='k', linewidth=0.5)
     # Leauthaud et al. (2012) all galaxies 0.2 < z < 0.48 (COSMOS)
-    #leauthaud2012 = sub.fill_between([0., 10.], [0.191-0.031, 0.191-0.031], [0.191+0.031, 0.191+0.031], alpha=0.2, label='Leauthaud+(2012)', color=pretty_colors[1], linewidth=0)
     # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
-    #reddick2013 = sub.fill_between([0., 10.], [0.187, 0.187], [0.233, 0.233], label='Reddick+(2013)', facecolor="none", hatch='X', edgecolor='k', linewidth=0.25)
     # Zu & Mandelbaum (2015) SDSS constraints on iHOD parameters
-    #zu2015 = sub.fill_between([0., 10.], [0.21, 0.21], [0.24, 0.24], alpha=0.2, label='Zu+(2015)', color=pretty_colors[1], linewidth=0)
     # Meng Gu et al. (2016) 
-    #gu2016, = sub.plot([0., 10.], [0.32, 0.32], ls='--', c='k') 
     
     # constraints for sigma_logMh
     lit_siglogMh = [
             'Mandelbaum+(2006)', #2.75673e+10, 1.18497e+1 2.75971e+10, 1.21469e+1 2.76147e+10, 1.23217e+1
-            'Han+(2015)', # 2.53944e+10, 1.17972e+1 2.54275e+10, 1.21556e+1 2.54615e+10, 1.25227e+1
-            'Velander+(2013)' # 2.10073e+10, 1.21993e+1 2.12155e+10, 1.24091e+1 2.10347e+10, 1.25577e+1
+            'Velander+(2013)', # 2.10073e+10, 1.21993e+1 2.12155e+10, 1.24091e+1 2.10347e+10, 1.25577e+1
+            'Han+(2015)' # 2.53944e+10, 1.17972e+1 2.54275e+10, 1.21556e+1 2.54615e+10, 1.25227e+1
             ]
-
-    lit_siglogMh_median = [0.47, 0.72, 0.36]
-    #lit_siglogMh_upper = [0.27, 0.192+0.031, 0.27, 0.23, 0.24]
-    #lit_siglogMh_lower = [0.08, 0.192-0.031, 0.15, 0.17, 0.20] 
+    lit_siglogMh_median = [0.47, 0.36, 0.72]
     
     # calculate the scatters from the ABC posteriors 
     smhmr = Obvs.Smhmr()
@@ -660,42 +651,37 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     # ABC posteriors 
     abc_post = sub.errorbar(tduties, sigMs[0,:], yerr=[sigMs[0,:]-sigMs[1,:], sigMs[2,:]-sigMs[0,:]], fmt='.k') 
     # literature 
-    sub.errorbar(np.logspace(np.log10(0.5), np.log10(9), len(lit_siglogMs)), lit_siglogMs_median,
-            yerr=[np.array(lit_siglogMs_median)-np.array(lit_siglogMs_lower), 
-                np.array(lit_siglogMs_upper)-np.array(lit_siglogMs_median)], fmt='.k',
-            color=['C'+str(i) for i in range(len(lit_siglogMs))])
+    subplts = [] 
+    for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
+        subplt = sub.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.C'+str(ii), markersize=10)
+        subplts.append(subplt) 
 
-    #legend1 = sub.legend([abc_post, more2011, leauthaud2012], ['ABC Posteriors', 'More+(2011)', 'Leauthaud+(2012)'], loc='upper left', prop={'size': 15})
-    #sub.legend([reddick2013, tinker2013], ['Reddick+(2013)', 'Tinker+(2013)'], loc='lower right', prop={'size': 15})
-    #plt.gca().add_artist(legend1)
-    # x-axis
-    sub.set_xlim([0.45, 10.]) 
+    legend1 = sub.legend(subplts[:3], lit_siglogMs[:3], loc='upper left', prop={'size': 15})
+    sub.legend(subplts[3:], lit_siglogMs[3:], loc='lower right', prop={'size': 15})
+    plt.gca().add_artist(legend1)
+    sub.set_xlim([0.45, 10.]) # x-axis
     sub.set_xscale('log') 
-    # y-axis
-    sub.set_ylabel(r'$\sigma_{M_*} \Big(M_\mathrm{halo} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=20)
-    sub.set_ylim([0., 0.5]) 
+    sub.set_ylabel(r'$\sigma_{M_*} \Big(M_\mathrm{halo} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=20) # y-axis
+    sub.set_ylim([0., 0.6]) 
+    sub.set_yticks([0., 0.2, 0.4, 0.6]) 
     
-    sub = fig.add_subplot(122)
+    sub = fig.add_subplot(122) 
     # ABC posteriors 
     abc_post = sub.errorbar(tduties, sigMh[0,:], yerr=[sigMh[0,:]-sigMh[1,:], sigMh[2,:]-sigMh[0,:]], fmt='.k') 
-    sub.scatter(np.logspace(np.log10(0.5), np.log10(9), len(lit_siglogMh)), lit_siglogMh_median)
-    # literature 
-    #sub.errorbar(np.logspace(0.5, 7.5, len(lit_siglogMs)), lit_median, 
-    #        yerr=[np.array(lit_median)-np.array(lit_lower), np.array(lit_upper)-np.array(lit_median)], fmt='.k')
-
-    #legend1 = sub.legend([abc_post, more2011, leauthaud2012], ['ABC Posteriors', 'More+(2011)', 'Leauthaud+(2012)'], loc='upper left', prop={'size': 15})
-    #sub.legend([reddick2013, tinker2013], ['Reddick+(2013)', 'Tinker+(2013)'], loc='lower right', prop={'size': 15})
-    #plt.gca().add_artist(legend1)
-    # x-axis
-    sub.set_xlim([0.45, 10.]) 
+    subplts = [] 
+    for ii, tt, sig in zip(range(len(lit_siglogMh)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMh)), lit_siglogMh_median):
+        subplt = sub.plot([tt/1.03, tt*1.03], [sig, sig], color='C'+str(ii))#, yerr=0.02, uplims=True)
+        subplt = sub.errorbar([tt], [sig], yerr=0.02, uplims=True, color='C'+str(ii))
+        subplts.append(subplt) 
+    sub.legend(subplts, lit_siglogMh, loc='lower right', prop={'size': 15})
+    sub.set_xlim([0.45, 10.]) # x-axis
     sub.set_xscale('log') 
-    # y-axis
-    sub.set_ylabel(r'$\sigma_{M_\mathrm{halo}} \Big(M_* = 10^{'+str(Mstar)+r'} M_\odot \Big)$', fontsize=20)
-    sub.set_ylim([0., 0.5]) 
+    sub.set_ylabel(r'$\sigma_{M_\mathrm{halo}} \Big(M_* = 10^{'+str(Mstar)+r'} M_\odot \Big)$', fontsize=20) # y-axis
+    sub.set_ylim([0., 0.75]) 
+    sub.set_yticks([0., 0.2, 0.4, 0.6]) 
     
     bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
-    bkgd.set_xlabel('$t_\mathrm{duty}$ [Gyr]', labelpad=15, fontsize=25) 
-    
+    bkgd.set_xlabel('$t_\mathrm{duty}$ [Gyr]', labelpad=10, fontsize=22) 
     fig.subplots_adjust(wspace=0.3)
     fig.savefig(''.join([UT.tex_dir(), 'figs/SHMRscatter_tduty.pdf']), 
             bbox_inches='tight', dpi=150) 
