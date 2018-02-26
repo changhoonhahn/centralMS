@@ -552,8 +552,8 @@ if __name__=='__main__':
     #sfh_name = 'rSFH_r0.99_delay'
     #sfh_name = 'test0' # 'randomSFH_short'
 
-    #sfh_name = 'rSFH_r0.99_tdyn_0.5gyr_narrSFMS'#'randomSFH_5gyr' # 'randomSFH_short'
-    sfh_name = 'randomSFH_2gyr'#_narrSFMS' # 'randomSFH_short'
+    sfh_name = 'rSFH_r0.99_tdyn_0.5gyr' # 0.5gyr_narrSFMS'#'randomSFH_5gyr' # 'randomSFH_short'
+    #sfh_name = 'randomSFH_0.5gyr'#_narrSFMS' # 'randomSFH_short'
     #sfh_name = 'rSFH_r0.5_tdyn_0.5gyr'
     #test_model_ABCparticle(sfh_name, 13)
     for t in [14]: #range(1,12)[::-1]: #[5,6]: #range(5):

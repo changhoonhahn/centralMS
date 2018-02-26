@@ -1,7 +1,7 @@
 # !/bin/bash
 # PBS -l nodes=c8.ib.local:ppn=1
-# PBS -N modelABC_random_0.5gyr 
+# PBS -N modelABC_rSFH_r0.99_tdyn_5gyr 
 cd $PBS_O_WORKDIR
 export NPROCS=`wc -l $PBS_NODEFILE |gawk '//{print $1}'`
 export PATH="/home/users/hahn/anaconda2/bin:$PATH"
-python /home/users/hahn/projects/centralMS/centralms/run/run_modelABC.py randomSFH_0.5gyr 14 
+python /home/users/hahn/projects/centralMS/centralms/run/run_modelABC.py rSFH_r0.99_tdyn_5gyr 14 
