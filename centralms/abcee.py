@@ -277,16 +277,6 @@ def model(run, args, **kwargs):
         theta['sfh']['dt_delay'] = 0. # Gyr 
         theta['sfh']['dt_dMh'] = 2.5 # Gyr
         theta['sfms']['sigma'] = 0.2 # note narrower SFMS
-    elif run == 'rSFH_r0.5_tdyn_0.5gyr': 
-        # random SFH with 0.5 correlation with halo growth 
-        # over t_dyn and duty cycle of 0.5 Gyr 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.5 * 0.3
-        theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = 2.5 # Gyr
     elif run == 'rSFH_r0.99_delay_dt_test': 
         theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
         theta['sfh']['dt_min'] = args[2]
@@ -311,6 +301,17 @@ def model(run, args, **kwargs):
         theta['sfh']['dt_max'] = 5. 
         theta['sfh']['sigma'] = 0.2  # note narrower SFMS
         theta['sfms']['sigma'] = 0.2 # note narrower SFMS
+    elif 'rSFH_r0.5_tdyn_' in run:
+        # random SFH with 0.5 correlation with halo growth 
+        # over t_dyn and duty cycle specified in `run`
+        tduty = float(run.split('rSFH_r0.5_tdyn_')[-1].split('gyr')[0])
+        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
+        theta['sfh']['dt_min'] = tduty
+        theta['sfh']['dt_max'] = tduty
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.5 * 0.3
+        theta['sfh']['dt_delay'] = 0. # Gyr 
+        theta['sfh']['dt_dMh'] = 2.5 # Gyr
     else: 
         raise NotImplementedError
 
