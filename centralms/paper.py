@@ -731,13 +731,14 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
 
     # calculate the scatters from the ABC posteriors 
     smhmr = Obvs.Smhmr()
-    for abias in [0., 0.99]: 
+    for i_a, abias in enumerate([0., 0.5, 0.99]): 
         if abias > 0.:
             runs = ['rSFH_r'+str(abias)+'_tdyn_'+str(tt)+'gyr' for tt in [0.5, 1, 2, 5]]
             tduties = [0.5, 1., 2., 5.]  #hardcoded
             iters = [14, 14, 14, 14] # iterations of ABC
             nparticles = [1000, 1000, 1000, 1000]
-            mark='^'
+            if abias == 0.99: mark='^'
+            else: mark='s'
             ms=4
         else: 
             runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr', 'randomSFH_5gyr', 'test0']
@@ -753,7 +754,7 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
         for i_t, tduty in enumerate(tduties): 
             abc_dir = UT.dat_dir()+'abc/'+runs[i_t]+'/model/' # ABC directory 
             sig_Mss, sig_Mhs = [], [] 
-            for i in range(200): 
+            for i in range(10): 
                 f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
                 subcat_sim_i = {} 
                 for key in f.keys(): 
@@ -782,9 +783,11 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
             sigMh[2, i_t] = sig_mh_high
         
         # ABC posteriors 
-        abc_post1 = sub1.errorbar(tduties, sigMs[0,:], yerr=[sigMs[0,:]-sigMs[1,:], sigMs[2,:]-sigMs[0,:]], 
+        abc_post1 = sub1.errorbar(10**(np.log10(tduties)+0.01*i_a), sigMs[0,:], 
+                yerr=[sigMs[0,:]-sigMs[1,:], sigMs[2,:]-sigMs[0,:]], 
                 fmt='.k', marker=mark, markersize=ms) 
-        abc_post2 = sub2.errorbar(tduties, sigMh[0,:], yerr=[sigMh[0,:]-sigMh[1,:], sigMh[2,:]-sigMh[0,:]], 
+        abc_post2 = sub2.errorbar(10**(np.log10(tduties)+0.01*i_a), sigMh[0,:], 
+                yerr=[sigMh[0,:]-sigMh[1,:], sigMh[2,:]-sigMh[0,:]], 
                 fmt='.k', marker=mark, markersize=ms) 
 
     # literature 
@@ -809,8 +812,9 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
         subplt = sub2.errorbar([tt], [sig], yerr=0.02, uplims=True, color='C'+str(ii))
         subplts.append(subplt) 
     abc_post1 = sub2.errorbar([0], [0], yerr=[0.1], fmt='.k', marker=None, markersize=None) 
-    abc_post2 = sub2.errorbar([0], [0], yerr=[0.1], fmt='.k', marker='^', markersize=3) 
-    leg_abc = sub2.legend([abc_post1, abc_post2], ['ABC posterior \n $r=0$', '$r=0.99$'], prop={'size': 15}) 
+    abc_post2 = sub2.errorbar([0], [0], yerr=[0.1], fmt='.k', marker='s', markersize=3) 
+    abc_post3 = sub2.errorbar([0], [0], yerr=[0.1], fmt='.k', marker='^', markersize=3) 
+    leg_abc = sub2.legend([abc_post1, abc_post2, abc_post3], ['ABC posterior \n $r=0$', '$r=0.5$', '$r=0.99$'], prop={'size': 15}) 
     sub2.legend(subplts, lit_siglogMh, loc='lower right', markerscale=4, prop={'size': 15})
 
     sub2.add_artist(leg_abc)
