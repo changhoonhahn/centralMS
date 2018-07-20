@@ -1,65 +1,10 @@
-'''
-
-
-
-'''
 import time 
 import numpy as np 
-from scipy.interpolate import interp1d
 from scipy.integrate import odeint
+from scipy.interpolate import interp1d
 
-import util as UT 
-import sfh as SFH
-
-
-def defaultTheta(sfh): 
-    ''' Return generic default parameter values
-    '''
-    theta = {} 
-
-    theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
-    theta['sfms'] = {'zslope': 1.05, 'mslope':0.58, 'offset': -0.1}
-    theta['fq'] = {'name': 'cosmos_tinker'}
-    theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-    
-    theta['sfh'] = {'name': sfh}
-    if sfh == 'constant_offset': 
-        theta['sfh']['nsnap0'] = 15 
-    elif sfh == 'corr_constant_offset':
-        theta['sfh']['m.kind'] = 'm.star'
-        theta['sfh']['dm.kind'] = 0.01 
-        theta['sfh']['sig_abias'] = 0.3 
-    elif sfh == 'random_step': 
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma'] = 0.3 
-    elif sfh == 'random_step_fluct': 
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma'] = 0.3 
-    elif sfh == 'random_step_abias': 
-        theta['sfh']['dt_min'] = 0.25 
-        theta['sfh']['dt_max'] = 0.25 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.29
-    elif sfh == 'random_step_abias2': 
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['t_abias'] = 2. # Gyr
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.29
-    elif sfh == 'random_step_abias_delay': 
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.2
-        theta['sfh']['dt_delay'] = 1. # Gyr 
-        theta['sfh']['dz_dMh'] = 0.5 
-    else: 
-        raise NotImplementedError
-
-    return theta 
+from . import util as UT 
+from . import sfh as SFH
 
 
 class Evolver(object): 
@@ -195,6 +140,56 @@ class Evolver(object):
         self.theta_sfh = theta['sfh']
 
         return None
+
+
+def defaultTheta(sfh): 
+    ''' Return generic default parameter values
+    '''
+    theta = {} 
+
+    theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
+    theta['sfms'] = {'zslope': 1.05, 'mslope':0.58, 'offset': -0.1}
+    theta['fq'] = {'name': 'cosmos_tinker'}
+    theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
+    
+    theta['sfh'] = {'name': sfh}
+    if sfh == 'constant_offset': 
+        theta['sfh']['nsnap0'] = 15 
+    elif sfh == 'corr_constant_offset':
+        theta['sfh']['m.kind'] = 'm.star'
+        theta['sfh']['dm.kind'] = 0.01 
+        theta['sfh']['sig_abias'] = 0.3 
+    elif sfh == 'random_step': 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma'] = 0.3 
+    elif sfh == 'random_step_fluct': 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma'] = 0.3 
+    elif sfh == 'random_step_abias': 
+        theta['sfh']['dt_min'] = 0.25 
+        theta['sfh']['dt_max'] = 0.25 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.29
+    elif sfh == 'random_step_abias2': 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['t_abias'] = 2. # Gyr
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.29
+    elif sfh == 'random_step_abias_delay': 
+        theta['sfh']['dt_min'] = 0.5 
+        theta['sfh']['dt_max'] = 0.5 
+        theta['sfh']['sigma_tot'] = 0.3 
+        theta['sfh']['sigma_corr'] = 0.2
+        theta['sfh']['dt_delay'] = 1. # Gyr 
+        theta['sfh']['dz_dMh'] = 0.5 
+    else: 
+        raise NotImplementedError
+
+    return theta 
 
 
 def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_kwargs=None, **theta): 

@@ -9,28 +9,34 @@ import numpy as np
 from scipy import interpolate
 
 
-def code_dir(): 
-    ''' Directory where all the code is located (the directory that this file is in!)
-    '''
-    return os.path.dirname(os.path.realpath(__file__))
+def check_env(): 
+    if os.environ.get('CENTRALMS_DIR') is None: 
+        raise ValueError("set $CENTRALMS_DIR in bashrc file!") 
+    return None
 
 
 def dat_dir(): 
-    ''' dat directory is symlinked to a local path where the data files are located
     '''
-    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/dat/'
+    '''
+    return os.environ.get('CENTRALMS_DIR') 
+
+
+def code_dir(): 
+    ''' Directory where all the code is located (the directory that this file is in!)
+    '''
+    return os.environ.get('CENTRALMS_CODEDIR') 
 
 
 def fig_dir(): 
-    ''' 
-    '''
-    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/fig/'
+    return ''.join([code_dir(), 'fig/']) 
+
+
+def doc_dir(): 
+    return ''.join([code_dir(), 'tex/']) 
 
 
 def tex_dir(): 
-    ''' 
-    '''
-    return os.path.dirname(os.path.dirname(os.path.realpath(__file__)))+'/tex/'
+    return ''.join([code_dir(), 'tex/']) 
 
 
 def bar_plot(bin_edges, values): 

@@ -20,6 +20,7 @@ try:
 except ImportError:
     pass
 
+
 class Subhalos(object): 
     def __init__(self, sigma_smhm=0.2, smf_source='li-march', nsnap0=20): 
         ''' catalog of subhalos over the snapshots 1 to nsnap0 
