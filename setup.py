@@ -13,7 +13,7 @@ setup(name = 'centralMS',
       platforms=['*nix'],
       license='GPL',
       requires = ['numpy', 'matplotlib', 'scipy'],
-      provides = ['centralMS'],
-      packages = ['centralMS'],
+      provides = ['centralms'],
+      packages = ['centralms'],
       scripts=['centralms/util.py']
       )
