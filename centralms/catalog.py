@@ -9,8 +9,8 @@ import h5py
 import numpy as np
 from astropy.io import fits 
 # --- local --- 
-from centralMS import util as UT
-from centralMS import sham_hack as sham
+from centralms import util as UT
+from centralms import sham_hack as sham
 
 # modules only available on Harmattan or Sirocco
 try: 
@@ -55,8 +55,9 @@ class Subhalos(object):
         '''
         f = h5py.File(self.File(**kwargs), 'r') 
         catalog = {} 
-        for key in f.attrs.keys():
-            catalog[key] = f.attrs[key]
+        catalog['metadata'] = {}
+        for key in f.attrs.keys(): 
+            catalog['metadata'][key] = f.attrs[key]
         for key in f.keys():
             catalog[key] = f[key].value
         return catalog 
@@ -131,7 +132,7 @@ class Subhalos(object):
                 hasmatches = (hasmatches & (catalog['index.snap'+str(i_snap)] > 0)) 
             print('%f of the subhalos at nsnap=1 have parent subhalos out to %i' % 
                     (np.sum(hasmatches)/np.float(len(hasmatches)), self.nsnap0))
-            mstarlim = (catalog['m.star'] > 9.0)
+            mstarlim = (catalog['m.sham'] > 9.0)
             print('%f of the subhalos with M*_sham > 9. at nsnap=1 have parent subhalos out to %i' % 
                     (np.sum(hasmatches & mstarlim)/np.float(np.sum(mstarlim)), self.nsnap0)) 
 
@@ -147,7 +148,11 @@ class Subhalos(object):
 
         # write to hdf5 file witht he simplest organization
         f = h5py.File(self.File(), 'w') 
-        f.attrs = {'nsnap0': self.nsnap0, 'sigma_smhm': self.sigma_smhm, 'smf_source': self.smf_source} 
+        # -- meta data -- 
+        f.attrs['nsnap0'] = self.nsnap0
+        f.attrs['sigma_smhm'] = self.sigma_smhm
+        f.attrs['smf_source'] = self.smf_source
+        # -- data -- 
         for key in catalog.keys(): 
             f.create_dataset(key, data=catalog[key])
         f.close() 
@@ -209,7 +214,7 @@ class CentralSubhalos(Subhalos):
                     (n_central, len(shcat['central'])))
             print('%i of %i central subhalos at nsnap=1 are centrals throughout nsnap=1 to %i' %
                     (np.sum(iscen), n_central, self.nsnap0)) 
-            mslim = (shcat['m.star'] > 9.) 
+            mslim = (shcat['m.sham'] > 9.) 
             print('%f central subhalos w/ M* > 9. at nsnap=1 are throughout nsnap=1 to %i' %
                     (np.float(np.sum(iscen & mslim))/float(np.sum((shcat['central'] == 1) & mslim)), self.nsnap0))
         
@@ -225,70 +230,69 @@ class CentralSubhalos(Subhalos):
     
         catalog = {} 
         for key in shcat.keys(): 
+            if key == 'metadata': continue 
             catalog[key] = shcat[key][cut_tot]
 
         # save to hdf5 file 
         if not silent: print('writing to %s ... ' % self.File()) 
         f = h5py.File(self.File(), 'w') 
+        # -- meta data -- 
         f.attrs['nsnap0'] = self.nsnap0
         f.attrs['sigma_smhm'] = self.sigma_smhm
         f.attrs['smf_source'] = self.smf_source
+        # -- data -- 
         for key in catalog.keys(): 
             f.create_dataset(key, data=catalog[key])
         f.create_dataset('weights', data=np.repeat(1., np.sum(cut_tot)))
         f.close() 
         return None 
 
-    def Downsample(self, ngal_thresh=4000, dmhalo=0.2): 
+    def Downsample(self, nbin_thresh=4000, dmhalo=0.2, silent=True): 
         ''' Downsample the catalog within bins of halo mass 
         '''
         catalog = self.Read()
-        Mhalo_min = np.min(catalog['halo.m'])
-        Mhalo_max = np.max(catalog['halo.m'])
-        print Mhalo_min, Mhalo_max
-        
+        nhalo = len(catalog['halo.m']) 
+        mhalo_min = catalog['halo.m'].min()
+        mhalo_max = catalog['halo.m'].max() 
+        weights = catalog['weights'] 
+        if not silent: print('%i subhalo with %f < Mhalo < %f' % (nhalo, mhalo_min, mhalo_max))
+
         # halo mass bins
-        mhalo_bin = np.arange(Mhalo_min - 0.5 * dmhalo, Mhalo_max + dmhalo, dmhalo) 
+        mhbin = np.arange(0.2*np.floor(mhalo_min/0.2), 0.2*(np.ceil(mhalo_max/0.2)+1), 0.2) 
         
-        weights = np.repeat(1., len(catalog['halo.m']))
-        print 'Before downsample; w_tot = ', np.sum(weights) 
+        for i_m in range(len(mhbin)-1): 
+            in_mhbin = ((catalog['halo.m'] > mhbin[i_m]) & (catalog['halo.m'] <= mhbin[i_m+1]))
+            nbin = np.sum(in_mhbin)
+
+            if nbin > nbin_thresh:  
+                weights[in_mhbin] = 0.
+                f_down = float(nbin_thresh)/float(nbin) 
+
+                keep_ind = np.random.choice(range(nbin), nbin_thresh, replace=False) 
+                weights[np.arange(nhalo)[in_mhbin][keep_ind]] = 1./f_down
+    
+        f_down = (float(nhalo)/float(np.sum(weights > 0.)))
+        if not silent: print('downsampled by %f x' % f_down)
         
-        for i_m in range(len(mhalo_bin) - 1): 
-            in_Mhalobin = np.where(
-                    (mhalo_bin[i_m] < catalog['halo.m']) &
-                    (mhalo_bin[i_m+1] >= catalog['halo.m'])) 
-            ngal_inbin = len(in_Mhalobin[0])
-
-            if ngal_inbin > ngal_thresh:  
-                weights[in_Mhalobin] = 0.
-                f_down = np.float(ngal_thresh)/np.float(ngal_inbin) 
-
-                keep_ind = np.random.choice(range(ngal_inbin), ngal_thresh, replace=False) 
-                weights[in_Mhalobin[0][keep_ind]] = 1./f_down
-
-            print ngal_inbin, np.sum(weights[in_Mhalobin])
-
-        f_down = np.float(len(catalog['halo.m'])) / np.float(np.sum(weights > 0.)) 
-        print 'downsampled by ', int(round(f_down)), 'x'
-
-        print 'After downsample; w_tot = ', np.sum(weights)
-        
-        if not np.allclose(np.float(len(catalog['halo.m'])), np.sum(weights)): 
-            print np.float(len(catalog['halo.m'])), np.sum(weights)
-            print np.float(len(catalog['halo.m'])) - np.sum(weights)
-            raise ValueError
+        assert np.allclose(float(nhalo), np.sum(weights))
 
         hasw = np.where(weights > 0.)
         
         # ouptut downsampled catalog to hdf5 file  
         down_file = self.File(downsampled=str(int(round(f_down))))
-        print 'writing to ... ', down_file
+        if not silent: print('writing to %s ... ' % down_file)
         f = h5py.File(down_file, 'w') 
-        grp = f.create_group('data') 
+        # -- meta data -- 
+        f.attrs['nsnap0'] = self.nsnap0
+        f.attrs['sigma_smhm'] = self.sigma_smhm
+        f.attrs['smf_source'] = self.smf_source
+        f.attrs['nbin_thresh'] = nbin_thresh
+        f.attrs['dmhalo'] = dmhalo
+        # -- data -- 
         for key in catalog.keys(): 
-            if key != 'weights': 
-                grp.create_dataset(key, data=catalog[key][hasw])
-        grp.create_dataset('weights', data=weights[hasw])
+            if key in ['weights', 'metadata']: continue 
+            f.create_dataset(key, data=catalog[key][hasw]) 
+        f.create_dataset('weights', data=weights[hasw])
         f.close() 
         return None 
 

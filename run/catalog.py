@@ -30,6 +30,14 @@ def buildCentralSubhalos(nsnap0=20, sigma_smhm=0.2, smf_source='li-march', silen
     return None 
 
 
+def buildCentralSubhalosDown(nsnap0=20, sigma_smhm=0.2, smf_source='li-march', silent=True): 
+    '''
+    '''
+    shcat = Cat.CentralSubhalos(sigma_smhm=sigma_smhm, smf_source=smf_source, nsnap0=nsnap0)
+    shcat.Downsample(silent=silent)
+    return None 
+
+
 def buildSDSSgroupcat(): 
     '''
     '''
@@ -39,7 +47,9 @@ def buildSDSSgroupcat():
             cat._Build(silent=False)
     return None 
 
+
 if __name__=="__main__":
     #buildSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
-    buildCentralSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
+    #buildCentralSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
     #buildSDSSgroupcat()
+    buildCentralSubhalosDown(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
