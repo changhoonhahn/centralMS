@@ -7,13 +7,12 @@ Create catalog for centralMS project.
 import os
 import h5py
 import numpy as np
-
-# --- Local --- 
-import util as UT
-from ChangTools.fitstables import mrdfits
+from astropy.io import fits 
+# --- local --- 
+from centralMS import util as UT
+from centralMS import sham_hack as sham
 
 # modules only available on Harmattan or Sirocco
-from centralms import sham_hack as sham
 try: 
     from treepm import subhalo_io 
     from utilities import utility as wetzel_util
@@ -204,8 +203,11 @@ class CentralSubhalos(Subhalos):
             print('%f central subhalos w/ M* > 9. at nsnap=1 are throughout nsnap=1 to %i' %
                     (np.float(np.sum(iscen & mslim))/float(np.sum((shcat['central'] == 1) & mslim)), self.nsnap0))
         
-        # cut by mmax?  
-        cut_mass = (shcat['m.max'] > 11.) 
+        # make sure mhalo and mmax are both non-zero 
+        # impose a halo.m cut, which was determined so that the 
+        # sample is stellar masses complete out to M_*~10^9. Below 
+        # things get gnarly. 
+        cut_mass = ((shcat['m.max'] > 0.) & (shcat['halo.m'] > 10.6))
         cut_tot = (iscen & cut_mass) 
         if not silent: 
             print('%i of %i subhalos that are centrals throughout are above the mass limit' % 
@@ -278,110 +280,68 @@ class CentralSubhalos(Subhalos):
         return None 
 
 
-class Observations(object):
+class SDSSgroupcat(Subhalos): 
+    ''' Subhalos subclass to deal with SDSS group catalog data 
     '''
-    '''
-    def __init__(self, cat, **cat_kwargs):
-        ''' Load in disparate observations into some universal format. 
+    def __init__(self, Mrcut=18, censat='central'):
         '''
-        available = ['group_catalog']
+        '''
+        mrmasscut_dict = {18: '9.4', 19: '9.8', 20: '10.2'}
+        self.Mrcut = Mrcut
+        self.masscut = mrmasscut_dict[Mrcut]
+        self.censat = censat 
+        self.h = 0.7
+        if self.censat not in ['central', 'satellite', 'all']: 
+            raise ValueError
 
-        if cat not in available: 
-            raise ValueError('must be one of the following : '+','.join(available))
-        self.name = cat
+    def File(self): 
+        ''' file name 
+        '''
+        f = ''.join([UT.dat_dir(), 'observations/',
+            'SDSSgroupcat',
+            '.Mr', str(self.Mrcut), 
+            '.Mstar', str(self.masscut), 
+            '.', str(self.censat), 
+            '.hdf5']) 
+        return f 
     
-        self._Unpack_kwargs(cat_kwargs)     # unpack keywoard arguments that specify the catalog 
-
-    def Read(self):
-
-        if self.name == 'group_catalog': 
-            catalog = self._ReadGroupCat()
-        else: 
-            raise NotImplementedError
-
-        return catalog 
-    
-    def _ReadGroupCat(self):
+    def _Build(self, silent=True):  
         '''
         '''
-        # check that appropriate kwargs are set 
-        assert 'Mrcut' in self._catalog_kwargs.keys()
-        assert 'masscut' in self._catalog_kwargs.keys()
-        assert 'position' in self._catalog_kwargs.keys()
-
-        h = 0.7
         # load in galdata .fits file  
-        galdata_file = ''.join([UT.dat_dir(), 'observations/', 
-            'clf_groups_M', str(self._catalog_kwargs['Mrcut']), 
-            '_', str(self._catalog_kwargs['masscut']), '_D360.', 
-            'galdata_corr.fits']) 
-        gal_data = mrdfits(galdata_file) 
+        fgal = fits.open(''.join([UT.dat_dir(), 'observations/', 
+            'clf_groups_M', str(self.Mrcut), '_', str(self.masscut), '_D360.', 
+            'galdata_corr.fits']) )
+        gal_data = fgal[1].data 
     
-        # process some of the data
-        for column in gal_data.__dict__.keys(): 
-            column_data = getattr(gal_data, column)
-            if column == 'stellmass': # stellmass is in units of Msol/h^2
-                column_data = column_data / h**2
-                # convert to log Mass
-                setattr(gal_data, 'mass', np.log10(column_data))
-            elif column == 'ssfr': 
-                column_data = column_data + np.log10(h**2)
-                # convert to log Mass 
-                setattr(gal_data, 'ssfr', column_data)    
-            elif column == 'cz': # convert to z else: 
-                setattr(gal_data, 'z', column_data/299792.458)
-            else: 
-                pass
-        setattr(gal_data, 'sfr', gal_data.mass + gal_data.ssfr)     # get sfr values
-        
+        catalog = {} 
+        catalog['ra']   = gal_data['ra'] * 57.2957795
+        catalog['dec']  = gal_data['dec'] * 57.2957795
+        catalog['z']    = gal_data['cz']/299792.458
+        catalog['mstar'] = gal_data['stellmass'] / self.h**2   # convert to log Mass
+        catalog['ssfr'] = gal_data['ssfr'] + np.log10(self.h**2) # remove h dependence 
+        catalog['sfr']  = catalog['ssfr'] + catalog['mstar'] 
+
         # read in central/satellite probability file 
-        file = ''.join([UT.dat_dir(), 'observations/', 
-            'clf_groups_M', str(self._catalog_kwargs['Mrcut']), 
-            '_', str(self._catalog_kwargs['masscut']), '_D360.', 
-            'prob.fits']) 
-        prob_data = mrdfits(file)            
+        fprob = fits.open(''.join([UT.dat_dir(), 'observations/', 
+            'clf_groups_M', str(self.Mrcut), '_', str(self.masscut), '_D360.', 'prob.fits'])) 
+        prob_data = fprob[1].data
+        catalog['p_sat'] = prob_data['p_sat'] 
 
         # central or satellite 
-        if self._catalog_kwargs['position'] == 'central': 
-            prob_index = np.where(prob_data.p_sat <= 0.5)
-        elif self._catalog_kwargs['position'] == 'satellite': 
-            prob_index = np.where(prob_data.p_sat > 0.5)
-        elif self._catalog_kwargs['position'] == 'all': 
-            prob_index = range(len(prob_data.p_sat))
-        else: 
-            raise ValueError
-    
-        # hardcoded list of columns... but oh well 
-        columns = ['ra', 'dec', 'mass', 'sfr', 'ssfr', 'z']
+        if self.censat == 'central': 
+            censat_cut = (prob_data['p_sat'] <= 0.5) 
+        elif self.censat == 'satellite': 
+            censat_cut = (prob_data['p_sat'] > 0.5) 
+        elif self.censat == 'all': 
+            censat_cut = np.ones(len(prob_data['p_sat'])).astype(bool) 
+        if not silent: 
+            print('%i out of %i galaxies are %s' % (np.sum(censat_cut), len(prob_data['p_sat']), self.censat))
         
-        # save columns into catalog dictionary 
-        catalog = {} 
-        for column in columns: 
-            column_data = getattr(gal_data, column)[prob_index]
-            if column in ['ra', 'dec']: 
-                catalog[column] = column_data * 57.2957795
-            else: 
-                catalog[column] = column_data
-        
-        return catalog 
-        
-    def _Unpack_kwargs(self, kwargs): 
-        ''' Process the keyword arguments for different observable 
-        catalogs. And load to self._catalog_kwargs
-        '''
-        if self.name == 'group_catalog': 
-            # absolute magnitude and mass cuts 
-            Mrcut = kwargs['Mrcut']
-            if Mrcut == 18:
-                masscut='9.4'
-            elif Mrcut == 19: 
-                masscut='9.8'
-            elif Mrcut == 20: 
-                masscut='10.2'
-            
-            # save to object
-            self._catalog_kwargs = {}
-            self._catalog_kwargs['Mrcut'] = Mrcut
-            self._catalog_kwargs['masscut'] = masscut 
-            self._catalog_kwargs['position'] = kwargs['position']
-
+        # write to hdf5 file 
+        if not silent: print('writing to %s ... ' % self.File()) 
+        f = h5py.File(self.File(), 'w') 
+        for key in catalog.keys(): 
+            f.create_dataset(key, data=catalog[key][censat_cut])
+        f.close() 
+        return None 

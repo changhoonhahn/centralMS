@@ -30,6 +30,16 @@ def buildCentralSubhalos(nsnap0=20, sigma_smhm=0.2, smf_source='li-march', silen
     return None 
 
 
+def buildSDSSgroupcat(): 
+    '''
+    '''
+    for Mr in [18, 19, 20]: 
+        for cs in ['central', 'satellite', 'all']: 
+            cat = Cat.SDSSgroupcat(Mrcut=Mr, censat=cs)
+            cat._Build(silent=False)
+    return None 
+
 if __name__=="__main__":
     #buildSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
-    buildCentralSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
+    #buildCentralSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
+    buildSDSSgroupcat()
