@@ -173,8 +173,8 @@ class CentralSubhalos(Subhalos):
             str_down = '.down'+downsampled+'x'
 
         file_name = ''.join([UT.dat_dir(), 
-            'PureCentralSubhalos', 
-            '.SHAMsigma', str(self.sigma_smhm), 
+            'CentralSubhalos', 
+            '.SHAMsig', str(self.sigma_smhm), 
             '.smf_', self.smf_source, 
             '.nsnap0_', str(self.nsnap0), 
             str_down, '.hdf5']) 
