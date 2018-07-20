@@ -22,5 +22,14 @@ def buildSubhalos(nsnap0=20, sigma_smhm=0.2, smf_source='li-march', silent=True)
     return None 
 
 
+def buildCentralSubhalos(nsnap0=20, sigma_smhm=0.2, smf_source='li-march', silent=True): 
+    '''
+    '''
+    shcat = Cat.CentralSubhalos(sigma_smhm=sigma_smhm, smf_source=smf_source, nsnap0=nsnap0)
+    shcat._Build(silent=silent)
+    return None 
+
+
 if __name__=="__main__":
-    buildSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
+    #buildSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
+    buildCentralSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
