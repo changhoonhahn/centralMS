@@ -41,5 +41,5 @@ def buildSDSSgroupcat():
 
 if __name__=="__main__":
     #buildSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
-    #buildCentralSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
-    buildSDSSgroupcat()
+    buildCentralSubhalos(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
+    #buildSDSSgroupcat()

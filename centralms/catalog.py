@@ -55,6 +55,8 @@ class Subhalos(object):
         '''
         f = h5py.File(self.File(**kwargs), 'r') 
         catalog = {} 
+        for key in f.attrs.keys():
+            catalog[key] = f.attrs[key]
         for key in f.keys():
             catalog[key] = f[key].value
         return catalog 
@@ -76,7 +78,10 @@ class Subhalos(object):
         # save snapshot 1 properties 
         catalog = {} 
         for prop in ['halo.m', 'm.max', 'm.star', 'ilk']: 
-            catalog[prop] = sub[1][prop]
+            if prop == 'm.star': 
+                catalog['m.sham'] = sub[1][prop]
+            else: 
+                catalog[prop] = sub[1][prop]
         
         # central/satellite classification
         central_indices = wetzel_util.utility_catalog.indices_ilk(sub[1], ilk='cen') 
@@ -103,8 +108,12 @@ class Subhalos(object):
             for prop in props: 
                 empty = np.repeat(-999., n_halo)
                 if prop == 'ilk': empty = empty.astype(int) 
-                catalog[prop+'.snap'+str(i_snap)] = empty  
-                catalog[prop+'.snap'+str(i_snap)][hasmatch] = (sub[i_snap][prop])[index_history[hasmatch]]
+                if prop == 'm.star':
+                    catalog['m.sham.snap'+str(i_snap)] = empty  
+                    catalog['m.sham.snap'+str(i_snap)][hasmatch] = (sub[i_snap][prop])[index_history[hasmatch]]
+                else: 
+                    catalog[prop+'.snap'+str(i_snap)] = empty  
+                    catalog[prop+'.snap'+str(i_snap)][hasmatch] = (sub[i_snap][prop])[index_history[hasmatch]]
             
             if i_snap <= self.nsnap0: 
                 # classify central/satellite at snapshot i_snap
@@ -130,14 +139,15 @@ class Subhalos(object):
         nsnap_start = np.repeat(-999, n_halo) 
         for i_snap in range(1,self.nsnap0+1)[::-1]: 
             if i_snap > 1: 
-                mstar = catalog['m.star.snap'+str(i_snap)]
+                mstar = catalog['m.sham.snap'+str(i_snap)]
             else: 
-                mstar = catalog['m.star']
+                mstar = catalog['m.sham']
             nsnap_start[(mstar > 0.) & (nsnap_start < i_snap)] = i_snap 
         catalog['nsnap_start'] = nsnap_start
 
         # write to hdf5 file witht he simplest organization
         f = h5py.File(self.File(), 'w') 
+        f.attrs = {'nsnap0': self.nsnap0, 'sigma_smhm': self.sigma_smhm, 'smf_source': self.smf_source} 
         for key in catalog.keys(): 
             f.create_dataset(key, data=catalog[key])
         f.close() 
@@ -220,6 +230,9 @@ class CentralSubhalos(Subhalos):
         # save to hdf5 file 
         if not silent: print('writing to %s ... ' % self.File()) 
         f = h5py.File(self.File(), 'w') 
+        f.attrs['nsnap0'] = self.nsnap0
+        f.attrs['sigma_smhm'] = self.sigma_smhm
+        f.attrs['smf_source'] = self.smf_source
         for key in catalog.keys(): 
             f.create_dataset(key, data=catalog[key])
         f.create_dataset('weights', data=np.repeat(1., np.sum(cut_tot)))
