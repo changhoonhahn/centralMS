@@ -1,10 +1,4 @@
-'''
-
-
-
-'''
 import time
-from sys import getsizeof
 import numpy as np 
 from scipy.special import erfinv
 from scipy.interpolate import interp1d
