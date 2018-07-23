@@ -7,10 +7,10 @@ The main observables are:
 
 
 '''
-import util as UT 
 import numpy as np 
-# --- local --- 
+# --- centralms --- 
 from sham_hack import SMFClass 
+from . import util as UT 
 
 
 def f_sat(logm, z): 
@@ -32,7 +32,7 @@ def f_sat(logm, z):
     return b0 + b1 * z
 
 
-def MF_data(source='li-white', m_arr=None):
+def dataSMF(source='li-white'):
     ''' Read in observed MFs
     '''
     if source == 'li-white': 
@@ -43,53 +43,32 @@ def MF_data(source='li-white', m_arr=None):
         mmid -= 2.*np.log10(0.7)
         phi *= 0.7**3
         err *= 0.7**3
-        
-        if m_arr is not None: # rebin 
-            phi_arr = np.zeros(len(m_arr))
-            err_arr = np.zeros(len(m_arr))
-            for i, mm in enumerate(m_arr): 
-                phi_arr[i] = phi[(np.abs(mmid - mm)).argmin()] 
-                err_arr[i] = err[(np.abs(mmid - mm)).argmin()] 
-        else: 
-            m_arr = mmid
-            phi_arr = phi
-            err_arr = err
-    return [m_arr, phi_arr, err_arr]
+    else: 
+        raise NotImplementedError
+    return [mmid, phi, err]
 
 
-def getMF(masses, weights=None, m_arr=None, box=250, h=0.7): 
+def getMF(masses, weights=None, mbin=None, box=250, h=0.7): 
     ''' Calculate the Mass Function phi for a given set of masses.
     Return Phi(m_arr) 
     '''
     if not np.all(np.isfinite(masses)): 
-        notfin = np.where(np.isfinite(masses) == False) 
-        print masses[notfin], weights[notfin]
-        #print np.sum(np.isfinite(masses)) 
+        print(masses[~np.isfinite(masses)], weights[~np.isfinite(masses)])
         raise ValueError
     
     if weights is None: 
-        w_arr = np.repeat(1.0, len(masses))
-    else: 
-        w_arr = weights
+        weights = np.ones(len(masses))
 
-    if m_arr is None:  # by default assumes it's calculating SMF
-        m_arr = np.arange(6.0, 12.1, 0.1) 
+    if mbin is None:  # by default assumes it's calculating SMF
+        mbin = np.arange(8.1, 11.9, 0.1) 
+    dlogm = mbin[1:] - mbin[:-1]
 
-    # calculate d logM
-    dm_arr = m_arr[1:] - m_arr[:-1]
-    if np.abs(dm_arr - dm_arr[0]).max() > 0.001: 
-        raise ValueError('m_arr has to be evenly spaced!')
-    dlogm = dm_arr[0]
-
-    # calculate logM bin edges
-    mbin_edges = np.append(m_arr - 0.5*dlogm, m_arr[-1] + 0.5*dlogm) 
-
-    Ngal,_ = np.histogram(masses, bins=mbin_edges, weights=w_arr) # number of galaxies in mass bin  
+    Ngal, _ = np.histogram(masses, bins=mbin, weights=weights) # number of galaxies in mass bin  
 
     vol = box ** 3  # box volume
-    phi = Ngal.astype('float') / vol /dlogm * h**3
+    phi = Ngal.astype(float) / vol / dlogm * h**3
+    return [0.5*(mbin[1:] + mbin[:-1]), phi]
 
-    return [m_arr, phi]
 
 
 def analyticSMF(redshift, m_arr=None, dlogm=0.1, source='li-drory-march'): 

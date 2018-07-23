@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
     ''' initiate log SFR function for Evolver.Evolve() method
     '''
+    nsnap0 = SHsnaps['metadata']['nsnap0']
     mu_sfr0 = SFR_sfms(SHsnaps['m.star0'][indices], UT.z_nsnap(SHsnaps['nsnap_start'][indices]), theta_sfms)
 
     if theta_sfh['name'] == 'constant_offset':
@@ -70,7 +71,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
                 
         # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0']) #'nsnap_start'][indices].max()) 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0) #'nsnap_start'][indices].max()) 
         
         # the range of the steps 
         tshift_min = theta_sfh['dt_min'] 
@@ -104,7 +105,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
                 
         # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0']) #'nsnap_start'][indices].max())
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)
 
         # the range of the steps 
         tshift_min = theta_sfh['dt_min'] 
@@ -160,7 +161,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             if theta_sfh['sigma_corr'] <= 0.: 
                 raise ValueError("no assembly bias; dont use this SFH")
         # first calculate the time at which the SFH changes (random step function duty cycle)
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0) 
         
         tshift_min = theta_sfh['dt_min'] # the range of the steps 
         tshift_max = theta_sfh['dt_max'] 
@@ -187,13 +188,13 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
         
         # M_h of the galaxies throughout the snapshots 
         # Mh_snaps = ngal x nsnap0+3 matrix 
-        Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']))#, dtype=np.float32)
+        Mh_snaps = np.zeros((n_gal, nsnap0))#, dtype=np.float32)
         Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
-        for isnap in range(2, SHsnaps['nsnap0']+1): 
+        for isnap in range(2, nsnap0+1): 
             Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
         
-        z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))
-        t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+10))
+        z_snaps = UT.z_nsnap(range(1, nsnap0+10))
+        t_snaps = UT.t_nsnap(range(1, nsnap0+10))
     
         # M_h at the steps 
         Mh_steps = np.zeros(tsteps.shape, dtype=np.float32) 
@@ -260,7 +261,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
 
         # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
         
         # the range of the steps 
         tshift_min = theta_sfh['dt_min'] 
@@ -285,9 +286,9 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             _dMhalos = np.zeros((n_gal, n_col)) # testing purposes
 
             # calculate dMhalo
-            dlogSFR = np.zeros((n_gal, SHsnaps['nsnap0']-1)) # n_gal x (nsnap0 - 1) matrix
+            dlogSFR = np.zeros((n_gal, nsnap0-1)) # n_gal x (nsnap0 - 1) matrix
 
-            for nsnap in range(1, SHsnaps['nsnap0'])[::-1]: 
+            for nsnap in range(1, nsnap0)[::-1]: 
                 if nsnap == 1: 
                     mhalo_later = SHsnaps['halo.m'][indices]
                 else: 
@@ -313,7 +314,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                     # i_rank = 1/2 (1 - erf(x/sqrt(2)))
                     # x = (SFR - avg_SFR)/sigma_SFR
                     # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
-                    dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1] = \
+                    dlogSFR[inbin, nsnap0 - nsnap - 1] = \
                             theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank)
                     
                     # test assembly bias 
@@ -337,7 +338,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                 #fig.savefig('abias_testing.png', bbox_inches='tight')
                 #raise ValueError
 
-            t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+1)[::-1])
+            t_snaps = UT.t_nsnap(range(1, nsnap0+1)[::-1])
 
             for igal in range(n_gal): 
                 i_tbins = np.digitize(tsteps[igal, range(n_col)], t_snaps) 
@@ -375,7 +376,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
                 
         # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
         
         # the range of the steps 
         tshift_min = theta_sfh['dt_min'] 
@@ -404,9 +405,9 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             #   ...
             #gal ngal [                      
 
-            dlogSFR = np.zeros((n_gal, SHsnaps['nsnap0']-1)) # n_gal x (nsnap0 - 1) matrix
+            dlogSFR = np.zeros((n_gal, nsnap0-1)) # n_gal x (nsnap0 - 1) matrix
 
-            for nsnap in range(1, SHsnaps['nsnap0'])[::-1]: 
+            for nsnap in range(1, nsnap0)[::-1]: 
                 if nsnap == 1: 
                     mhalo_later = SHsnaps['halo.m'][indices]
                 else: 
@@ -434,11 +435,11 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
                     # i_rank = 1/2 (1 - erf(x/sqrt(2)))
                     # x = (SFR - avg_SFR)/sigma_SFR
                     # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
-                    dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1] = \
+                    dlogSFR[inbin, nsnap0 - nsnap - 1] = \
                             theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank)
             
             # nsnap0, nsnap0-1, nsnap0-2, ... ,2, 1 
-            t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+1)[::-1])
+            t_snaps = UT.t_nsnap(range(1, nsnap0+1)[::-1])
 
             for igal in range(n_gal): 
                 # each galaxy's timesteps 
@@ -480,7 +481,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             raise ValueError
                 
         # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
         
         # the range of the steps 
         tshift_min = theta_sfh['dt_min'] 
@@ -509,24 +510,24 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             #   ...
             #gal ngal [                      
             
-            t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+1)[::-1])
+            t_snaps = UT.t_nsnap(range(1, nsnap0+1)[::-1])
 
             t_abias = theta_sfh['t_abias'] # assembly bias timescale 
-            n_abias = np.int(np.ceil((UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0']))/t_abias))
+            n_abias = np.int(np.ceil((UT.t_nsnap(1) - UT.t_nsnap(nsnap0))/t_abias))
             t_step_abias = np.array([UT.t_nsnap(1) - (n_abias - i_abias) * t_abias 
                 for i_abias in range(n_abias+1)])
-            assert t_step_abias[0] < UT.t_nsnap(SHsnaps['nsnap0'])
-            t_step_abias[0] = UT.t_nsnap(SHsnaps['nsnap0'])
+            assert t_step_abias[0] < UT.t_nsnap(nsnap0)
+            t_step_abias[0] = UT.t_nsnap(nsnap0)
 
             # M_halo of the galaxies in the snapshots 
-            Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0'])) 
-            for ii, isnap in enumerate(range(2, SHsnaps['nsnap0']+1)[::-1]): 
+            Mh_snaps = np.zeros((n_gal, nsnap0)) 
+            for ii, isnap in enumerate(range(2, nsnap0+1)[::-1]): 
                 Mh_snaps[:,ii] = SHsnaps['halo.m.snap'+str(isnap)][indices]
             Mh_snaps[:,-1] = SHsnaps['halo.m'][indices]
 
             Mh_abias = np.zeros((n_gal, len(t_step_abias)))
             for igal in range(n_gal): 
-                Mh_snaps_i = 10**Mh_snaps[igal, range(SHsnaps['nsnap0'])]
+                Mh_snaps_i = 10**Mh_snaps[igal, range(nsnap0)]
                 Mh_abias[igal, 0] = Mh_snaps_i[0]
                 Mh_abias[igal, -1] = Mh_snaps_i[-1]
                 Mh_abias[igal, 1:-1] = np.interp(t_step_abias[1:-1], t_snaps, Mh_snaps_i)
@@ -626,12 +627,12 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
             if theta_sfh['sigma_corr'] <= 0.: 
                 raise ValueError("no assembly bias; dont use this SFH")
 
-        if UT.z_nsnap(SHsnaps['nsnap0']) + theta_sfh['dz_dMh'] > UT.z_nsnap(SHsnaps['nsnap0'] + 10):
-            print UT.z_nsnap(SHsnaps['nsnap0']) + theta_sfh['dz_dMh'], UT.z_nsnap(SHsnaps['nsnap0'] + 10)
+        if UT.z_nsnap(nsnap0) + theta_sfh['dz_dMh'] > UT.z_nsnap(nsnap0 + 10):
+            print UT.z_nsnap(nsnap0) + theta_sfh['dz_dMh'], UT.z_nsnap(nsnap0 + 10)
             raise ValueError
 
         # first calculate the time at which the SFH changes (random step function duty cycle)
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
+        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
         
         tshift_min = theta_sfh['dt_min'] # the range of the steps 
         tshift_max = theta_sfh['dt_max'] 
@@ -651,13 +652,13 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
 
         # M_h of the galaxies throughout the snapshots 
         # Mh_snaps = ngal x nsnap0+3 matrix 
-        Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']+9))#, dtype=np.float32)
+        Mh_snaps = np.zeros((n_gal, nsnap0+9))#, dtype=np.float32)
         Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
-        for isnap in range(2, SHsnaps['nsnap0']+10): 
+        for isnap in range(2, nsnap0+10): 
             Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
         
-        z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))
-        t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+10))
+        z_snaps = UT.z_nsnap(range(1, nsnap0+10))
+        t_snaps = UT.t_nsnap(range(1, nsnap0+10))
 
         # f_dMh growth rate of halo from t_delay - dt  to t_delay
         f_dMh = np.zeros(tsteps.shape, dtype=np.float32)

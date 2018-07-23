@@ -15,7 +15,7 @@ def Evolve(shcat, theta):
     # meta data 
     nsnap0 = shcat['metadata']['nsnap0']
     ngal = len(shcat['m.sham'])
-    isSF = np.arange(ngal)[shcat['galtype'] == 'SF']
+    isSF = np.arange(ngal)[shcat['galtype'] == 'sf']
 
     # initiate logSFR(logM, z) function and keywords
     logSFR_logM_z, sfr_kwargs = SFH.logSFR_initiate(shcat, isSF, 
@@ -75,6 +75,7 @@ def initSF(shcat, theta):
         
     # pick SF subhalos based on f_SFS(M_SHAM) at snapshot 1 
     f_sfs = Fsfms(shcat['m.sham'])
+    f_sfs = np.clip(f_sfs, 0., 1.) 
     rand = np.random.uniform(0., 1., ngal) 
     isSF = (rand < f_sfs)
     

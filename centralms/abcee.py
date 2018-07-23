@@ -6,23 +6,16 @@ use ABC-PMC
 import os 
 import h5py 
 import numpy as np
+import scipy as sp 
 import abcpmc
 from abcpmc import mpi_util
 import corner as DFM
-try: 
-    import codif
-    flag_codif = True 
-except ImportError: 
-    flag_codif = False
-
 # -- local -- 
-import observables as Obvs
-import util as UT
-import catalog as Cat
-import evolver as Evol
-import sfh as SFH
-
-import matplotlib.pyplot as plt 
+from . import util as UT
+from . import sfh as SFH
+from . import catalog as Cat
+from . import evolver as Evol
+from . import observables as Obvs
 
 
 def Theta(run): 
@@ -34,7 +27,7 @@ def Theta(run):
     return tt
 
 
-def Prior(run, shape='tophat'): 
+def Prior(name, shape='tophat'): 
     ''' Generate ABCPMC prior object given prior name, summary statistics, 
     and prior distribution shape. 
 
@@ -49,67 +42,56 @@ def Prior(run, shape='tophat'):
     '''
     if shape != 'tophat': 
         raise NotImpelementError
+    if name not in ['anchored', 'flex']: 
+        raise ValueError
+    
+    if name == 'anchored': 
+        # new priors since we implemented "anchored" SFMS  
+        # SFMS amplitude z-dep parameter, SFMS slope z-dep parameter
+        prior_min = [0.5, -0.5]#, -0.15]
+        prior_max = [2.5, 0.5]#, -0.06]
+    elif name == 'flex': 
+        # SFMS_zslope, SFMS_mslope
+        prior_min = [1., 0.0]#, -0.15]
+        prior_max = [2., 0.8]#, -0.06]
+    return  abcpmc.TophatPrior(prior_min, prior_max) 
 
-    # SFMS_zslope, SFMS_mslope
-    #prior_min = [1., 0.4]#, -0.15]
-    #prior_max = [1.8, 0.8]#, -0.06]
 
-    # new priors since we implemented "anchored" SFMS  
-    # SFMS amplitude z-dep parameter, SFMS slope z-dep parameter
-    prior_min = [0.5, -0.5]#, -0.15]
-    prior_max = [2., 0.5]#, -0.06]
-
-    prior_obj = abcpmc.TophatPrior(prior_min, prior_max) 
-
-    return prior_obj
-
-
-def Data(**data_kwargs): 
-    ''' Our 'data'
+def dataSum(sumstat=['smf']): 
+    ''' Summary statistics of the data (SDSS) 
     '''
-    subhist = Cat.PureCentralSubhalos(nsnap0=data_kwargs['nsnap0'], 
-            sigma_smhm=data_kwargs['sigma_smhm'])
-    subcat = subhist.Read(downsampled='14') # full/downsampled does not make a difference 
-    return subcat
-
-
-def SumData(sumstat, m_arr=np.linspace(9.5, 12.0, 11), info=False, **data_kwargs): 
-    ''' Return the summary statistics of data 
-    '''
-    subcat = Data(**data_kwargs)
-
     sums = [] 
-    if 'smf' in sumstat: # stellar mass function 
-        if 'nsnap0' not in data_kwargs.keys():
-            raise ValueError
-
-        smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], m_arr=m_arr) 
-
-        if not info: 
-            sum = smf[1] # phi 
-        else: 
-            sum = smf # mass, phi 
-
-        sums.append(sum) 
+    if 'smf' in sumstat: # central stellar mass function 
+        marr, smf, _ = Obvs.dataSMF(source='li-white') # Li & White SMF 
+        fcen = (1. - np.array([Obvs.f_sat(mm, 0.05) for mm in marr])) # sallite fraction 
+        sums.append(fcen * smf) 
     else: 
         raise NotImplementedError
-
     return sums
 
 
 def model(run, args, **kwargs): 
     ''' model given the ABC run 
     '''
+    theta = _model_theta(run, args) # return theta(run, args)  
+
+    # load in Subhalo Catalog (pure centrals)
+    if 'sigma_smhm' in kwargs.keys(): 
+        censub = Cat.CentralSubhalos(nsnap0=kwargs['nsnap0'], 
+                sigma_smhm=kwargs['sigma_smhm'])
+    else: 
+        censub = Cat.CentralSubhalos(nsnap0=kwargs['nsnap0'])
+    shcat = censub.Read(downsampled=kwargs['downsampled']) 
+    shcat = Evol.Evolve(shcat, theta) 
+    return shcat 
+
+
+def _model_theta(run, args): 
+    ''' return theta given run and args 
+    '''
     theta = {}
-    # args = SFMS_zslope, SFMS_mslope
-
-    # these values were set by cenque project's output
-    theta['gv'] = {'slope': 1.03, 'fidmass': 10.5, 'offset': -0.02}
-    theta['fq'] = {'name': 'cosmos_tinker'}
-    theta['fpq'] = {'slope': -2.079703, 'offset': 1.6153725, 'fidmass': 10.5}
-    
+    # parameters for stellar mass integration  
     theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
-
     # SFMS slopes can change 
     #theta['sfms'] = {'zslope': args[0], 'mslope': args[1]}#, 'offset': args[2]}
     theta['sfms'] = {'name': 'anchored', 'amp': args[0], 'slope': args[1], 'sigma': 0.3}
@@ -314,27 +296,10 @@ def model(run, args, **kwargs):
         theta['sfh']['dt_dMh'] = 2.5 # Gyr
     else: 
         raise NotImplementedError
-
-    # load in Subhalo Catalog (pure centrals)
-    if 'sigma_smhm' in kwargs.keys(): 
-        subhist = Cat.PureCentralSubhalos(nsnap0=kwargs['nsnap0'], 
-                sigma_smhm=kwargs['sigma_smhm'])
-    else: 
-        subhist = Cat.PureCentralSubhalos(nsnap0=kwargs['nsnap0'])
-    subcat = subhist.Read(downsampled=kwargs['downsampled']) # halo sample  
-    
-    eev = Evol.Evolver(subcat, theta, nsnap0=kwargs['nsnap0'])
-    eev.InitSF()
-    if 'forTests' not in kwargs.keys(): 
-        eev.newEvolve() 
-        return eev.SH_catalog
-    else: 
-        if kwargs['forTests']: 
-            eev.newEvolve(forTests=True) 
-            return eev.SH_catalog, eev
+    return theta
 
 
-def SumSim(sumstat, subcat, info=False, m_arr=np.linspace(9.5, 12.0, 11)): #, **sim_kwargs): 
+def modelSum(cencat, sumstat=['smf']): 
     ''' Return summary statistic of the simulation 
     
     parameters
@@ -342,61 +307,26 @@ def SumSim(sumstat, subcat, info=False, m_arr=np.linspace(9.5, 12.0, 11)): #, **
     sumstat : (list) 
         list of summary statistics to be included
 
-    subcat : (obj)
-        subhalo catalog output from model function 
+    cencat : (obj)
+        central subhalo catalog output from model function 
 
     info : (bool)
         specify extra info. Default is 0 
     '''
     sums = [] 
     for stat in sumstat: 
-        if stat == 'smf': # stellar mass function 
+        if stat == 'smf': # central stellar mass function 
             try:
-                smf = Obvs.getMF(subcat['m.star'], weights=subcat['weights'], m_arr=m_arr)
+                m_arr, smf = Obvs.getMF(cencat['m.star'], weights=cencat['weights'])
             except ValueError: 
-                smf = [m_arr, np.zeros(len(m_arr))]
-
-            if not info: 
-                sum = smf[1] # phi 
-            else: 
-                sum = smf # m_bin, phi 
-
-            # combine integrated stellar masses of SF galaxies
-            # with SHAM stellar masses of the rest 
-            # in principle we could compare to the SHAM MF * fQ...
+                smf = np.zeros(38)
+            sums.append(smf) 
         else: 
             raise NotImplementedError
-        
-        sums.append(sum) 
     return sums
 
 
-# different distance metric calculations 
-def roe_wrap(sumstat, type='L2'):
-    ''' Get it? Wrapper for Rhos or roe wrap. 
-    '''
-    if len(sumstat) == 1: # only SMF 
-        if type == 'L2': 
-            return L2_logSMF
-    else: 
-        raise NotImplementedError
-
-
-def L2_logSMF(simsum, datsum): 
-    ''' Measure the L2 norm for the case where the summary statistic 
-    is the log(SMF). 
-    '''
-    if len(simsum[0]) != len(datsum[0]): 
-        raise ValueError
-
-    nonzero = np.where((simsum[0] > 0.) & (datsum[0] > 0.)) # preventing nans  
-    n_bins = len(nonzero[0]) # number of bins 
-
-    return np.sum((np.log10(simsum[0][nonzero]) - np.log10(datsum[0][nonzero]))**2)/np.float(n_bins)
-
-
-def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False, 
-        restart=False, t_restart=None, **run_kwargs): 
+def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart=None, **run_kwargs): 
     ''' Main code for running ABC 
 
     Parameters
@@ -415,44 +345,34 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
         will be used to calculate the distance metric. Options 
         include: 
 
-    prior : (string)
-        String that specifies the priors
-
+    prior : (object)
+        object that specifies the priors
     '''
-    # check inputs 
     if len(eps0) != len(sumstat): 
         raise ValueError('Epsilon thresholds should correspond to number of summary statistics')
     
-    # prior object 
-    prior_obj = Prior(run, shape='tophat')
-
     # summary statistics of data 
-    m_arr = np.linspace(9.5, 12.0, 11) 
-    data_kwargs = {} 
-    data_kwargs['nsnap0'] = run_kwargs['nsnap0']
-    data_kwargs['sigma_smhm'] = 0.2 #run_kwargs['sigma_smhm']
-    data_sum = SumData(sumstat, m_arr=m_arr, **data_kwargs)
+    data_sum = dataSum(sumstat=sumstat)
+
+    # get uncertainties of central SMF
+    _, _, phi_err = Obvs.dataSMF(source='li-white')
+    # now scale err by f_cen 
+    phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in m_arr])))
 
     # summary statistics of simulation 
     sim_kwargs = {} 
     sim_kwargs['nsnap0'] = run_kwargs['nsnap0']
     sim_kwargs['downsampled'] = run_kwargs['downsampled']
     def Sim(tt): 
-        sh_catalog = model(run, tt, **sim_kwargs)
-        sums = SumSim(sumstat, sh_catalog, m_arr=m_arr)
+        cencat = model(run, tt, **sim_kwargs)
+        sums = modelSum(cencat, sumstat=sumsat)
         return sums 
-
-    # get uncertainties of central SMF
-    _, _, phi_err = Obvs.MF_data(source='li-white', m_arr=m_arr)
-    # now scale err by f_cen 
-    phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in m_arr])))
 
     # distance metric 
     def Rho(simsum, datsum): 
         nonzero = np.where((simsum[0] > 0.) & (datsum[0] > 0.)) # preventing nans  
-        n_bins = len(nonzero[0]) # number of bins 
-	#print np.sum((simsum[0][nonzero] - datsum[0][nonzero])**2/(phi_err[nonzero]**2))/float(n_bins)
-        return np.sum((simsum[0][nonzero] - datsum[0][nonzero])**2/(phi_err[nonzero]**2))/float(n_bins)
+        n_bins = float(len(nonzero[0])) # number of bins 
+        return np.sum((simsum[0][nonzero] - datsum[0][nonzero])**2/(phi_err[nonzero]**2))/n_bins
 
     init_pool = None 
     # for restarting ABC (use with caution)
@@ -467,18 +387,17 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
     try:
         mpi_pool = mpi_util.MpiPool()
         abcpmc_sampler = abcpmc.Sampler(
-                N=N_p,                # N_particles
-                Y=data_sum,             # data
-                postfn=Sim,             # simulator 
-                dist=Rho,               # distance function  
+                N=N_p,          # N_particles
+                Y=data_sum,     # data
+                postfn=Sim,     # simulator 
+                dist=Rho,       # distance function  
                 pool=mpi_pool)  
-
     except AttributeError: 
         abcpmc_sampler = abcpmc.Sampler(
-                N=N_p,                # N_particles
-                Y=data_sum,             # data
-                postfn=Sim,            # simulator 
-                dist=Rho)           # distance function  
+                N=N_p,          # N_particles
+                Y=data_sum,     # data
+                postfn=Sim,     # simulator 
+                dist=Rho)       # distance function  
 
     # Write out all details of the run info 
     write_kwargs = {} 
@@ -498,55 +417,76 @@ def runABC(run, T, eps0, N_p=1000, sumstat=None, notify=False,
     if init_pool is None:   # initiate epsilon write out
         Writeout('eps', run, None)
 
-    print '----------------------------------------'
+    print('----------------------------------------')
     for pool in abcpmc_sampler.sample(prior_obj, eps):#, pool=init_pool):
         print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
-        print 'eps ', eps(pool.t)
+        print('eps ', eps(pool.t))
         Writeout('eps', run, pool)
 
         # write out theta, weights, and distances to file 
         Writeout('theta', run, pool) 
         Writeout('w', run, pool) 
         Writeout('rho', run, pool) 
-        #plotABC(run, pool.t) # plot corner plot 
 
-        if notify and flag_codif: 
-            codif.notif(subject=run+' T = '+str(pool.t)+' FINISHED')
         # update epsilon based on median thresholding 
         if len(eps0) > 1: 
             eps.eps = np.median(np.atleast_2d(pool.dists), axis = 0)
         else: 
             eps.eps = np.median(pool.dists)
-        print '----------------------------------------'
+        print('----------------------------------------')
         pools.append(pool)
 
-    if notify and flag_codif: 
-        codif.notif(subject=run+' ALL FINISHED')
     return pools 
+
+
+def minimize(run, sumstat=None, **run_kwargs): 
+    '''
+    '''
+    # summary statistics of data 
+    data_sum = dataSum(sumstat=sumstat)
+
+    # get uncertainties of central SMF
+    m_arr, _, phi_err = Obvs.dataSMF(source='li-white')
+    # now scale err by f_cen 
+    phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in m_arr])))
+
+    # summary statistics of simulation 
+    sim_kwargs = {} 
+    sim_kwargs['nsnap0'] = run_kwargs['nsnap0']
+    sim_kwargs['downsampled'] = run_kwargs['downsampled']
+    def chi2(tt): 
+        cencat = model(run, tt, **sim_kwargs)
+        simsum = modelSum(cencat, sumstat=sumstat)
+        nonzero = np.where((simsum[0] > 0.) & (data_sum[0] > 0.)) # preventing nans  
+        n_bins = float(len(nonzero[0])) # number of bins 
+        return np.sum((simsum[0][nonzero] - data_sum[0][nonzero])**2/(phi_err[nonzero]**2))/n_bins
+    
+    for m_m in [0.5, 1., 2., 2.5]: 
+        for m_z in [-0.5, -0.25, 0., 0.25, 0.5]: 
+            print('[%f, %f] -- chi2 = %f' % (m_m, m_z, chi2((m_m, m_z))))
+    theta_opt = sp.optimize.minimize(chi2, [1.5, 0.1], method='BFGS') 
+    print theta_opt
+    return None 
 
 
 def Writeout(type, run, pool, **kwargs): 
     ''' Given abcpmc pool object. Writeout specified ABC pool property
     '''
-    file = UT.dat_dir()+'abc/'+run+'/'
+    abc_dir = ''.join([UT.dat_dir(), 'abc/', run, '/']) 
 
     if type == 'init': # initialize
-        if not os.path.exists(file): # make directory if it doesn't exist 
+        if not os.path.exists(abc_dir): # make directory if it doesn't exist 
             try: 
-                os.makedirs(file)
+                os.makedirs(abc_dir)
             except OSError: 
                 pass 
         
         # write specific info of the run  
-        file += 'info.md'
-        f = open(file, 'w')
+        f = open(abc_dir+'info.md', 'w')
         f.write('# '+run+' run specs \n')
         f.write(''.join(['N_iter = ', str(kwargs['Niter']), '\n']))
         f.write(''.join(['N_particles = ', str(pool.N), '\n']))
         f.write(''.join(['Distance function = ', pool.dist.__name__ , '\n']))
-        # variables
-        theta_info = Theta(run)
-        f.write(''.join(['Variables = [', ','.join(theta_info['variable']), '] \n']))
         # prior 
         prior_obj = Prior(run)
         f.write('Top Hat Priors \n')
@@ -558,20 +498,16 @@ def Writeout(type, run, pool, **kwargs):
         f.write(''.join(['Downsampled by = ', str(kwargs['downsampled']), '\n']))
         f.close()
     elif type == 'restart': # initialize
-        if not os.path.exists(file): # make directory if it doesn't exist 
+        if not os.path.exists(abc_dir+'info.md'): # make directory if it doesn't exist 
             raise ValueError('cannot find run directory')
         
         # write specific info of the run  
-        file += 'info.md'
-        f = open(file, 'a')
+        f = open(abc_dir+'info.md', 'a')
         f.write('# RESTARTING, details below should agree with details above')
         f.write('# '+run+' run specs \n')
         f.write(''.join(['N_iter = ', str(kwargs['Niter']), '\n']))
         f.write(''.join(['N_particles = ', str(pool.N), '\n']))
         f.write(''.join(['Distance function = ', pool.dist.__name__ , '\n']))
-        # variables
-        theta_info = Theta(run)
-        f.write(''.join(['Variables = [', ','.join(theta_info['variable']), '] \n']))
         # prior 
         prior_obj = Prior(run)
         f.write('Top Hat Priors \n')
@@ -583,22 +519,18 @@ def Writeout(type, run, pool, **kwargs):
         f.write(''.join(['Downsampled by = ', str(kwargs['downsampled']), '\n']))
         f.close()
     elif type == 'eps': # threshold writeout 
-        file += ''.join(['epsilon.', run, '.dat'])
         if pool is None: # write or overwrite threshold writeout
-            f = open(file, "w")
+            f = open(''.join([abc_dir, 'epsilon.', run, '.dat']), "w")
         else: 
-            f = open(file, "a") #append 
+            f = open(''.join([abc_dir, 'epsilon.', run, '.dat']), "a") #append 
             f.write(str(pool.eps)+'\t'+str(pool.ratio)+'\n')
         f.close()
     elif type == 'theta': # particle thetas
-        file += ''.join(['theta.t', str(pool.t), '.', run, '.dat']) 
-        np.savetxt(file, pool.thetas) 
+        np.savetxt(''.join([abc_dir, 'theta.t', str(pool.t), '.', run, '.dat']), pool.thetas) 
     elif type == 'w': # particle weights
-        file += ''.join(['w.t', str(pool.t), '.', run, '.dat']) 
-        np.savetxt(file, pool.ws)
+        np.savetxt(''.join([abc_dir, 'w.t', str(pool.t), '.', run, '.dat']), pool.ws)
     elif type == 'rho': # distance
-        file += ''.join(['rho.t', str(pool.t), '.', run, '.dat']) 
-        np.savetxt(file, pool.dists)
+        np.savetxt(''.join([abc_dir, 'rho.t', str(pool.t), '.', run, '.dat']), pool.dists)
     else: 
         raise ValueError
     return None 
