@@ -464,7 +464,7 @@ def minimize(run, sumstat=None, **run_kwargs):
     for m_m in [0.5, 1., 2., 2.5]: 
         for m_z in [-0.5, -0.25, 0., 0.25, 0.5]: 
             print('[%f, %f] -- chi2 = %f' % (m_m, m_z, chi2((m_m, m_z))))
-    theta_opt = sp.optimize.minimize(chi2, [1.5, 0.1], method='BFGS') 
+    theta_opt = sp.optimize.minimize(chi2, [1.5, 0.1], method='L-BFGS-B', bounds=[[0.5, 2.5], [-0.5, 0.5]]) 
     print theta_opt
     return None 
 
@@ -539,9 +539,7 @@ def Writeout(type, run, pool, **kwargs):
 def readABC(run, T): 
     ''' Read in theta, w, and rho from ABC writeouts
     '''
-    dir = UT.dat_dir()+'abc/'+run+'/'
-    file = lambda ss, t, r: ''.join([dir, ss, '.t', str(t), '.', r, '.dat'])
-    
+    file = lambda ss, t, r: ''.join([UT.dat_dir(), 'abc/', run, '/', ss, '.t', str(t), '.', r, '.dat'])
     abc_out = {}    # read in theta, w, rho 
     abc_out['theta'] = np.loadtxt(file('theta', T, run)) 
     abc_out['w'] = np.loadtxt(file('w', T, run))
