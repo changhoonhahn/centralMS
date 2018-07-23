@@ -1,5 +1,6 @@
 '''
 '''
+import sys 
 import numpy as np 
 # --- centralms --- 
 from centralMS import util as UT
@@ -28,5 +29,11 @@ def noAbiasABC(tduty, Niter=14, Npart=1000):
 
 
 if __name__=="__main__":
-    #minimize(10) 
-    noAbiasABC(10, Niter=2, Npart=10) # test 
+    name = sys.argv[1]
+    if name == 'noabias': 
+        tduty = float(sys.argv[2])
+        niter = int(sys.argv[3]) 
+        npart = int(sys.argv[4]) 
+        noAbiasABC(tduty, Niter=niter, Npart=npart) # test 
+    elif name == 'abias': 
+        raise ValueError
