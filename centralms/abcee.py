@@ -355,7 +355,7 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
     data_sum = dataSum(sumstat=sumstat)
 
     # get uncertainties of central SMF
-    _, _, phi_err = Obvs.dataSMF(source='li-white')
+    m_arr, _, phi_err = Obvs.dataSMF(source='li-white')
     # now scale err by f_cen 
     phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in m_arr])))
 
@@ -365,7 +365,7 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
     sim_kwargs['downsampled'] = run_kwargs['downsampled']
     def Sim(tt): 
         cencat = model(run, tt, **sim_kwargs)
-        sums = modelSum(cencat, sumstat=sumsat)
+        sums = modelSum(cencat, sumstat=sumstat)
         return sums 
 
     # distance metric 
@@ -403,6 +403,7 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
     write_kwargs = {} 
     write_kwargs['Niter'] = T
     write_kwargs['sumstat'] = sumstat 
+    write_kwargs['prior'] = prior
     for key in run_kwargs.keys():
         write_kwargs[key] = run_kwargs[key]
     if not restart: 
@@ -418,7 +419,7 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
         Writeout('eps', run, None)
 
     print('----------------------------------------')
-    for pool in abcpmc_sampler.sample(prior_obj, eps):#, pool=init_pool):
+    for pool in abcpmc_sampler.sample(prior, eps):#, pool=init_pool):
         print("T:{0},ratio: {1:>.4f}".format(pool.t, pool.ratio))
         print('eps ', eps(pool.t))
         Writeout('eps', run, pool)
@@ -488,7 +489,7 @@ def Writeout(type, run, pool, **kwargs):
         f.write(''.join(['N_particles = ', str(pool.N), '\n']))
         f.write(''.join(['Distance function = ', pool.dist.__name__ , '\n']))
         # prior 
-        prior_obj = Prior(run)
+        prior_obj = kwargs['prior'] 
         f.write('Top Hat Priors \n')
         f.write(''.join(['Prior Min = [', ','.join([str(prior_obj.min[i]) for i in range(len(prior_obj.min))]), '] \n']))
         f.write(''.join(['Prior Max = [', ','.join([str(prior_obj.max[i]) for i in range(len(prior_obj.max))]), '] \n']))
@@ -509,7 +510,7 @@ def Writeout(type, run, pool, **kwargs):
         f.write(''.join(['N_particles = ', str(pool.N), '\n']))
         f.write(''.join(['Distance function = ', pool.dist.__name__ , '\n']))
         # prior 
-        prior_obj = Prior(run)
+        prior_obj = kwargs['prior'] 
         f.write('Top Hat Priors \n')
         f.write(''.join(['Prior Min = [', ','.join([str(prior_obj.min[i]) for i in range(len(prior_obj.min))]), '] \n']))
         f.write(''.join(['Prior Max = [', ','.join([str(prior_obj.max[i]) for i in range(len(prior_obj.max))]), '] \n']))
