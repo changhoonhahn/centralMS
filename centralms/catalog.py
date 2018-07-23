@@ -9,8 +9,8 @@ import h5py
 import numpy as np
 from astropy.io import fits 
 # --- local --- 
-from centralms import util as UT
-from centralms import sham_hack as sham
+from . import util as UT
+from . import sham_hack as sham
 
 # modules only available on Harmattan or Sirocco
 try: 
@@ -335,9 +335,9 @@ class SDSSgroupcat(Subhalos):
         catalog['ra']   = gal_data['ra'] * 57.2957795
         catalog['dec']  = gal_data['dec'] * 57.2957795
         catalog['z']    = gal_data['cz']/299792.458
-        catalog['mstar'] = gal_data['stellmass'] / self.h**2   # convert to log Mass
+        catalog['mstar'] = np.log10(gal_data['stellmass'] / self.h**2)   # convert to log Mass
         catalog['ssfr'] = gal_data['ssfr'] + np.log10(self.h**2) # remove h dependence 
-        catalog['sfr']  = catalog['ssfr'] + catalog['mstar'] 
+        catalog['sfr']  = catalog['ssfr'] + catalog['mstar']
 
         # read in central/satellite probability file 
         fprob = fits.open(''.join([UT.dat_dir(), 'observations/', 

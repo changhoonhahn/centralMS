@@ -4,7 +4,7 @@ import os, sys
 
 __version__ = '0.1'
 
-setup(name = 'centralMS',
+setup(name = 'centralms',
       version = __version__,
       description = 'TBD',
       author='ChangHoon Hahn',
@@ -14,6 +14,5 @@ setup(name = 'centralMS',
       license='GPL',
       requires = ['numpy', 'matplotlib', 'scipy'],
       provides = ['centralms'],
-      packages = ['centralms'],
-      scripts=['centralms/util.py']
+      packages = ['centralms']
       )
