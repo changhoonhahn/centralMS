@@ -60,7 +60,7 @@ def getMF(masses, weights=None, mbin=None, box=250, h=0.7):
         weights = np.ones(len(masses))
 
     if mbin is None:  # by default assumes it's calculating SMF
-        mbin = np.arange(8.1, 11.9, 0.1) 
+        mbin = np.arange(8.1, 11.9, 0.1) - 2.*np.log10(0.7)
     dlogm = mbin[1:] - mbin[:-1]
 
     Ngal, _ = np.histogram(masses, bins=mbin, weights=weights) # number of galaxies in mass bin  
