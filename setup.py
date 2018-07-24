@@ -4,7 +4,7 @@ import os, sys
 
 __version__ = '0.1'
 
-setup(name = 'centralms',
+setup(name = 'centralMS',
       version = __version__,
       description = 'TBD',
       author='ChangHoon Hahn',

@@ -53,7 +53,7 @@ def getMF(masses, weights=None, mbin=None, box=250, h=0.7):
     Return Phi(m_arr) 
     '''
     if not np.all(np.isfinite(masses)): 
-        print(masses[~np.isfinite(masses)], weights[~np.isfinite(masses)])
+        #print(masses[~np.isfinite(masses)], weights[~np.isfinite(masses)])
         raise ValueError
     
     if weights is None: 
@@ -68,7 +68,6 @@ def getMF(masses, weights=None, mbin=None, box=250, h=0.7):
     vol = box ** 3  # box volume
     phi = Ngal.astype(float) / vol / dlogm * h**3
     return [0.5*(mbin[1:] + mbin[:-1]), phi]
-
 
 
 def analyticSMF(redshift, m_arr=None, dlogm=0.1, source='li-drory-march'): 
