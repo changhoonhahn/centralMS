@@ -11,7 +11,7 @@ local_dir=$CENTRALMS_DIR"abc/"
 
 cmd=$remote":"$remote_dir$run"/{info.md"
 
-for t in {0..6}; do 
+for t in {0..9}; do 
     cmd=$cmd",theta.t"$t"."$run".dat"
     cmd=$cmd",w.t"$t"."$run".dat"
     cmd=$cmd",rho.t"$t"."$run".dat"
