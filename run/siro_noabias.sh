@@ -10,4 +10,5 @@ export CENTRALMS_CODEDIR="/home/users/hahn/projects/centralMS/"
 
 tduty=5
 
-/usr/local/openmpi-1.10.7/bin/mpiexec -np $NPROCS -npernode 24 python /home/users/hahn/projects/centralMS/run/abc.py noabias $tduty 15 1000 > /home/users/hahn/projects/centralMS/run/randomSFH_5gyr.log
+mpirun -np 24 python /home/users/hahn/projects/centralMS/run/abc.py noabias $tduty 15 1000 > /home/users/hahn/projects/centralMS/run/randomSFH_5gyr.log
+#/usr/local/openmpi-1.10.7/bin/mpiexec -np $NPROCS -npernode 24 python /home/users/hahn/projects/centralMS/run/abc.py noabias $tduty 15 1000 > /home/users/hahn/projects/centralMS/run/randomSFH_5gyr.log

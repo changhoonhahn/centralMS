@@ -1,5 +1,5 @@
 # !/bin/bash
-# PBS -l nodes=1:ppn=1
+# PBS -l nodes=1:ppn=24
 # PBS -N test 
 cd $PBS_O_WORKDIR
 export NPROCS=`wc -l $PBS_NODEFILE |gawk '//{print $1}'`
@@ -7,6 +7,9 @@ export PATH="/home/users/hahn/anaconda2/bin:$PATH"
 
 export CENTRALMS_DIR="/mount/sirocco1/hahn/centralms/"
 export CENTRALMS_CODEDIR="/home/users/hahn/projects/centralMS/"
+#c11.ib.local
+tduty=5
 
-/home/users/hahn/anaconda2/bin/python /home/users/hahn/projects/centralMS/run/abc.py noabias 5 2 10 
-
+#/usr/local/openmpi-1.10.7/bin/mpiexec -np 20 python /home/users/hahn/projects/centralMS/run/abc.py noabias $tduty 2 10 > /home/users/hahn/projects/centralMS/run/test.log
+#mpirun python /home/users/hahn/projects/centralMS/run/abc.py noabias $tduty 2 10 > /home/users/hahn/projects/centralMS/run/test.log
+mpirun -np 24 python /home/users/hahn/projects/centralMS/run/abc.py noabias $tduty 2 48 > /home/users/hahn/projects/centralMS/run/test.log

@@ -5,6 +5,7 @@ use ABC-PMC
 '''
 import os 
 import h5py 
+import time
 import numpy as np
 import scipy as sp 
 import abcpmc
@@ -72,6 +73,7 @@ def dataSum(sumstat=['smf']):
 def model(run, args, **kwargs): 
     ''' model given the ABC run 
     '''
+    print(time.time())
     theta = _model_theta(run, args) # return theta(run, args)  
 
     # load in Subhalo Catalog (pure centrals)
@@ -391,7 +393,9 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
                 postfn=Sim,     # simulator 
                 dist=Rho,       # distance function  
                 pool=mpi_pool)  
+        print('yes MPI') 
     except AttributeError: 
+        print('no MPI') 
         abcpmc_sampler = abcpmc.Sampler(
                 N=N_p,          # N_particles
                 Y=data_sum,     # data
