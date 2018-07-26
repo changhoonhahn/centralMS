@@ -104,10 +104,11 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
         tduty = theta_sfh['tduty'] # dutycycle time
 
         # get the times when the amplitude changes 
-        n_col = int(np.ceil(dt_tot / tduty))+1  # number of columns 
+        n_col = int(np.ceil(dt_tot / tduty))+2  # number of columns 
         n_gal = len(indices)    # number of galaxies
         tshift = np.tile(tduty, (n_gal, n_col))
         tshift[:,0] = 0.
+        tshift[:,1] = np.random.uniform(0., tduty, n_gal) 
         tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
         del tshift
         # make sure everything evolves properly until the end

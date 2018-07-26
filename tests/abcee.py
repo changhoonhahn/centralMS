@@ -145,36 +145,37 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
     
     # dSFR as a function of t_cosmic 
     sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+3)
-    mbins = np.arange(9., 12., 0.5) 
+    mbins = np.linspace(9., 12., 10) 
 
     i_r = [] # select random SF galaxies over mass bins
     for i_m in range(len(mbins)-1): 
         inmbin = np.where(
                 (subcat_sim['galtype'] == 'sf') & 
+                (subcat_sim['nsnap_start'] == nsnap0) & 
+                (subcat_sim['weights'] > 0) & 
                 (subcat_sim['m.star'] > mbins[i_m]) & 
                 (subcat_sim['m.star'] <= mbins[i_m+1]))
-        i_r.append(np.random.choice(inmbin[0], size=1)[0])
+        if len(inmbin[0]) > 0: 
+            i_r.append(np.random.choice(inmbin[0], size=1)[0])
     i_r = np.array(i_r)
 
     # calculate d(logSFR)  = logSFR - logSFR_MS 
     dlogsfrs = np.zeros((len(i_r), nsnap0-1))
     for i_snap in range(1, nsnap0): 
-        if i_snap == 1: 
-            sfr = subcat_sim['sfr'][i_r]
-            sfr_ms = SFH.SFR_sfms(subcat_sim['m.star'][i_r], UT.z_nsnap(i_snap), tt['sfms']) 
-            dlogsfrs[:,0] =  sfr - sfr_ms 
-        else: 
-            sfr = subcat_sim['sfr.snap'+str(i_snap)][i_r]
-            sfr_ms = SFH.SFR_sfms(subcat_sim['m.star.snap'+str(i_snap)][i_r], UT.z_nsnap(i_snap), tt['sfms']) 
-            dlogsfrs[:,i_snap-1] = sfr - sfr_ms 
+        snap_str = ''
+        if i_snap != 1: snap_str = '.snap'+str(i_snap)
+
+        sfr = subcat_sim['sfr'+snap_str][i_r]
+        sfr_ms = SFH.SFR_sfms(subcat_sim['m.star'+snap_str][i_r], UT.z_nsnap(i_snap), tt['sfms']) 
+        dlogsfrs[:,i_snap-1] =  sfr - sfr_ms 
 
     for i in range(dlogsfrs.shape[0]): 
-        sub.plot(UT.t_nsnap(range(1, nsnap0)), dlogsfrs[i,:]) 
+        sub.plot(UT.t_nsnap(range(1, nsnap0))[::-1], dlogsfrs[i,:][::-1]) 
     for i in range(1, nsnap0): 
-        sub.vlines(UT.t_nsnap(i), -1., 1., color='k', linestyle='--')
+        sub.vlines(UT.t_nsnap(i), -1., 1., color='k', linestyle='--', linewidth=0.5)
 
-    sub.set_xlim([13.81, 9.])
-    sub.set_xticks([13., 12., 11., 10., 9.])
+    sub.set_xlim([UT.t_nsnap(nsnap0-1), UT.t_nsnap(1)])
+    #sub.set_xticks([13., 12., 11., 10., 9.])
     sub.set_xlabel('$t_\mathrm{cosmic}$ [Gyr]', fontsize=25)
     sub.set_ylim([-1., 1.]) 
     sub.set_yticks([-0.9, -0.6, -0.3, 0., 0.3, 0.6, 0.9])
@@ -193,5 +194,6 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
 
 
 if __name__=="__main__": 
-    plotABC('randomSFH_0.5gyr', 12)
-    qaplotABC('randomSFH_0.5gyr', 12)#, theta=[2., -0.16], figure=''.join([UT.dat_dir(), 'abc/randomSFH_5gyr/test.png']))
+    #plotABC('randomSFH_0.5gyr', 12)
+    #qaplotABC('randomSFH_0.5gyr', 12)#, theta=[2., -0.16], figure=''.join([UT.dat_dir(), 'abc/randomSFH_5gyr/test.png']))
+    qaplotABC('randomSFH5gyr.sfsanchored', 12, theta=[1.25, 0.0], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
