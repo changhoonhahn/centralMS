@@ -103,8 +103,7 @@ def _model_theta(run, args):
         # SFH that randomly fluctuates on a tduty timescale
         theta['sfh'] = {'name': 'random_step_fluct'} 
         tduty = float(run.split('randomSFH')[-1].split('gyr')[0]) 
-        theta['sfh']['dt_min'] = tduty
-        theta['sfh']['dt_max'] = tduty
+        theta['sfh']['tduty'] = tduty
         theta['sfh']['sigma'] = 0.3 
     else: 
         raise ValueError

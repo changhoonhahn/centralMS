@@ -8,7 +8,7 @@ import util as UT
 import matplotlib.pyplot as plt
 
 
-def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
+def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=False):
     ''' initiate log SFR function for Evolver.Evolve() method
     '''
     nsnap0 = SHsnaps['metadata']['nsnap0']
@@ -98,53 +98,46 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None):
     elif theta_sfh['name'] == 'random_step_fluct': 
         # completely random amplitude that is sampled from a Gaussian with sig_logSFR
         # EXCEPT each adjacent timesteps have alternating sign amplitudes
-        # time steps are sampled randomly from a unifrom distribution [dt_min, dt_max]
-        if 'dt_min' not in theta_sfh: 
-            raise ValueError
-        if 'dt_max' not in theta_sfh: 
-            raise ValueError
-                
-        # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)
+        # time steps have width specified tduty 
+        dt_tot= UT.t_nsnap(1) - UT.t_nsnap(nsnap0) # total cosmic time of evolution 
 
-        # the range of the steps 
-        tshift_min = theta_sfh['dt_min'] 
-        tshift_max = theta_sfh['dt_max'] 
+        tduty = theta_sfh['tduty'] # dutycycle time
 
         # get the times when the amplitude changes 
-        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
+        n_col = int(np.ceil(dt_tot / tduty))+1  # number of columns 
         n_gal = len(indices)    # number of galaxies
-        tshift = np.zeros((n_gal, n_col))
-        tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+        tshift = np.tile(tduty, (n_gal, n_col))
+        tshift[:,0] = 0.
         tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
         del tshift
         # make sure everything evolves properly until the end
         assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
         
-        # all positive amplitudes
+        # dlogSFR absolute amplitue 
         dlogSFR_amp = np.abs(np.random.randn(n_gal, n_col)) * theta_sfh['sigma']
-        # now make every other time step negative!
-        plusminus = np.ones((n_gal, n_col))
-        rrr = np.random.uniform(0., 1., n_gal)
-        even = np.where(rrr < 0.5) 
-        odd = np.where(rrr > 0.5) 
+        dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0 # dlogSFR at nsnap_start 
 
-        for i in range(np.int(np.ceil(np.float(n_col)/2.))): 
-            plusminus[even, 2*i] *= -1. 
-            if 2*i+1 < n_col: 
-                plusminus[odd, 2*i+1] *= -1. 
-        dlogSFR_amp *= plusminus
+        # now make every other time step has fluctuating signs!
+        pos = dlogSFR_amp[:,0] >= 0.
+        neg = ~pos
+
+        fluct = np.ones(n_col-1)
+        fluct[2 * np.arange(int(np.ceil(float(n_col-1)/2.)))] *= -1.
         
-        # make sure that nsnap0 is consistent with initial conditions!
-        dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+        dlogSFR_amp[pos,1:] *= fluct 
+        dlogSFR_amp[neg,1:] *= -1. * fluct
+
         # testing the distribution of delta SFR
-        #for i in range(dlogSFR_amp.shape[1]): 
-        #    print np.std(dlogSFR_amp[:,i])
-        #    plt.hist(dlogSFR_amp[:,i]) 
-        #    plt.show() 
+        if testing: 
+            for i in range(n_col):
+                plt.hist(dlogSFR_amp[:,i], range=(-1., 1.), 
+                        linewidth=2, histtype='step', density=True, label='Step '+str(i)) 
+                plt.legend()
+                plt.xlabel(r'$\Delta\log\,\mathrm{SFR}$', fontsize=20)
+                plt.xlim([-1., 1.])
+            plt.savefig(''.join([UT.fig_dir(), 'random_step_fluct_test.png']), bbox_inches='tight')
 
         F_sfr = _logSFR_dSFR_tsteps
-        
         sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
 
     elif theta_sfh['name'] == 'random_step_most_abias': 
