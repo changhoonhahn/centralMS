@@ -147,9 +147,9 @@ class Subhalos(object):
         catalog['nsnap_start'] = nsnap_start
     
         # get m.sham at the initial snapshots of the halo 
-        catalog['m.star0'] = np.zeros(ngal) # initial SHAM stellar mass 
-        catalog['halo.m0'] = np.zeros(ngal) # initial halo mass 
-        for i in range(1, nsnap0+1): 
+        catalog['m.star0'] = np.zeros(n_halo) # initial SHAM stellar mass 
+        catalog['halo.m0'] = np.zeros(n_halo) # initial halo mass 
+        for i in range(1,self.nsnap0+1): 
             istart = (catalog['nsnap_start'] == i) # subhalos that being at snapshot i  
             str_snap = ''
             if i != 1: str_snap = '.snap'+str(i) 
