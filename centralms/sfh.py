@@ -1016,11 +1016,6 @@ def SFR_sfms(logm, z, theta):
     The model takes the functional form of 
         log(SFR) = A * (log M* - logM_fid) + B * (z - z_fid) + C
     '''
-    assert theta is not None 
-    
-    if 'name' not in theta.keys(): 
-        raise ValueError
-    
     if theta['name'] == 'flex': # this is a very flexible SFMS
         if 'mslope' not in theta.keys(): 
             raise ValueError
@@ -1032,11 +1027,9 @@ def SFR_sfms(logm, z, theta):
             raise ValueError
         if 'slope' not in theta.keys(): 
             raise ValueError
-
         # in this prescription, log SFR_MS is anchored at z = 0 from SDSS DR7 central galaxy SFMS
         return (0.5757 * (logm - 10.5) - 0.13868) + \
                 (z - 0.05) * (theta['slope'] * (logm - 10.5) + theta['amp']) 
-
 
 def SSFR_sfms(logm, z, theta): 
     return SFR_sfms(logm, z, theta) - logm 

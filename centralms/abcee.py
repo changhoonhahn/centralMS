@@ -93,209 +93,84 @@ def _model_theta(run, args):
     # parameters for stellar mass integration  
     theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
     # SFMS slopes can change 
-    #theta['sfms'] = {'zslope': args[0], 'mslope': args[1]}#, 'offset': args[2]}
-    theta['sfms'] = {'name': 'anchored', 'amp': args[0], 'slope': args[1], 'sigma': 0.3}
-
-    if run == 'test0': 
-        # simplest test with constant offset SFH 
-        theta['sfh'] = {'name': 'constant_offset'}
-        theta['sfh']['nsnap0'] =  kwargs['nsnap0'] 
-    elif run == 'randomSFH':  
-        # random fluctuation SFH where fluctuations 
-        # happen on fixed 0.5 Gyr timescales  
+    if run.split('.sfs')[-1] == 'flex': 
+        theta['sfms'] = {'name': 'flex', 'zslope': args[0], 'mslope': args[1], 'sigma': 0.3}
+    elif run.split('.sfs')[-1] == 'anchored': 
+        theta['sfms'] = {'name': 'anchored', 'amp': args[0], 'slope': args[1], 'sigma': 0.3}
+    
+    if 'randomSFH' in run: 
+        # run = randomSFH%fgyr.sfms
+        # SFH that randomly fluctuates on a tduty timescale
         theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma'] = 0.3 
-    elif run == 'randomSFH_1gyr':  
-        # random fluctuation SFH where fluctuations 
-        # happen on fixed 1 Gyr timescales  
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 1. 
-        theta['sfh']['dt_max'] = 1. 
-        theta['sfh']['sigma'] = 0.3 
-    elif run == 'randomSFH_2gyr':  
-        # random fluctuation SFH where fluctuations 
-        # happen on fixed 2 Gyr timescales  
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 2. 
-        theta['sfh']['dt_max'] = 2. 
-        theta['sfh']['sigma'] = 0.3 
-    elif run == 'randomSFH_5gyr':  
-        # random fluctuation SFH where fluctuations 
-        # happen on fixed 2 Gyr timescales  
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 5. 
-        theta['sfh']['dt_max'] = 5. 
-        theta['sfh']['sigma'] = 0.3 
-    elif run == 'randomSFH_10gyr':  
-        # random fluctuation SFH where fluctuations 
-        # happen on fixed 2 Gyr timescales  
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 10. 
-        theta['sfh']['dt_max'] = 10. 
-        theta['sfh']['sigma'] = 0.3 
-    elif run == 'randomSFH_0.5gyr':  
-        # random fluctuation SFH where fluctuations 
-        # happen on fixed 2 Gyr timescales  
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 0.5
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma'] = 0.3 
-        theta['mass']['t_step'] = 0.025 # change timestep 
-    elif run == 'randomSFH_integtest':  
-        # random fluctuation SFH where fluctuations 
-        # happen on fixed 0.5 Gyr timescales  
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma'] = 0.3 
-        theta['mass']['t_step'] = 0.01 # change timestep 
-    elif run == 'randomSFH_short':  
-        # random fluctuation SFH where fluctuations 
-        # happen on fixed short 0.1 Gyr timescales  
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 0.1 
-        theta['sfh']['dt_max'] = 0.1 
-        theta['sfh']['sigma'] = 0.3 
-        theta['mass']['t_step'] = 0.01 # change timestep 
-    elif run == 'randomSFH_long':  
-        # random fluctuation SFH where fluctuations 
-        # happen on fixed longer 1 Gyr timescales  
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 5.
-        theta['sfh']['dt_max'] = 5. 
-        theta['sfh']['sigma'] = 0.3 
-    elif run == 'rSFH_r1.0_most': 
-        theta['sfh'] = {'name': 'random_step_most_abias'}
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.3
-    elif run == 'randomSFH_r0.2': 
-        # random fluctuation SFH corrected by r=0.2 with halo aseembly property 
-        # fluctuations happen on fixed 0.5 Gyr timescales  
-        # halo assembly property here is halo mass growth over 2 Gyrs 
-        theta['sfh'] = {'name': 'random_step_abias2'} 
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['t_abias'] = 2. # Gyr
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.2 * 0.3
-    elif run == 'randomSFH_r0.99': 
-        # random fluctuation SFH corrected by r=0.99 with halo aseembly property 
-        # fluctuations happen on fixed 0.5 Gyr timescales  
-        # halo assembly property here is halo mass growth over 2 Gyrs 
-        theta['sfh'] = {'name': 'random_step_abias2'} 
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['t_abias'] = 2. # Gyr
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.99 * 0.3
-    elif run == 'rSFH_r0.66_delay': 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dz'}
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.66 * 0.3
-        theta['sfh']['dt_delay'] = 1. # Gyr 
-        theta['sfh']['dz_dMh'] = 0.5 
-    elif run == 'rSFH_r0.99_delay': 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dz'}
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.99 * 0.3
-        theta['sfh']['dt_delay'] = 1. # Gyr 
-        theta['sfh']['dz_dMh'] = 0.5 
-    elif run == 'rSFH_r0.99_tdyn_5gyr': 
-        # random SFH with 0.99 correlation with halo growth 
-        # over t_dyn and duty cycle of 5 Gyr 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-        theta['sfh']['dt_min'] = 5. 
-        theta['sfh']['dt_max'] = 5. 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.99 * 0.3
-        theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = 2.5 # Gyr
-    elif run == 'rSFH_r0.99_tdyn_2gyr': 
-        # random SFH with 0.99 correlation with halo growth 
-        # over t_dyn and duty cycle of 2 Gyr 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-        theta['sfh']['dt_min'] = 2. 
-        theta['sfh']['dt_max'] = 2. 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.99 * 0.3
-        theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = 2.5 # Gyr
-    elif run == 'rSFH_r0.99_tdyn_1gyr': 
-        # random SFH with 0.99 correlation with halo growth 
-        # over t_dyn and duty cycle of 1 Gyr 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-        theta['sfh']['dt_min'] = 1. 
-        theta['sfh']['dt_max'] = 1. 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.99 * 0.3
-        theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = 2.5 # Gyr
-    elif run == 'rSFH_r0.99_tdyn_0.5gyr': 
-        # random SFH with 0.99 correlation with halo growth 
-        # over t_dyn and duty cycle of 0.5 Gyr 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.99 * 0.3
-        theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = 2.5 # Gyr
-    elif run == 'rSFH_r0.99_tdyn_0.5gyr_narrSFMS': 
-        # random SFH with 0.99 correlation with halo growth 
-        # over t_dyn and duty cycle of 0.5 Gyr 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-        theta['sfh']['dt_min'] = 0.5 
-        theta['sfh']['dt_max'] = 0.5 
-        theta['sfh']['sigma_tot'] = 0.2 # note narrower SFMS
-        theta['sfh']['sigma_corr'] = 0.99 * 0.2 # note narrower SFMS
-        theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = 2.5 # Gyr
-        theta['sfms']['sigma'] = 0.2 # note narrower SFMS
-    elif run == 'rSFH_r0.99_delay_dt_test': 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-        theta['sfh']['dt_min'] = args[2]
-        theta['sfh']['dt_max'] = args[2] 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.99 * 0.3
-        theta['sfh']['dt_delay'] = args[3] # Gyr 
-        theta['sfh']['dt_dMh'] = args[4]  # Gyr
-    elif run == 'rSFH_r_delay_dt_test': 
-        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-        theta['sfh']['dt_min'] = args[3]
-        theta['sfh']['dt_max'] = args[3] 
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = args[2] * 0.3
-        theta['sfh']['dt_delay'] = args[4] # Gyr 
-        theta['sfh']['dt_dMh'] = args[5]  # Gyr
-    elif run == 'randomSFH_5gyr_narrSFMS':  
-        # random fluctuation SFH where fluctuations happen on fixed 5 Gyr timescales  
-        # we also use a 0.2 dex scatter SFMS. 
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        theta['sfh']['dt_min'] = 5. 
-        theta['sfh']['dt_max'] = 5. 
-        theta['sfh']['sigma'] = 0.2  # note narrower SFMS
-        theta['sfms']['sigma'] = 0.2 # note narrower SFMS
-    elif 'rSFH_r0.5_tdyn_' in run:
-        # random SFH with 0.5 correlation with halo growth 
-        # over t_dyn and duty cycle specified in `run`
-        tduty = float(run.split('rSFH_r0.5_tdyn_')[-1].split('gyr')[0])
-        theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
+        tduty = float(run.split('randomSFH')[-1].split('gyr')[0]) 
         theta['sfh']['dt_min'] = tduty
         theta['sfh']['dt_max'] = tduty
-        theta['sfh']['sigma_tot'] = 0.3 
-        theta['sfh']['sigma_corr'] = 0.5 * 0.3
-        theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = 2.5 # Gyr
+        theta['sfh']['sigma'] = 0.3 
     else: 
-        raise NotImplementedError
+        raise ValueError
+    '''
+        elif run == 'rSFH_r1.0_most': 
+            theta['sfh'] = {'name': 'random_step_most_abias'}
+            theta['sfh']['dt_min'] = 0.5 
+            theta['sfh']['dt_max'] = 0.5 
+            theta['sfh']['sigma_tot'] = 0.3 
+            theta['sfh']['sigma_corr'] = 0.3
+        elif run == 'rSFH_r0.66_delay': 
+            theta['sfh'] = {'name': 'random_step_abias_delay_dz'}
+            theta['sfh']['dt_min'] = 0.5 
+            theta['sfh']['dt_max'] = 0.5 
+            theta['sfh']['sigma_tot'] = 0.3 
+            theta['sfh']['sigma_corr'] = 0.66 * 0.3
+            theta['sfh']['dt_delay'] = 1. # Gyr 
+            theta['sfh']['dz_dMh'] = 0.5 
+        elif run == 'rSFH_r0.99_delay': 
+            theta['sfh'] = {'name': 'random_step_abias_delay_dz'}
+            theta['sfh']['dt_min'] = 0.5 
+            theta['sfh']['dt_max'] = 0.5 
+            theta['sfh']['sigma_tot'] = 0.3 
+            theta['sfh']['sigma_corr'] = 0.99 * 0.3
+            theta['sfh']['dt_delay'] = 1. # Gyr 
+            theta['sfh']['dz_dMh'] = 0.5 
+        elif run == 'rSFH_r0.99_tdyn_5gyr': 
+            # random SFH with 0.99 correlation with halo growth 
+            # over t_dyn and duty cycle of 5 Gyr 
+            theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
+            theta['sfh']['dt_min'] = 5. 
+            theta['sfh']['dt_max'] = 5. 
+            theta['sfh']['sigma_tot'] = 0.3 
+            theta['sfh']['sigma_corr'] = 0.99 * 0.3
+            theta['sfh']['dt_delay'] = 0. # Gyr 
+            theta['sfh']['dt_dMh'] = 2.5 # Gyr
+        elif run == 'rSFH_r0.99_tdyn_0.5gyr_narrSFMS': 
+            # random SFH with 0.99 correlation with halo growth 
+            # over t_dyn and duty cycle of 0.5 Gyr 
+            theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
+            theta['sfh']['dt_min'] = 0.5 
+            theta['sfh']['dt_max'] = 0.5 
+            theta['sfh']['sigma_tot'] = 0.2 # note narrower SFMS
+            theta['sfh']['sigma_corr'] = 0.99 * 0.2 # note narrower SFMS
+            theta['sfh']['dt_delay'] = 0. # Gyr 
+            theta['sfh']['dt_dMh'] = 2.5 # Gyr
+            theta['sfms']['sigma'] = 0.2 # note narrower SFMS
+        elif run == 'rSFH_r0.99_delay_dt_test': 
+            theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
+            theta['sfh']['dt_min'] = args[2]
+            theta['sfh']['dt_max'] = args[2] 
+            theta['sfh']['sigma_tot'] = 0.3 
+            theta['sfh']['sigma_corr'] = 0.99 * 0.3
+            theta['sfh']['dt_delay'] = args[3] # Gyr 
+            theta['sfh']['dt_dMh'] = args[4]  # Gyr
+        elif run == 'rSFH_r_delay_dt_test': 
+            theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
+            theta['sfh']['dt_min'] = args[3]
+            theta['sfh']['dt_max'] = args[3] 
+            theta['sfh']['sigma_tot'] = 0.3 
+            theta['sfh']['sigma_corr'] = args[2] * 0.3
+            theta['sfh']['dt_delay'] = args[4] # Gyr 
+            theta['sfh']['dt_dMh'] = args[5]  # Gyr
+        else: 
+            raise NotImplementedError
+    '''
     return theta
 
 
@@ -326,7 +201,7 @@ def modelSum(cencat, sumstat=['smf']):
     return sums
 
 
-def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart=None, **run_kwargs): 
+def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart=None, nsnap0=15, downsampled='20'): 
     ''' Main code for running ABC 
 
     Parameters
@@ -360,11 +235,8 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
     phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in m_arr])))
 
     # summary statistics of simulation 
-    sim_kwargs = {} 
-    sim_kwargs['nsnap0'] = run_kwargs['nsnap0']
-    sim_kwargs['downsampled'] = run_kwargs['downsampled']
     def Sim(tt): 
-        cencat = model(run, tt, **sim_kwargs)
+        cencat = model(run, tt, nsnap0=nsnap0, downsampled=downsampled)
         sums = modelSum(cencat, sumstat=sumstat)
         return sums 
 
@@ -406,8 +278,8 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
     write_kwargs['Niter'] = T
     write_kwargs['sumstat'] = sumstat 
     write_kwargs['prior'] = prior
-    for key in run_kwargs.keys():
-        write_kwargs[key] = run_kwargs[key]
+    write_kwargs['nsnap0'] = nsnap0 # initial snapshot
+    write_kwargs['downsampled'] = downsampled # downsample factor
     if not restart: 
         Writeout('init', run, abcpmc_sampler, **write_kwargs)
     else: 

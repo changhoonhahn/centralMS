@@ -17,14 +17,14 @@ def minimize(tduty):
     return None 
 
 
-def noAbiasABC(tduty, Niter=14, Npart=1000): 
+def noAbiasABC(tduty, sfs='flex', Niter=14, Npart=1000): 
     ''' ABC run without assembly bias 
     '''
     if tduty not in ['0.5', '1', '2', '5', '10']: 
         raise ValueError 
-    run = ''.join(['randomSFH_', tduty, 'gyr']) 
+    run = ''.join(['randomSFH', tduty, 'gyr.sfs', sfs]) 
     print(run)
-    prior = ABC.Prior('anchored', shape='tophat') 
+    prior = ABC.Prior(sfs, shape='tophat') 
     ABC.runABC(run, Niter, [1.e5], prior, N_p=Npart, sumstat=['smf'], nsnap0=15, downsampled='20') 
     return None 
 
