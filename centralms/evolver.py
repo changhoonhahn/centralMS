@@ -79,16 +79,6 @@ def initSF(shcat, theta):
     rand = np.random.uniform(0., 1., ngal) 
     isSF = (rand < f_sfs)
     
-    # get m.sham at the initial snapshots of the halo 
-    shcat['m.star0'] = np.zeros(ngal) # initial SHAM stellar mass 
-    shcat['halo.m0'] = np.zeros(ngal) # initial halo mass 
-    for i in range(1, nsnap0+1): 
-        istart = (shcat['nsnap_start'] == i) # subhalos that being at snapshot i  
-        str_snap = ''
-        if i != 1: str_snap = '.snap'+str(i) 
-        shcat['m.star0'][istart] = shcat['m.sham'+str_snap][istart]
-        shcat['halo.m0'][istart] = shcat['halo.m'+str_snap][istart]
-
     shcat['sfr0'] = np.repeat(-999., ngal) # assign initial SFRs
     dsfr0 = theta['sfms']['sigma'] * np.random.randn(np.sum(isSF))
     shcat['sfr0'][isSF] = SFH.SFR_sfms(

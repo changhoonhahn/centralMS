@@ -145,6 +145,16 @@ class Subhalos(object):
                 mstar = catalog['m.sham']
             nsnap_start[(mstar > 0.) & (nsnap_start < i_snap)] = i_snap 
         catalog['nsnap_start'] = nsnap_start
+    
+        # get m.sham at the initial snapshots of the halo 
+        catalog['m.star0'] = np.zeros(ngal) # initial SHAM stellar mass 
+        catalog['halo.m0'] = np.zeros(ngal) # initial halo mass 
+        for i in range(1, nsnap0+1): 
+            istart = (catalog['nsnap_start'] == i) # subhalos that being at snapshot i  
+            str_snap = ''
+            if i != 1: str_snap = '.snap'+str(i) 
+            catalog['m.star0'][istart] = catalog['m.sham'+str_snap][istart]
+            catalog['halo.m0'][istart] = catalog['halo.m'+str_snap][istart]
 
         # write to hdf5 file witht he simplest organization
         f = h5py.File(self.File(), 'w') 
