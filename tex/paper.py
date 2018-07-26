@@ -574,9 +574,9 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sigma_logM*(M_h = 10^12) and sigma_logMhalo(M* = 10^10.5)) as a function of duty 
     cycle timescale (t_duty) from the ABC posteriors. 
     '''
-    runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr', 'randomSFH_5gyr', 'test0']
+    runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr', 'randomSFH_5gyr', 'randomSFH_10gyr']
     tduties = [0.5, 1., 2., 5., 7.47]  #hardcoded
-    iters = [13, 14, 14, 14, 14] # iterations of ABC
+    iters = [12, 12, 12, 12, 12] # iterations of ABC
     nparticles = [1000, 1000, 1000, 1000, 1000]
 
     # constraints from literature 
@@ -612,7 +612,7 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sigMs = np.zeros((3, len(tduties)))
     sigMh = np.zeros((3, len(tduties)))
     for i_t, tduty in enumerate(tduties): 
-        abc_dir = UT.dat_dir()+'abc/'+runs[i_t]+'/model/' # ABC directory 
+        abc_dir = ''.join([UT.dat_dir(), 'abc/', runs[i_t], '/model/']) # ABC directory 
         sig_Mss, sig_Mhs = [], [] 
         for i in range(200): 
             f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 

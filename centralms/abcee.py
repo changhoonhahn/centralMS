@@ -73,7 +73,6 @@ def dataSum(sumstat=['smf']):
 def model(run, args, **kwargs): 
     ''' model given the ABC run 
     '''
-    print(time.time())
     theta = _model_theta(run, args) # return theta(run, args)  
 
     # load in Subhalo Catalog (pure centrals)

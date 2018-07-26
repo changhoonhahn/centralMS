@@ -1,5 +1,5 @@
 # !/bin/bash/
-run="randomSFH_5gyr"
+run="randomSFH_0.5gyr"
 remote="sirocco"
 if [ $remote = "sirocco" ]; then 
     remote_dir="/mount/sirocco1/hahn/centralms/abc/"
@@ -11,11 +11,11 @@ local_dir=$CENTRALMS_DIR"abc/"
 
 cmd=$remote":"$remote_dir$run"/{info.md"
 
-for t in {0..9}; do 
+for t in {0..12}; do 
     cmd=$cmd",theta.t"$t"."$run".dat"
     cmd=$cmd",w.t"$t"."$run".dat"
     cmd=$cmd",rho.t"$t"."$run".dat"
 done 
 cmd=$cmd"}"
-echo $cmd
+#echo $cmd
 scp $cmd $local_dir$run
