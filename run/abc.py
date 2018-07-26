@@ -33,8 +33,9 @@ if __name__=="__main__":
     name = sys.argv[1]
     if name == 'noabias': 
         tduty = sys.argv[2]
-        niter = int(sys.argv[3]) 
-        npart = int(sys.argv[4]) 
-        noAbiasABC(tduty, Niter=niter, Npart=npart) # test 
+        sfs = sys.argv[3]
+        niter = int(sys.argv[4]) 
+        npart = int(sys.argv[5]) 
+        noAbiasABC(tduty, sfs=sfs, Niter=niter, Npart=npart) # test 
     elif name == 'abias': 
         raise ValueError
