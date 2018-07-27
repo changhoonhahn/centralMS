@@ -421,7 +421,7 @@ def readABC(run, T):
     return abc_out
 
 
-def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20', n_cpu=1): 
+def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20'): 
     ''' Evaluate and save specific columns of the forward model evaluated for each of the 
     particles in the T-th iteration of the ABC run. Takes... a while 
     '''
@@ -452,11 +452,6 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20', n_cpu
             f.create_dataset(key, data=subcat_sim_i[key])
         f.close()
         return None 
-    for i in range(len(abcout['w'])): 
-        model_thetai(i) 
-    #pewl = MP.Pool(processes=n_cpu) 
-    #pewl.map(model_thetai, [(i) for i in range(len(abcout['w']))])
-    #pewl.close()
-    #pewl.terminate()
-    #pewl.join()
+    pewl = mpi_util.MpiPool() 
+    pewl.map(model_thetai, [(i) for i in range(len(abcout['w']))])
     return None  
