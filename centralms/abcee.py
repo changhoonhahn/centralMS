@@ -445,6 +445,7 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20'):
         f.close()
 
     def model_thetai(i):
+        print('%s iteration %i : model ABC theta %i' % (run, T, i))
         subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
         fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
         f = h5py.File(fname, 'w') 
