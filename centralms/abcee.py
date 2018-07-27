@@ -10,6 +10,7 @@ import numpy as np
 import scipy as sp 
 import abcpmc
 from abcpmc import mpi_util
+import multiprocessing as MP
 # -- local -- 
 from . import util as UT
 from . import sfh as SFH
@@ -421,7 +422,7 @@ def readABC(run, T):
     return abc_out
 
 
-def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20'): 
+def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20', n_cpu=1): 
     ''' Evaluate and save specific columns of the forward model evaluated for each of the 
     particles in the T-th iteration of the ABC run. Takes... a while 
     '''
@@ -444,12 +445,18 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20'):
             f.create_dataset(key, data=subcat_sim[key])
         f.close()
 
-    # now save the rest 
-    for i in range(len(abcout['w'])): 
+    def model_thetai(i):
         subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
         fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
         f = h5py.File(fname, 'w') 
         for key in savekeys: 
             f.create_dataset(key, data=subcat_sim_i[key])
         f.close()
+        return None 
+    
+    pewl = MP.Pool(processes=n_cpu) 
+    pewl.map(_make_subbox, [(i) for i in range(len(abcout['w']))])
+    pewl.close()
+    pewl.terminate()
+    pewl.join()
     return None  

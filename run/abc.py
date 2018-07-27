@@ -29,7 +29,7 @@ def noAbiasABC(tduty, sfs='flex', Niter=14, Npart=1000):
     return None 
 
 
-def modelABCpool(run, t): 
+def modelABCpool(run, t, n_cpu): 
     ''' evaluate model(theta) for all theta in ABC pool 
     '''
     ABC.model_ABCparticle(run, t, nsnap0=15, downsampled='20') 
@@ -49,6 +49,7 @@ if __name__=="__main__":
     elif name == 'modelrun': 
         run = sys.argv[2]
         niter = int(sys.argv[3]) 
-        modelABCpool(run, niter)
+        ncpu = int(sys.argv[4]) 
+        modelABCpool(run, niter, ncpu)
     else: 
         raise NotImplementedError
