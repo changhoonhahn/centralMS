@@ -574,9 +574,13 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sigma_logM*(M_h = 10^12) and sigma_logMhalo(M* = 10^10.5)) as a function of duty 
     cycle timescale (t_duty) from the ABC posteriors. 
     '''
-    runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr', 'randomSFH_5gyr', 'randomSFH_10gyr']
+    runs = ['randomSFH0.5gyr.sfsanchored', 
+            'randomSFH1gyr.sfsanchored', 
+            'randomSFH2gyr.sfsanchored', 
+            'randomSFH5gyr.sfsanchored', 
+            'randomSFH10gyr.sfsanchored']
     tduties = [0.5, 1., 2., 5., 7.47]  #hardcoded
-    iters = [12, 12, 12, 12, 12] # iterations of ABC
+    iters = [13, 13, 12, 12, 12] # iterations of ABC
     nparticles = [1000, 1000, 1000, 1000, 1000]
 
     # constraints from literature 

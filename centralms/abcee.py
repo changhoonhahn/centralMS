@@ -421,32 +421,35 @@ def readABC(run, T):
     return abc_out
 
 
-def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2): 
+def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20'): 
     ''' Evaluate and save specific columns of the forward model evaluated for each of the 
     particles in the T-th iteration of the ABC run. Takes... a while 
     '''
-    # read in the abc particles 
-    abcout = readABC(run, T)
-    abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # directory where all the ABC files are stored
+    abc_dir = ''.join([UT.dat_dir(), 'abc/', run, '/model/'])  # directory where all the ABC files are stored
+    if not os.path.exists(abc_dir): # make directory if it doesn't exist 
+        os.makedirs(abc_dir)
     
+    abcout = readABC(run, T) # read in the abc particles 
+    savekeys = ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'galtype']
+
     # save the median theta separately (evaluate it a bunch of times) 
     #theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
     theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
     for i in range(10):  
-        subcat_sim = model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+        subcat_sim = model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
 
         fname = ''.join([abc_dir, 'model.theta_median', str(i), '.t', str(T), '.hdf5'])
         f = h5py.File(fname, 'w') 
-        for key in ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'gclass']: 
+        for key in savekeys: 
             f.create_dataset(key, data=subcat_sim[key])
         f.close()
-    #return None  
+
     # now save the rest 
     for i in range(len(abcout['w'])): 
-        subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
+        subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
         fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
         f = h5py.File(fname, 'w') 
-        for key in ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'gclass']: 
+        for key in savekeys: 
             f.create_dataset(key, data=subcat_sim_i[key])
         f.close()
     return None  

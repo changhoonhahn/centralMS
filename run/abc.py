@@ -29,6 +29,13 @@ def noAbiasABC(tduty, sfs='flex', Niter=14, Npart=1000):
     return None 
 
 
+def modelABCpool(run, t): 
+    ''' evaluate model(theta) for all theta in ABC pool 
+    '''
+    ABC.model_ABCparticle(run, t, nsnap0=15, downsampled='20') 
+    return None 
+
+
 if __name__=="__main__":
     name = sys.argv[1]
     if name == 'noabias': 
@@ -39,3 +46,9 @@ if __name__=="__main__":
         noAbiasABC(tduty, sfs=sfs, Niter=niter, Npart=npart) # test 
     elif name == 'abias': 
         raise ValueError
+    elif name == 'modelrun': 
+        run = sys.argv[2]
+        niter = int(sys.argv[3]) 
+        modelABCpool(run, niter)
+    else: 
+        raise NotImplementedError

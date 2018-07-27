@@ -194,6 +194,6 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
 
 
 if __name__=="__main__": 
-    #plotABC('randomSFH_0.5gyr', 12)
-    #qaplotABC('randomSFH_0.5gyr', 12)#, theta=[2., -0.16], figure=''.join([UT.dat_dir(), 'abc/randomSFH_5gyr/test.png']))
-    qaplotABC('randomSFH5gyr.sfsanchored', 12, theta=[1.25, 0.0], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
+    plotABC('randomSFH10gyr.sfsanchored', 12)
+    qaplotABC('randomSFH10gyr.sfsanchored', 12)
+    #qaplotABC('randomSFH5gyr.sfsanchored', 12, theta=[1.25, 0.0], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
