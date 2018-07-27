@@ -10,7 +10,6 @@ import numpy as np
 import scipy as sp 
 import abcpmc
 from abcpmc import mpi_util
-import multiprocessing as MP
 # -- local -- 
 from . import util as UT
 from . import sfh as SFH
@@ -453,10 +452,11 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20', n_cpu
             f.create_dataset(key, data=subcat_sim_i[key])
         f.close()
         return None 
-    
-    pewl = MP.Pool(processes=n_cpu) 
-    pewl.map(_make_subbox, [(i) for i in range(len(abcout['w']))])
-    pewl.close()
-    pewl.terminate()
-    pewl.join()
+    for i in range(len(abcout['w'])): 
+        model_thetai(i) 
+    #pewl = MP.Pool(processes=n_cpu) 
+    #pewl.map(model_thetai, [(i) for i in range(len(abcout['w']))])
+    #pewl.close()
+    #pewl.terminate()
+    #pewl.join()
     return None  
