@@ -439,20 +439,19 @@ def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20'):
         subcat_sim = model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
 
         fname = ''.join([abc_dir, 'model.theta_median', str(i), '.t', str(T), '.hdf5'])
-        f = h5py.File(fname, 'w') 
-        for key in savekeys: 
-            f.create_dataset(key, data=subcat_sim[key])
-        f.close()
+        with h5py.File(fname, 'w') as f: 
+            for key in savekeys: 
+                f.create_dataset(key, data=subcat_sim[key])
 
     def model_thetai(i):
         print('%s iteration %i : model ABC theta %i' % (run, T, i))
         subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
         fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
-        f = h5py.File(fname, 'w') 
-        for key in savekeys: 
-            f.create_dataset(key, data=subcat_sim_i[key])
-        f.close()
+        with h5py.File(fname, 'w') as f: 
+            for key in savekeys: 
+                f.create_dataset(key, data=subcat_sim_i[key])
         return None 
+
     pewl = mpi_util.MpiPool() 
     pewl.map(model_thetai, [(i) for i in range(len(abcout['w']))])
     return None  
