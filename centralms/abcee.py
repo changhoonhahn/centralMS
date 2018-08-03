@@ -9,7 +9,8 @@ import time
 import numpy as np
 import scipy as sp 
 import abcpmc
-from abcpmc import mpi_util
+from mpi4py import MPI
+#from abcpmc import mpi_util
 # -- local -- 
 from . import util as UT
 from . import sfh as SFH
@@ -419,39 +420,3 @@ def readABC(run, T):
     abc_out['w'] = np.loadtxt(file('w', T, run))
     abc_out['rho'] = np.loadtxt(file('rho', T, run))
     return abc_out
-
-
-def model_ABCparticle(run, T, nsnap0=15, sigma_smhm=0.2, downsampled='20'): 
-    ''' Evaluate and save specific columns of the forward model evaluated for each of the 
-    particles in the T-th iteration of the ABC run. Takes... a while 
-    '''
-    abc_dir = ''.join([UT.dat_dir(), 'abc/', run, '/model/'])  # directory where all the ABC files are stored
-    if not os.path.exists(abc_dir): # make directory if it doesn't exist 
-        os.makedirs(abc_dir)
-    
-    abcout = readABC(run, T) # read in the abc particles 
-    savekeys = ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'galtype']
-
-    # save the median theta separately (evaluate it a bunch of times) 
-    #theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
-    theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
-    for i in range(10):  
-        subcat_sim = model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
-
-        fname = ''.join([abc_dir, 'model.theta_median', str(i), '.t', str(T), '.hdf5'])
-        with h5py.File(fname, 'w') as f: 
-            for key in savekeys: 
-                f.create_dataset(key, data=subcat_sim[key])
-
-    def model_thetai(i):
-        print('%s iteration %i : model ABC theta %i' % (run, T, i))
-        subcat_sim_i = model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
-        fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
-        with h5py.File(fname, 'w') as f: 
-            for key in savekeys: 
-                f.create_dataset(key, data=subcat_sim_i[key])
-        return None 
-
-    pewl = mpi_util.MpiPool() 
-    pewl.map(model_thetai, [(i) for i in range(len(abcout['w']))])
-    return None  

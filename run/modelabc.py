@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 import os
 import sys 
-import h5py
+#import h5py
+import pickle
 import numpy as np 
 from mpi4py import MPI
 # --- centralms --- 
@@ -21,7 +22,6 @@ downsampled = '20'
 abcout = ABC.readABC(run, T) # read in the abc particles 
 savekeys = ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'galtype']
 
-
 abc_dir = ''.join([UT.dat_dir(), 'abc/', run, '/model/'])  # directory where all the ABC files are stored
 if not os.path.exists(abc_dir): # make directory if it doesn't exist 
     os.makedirs(abc_dir)
@@ -32,10 +32,16 @@ theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shap
 for i in range(10):  
     subcat_sim = ABC.model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
 
-    fname = ''.join([abc_dir, 'model.theta_median', str(i), '.t', str(T), '.hdf5'])
-    with h5py.File(fname, 'w') as f: 
-        for key in savekeys: 
-            f.create_dataset(key, data=subcat_sim[key])
+    fname = ''.join([abc_dir, 'model.theta_median', str(i), '.t', str(T), '.p'])
+    out = {} 
+    for key in savekeys: 
+        out[key] = subcat_sim[key]
+    pickle.dump(out, open(fname, 'wb'))
+
+    #fname = ''.join([abc_dir, 'model.theta_median', str(i), '.t', str(T), '.hdf5'])
+    #with h5py.File(fname, 'w') as f: 
+    #    for key in savekeys: 
+    #        f.create_dataset(key, data=subcat_sim[key])
 
 COMM = MPI.COMM_WORLD # default communicator
 
@@ -49,13 +55,17 @@ def _split(container, count):
 
 def model_thetai(i):
     print('%s iteration %i : model ABC theta %i' % (run, T, i))
-    subcat_sim_i = ABC.model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled, i=i) 
-    fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
-    print('writing to %s' % fname)
-    with h5py.File(fname, 'w') as f: 
-        for key in savekeys: 
-            f.create_dataset(key, data=subcat_sim_i[key])
-    print('%s written' % fname)
+    subcat_sim_i = ABC.model(run, abcout['theta'][i], nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
+    fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.p'])
+    out = {} 
+    for key in savekeys: 
+        out[key] = subcat_sim[key]
+    pickle.dump(out, open(fname, 'wb'))
+    
+    #fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
+    #with h5py.File(fname, 'w') as f: 
+    #    for key in savekeys: 
+    #        f.create_dataset(key, data=subcat_sim_i[key])
     return i 
     
 if COMM.rank == 0:
