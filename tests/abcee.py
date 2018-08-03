@@ -21,7 +21,7 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
-def plotABC(run, T): 
+def plotABC(run, T, prior='flex'): 
     ''' Corner plots of ABC runs  
     '''
     # thetas
@@ -29,7 +29,7 @@ def plotABC(run, T):
     theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) 
             for i in range(len(abcout['theta'][0]))]
     theta_info = ABC.Theta() 
-    prior_obj = ABC.Prior('anchored') # prior
+    prior_obj = ABC.Prior(prior) # prior
     prior_range = [(prior_obj.min[i], prior_obj.max[i]) for i in range(len(prior_obj.min))]
     
     # figure name 
@@ -194,6 +194,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
 
 
 if __name__=="__main__": 
-    plotABC('randomSFH10gyr.sfsanchored', 12)
-    qaplotABC('randomSFH10gyr.sfsanchored', 12)
+    for tduty in ['0.5', '1', '2', '5', '10']: 
+        plotABC('randomSFH'+tduty+'gyr.sfsflex', 14, prior='flex')
+        qaplotABC('randomSFH'+tduty+'gyr.sfsflex', 14)
     #qaplotABC('randomSFH5gyr.sfsanchored', 12, theta=[1.25, 0.0], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
