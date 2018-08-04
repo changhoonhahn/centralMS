@@ -5,6 +5,7 @@ figures for centralMS paper
 
 '''
 import h5py
+import pickle
 import numpy as np 
 import corner as DFM
 from scipy.interpolate import interp1d
@@ -574,13 +575,13 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sigma_logM*(M_h = 10^12) and sigma_logMhalo(M* = 10^10.5)) as a function of duty 
     cycle timescale (t_duty) from the ABC posteriors. 
     '''
-    runs = ['randomSFH0.5gyr.sfsanchored', 
-            'randomSFH1gyr.sfsanchored', 
-            'randomSFH2gyr.sfsanchored', 
-            'randomSFH5gyr.sfsanchored', 
-            'randomSFH10gyr.sfsanchored']
+    runs = ['randomSFH0.5gyr.sfsflex', 
+            'randomSFH1gyr.sfsflex', 
+            'randomSFH2gyr.sfsflex', 
+            'randomSFH5gyr.sfsflex', 
+            'randomSFH10gyr.sfsflex']
     tduties = [0.5, 1., 2., 5., 7.47]  #hardcoded
-    iters = [13, 13, 12, 12, 12] # iterations of ABC
+    iters = [14 for i in range(len(tduties))] # 13, 13, 12, 12, 12] # iterations of ABC
     nparticles = [1000, 1000, 1000, 1000, 1000]
 
     # constraints from literature 
@@ -618,13 +619,17 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     for i_t, tduty in enumerate(tduties): 
         abc_dir = ''.join([UT.dat_dir(), 'abc/', runs[i_t], '/model/']) # ABC directory 
         sig_Mss, sig_Mhs = [], [] 
-        for i in range(200): 
-            f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
+        for i in range(100): 
+            #f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
+            #subcat_sim_i = {} 
+            #for key in f.keys(): 
+            #    subcat_sim_i[key] = f[key].value
+            f = pickle.load(open(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.p']), 'rb'))
             subcat_sim_i = {} 
             for key in f.keys(): 
-                subcat_sim_i[key] = f[key].value
+                subcat_sim_i[key] = f[key]
             
-            isSF = np.where(subcat_sim_i['gclass'] == 'sf') # only SF galaxies 
+            isSF = np.where(subcat_sim_i['galtype'] == 'sf') # only SF galaxies 
 
             sig_ms_i = smhmr.sigma_logMstar(
                     subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
@@ -659,7 +664,7 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
         subplts.append(subplt) 
 
     legend1 = sub.legend(subplts[:3], lit_siglogMs[:3], loc='upper left', prop={'size': 15})
-    sub.legend(subplts[3:], lit_siglogMs[3:], loc='lower right', prop={'size': 15})
+    sub.legend(subplts[3:], lit_siglogMs[3:], loc='lower right', handletextpad=0.1, prop={'size': 15})
     plt.gca().add_artist(legend1)
     sub.set_xlim([0.45, 10.]) # x-axis
     sub.set_xscale('log') 

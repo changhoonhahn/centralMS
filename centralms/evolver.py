@@ -19,7 +19,7 @@ def Evolve(shcat, theta):
 
     # initiate logSFR(logM, z) function and keywords
     logSFR_logM_z, sfr_kwargs = SFH.logSFR_initiate(shcat, isSF, 
-            theta_sfh=theta['sfh'], theta_sfms=theta['sfms'])
+            theta_sfh=theta['sfh'], theta_sfms=theta['sfms'], testing=True)
 
     # get integrated stellar masses 
     logM_integ, logSFRs = _MassSFR_Wrapper(

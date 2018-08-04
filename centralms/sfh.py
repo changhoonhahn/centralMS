@@ -141,638 +141,27 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
         F_sfr = _logSFR_dSFR_tsteps
         sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
 
-    elif theta_sfh['name'] == 'random_step_most_abias': 
-        # random steps with assembly bias where SFH is correlated with 
-        # halo mass growth from snapshots nsnap0 to 1. This is designed to 
-        # maximize assembly bias 
-        if 'dt_min' not in theta_sfh: 
-            raise ValueError
-        if 'dt_max' not in theta_sfh: 
-            raise ValueError
-        if 'sigma_corr' not in theta_sfh:  
-            raise ValueError
-        else: 
-            if theta_sfh['sigma_corr'] <= 0.: 
-                raise ValueError("no assembly bias; dont use this SFH")
-        # first calculate the time at which the SFH changes (random step function duty cycle)
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0) 
-        
-        tshift_min = theta_sfh['dt_min'] # the range of the steps 
-        tshift_max = theta_sfh['dt_max'] 
-
-        # get the times when the amplitude changes 
-        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
-        n_gal = len(indices)
-
-        tshift = np.zeros((n_gal, n_col), dtype=np.float32)
-        if tshift_min == tshift_max: 
-            tshift[:,1:] = np.repeat(tshift_min, n_gal * (n_col-1)).reshape((n_gal, n_col-1))
-        else: 
-            tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
-        tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
-        del tshift
-    
-        # M_halo initial 
-        Mh_i = SHsnaps['halo.m0'][indices]
-        # M_halo final 
-        Mh_f = SHsnaps['halo.m'][indices]
-        
-        f_dMh = 1. - 10.**(Mh_i - Mh_f) #10.**(Mh_f - Mh_i - 10)
-        #f_dMh = Mh_f - Mh_i
-        
-        # M_h of the galaxies throughout the snapshots 
-        # Mh_snaps = ngal x nsnap0+3 matrix 
-        Mh_snaps = np.zeros((n_gal, nsnap0))#, dtype=np.float32)
-        Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
-        for isnap in range(2, nsnap0+1): 
-            Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
-        
-        z_snaps = UT.z_nsnap(range(1, nsnap0+10))
-        t_snaps = UT.t_nsnap(range(1, nsnap0+10))
-    
-        # M_h at the steps 
-        Mh_steps = np.zeros(tsteps.shape, dtype=np.float32) 
-        for i_g in range(n_gal): 
-            insim = np.where(Mh_snaps[i_g,:] > 0.)[0] # some halos did not exist far back
-            Mh_snaps_i = 10**(Mh_snaps[i_g,insim] - 10.) # scaled by 10^10 for ease
-            t_snaps_i = t_snaps[insim]
-            # SFH is correlated with halo growth dt_delay earlier  
-            tstep_i = tsteps[i_g,:]
-            # note that x has to be monotonically for np.interp 
-            Mh_steps[i_g,:] = np.interp(tstep_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
-
-        # calculate the d(log SFR) amplitude at t_steps 
-        dlogSFR_amp = np.zeros(tsteps.shape)#, dtype=np.float32)
-        for ii in range(tsteps.shape[1]): 
-            Mh_step = np.log10(Mh_steps[:,ii]) + 10.
-            mh_bins = np.arange(Mh_step.min(), Mh_step.max()+0.2, 0.2)
-            
-            #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
-            for i_m in range(len(mh_bins)-1): 
-                inbin = np.where((Mh_step >= mh_bins[i_m]) & 
-                        (Mh_step < mh_bins[i_m+1]))
-                n_bin = len(inbin[0])
-                 
-                isort = np.argsort(-1. * f_dMh[inbin])
-
-                irank = np.zeros(n_bin)
-                irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
-                
-                # i_rank = 1/2 (1 - erf(x/sqrt(2)))
-                # x = (SFR - avg_SFR)/sigma_SFR
-                # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
-                dlogSFR_amp[inbin, ii] = \
-                        theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank) 
-
-                #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
-                #sub.scatter(f_dMh[inbin], 0.3 * np.random.randn(n_bin), c='k')
-                #sub.scatter(f_dMh[inbin], dlogSFR_amp[inbin, ii] + \
-                #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
-                #sub.set_xlim([-1., 1.])
-                #sub.set_ylim([-1., 1.])
-
-            #plt.show()
-            #raise ValueError
-        del f_dMh
-        del Mh_steps
-        
-        # add in intrinsic scatter
-        dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
-        dlogSFR_amp += dlogSFR_int
-
-        #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
-        SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
-        
-        F_sfr = _logSFR_dSFR_tsteps
-        
-        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
-
-    elif theta_sfh['name'] == 'random_step_abias': 
-        # random steps with assembly bias  
-        if 'dt_min' not in theta_sfh: 
-            raise ValueError
-        if 'dt_max' not in theta_sfh: 
-            raise ValueError
-
-        # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
-        
-        # the range of the steps 
-        tshift_min = theta_sfh['dt_min'] 
-        tshift_max = theta_sfh['dt_max'] 
-
-        # get the times when the amplitude changes 
-        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
-        n_gal = len(indices)
-
-        tshift = np.zeros((n_gal, n_col))
-        tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
-        tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
-        del tshift
-        
-        assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
-        
-        # calculate d(logSFR) amplitude
-        dlogSFR_amp = np.zeros((n_gal, n_col))
-
-        if theta_sfh['sigma_corr'] > 0.: # if there's correlation between dlogMhalo and dlogSFR
-            
-            _dMhalos = np.zeros((n_gal, n_col)) # testing purposes
-
-            # calculate dMhalo
-            dlogSFR = np.zeros((n_gal, nsnap0-1)) # n_gal x (nsnap0 - 1) matrix
-
-            for nsnap in range(1, nsnap0)[::-1]: 
-                if nsnap == 1: 
-                    mhalo_later = SHsnaps['halo.m'][indices]
-                else: 
-                    mhalo_later = SHsnaps['halo.m.snap'+str(nsnap)][indices]
-                mhalo_early = SHsnaps['halo.m.snap'+str(nsnap+1)][indices]
-                
-                # log M_h(t_i) - log M_h(t_i+1) = log(M_h(t_i) / M_h(t_i+1))
-                # (M_h(t_i+1)-M_h(t_i))/M_h(t_i+1) = 1. - M_h(t_i)/M_h(t_i+1)
-                f_dMh = 1. - 10**(mhalo_early - mhalo_later)
-                ibins = np.digitize(mhalo_later, 
-                        np.arange(mhalo_later.min(), mhalo_later.max()+0.2, 0.2))
-            
-                #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(ibins.max())/3.)+1.), 15))
-                for ibin in range(1, ibins.max()+1): 
-                    inbin = np.where(ibins == ibin)
-                    n_bin = len(inbin[0])
-                     
-                    isort = np.argsort(-1. * f_dMh[inbin])
-
-                    irank = np.zeros(n_bin)
-                    irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
-                    
-                    # i_rank = 1/2 (1 - erf(x/sqrt(2)))
-                    # x = (SFR - avg_SFR)/sigma_SFR
-                    # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
-                    dlogSFR[inbin, nsnap0 - nsnap - 1] = \
-                            theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank)
-                    
-                    # test assembly bias 
-                    #sub = fig.add_subplot(3, np.int(np.ceil(np.float(ibins.max())/3.)+1), ibin)
-                    #sub.scatter(f_dMh[inbin], 0.3 * np.random.randn(n_bin), c='k')
-                    #sub.scatter(f_dMh[inbin], dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1] + \
-                    #                np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
-                    #sub.set_xlim([-1., 1.])
-                    #sub.set_ylim([-1., 1.])
-                # test assembly bias  implementation 
-                #sub = fig.add_subplot(3, np.int(np.ceil(np.float(ibins.max())/3.)+1), ibin+1)
-                #sub.scatter(f_dMh, 0.3 * np.random.randn(len(f_dMh)), c='k')
-                #sub.scatter(f_dMh, dlogSFR[:, SHsnaps['nsnap0'] - nsnap - 1] + \
-                #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * \
-                #        np.random.randn(len(f_dMh)), c='r', lw=0)
-                #sub.set_xlim([-1., 1.])
-                #sub.set_ylim([-1., 1.])
-                ##print np.std(dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1])
-                #fig.text(0.5, 0.04, '$\Delta M_h / M_h$', ha='center')
-                #fig.text(0.04, 0.5, '$\Delta$ log SFR', va='center', rotation='vertical')
-                #fig.savefig('abias_testing.png', bbox_inches='tight')
-                #raise ValueError
-
-            t_snaps = UT.t_nsnap(range(1, nsnap0+1)[::-1])
-
-            for igal in range(n_gal): 
-                i_tbins = np.digitize(tsteps[igal, range(n_col)], t_snaps) 
-                i_tbins = i_tbins.clip(0, len(t_snaps)-1) # clip out of range indices
-                
-                #for n in range(n_col): 
-                #    print t_snaps[i_tbins[n] - 1], '<= ', tsteps[igal, n], ' <',  t_snaps[i_tbins[n]]
-                dlogSFR_amp[igal, range(n_col)] = dlogSFR[igal, i_tbins-1]
-                
-                #_dMhalos[igal, range(n_col)] = dMhalos[igal, i_tbins-1]
-
-        # add in intrinsic scatter
-        dlogSFR_corr = dlogSFR_amp
-        dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
-        dlogSFR_amp += dlogSFR_int
-
-        #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
-        SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
-        
-        #for i_col in range(n_col): 
-        #    plt.scatter(_dMhalos[range(10000), i_col], 0.3 * np.random.randn(10000), c='k')
-        #    plt.scatter(_dMhalos[range(10000), i_col], dlogSFR_amp[range(10000), i_col], lw=0, c='r')
-        #    plt.show()
-
-        F_sfr = _logSFR_dSFR_tsteps
-        
-        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms, 
-                'dlogSFR_corr': dlogSFR_corr} #'dMhalos': _dMhalos, 
-    
-    elif theta_sfh['name'] == 'random_step_abias_dumb': 
-        # random steps with assembly bias done in a dumb way 
-        if 'dt_min' not in theta_sfh: 
-            raise ValueError
-        if 'dt_max' not in theta_sfh: 
-            raise ValueError
-                
-        # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
-        
-        # the range of the steps 
-        tshift_min = theta_sfh['dt_min'] 
-        tshift_max = theta_sfh['dt_max'] 
-
-        # get the times when the amplitude changes 
-        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
-        n_gal = len(indices)
-
-        tshift = np.zeros((n_gal, n_col))
-        tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
-        tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
-        del tshift
-        
-        assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
-        
-        # calculate d(logSFR) amplitude
-        dlogSFR_amp = np.zeros((n_gal, n_col))
-
-        if theta_sfh['sigma_corr'] > 0.: # if there's correlation between dlogMhalo and dlogSFR
-            # calculate dlogSFR with assembly bias 
-            # dlogSFR = 
-            #           nsnap0-1, nsnap0-2, ..., 2, 1
-            #   gal 1 [                      
-            #   gal 2 [                      
-            #   ...
-            #gal ngal [                      
-
-            dlogSFR = np.zeros((n_gal, nsnap0-1)) # n_gal x (nsnap0 - 1) matrix
-
-            for nsnap in range(1, nsnap0)[::-1]: 
-                if nsnap == 1: 
-                    mhalo_later = SHsnaps['halo.m'][indices]
-                else: 
-                    mhalo_later = SHsnaps['halo.m.snap'+str(nsnap)][indices]
-                mhalo_early = SHsnaps['halo.m.snap'+str(nsnap+1)][indices]
-                
-                # log M_h(t_i) - log M_h(t_i+1) = log(M_h(t_i) / M_h(t_i+1))
-                # (M_h(t_i+1)-M_h(t_i))/M_h(t_i+1) = 1. - M_h(t_i)/M_h(t_i+1)
-                f_dMh = 1. - 10**(mhalo_early - mhalo_later)
-
-                mh_bins = np.arange(mhalo_later.min(), mhalo_later.max()+0.2, 0.2)
-
-
-                for i_m in range(len(mh_bins)-1): 
-                    inbin = np.where(
-                            (mhalo_later >= mh_bins[i_m]) & 
-                            (mhalo_later < mh_bins[i_m+1]))
-                    n_bin = len(inbin[0])
-                     
-                    isort = np.argsort(-1. * f_dMh[inbin])
-
-                    irank = np.zeros(n_bin)
-                    irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
-                    
-                    # i_rank = 1/2 (1 - erf(x/sqrt(2)))
-                    # x = (SFR - avg_SFR)/sigma_SFR
-                    # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
-                    dlogSFR[inbin, nsnap0 - nsnap - 1] = \
-                            theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank)
-            
-            # nsnap0, nsnap0-1, nsnap0-2, ... ,2, 1 
-            t_snaps = UT.t_nsnap(range(1, nsnap0+1)[::-1])
-
-            for igal in range(n_gal): 
-                # each galaxy's timesteps 
-                #i_tbins = np.digitize(tsteps[igal, range(n_col)], t_snaps) 
-                #i_tbins = i_tbins.clip(0, len(t_snaps)-1) # clip out of range indices
-                igal_tsteps = tsteps[igal, range(n_col)]
-                i_tbins = np.digitize(igal_tsteps, t_snaps) 
-            
-                inrange = np.where((i_tbins < len(t_snaps)) & (i_tbins > 0)) 
-                dlogSFR_amp_i = np.zeros(n_col)
-                dlogSFR_amp_i[inrange] = dlogSFR[igal, i_tbins[inrange]-1]
-
-                #dlogSFR_amp[igal, range(n_col)] = dlogSFR[igal, i_tbins-1]
-                #_dMhalos[igal, range(n_col)] = dMhalos[igal, i_tbins-1]
-
-        # add in intrinsic scatter
-        #dlogSFR_corr = dlogSFR_amp
-        dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
-        dlogSFR_amp += dlogSFR_int
-
-        #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
-        SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
-        
-        #for i_col in range(n_col): 
-        #    plt.scatter(_dMhalos[range(10000), i_col], 0.3 * np.random.randn(10000), c='k')
-        #    plt.scatter(_dMhalos[range(10000), i_col], dlogSFR_amp[range(10000), i_col], lw=0, c='r')
-        #    plt.show()
-
-        F_sfr = _logSFR_dSFR_tsteps
-        
-        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
-                #, 'dlogSFR_corr': dlogSFR_corr} #'dMhalos': _dMhalos, 
-    
-    elif theta_sfh['name'] == 'random_step_abias2': 
-        # random steps with assembly bias with control over timescale of halo formation 
-        if 'dt_min' not in theta_sfh: 
-            raise ValueError
-        if 'dt_max' not in theta_sfh: 
-            raise ValueError
-                
-        # Random step function duty cycle 
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
-        
-        # the range of the steps 
-        tshift_min = theta_sfh['dt_min'] 
-        tshift_max = theta_sfh['dt_max'] 
-
-        # get the times when the amplitude changes 
-        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
-        n_gal = len(indices)
-
-        tshift = np.zeros((n_gal, n_col))
-        tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
-        tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
-        del tshift
-        
-        assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
-        
-        # calculate d(logSFR) amplitude
-        dlogSFR_amp = np.zeros((n_gal, n_col))
-
-        if theta_sfh['sigma_corr'] > 0.: # if there's correlation between dlogMhalo and dlogSFR
-            # calculate dlogSFR with assembly bias 
-            # dlogSFR = 
-            #           nsnap0-1, nsnap0-2, ..., 2, 1
-            #   gal 1 [                      
-            #   gal 2 [                      
-            #   ...
-            #gal ngal [                      
-            
-            t_snaps = UT.t_nsnap(range(1, nsnap0+1)[::-1])
-
-            t_abias = theta_sfh['t_abias'] # assembly bias timescale 
-            n_abias = np.int(np.ceil((UT.t_nsnap(1) - UT.t_nsnap(nsnap0))/t_abias))
-            t_step_abias = np.array([UT.t_nsnap(1) - (n_abias - i_abias) * t_abias 
-                for i_abias in range(n_abias+1)])
-            assert t_step_abias[0] < UT.t_nsnap(nsnap0)
-            t_step_abias[0] = UT.t_nsnap(nsnap0)
-
-            # M_halo of the galaxies in the snapshots 
-            Mh_snaps = np.zeros((n_gal, nsnap0)) 
-            for ii, isnap in enumerate(range(2, nsnap0+1)[::-1]): 
-                Mh_snaps[:,ii] = SHsnaps['halo.m.snap'+str(isnap)][indices]
-            Mh_snaps[:,-1] = SHsnaps['halo.m'][indices]
-
-            Mh_abias = np.zeros((n_gal, len(t_step_abias)))
-            for igal in range(n_gal): 
-                Mh_snaps_i = 10**Mh_snaps[igal, range(nsnap0)]
-                Mh_abias[igal, 0] = Mh_snaps_i[0]
-                Mh_abias[igal, -1] = Mh_snaps_i[-1]
-                Mh_abias[igal, 1:-1] = np.interp(t_step_abias[1:-1], t_snaps, Mh_snaps_i)
-            Mh_abias = np.log10(Mh_abias)
-
-            dlogSFR = np.zeros((Mh_abias.shape[0], Mh_abias.shape[1]-1))
-            #dlogSFR = np.zeros((n_gal, SHsnaps['nsnap0']-1)) # n_gal x (nsnap0 - 1) matrix
-            for ii in range(dlogSFR.shape[1]): 
-                # log M_h(t_i) - log M_h(t_i+1) = log(M_h(t_i) / M_h(t_i+1))
-                # (M_h(t_i+1)-M_h(t_i))/M_h(t_i+1) = 1. - M_h(t_i)/M_h(t_i+1)
-                mhalo_later = Mh_abias[:, ii+1]
-                mhalo_early = Mh_abias[:, ii]
-                
-                f_dMh = 1. - 10**(mhalo_early - mhalo_later)
-
-                mh_bins = np.arange(mhalo_later.min(), mhalo_later.max()+0.2, 0.2)
-
-                #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
-                for i_m in range(len(mh_bins)-1): 
-                    inbin = np.where((mhalo_later >= mh_bins[i_m]) & 
-                            (mhalo_later < mh_bins[i_m+1]))
-                    n_bin = len(inbin[0])
-                     
-                    isort = np.argsort(-1. * f_dMh[inbin])
-
-                    irank = np.zeros(n_bin)
-                    irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
-                    
-                    # i_rank = 1/2 (1 - erf(x/sqrt(2)))
-                    # x = (SFR - avg_SFR)/sigma_SFR
-                    # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
-                    dlogSFR[inbin, ii] = \
-                            theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank)
-                    
-                    # test assembly bias 
-                    #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
-                    #sub.scatter(f_dMh[inbin], 0.3 * np.random.randn(n_bin), c='k')
-                    #sub.scatter(f_dMh[inbin], dlogSFR[inbin, ii] + \
-                    #                np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
-                    #sub.set_xlim([-1., 1.])
-                    #sub.set_ylim([-1., 1.])
-                # test assembly bias  implementation 
-                #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+2)
-                #sub.scatter(f_dMh, 0.3 * np.random.randn(len(f_dMh)), c='k')
-                #sub.scatter(f_dMh, dlogSFR[:, ii] + \
-                #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * \
-                #        np.random.randn(len(f_dMh)), c='r', lw=0)
-                #sub.set_xlim([-1., 1.])
-                #sub.set_ylim([-1., 1.])
-                ##print np.std(dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1])
-                #fig.text(0.5, 0.04, '$\Delta M_h / M_h$', ha='center')
-                #fig.text(0.04, 0.5, '$\Delta$ log SFR', va='center', rotation='vertical')
-                #fig.savefig('abias_testing.png', bbox_inches='tight')
-                #raise ValueError
-            
-            for igal in range(n_gal): 
-                # each galaxy's timesteps 
-                #i_tbins = np.digitize(tsteps[igal, range(n_col)], t_snaps) 
-                #i_tbins = i_tbins.clip(0, len(t_snaps)-1) # clip out of range indices
-                igal_tsteps = tsteps[igal, range(n_col)]
-                i_tbins = np.digitize(igal_tsteps, t_step_abias) 
-            
-                inrange = np.where((i_tbins < len(t_step_abias)) & (i_tbins > 0)) 
-                dlogSFR_amp_i = np.zeros(n_col)
-                dlogSFR_amp_i[inrange] = dlogSFR[igal, i_tbins[inrange]-1]
-
-                dlogSFR_amp[igal, range(n_col)] = dlogSFR_amp_i 
-
-        # add in intrinsic scatter
-        #dlogSFR_corr = dlogSFR_amp
-        dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
-        dlogSFR_amp += dlogSFR_int
-
-        #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
-        SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
-        
-        #for i_col in range(n_col): 
-        #    plt.scatter(_dMhalos[range(10000), i_col], 0.3 * np.random.randn(10000), c='k')
-        #    plt.scatter(_dMhalos[range(10000), i_col], dlogSFR_amp[range(10000), i_col], lw=0, c='r')
-        #    plt.show()
-
-        F_sfr = _logSFR_dSFR_tsteps
-        
-        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
-                #, 'dlogSFR_corr': dlogSFR_corr} #'dMhalos': _dMhalos, 
-    
-    elif theta_sfh['name'] == 'random_step_abias_delay_dz': 
-        # random steps with assembly bias where SFH is correlated with 
-        # halo mass growth over dz_dMh, dt_delay earlier 
-        if 'dt_min' not in theta_sfh: 
-            raise ValueError
-        if 'dt_max' not in theta_sfh: 
-            raise ValueError
-        if 'sigma_corr' not in theta_sfh:  
-            raise ValueError
-        else: 
-            if theta_sfh['sigma_corr'] <= 0.: 
-                raise ValueError("no assembly bias; dont use this SFH")
-
-        if UT.z_nsnap(nsnap0) + theta_sfh['dz_dMh'] > UT.z_nsnap(nsnap0 + 10):
-            print UT.z_nsnap(nsnap0) + theta_sfh['dz_dMh'], UT.z_nsnap(nsnap0 + 10)
-            raise ValueError
-
-        # first calculate the time at which the SFH changes (random step function duty cycle)
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
-        
-        tshift_min = theta_sfh['dt_min'] # the range of the steps 
-        tshift_max = theta_sfh['dt_max'] 
-
-        # get the times when the amplitude changes 
-        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
-        n_gal = len(indices)
-
-        tshift = np.zeros((n_gal, n_col), dtype=np.float32)
-        if tshift_min == tshift_max: 
-            tshift[:,1:] = np.repeat(tshift_min, n_gal * (n_col-1)).reshape((n_gal, n_col-1))
-        else: 
-            tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
-        tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
-        #tsteps = np.clip(tsteps.astype(np.float32), 0., UT.t_nsnap(1))
-        del tshift
-
-        # M_h of the galaxies throughout the snapshots 
-        # Mh_snaps = ngal x nsnap0+3 matrix 
-        Mh_snaps = np.zeros((n_gal, nsnap0+9))#, dtype=np.float32)
-        Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
-        for isnap in range(2, nsnap0+10): 
-            Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
-        
-        z_snaps = UT.z_nsnap(range(1, nsnap0+10))
-        t_snaps = UT.t_nsnap(range(1, nsnap0+10))
-
-        # f_dMh growth rate of halo from t_delay - dt  to t_delay
-        f_dMh = np.zeros(tsteps.shape, dtype=np.float32)
-        Mh_steps = np.zeros(tsteps.shape, dtype=np.float32) 
-        for i_g in range(n_gal): 
-            insim = np.where(Mh_snaps[i_g,:] > 0.)[0] # some halos did not exist far back
-            Mh_snaps_i = 10**(Mh_snaps[i_g,insim] - 10.) # scaled by 10^10 for ease
-            t_snaps_i = t_snaps[insim]
-
-            # SFH is correlated with halo growth dt_delay earlier  
-            tstep_i = tsteps[i_g,:]
-            tdelay_i = tstep_i - theta_sfh['dt_delay']
-            
-            # note that x has to be monotonically for np.interp 
-            Mh_steps[i_g,:] = np.interp(tstep_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
-            Mh_delay  = np.interp(tdelay_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
-            Mh_delay_dz = np.interp(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'], z_snaps[insim], Mh_snaps_i)
-
-            f_dMh[i_g,:] = 1. - Mh_delay_dz / Mh_delay 
-            #plt.plot(t_snaps_i[::-1], Mh_snaps_i[::-1], c='k', lw=2, ls='--')
-            #plt.scatter(tdelay_i, Mh_delay, c='b', lw=0, s=40)
-            #print 'tdelay = ', tdelay_i, UT.z_of_t(tdelay_i)
-            #print 'zdelay+dz = ', UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh']
-            #print 't(zdelay+dz) = ', UT.t_of_z(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'])
-
-            #plt.scatter(UT.t_of_z(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh']), Mh_delay_dz, c='r', lw=0, s=40) 
-            #plt.show()
-            #if i_g > 10:
-            #    raise ValueError
-
-
-        # calculate the d(log SFR) amplitude at t_steps 
-        dlogSFR_amp = np.zeros(f_dMh.shape, dtype=np.float32)
-        for ii in range(f_dMh.shape[1]): 
-            f_dMh_i = f_dMh[:,ii]
-            Mh_step = np.log10(Mh_steps[:,ii]) + 10.
-            mh_bins = np.arange(Mh_step.min(), Mh_step.max()+0.2, 0.2)
-            
-            #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
-            for i_m in range(len(mh_bins)-1): 
-                inbin = np.where((Mh_step >= mh_bins[i_m]) & 
-                        (Mh_step < mh_bins[i_m+1]))
-                n_bin = len(inbin[0])
-                 
-                isort = np.argsort(-1. * f_dMh_i[inbin])
-
-                irank = np.zeros(n_bin)
-                irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
-                
-                # i_rank = 1/2 (1 - erf(x/sqrt(2)))
-                # x = (SFR - avg_SFR)/sigma_SFR
-                # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
-                dlogSFR_amp[inbin, ii] = \
-                        theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank) 
-
-                #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
-                #sub.scatter(f_dMh_i[inbin], 0.3 * np.random.randn(n_bin), c='k')
-                #sub.scatter(f_dMh_i[inbin], dlogSFR_amp[inbin, ii] + \
-                #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
-                #sub.set_xlim([-1., 1.])
-                #sub.set_ylim([-1., 1.])
-
-            #plt.show()
-            #raise ValueError
-        del f_dMh
-        del Mh_steps
-        
-        # add in intrinsic scatter
-        dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
-        dlogSFR_amp += dlogSFR_int
-
-        #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
-        SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
-        
-        F_sfr = _logSFR_dSFR_tsteps
-        
-        sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
-    
-    elif theta_sfh['name'] == 'random_step_abias_delay_dt': 
-        # random steps with assembly bias where SFH is correlated with 
-        # halo mass growth over dz_dMh, dt_delay earlier 
-        if 'dt_min' not in theta_sfh: 
-            raise ValueError
-        if 'dt_max' not in theta_sfh: 
-            raise ValueError
-        if 'sigma_corr' not in theta_sfh:  
-            raise ValueError
-        else: 
-            if theta_sfh['sigma_corr'] <= 0.: 
-                raise ValueError("no assembly bias; dont use this SFH")
-
-        if theta_sfh['dt_dMh'] == 0.: 
-            raise ValueError("no assembly bias; dont use this SFH")
-
-
+    elif theta_sfh['name'] == 'random_step_abias_dt': 
+        # SFH where the amplitude w.r.t. the SFS is correlated with halo mass growth over 
+        # specifed `dt_dMh`. The amplitude is sampled at every time step specified by `tduty`
         if UT.t_nsnap(SHsnaps['nsnap0']) + theta_sfh['dt_dMh'] < UT.t_nsnap(SHsnaps['nsnap0'] + 10):
-            print UT.t_nsnap(SHsnaps['nsnap0']) + theta_sfh['dt_dMh'], UT.t_nsnap(SHsnaps['nsnap0'] + 10)
-            raise ValueError
+            # make sure we have sufficient snapshot history 
+            raise ValueError("dt_dMh is too long; the halo snapshot history is not long enough")  
 
-        # first calculate the time at which the SFH changes (random step function duty cycle)
-        del_t_max = UT.t_nsnap(1) - UT.t_nsnap(SHsnaps['nsnap0'])#SHsnaps['nsnap_start'][indices].max()) 
-        
-        tshift_min = theta_sfh['dt_min'] # the range of the steps 
-        tshift_max = theta_sfh['dt_max'] 
+        dt_tot= UT.t_nsnap(1) - UT.t_nsnap(nsnap0) # total cosmic time of evolution 
+
+        tduty = theta_sfh['tduty'] # dutycycle time
 
         # get the times when the amplitude changes 
-        n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
-        n_gal = len(indices)
-
-        tshift = np.zeros((n_gal, n_col), dtype=np.float32)
-        if tshift_min == tshift_max: 
-            tshift[:,1:] = np.repeat(tshift_min, n_gal * (n_col-1)).reshape((n_gal, n_col-1))
-        else: 
-            tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+        n_col = int(np.ceil(dt_tot / tduty))+2  # number of columns 
+        n_gal = len(indices)    # number of galaxies
+        tshift = np.tile(tduty, (n_gal, n_col))
+        tshift[:,0] = 0.
+        tshift[:,1] = np.random.uniform(0., tduty, n_gal) 
         tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
-        #tsteps = np.clip(tsteps.astype(np.float32), 0., UT.t_nsnap(1))
         del tshift
 
         # M_h of the galaxies throughout the snapshots 
-        # Mh_snaps = ngal x nsnap0+3 matrix 
         Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']+9))#, dtype=np.float32)
         Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
         for isnap in range(2, SHsnaps['nsnap0']+10): 
@@ -781,51 +170,41 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
         z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))
         t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+10))
 
-        # f_dMh growth rate of halo from t_delay - dt  to t_delay
-        f_dMh = np.zeros(tsteps.shape, dtype=np.float32)
-        Mh_steps = np.zeros(tsteps.shape, dtype=np.float32) 
+        # now we need to use these M_h to calculate the halo growth rates
+        # at every time step t_i over the range t_i - dt_dMh to t_i. This means
+        # we need to get M_h at both t_i and t_i-dt_dMh...
+
+        f_dMh = np.zeros(tsteps.shape, dtype=np.float32) # growth rate of halos over t_i and t_i - dt_Mh
+        Mh_ts = np.zeros(tsteps.shape, dtype=np.float32)
         for i_g in range(n_gal): 
-            insim = np.where(Mh_snaps[i_g,:] > 0.)[0] # some halos did not exist far back
-            Mh_snaps_i = 10**(Mh_snaps[i_g,insim] - 10.) # scaled by 10^10 for ease
-            t_snaps_i = t_snaps[insim]
-
-            # SFH is correlated with halo growth dt_delay earlier  
-            tstep_i = tsteps[i_g,:]
-            tdelay_i = tstep_i - theta_sfh['dt_delay']
+            in_sim = Mh_snaps[i_g,:] > 0.
+            t_snaps_i = t_snaps[in_sim]
+            Mh_snaps_i = np.power(Mh_snaps[i_g, in_sim]) 
             
-            # note that x has to be monotonically increasing for np.interp 
-            Mh_steps[i_g,:] = np.interp(tstep_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
-            Mh_delay  = np.interp(tdelay_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
-            Mh_delay_dt = np.interp(tdelay_i - theta_sfh['dt_dMh'], t_snaps_i[::-1], Mh_snaps_i[::-1])
+            t_i = tsteps[i_g,:] # t_i
+            t_imdt = tstep[i_g,:] - theta_sfh['dt_dMh'] # t_i - dt_dMh
 
-            f_dMh[i_g,:] = 1. - Mh_delay_dt / Mh_delay 
-
-            #print 'tdelay = ', tdelay_i, UT.z_of_t(tdelay_i)
-            #print 'zdelay+dz = ', UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh']
-            #print 't(zdelay+dz) = ', UT.t_of_z(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'])
-            #for tt in tstep_i:  
-            #    plt.vlines(tt, np.log10(Mh_delay_dt.min())+10, 
-            #            np.log10(Mh_steps[i_g,:].max())+10, linestyle='--')
-            #plt.plot(t_snaps_i[::-1], np.log10(Mh_snaps_i[::-1])+10, c='k', lw=2, ls='--', 
-            #        label='$M_h$ snapshots')
-            #plt.scatter(tdelay_i, np.log10(Mh_delay)+10, c='b', lw=0, s=40, label='$M_h(t_{delay})$')
-            #plt.scatter(tdelay_i - theta_sfh['dt_dMh'], np.log10(Mh_delay_dt)+10, c='r', lw=0, s=40, label='$M_h(t_{delay}+\Delta t)$')
-            #plt.show()
-            #if i_g > 20:
-            #    raise ValueError
+            Mh_ti = np.interp(t_i, t_snaps_i[::-1], Mh_snaps_i[::-1]) 
+            Mh_timdt = np.interp(t_imdt, t_snaps_i[::-1], Mh_snaps_i[::-1]) 
+            
+            f_dMh[i_g,:] = 1. - Mh_timdt / Mh_ti 
+            Mh_ts[i_g,:] = Mh_ti
 
         # calculate the d(log SFR) amplitude at t_steps 
+        # at each t_step, for a given halo mass bin of 0.2 dex, 
+        # rank order the SFRs and the halo growth rate 
         dlogSFR_amp = np.zeros(f_dMh.shape, dtype=np.float32)
         for ii in range(f_dMh.shape[1]): 
             f_dMh_i = f_dMh[:,ii]
-            Mh_step = np.log10(Mh_steps[:,ii]) + 10.
-            mh_bins = np.arange(Mh_step.min(), Mh_step.max()+0.2, 0.2)
-            
-            #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
+            Mh_ti = Mh_ti
+
+            mh_bins = np.arange(Mh_ti.min(), Mh_step.max(), 0.2)
+           
+            if testing: 
+                fig = plt.figure(1, figsize=(8*np.int(np.ceil(float(len(mh_bins))/3.)+1.), 15))
             for i_m in range(len(mh_bins)-1): 
-                inbin = np.where((Mh_step >= mh_bins[i_m]) & 
-                        (Mh_step < mh_bins[i_m+1]))
-                n_bin = len(inbin[0])
+                inbin = ((Mh_ti >= mh_bins[i_m]) & (Mh_ti < mh_bins[i_m]+0.2))
+                n_bin = np.sum(inbin)
                  
                 isort = np.argsort(-1. * f_dMh_i[inbin])
 
@@ -837,33 +216,619 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
                 # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
                 dlogSFR_amp[inbin, ii] = \
                         theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank) 
-
-                #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
-                #sub.scatter(f_dMh_i[inbin], 0.3 * np.random.randn(n_bin), c='k')
-                #sub.scatter(f_dMh_i[inbin], dlogSFR_amp[inbin, ii] + \
-                #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
-                #sub.set_xlim([-1., 1.])
-                #sub.set_ylim([-1., 1.])
-
-            #plt.show()
-            #raise ValueError
+                
+                if testing: 
+                    sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
+                    sub.scatter(f_dMh_i[inbin], 0.3 * np.random.randn(n_bin), c='k')
+                    sub.scatter(f_dMh_i[inbin], dlogSFR_amp[inbin, ii] + \
+                            np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
+                    sub.set_xlim([-1., 1.])
+                    sub.set_ylim([-1., 1.])
+            if testing: 
+                plt.savefig(''.join([UT.fig_dir(), 'random_step_abias_dt_test.png']), bbox_inches='tight')
         del f_dMh
         del Mh_steps
         
         # add in intrinsic scatter
         dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
         dlogSFR_amp += dlogSFR_int
-
-        #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
-        SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
+        SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0] # change SFR_0 so that it's assembly biased as well
         
         F_sfr = _logSFR_dSFR_tsteps
-        
         sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
-    
     else:
         raise NotImplementedError
+    '''
+        elif theta_sfh['name'] == 'random_step_most_abias': 
+            # random steps with assembly bias where SFH is correlated with 
+            # halo mass growth from snapshots nsnap0 to 1. This is designed to 
+            # maximize assembly bias 
+            if 'dt_min' not in theta_sfh: 
+                raise ValueError
+            if 'dt_max' not in theta_sfh: 
+                raise ValueError
+            if 'sigma_corr' not in theta_sfh:  
+                raise ValueError
+            else: 
+                if theta_sfh['sigma_corr'] <= 0.: 
+                    raise ValueError("no assembly bias; dont use this SFH")
+            # first calculate the time at which the SFH changes (random step function duty cycle)
+            del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0) 
+            
+            tshift_min = theta_sfh['dt_min'] # the range of the steps 
+            tshift_max = theta_sfh['dt_max'] 
 
+            # get the times when the amplitude changes 
+            n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
+            n_gal = len(indices)
+
+            tshift = np.zeros((n_gal, n_col), dtype=np.float32)
+            if tshift_min == tshift_max: 
+                tshift[:,1:] = np.repeat(tshift_min, n_gal * (n_col-1)).reshape((n_gal, n_col-1))
+            else: 
+                tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+            tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+            del tshift
+        
+            # M_halo initial 
+            Mh_i = SHsnaps['halo.m0'][indices]
+            # M_halo final 
+            Mh_f = SHsnaps['halo.m'][indices]
+            
+            f_dMh = 1. - 10.**(Mh_i - Mh_f) #10.**(Mh_f - Mh_i - 10)
+            #f_dMh = Mh_f - Mh_i
+            
+            # M_h of the galaxies throughout the snapshots 
+            # Mh_snaps = ngal x nsnap0+3 matrix 
+            Mh_snaps = np.zeros((n_gal, nsnap0))#, dtype=np.float32)
+            Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
+            for isnap in range(2, nsnap0+1): 
+                Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
+            
+            z_snaps = UT.z_nsnap(range(1, nsnap0+10))
+            t_snaps = UT.t_nsnap(range(1, nsnap0+10))
+        
+            # M_h at the steps 
+            Mh_steps = np.zeros(tsteps.shape, dtype=np.float32) 
+            for i_g in range(n_gal): 
+                insim = np.where(Mh_snaps[i_g,:] > 0.)[0] # some halos did not exist far back
+                Mh_snaps_i = 10**(Mh_snaps[i_g,insim] - 10.) # scaled by 10^10 for ease
+                t_snaps_i = t_snaps[insim]
+                # SFH is correlated with halo growth dt_delay earlier  
+                tstep_i = tsteps[i_g,:]
+                # note that x has to be monotonically for np.interp 
+                Mh_steps[i_g,:] = np.interp(tstep_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
+
+            # calculate the d(log SFR) amplitude at t_steps 
+            dlogSFR_amp = np.zeros(tsteps.shape)#, dtype=np.float32)
+            for ii in range(tsteps.shape[1]): 
+                Mh_step = np.log10(Mh_steps[:,ii]) + 10.
+                mh_bins = np.arange(Mh_step.min(), Mh_step.max()+0.2, 0.2)
+                
+                #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
+                for i_m in range(len(mh_bins)-1): 
+                    inbin = np.where((Mh_step >= mh_bins[i_m]) & 
+                            (Mh_step < mh_bins[i_m+1]))
+                    n_bin = len(inbin[0])
+                     
+                    isort = np.argsort(-1. * f_dMh[inbin])
+
+                    irank = np.zeros(n_bin)
+                    irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
+                    
+                    # i_rank = 1/2 (1 - erf(x/sqrt(2)))
+                    # x = (SFR - avg_SFR)/sigma_SFR
+                    # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
+                    dlogSFR_amp[inbin, ii] = \
+                            theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank) 
+
+                    #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
+                    #sub.scatter(f_dMh[inbin], 0.3 * np.random.randn(n_bin), c='k')
+                    #sub.scatter(f_dMh[inbin], dlogSFR_amp[inbin, ii] + \
+                    #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
+                    #sub.set_xlim([-1., 1.])
+                    #sub.set_ylim([-1., 1.])
+
+                #plt.show()
+                #raise ValueError
+            del f_dMh
+            del Mh_steps
+            
+            # add in intrinsic scatter
+            dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
+            dlogSFR_amp += dlogSFR_int
+
+            #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+            SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
+            
+            F_sfr = _logSFR_dSFR_tsteps
+            
+            sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
+
+        elif theta_sfh['name'] == 'random_step_abias': 
+            # random steps with assembly bias  
+            if 'dt_min' not in theta_sfh: 
+                raise ValueError
+            if 'dt_max' not in theta_sfh: 
+                raise ValueError
+
+            # Random step function duty cycle 
+            del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
+            
+            # the range of the steps 
+            tshift_min = theta_sfh['dt_min'] 
+            tshift_max = theta_sfh['dt_max'] 
+
+            # get the times when the amplitude changes 
+            n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
+            n_gal = len(indices)
+
+            tshift = np.zeros((n_gal, n_col))
+            tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+            tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+            del tshift
+            
+            assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
+            
+            # calculate d(logSFR) amplitude
+            dlogSFR_amp = np.zeros((n_gal, n_col))
+
+            if theta_sfh['sigma_corr'] > 0.: # if there's correlation between dlogMhalo and dlogSFR
+                
+                _dMhalos = np.zeros((n_gal, n_col)) # testing purposes
+
+                # calculate dMhalo
+                dlogSFR = np.zeros((n_gal, nsnap0-1)) # n_gal x (nsnap0 - 1) matrix
+
+                for nsnap in range(1, nsnap0)[::-1]: 
+                    if nsnap == 1: 
+                        mhalo_later = SHsnaps['halo.m'][indices]
+                    else: 
+                        mhalo_later = SHsnaps['halo.m.snap'+str(nsnap)][indices]
+                    mhalo_early = SHsnaps['halo.m.snap'+str(nsnap+1)][indices]
+                    
+                    # log M_h(t_i) - log M_h(t_i+1) = log(M_h(t_i) / M_h(t_i+1))
+                    # (M_h(t_i+1)-M_h(t_i))/M_h(t_i+1) = 1. - M_h(t_i)/M_h(t_i+1)
+                    f_dMh = 1. - 10**(mhalo_early - mhalo_later)
+                    ibins = np.digitize(mhalo_later, 
+                            np.arange(mhalo_later.min(), mhalo_later.max()+0.2, 0.2))
+                
+                    #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(ibins.max())/3.)+1.), 15))
+                    for ibin in range(1, ibins.max()+1): 
+                        inbin = np.where(ibins == ibin)
+                        n_bin = len(inbin[0])
+                         
+                        isort = np.argsort(-1. * f_dMh[inbin])
+
+                        irank = np.zeros(n_bin)
+                        irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
+                        
+                        # i_rank = 1/2 (1 - erf(x/sqrt(2)))
+                        # x = (SFR - avg_SFR)/sigma_SFR
+                        # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
+                        dlogSFR[inbin, nsnap0 - nsnap - 1] = \
+                                theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank)
+                        
+                        # test assembly bias 
+                        #sub = fig.add_subplot(3, np.int(np.ceil(np.float(ibins.max())/3.)+1), ibin)
+                        #sub.scatter(f_dMh[inbin], 0.3 * np.random.randn(n_bin), c='k')
+                        #sub.scatter(f_dMh[inbin], dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1] + \
+                        #                np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
+                        #sub.set_xlim([-1., 1.])
+                        #sub.set_ylim([-1., 1.])
+                    # test assembly bias  implementation 
+                    #sub = fig.add_subplot(3, np.int(np.ceil(np.float(ibins.max())/3.)+1), ibin+1)
+                    #sub.scatter(f_dMh, 0.3 * np.random.randn(len(f_dMh)), c='k')
+                    #sub.scatter(f_dMh, dlogSFR[:, SHsnaps['nsnap0'] - nsnap - 1] + \
+                    #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * \
+                    #        np.random.randn(len(f_dMh)), c='r', lw=0)
+                    #sub.set_xlim([-1., 1.])
+                    #sub.set_ylim([-1., 1.])
+                    ##print np.std(dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1])
+                    #fig.text(0.5, 0.04, '$\Delta M_h / M_h$', ha='center')
+                    #fig.text(0.04, 0.5, '$\Delta$ log SFR', va='center', rotation='vertical')
+                    #fig.savefig('abias_testing.png', bbox_inches='tight')
+                    #raise ValueError
+
+                t_snaps = UT.t_nsnap(range(1, nsnap0+1)[::-1])
+
+                for igal in range(n_gal): 
+                    i_tbins = np.digitize(tsteps[igal, range(n_col)], t_snaps) 
+                    i_tbins = i_tbins.clip(0, len(t_snaps)-1) # clip out of range indices
+                    
+                    #for n in range(n_col): 
+                    #    print t_snaps[i_tbins[n] - 1], '<= ', tsteps[igal, n], ' <',  t_snaps[i_tbins[n]]
+                    dlogSFR_amp[igal, range(n_col)] = dlogSFR[igal, i_tbins-1]
+                    
+                    #_dMhalos[igal, range(n_col)] = dMhalos[igal, i_tbins-1]
+
+            # add in intrinsic scatter
+            dlogSFR_corr = dlogSFR_amp
+            dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
+            dlogSFR_amp += dlogSFR_int
+
+            #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+            SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
+            
+            #for i_col in range(n_col): 
+            #    plt.scatter(_dMhalos[range(10000), i_col], 0.3 * np.random.randn(10000), c='k')
+            #    plt.scatter(_dMhalos[range(10000), i_col], dlogSFR_amp[range(10000), i_col], lw=0, c='r')
+            #    plt.show()
+
+            F_sfr = _logSFR_dSFR_tsteps
+            
+            sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms, 
+                    'dlogSFR_corr': dlogSFR_corr} #'dMhalos': _dMhalos, 
+        
+        elif theta_sfh['name'] == 'random_step_abias_dumb': 
+            # random steps with assembly bias done in a dumb way 
+            if 'dt_min' not in theta_sfh: 
+                raise ValueError
+            if 'dt_max' not in theta_sfh: 
+                raise ValueError
+                    
+            # Random step function duty cycle 
+            del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
+            
+            # the range of the steps 
+            tshift_min = theta_sfh['dt_min'] 
+            tshift_max = theta_sfh['dt_max'] 
+
+            # get the times when the amplitude changes 
+            n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
+            n_gal = len(indices)
+
+            tshift = np.zeros((n_gal, n_col))
+            tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+            tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+            del tshift
+            
+            assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
+            
+            # calculate d(logSFR) amplitude
+            dlogSFR_amp = np.zeros((n_gal, n_col))
+
+            if theta_sfh['sigma_corr'] > 0.: # if there's correlation between dlogMhalo and dlogSFR
+                # calculate dlogSFR with assembly bias 
+                # dlogSFR = 
+                #           nsnap0-1, nsnap0-2, ..., 2, 1
+                #   gal 1 [                      
+                #   gal 2 [                      
+                #   ...
+                #gal ngal [                      
+
+                dlogSFR = np.zeros((n_gal, nsnap0-1)) # n_gal x (nsnap0 - 1) matrix
+
+                for nsnap in range(1, nsnap0)[::-1]: 
+                    if nsnap == 1: 
+                        mhalo_later = SHsnaps['halo.m'][indices]
+                    else: 
+                        mhalo_later = SHsnaps['halo.m.snap'+str(nsnap)][indices]
+                    mhalo_early = SHsnaps['halo.m.snap'+str(nsnap+1)][indices]
+                    
+                    # log M_h(t_i) - log M_h(t_i+1) = log(M_h(t_i) / M_h(t_i+1))
+                    # (M_h(t_i+1)-M_h(t_i))/M_h(t_i+1) = 1. - M_h(t_i)/M_h(t_i+1)
+                    f_dMh = 1. - 10**(mhalo_early - mhalo_later)
+
+                    mh_bins = np.arange(mhalo_later.min(), mhalo_later.max()+0.2, 0.2)
+
+
+                    for i_m in range(len(mh_bins)-1): 
+                        inbin = np.where(
+                                (mhalo_later >= mh_bins[i_m]) & 
+                                (mhalo_later < mh_bins[i_m+1]))
+                        n_bin = len(inbin[0])
+                         
+                        isort = np.argsort(-1. * f_dMh[inbin])
+
+                        irank = np.zeros(n_bin)
+                        irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
+                        
+                        # i_rank = 1/2 (1 - erf(x/sqrt(2)))
+                        # x = (SFR - avg_SFR)/sigma_SFR
+                        # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
+                        dlogSFR[inbin, nsnap0 - nsnap - 1] = \
+                                theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank)
+                
+                # nsnap0, nsnap0-1, nsnap0-2, ... ,2, 1 
+                t_snaps = UT.t_nsnap(range(1, nsnap0+1)[::-1])
+
+                for igal in range(n_gal): 
+                    # each galaxy's timesteps 
+                    #i_tbins = np.digitize(tsteps[igal, range(n_col)], t_snaps) 
+                    #i_tbins = i_tbins.clip(0, len(t_snaps)-1) # clip out of range indices
+                    igal_tsteps = tsteps[igal, range(n_col)]
+                    i_tbins = np.digitize(igal_tsteps, t_snaps) 
+                
+                    inrange = np.where((i_tbins < len(t_snaps)) & (i_tbins > 0)) 
+                    dlogSFR_amp_i = np.zeros(n_col)
+                    dlogSFR_amp_i[inrange] = dlogSFR[igal, i_tbins[inrange]-1]
+
+                    #dlogSFR_amp[igal, range(n_col)] = dlogSFR[igal, i_tbins-1]
+                    #_dMhalos[igal, range(n_col)] = dMhalos[igal, i_tbins-1]
+
+            # add in intrinsic scatter
+            #dlogSFR_corr = dlogSFR_amp
+            dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
+            dlogSFR_amp += dlogSFR_int
+
+            #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+            SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
+            
+            #for i_col in range(n_col): 
+            #    plt.scatter(_dMhalos[range(10000), i_col], 0.3 * np.random.randn(10000), c='k')
+            #    plt.scatter(_dMhalos[range(10000), i_col], dlogSFR_amp[range(10000), i_col], lw=0, c='r')
+            #    plt.show()
+
+            F_sfr = _logSFR_dSFR_tsteps
+            
+            sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
+                    #, 'dlogSFR_corr': dlogSFR_corr} #'dMhalos': _dMhalos, 
+        
+        elif theta_sfh['name'] == 'random_step_abias2': 
+            # random steps with assembly bias with control over timescale of halo formation 
+            if 'dt_min' not in theta_sfh: 
+                raise ValueError
+            if 'dt_max' not in theta_sfh: 
+                raise ValueError
+                    
+            # Random step function duty cycle 
+            del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
+            
+            # the range of the steps 
+            tshift_min = theta_sfh['dt_min'] 
+            tshift_max = theta_sfh['dt_max'] 
+
+            # get the times when the amplitude changes 
+            n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
+            n_gal = len(indices)
+
+            tshift = np.zeros((n_gal, n_col))
+            tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+            tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+            del tshift
+            
+            assert tsteps[range(n_gal), n_col-1].min() > UT.t_nsnap(1)
+            
+            # calculate d(logSFR) amplitude
+            dlogSFR_amp = np.zeros((n_gal, n_col))
+
+            if theta_sfh['sigma_corr'] > 0.: # if there's correlation between dlogMhalo and dlogSFR
+                # calculate dlogSFR with assembly bias 
+                # dlogSFR = 
+                #           nsnap0-1, nsnap0-2, ..., 2, 1
+                #   gal 1 [                      
+                #   gal 2 [                      
+                #   ...
+                #gal ngal [                      
+                
+                t_snaps = UT.t_nsnap(range(1, nsnap0+1)[::-1])
+
+                t_abias = theta_sfh['t_abias'] # assembly bias timescale 
+                n_abias = np.int(np.ceil((UT.t_nsnap(1) - UT.t_nsnap(nsnap0))/t_abias))
+                t_step_abias = np.array([UT.t_nsnap(1) - (n_abias - i_abias) * t_abias 
+                    for i_abias in range(n_abias+1)])
+                assert t_step_abias[0] < UT.t_nsnap(nsnap0)
+                t_step_abias[0] = UT.t_nsnap(nsnap0)
+
+                # M_halo of the galaxies in the snapshots 
+                Mh_snaps = np.zeros((n_gal, nsnap0)) 
+                for ii, isnap in enumerate(range(2, nsnap0+1)[::-1]): 
+                    Mh_snaps[:,ii] = SHsnaps['halo.m.snap'+str(isnap)][indices]
+                Mh_snaps[:,-1] = SHsnaps['halo.m'][indices]
+
+                Mh_abias = np.zeros((n_gal, len(t_step_abias)))
+                for igal in range(n_gal): 
+                    Mh_snaps_i = 10**Mh_snaps[igal, range(nsnap0)]
+                    Mh_abias[igal, 0] = Mh_snaps_i[0]
+                    Mh_abias[igal, -1] = Mh_snaps_i[-1]
+                    Mh_abias[igal, 1:-1] = np.interp(t_step_abias[1:-1], t_snaps, Mh_snaps_i)
+                Mh_abias = np.log10(Mh_abias)
+
+                dlogSFR = np.zeros((Mh_abias.shape[0], Mh_abias.shape[1]-1))
+                #dlogSFR = np.zeros((n_gal, SHsnaps['nsnap0']-1)) # n_gal x (nsnap0 - 1) matrix
+                for ii in range(dlogSFR.shape[1]): 
+                    # log M_h(t_i) - log M_h(t_i+1) = log(M_h(t_i) / M_h(t_i+1))
+                    # (M_h(t_i+1)-M_h(t_i))/M_h(t_i+1) = 1. - M_h(t_i)/M_h(t_i+1)
+                    mhalo_later = Mh_abias[:, ii+1]
+                    mhalo_early = Mh_abias[:, ii]
+                    
+                    f_dMh = 1. - 10**(mhalo_early - mhalo_later)
+
+                    mh_bins = np.arange(mhalo_later.min(), mhalo_later.max()+0.2, 0.2)
+
+                    #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
+                    for i_m in range(len(mh_bins)-1): 
+                        inbin = np.where((mhalo_later >= mh_bins[i_m]) & 
+                                (mhalo_later < mh_bins[i_m+1]))
+                        n_bin = len(inbin[0])
+                         
+                        isort = np.argsort(-1. * f_dMh[inbin])
+
+                        irank = np.zeros(n_bin)
+                        irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
+                        
+                        # i_rank = 1/2 (1 - erf(x/sqrt(2)))
+                        # x = (SFR - avg_SFR)/sigma_SFR
+                        # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
+                        dlogSFR[inbin, ii] = \
+                                theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank)
+                        
+                        # test assembly bias 
+                        #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
+                        #sub.scatter(f_dMh[inbin], 0.3 * np.random.randn(n_bin), c='k')
+                        #sub.scatter(f_dMh[inbin], dlogSFR[inbin, ii] + \
+                        #                np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
+                        #sub.set_xlim([-1., 1.])
+                        #sub.set_ylim([-1., 1.])
+                    # test assembly bias  implementation 
+                    #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+2)
+                    #sub.scatter(f_dMh, 0.3 * np.random.randn(len(f_dMh)), c='k')
+                    #sub.scatter(f_dMh, dlogSFR[:, ii] + \
+                    #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * \
+                    #        np.random.randn(len(f_dMh)), c='r', lw=0)
+                    #sub.set_xlim([-1., 1.])
+                    #sub.set_ylim([-1., 1.])
+                    ##print np.std(dlogSFR[inbin, SHsnaps['nsnap0'] - nsnap - 1])
+                    #fig.text(0.5, 0.04, '$\Delta M_h / M_h$', ha='center')
+                    #fig.text(0.04, 0.5, '$\Delta$ log SFR', va='center', rotation='vertical')
+                    #fig.savefig('abias_testing.png', bbox_inches='tight')
+                    #raise ValueError
+                
+                for igal in range(n_gal): 
+                    # each galaxy's timesteps 
+                    #i_tbins = np.digitize(tsteps[igal, range(n_col)], t_snaps) 
+                    #i_tbins = i_tbins.clip(0, len(t_snaps)-1) # clip out of range indices
+                    igal_tsteps = tsteps[igal, range(n_col)]
+                    i_tbins = np.digitize(igal_tsteps, t_step_abias) 
+                
+                    inrange = np.where((i_tbins < len(t_step_abias)) & (i_tbins > 0)) 
+                    dlogSFR_amp_i = np.zeros(n_col)
+                    dlogSFR_amp_i[inrange] = dlogSFR[igal, i_tbins[inrange]-1]
+
+                    dlogSFR_amp[igal, range(n_col)] = dlogSFR_amp_i 
+
+            # add in intrinsic scatter
+            #dlogSFR_corr = dlogSFR_amp
+            dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
+            dlogSFR_amp += dlogSFR_int
+
+            #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+            SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
+            
+            #for i_col in range(n_col): 
+            #    plt.scatter(_dMhalos[range(10000), i_col], 0.3 * np.random.randn(10000), c='k')
+            #    plt.scatter(_dMhalos[range(10000), i_col], dlogSFR_amp[range(10000), i_col], lw=0, c='r')
+            #    plt.show()
+
+            F_sfr = _logSFR_dSFR_tsteps
+            
+            sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
+                    #, 'dlogSFR_corr': dlogSFR_corr} #'dMhalos': _dMhalos, 
+        
+        elif theta_sfh['name'] == 'random_step_abias_delay_dz': 
+            # random steps with assembly bias where SFH is correlated with 
+            # halo mass growth over dz_dMh, dt_delay earlier 
+            if 'dt_min' not in theta_sfh: 
+                raise ValueError
+            if 'dt_max' not in theta_sfh: 
+                raise ValueError
+            if 'sigma_corr' not in theta_sfh:  
+                raise ValueError
+            else: 
+                if theta_sfh['sigma_corr'] <= 0.: 
+                    raise ValueError("no assembly bias; dont use this SFH")
+
+            if UT.z_nsnap(nsnap0) + theta_sfh['dz_dMh'] > UT.z_nsnap(nsnap0 + 10):
+                print UT.z_nsnap(nsnap0) + theta_sfh['dz_dMh'], UT.z_nsnap(nsnap0 + 10)
+                raise ValueError
+
+            # first calculate the time at which the SFH changes (random step function duty cycle)
+            del_t_max = UT.t_nsnap(1) - UT.t_nsnap(nsnap0)#SHsnaps['nsnap_start'][indices].max()) 
+            
+            tshift_min = theta_sfh['dt_min'] # the range of the steps 
+            tshift_max = theta_sfh['dt_max'] 
+
+            # get the times when the amplitude changes 
+            n_col = int(np.ceil(del_t_max/tshift_min))+1  # number of columns 
+            n_gal = len(indices)
+
+            tshift = np.zeros((n_gal, n_col), dtype=np.float32)
+            if tshift_min == tshift_max: 
+                tshift[:,1:] = np.repeat(tshift_min, n_gal * (n_col-1)).reshape((n_gal, n_col-1))
+            else: 
+                tshift[:,1:] = np.random.uniform(tshift_min, tshift_max, size=(n_gal, n_col-1))
+            tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+            #tsteps = np.clip(tsteps.astype(np.float32), 0., UT.t_nsnap(1))
+            del tshift
+
+            # M_h of the galaxies throughout the snapshots 
+            # Mh_snaps = ngal x nsnap0+3 matrix 
+            Mh_snaps = np.zeros((n_gal, nsnap0+9))#, dtype=np.float32)
+            Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
+            for isnap in range(2, nsnap0+10): 
+                Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
+            
+            z_snaps = UT.z_nsnap(range(1, nsnap0+10))
+            t_snaps = UT.t_nsnap(range(1, nsnap0+10))
+
+            # f_dMh growth rate of halo from t_delay - dt  to t_delay
+            f_dMh = np.zeros(tsteps.shape, dtype=np.float32)
+            Mh_steps = np.zeros(tsteps.shape, dtype=np.float32) 
+            for i_g in range(n_gal): 
+                insim = np.where(Mh_snaps[i_g,:] > 0.)[0] # some halos did not exist far back
+                Mh_snaps_i = 10**(Mh_snaps[i_g,insim] - 10.) # scaled by 10^10 for ease
+                t_snaps_i = t_snaps[insim]
+
+                # SFH is correlated with halo growth dt_delay earlier  
+                tstep_i = tsteps[i_g,:]
+                tdelay_i = tstep_i - theta_sfh['dt_delay']
+                
+                # note that x has to be monotonically for np.interp 
+                Mh_steps[i_g,:] = np.interp(tstep_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
+                Mh_delay  = np.interp(tdelay_i, t_snaps_i[::-1], Mh_snaps_i[::-1])
+                Mh_delay_dz = np.interp(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'], z_snaps[insim], Mh_snaps_i)
+
+                f_dMh[i_g,:] = 1. - Mh_delay_dz / Mh_delay 
+                #plt.plot(t_snaps_i[::-1], Mh_snaps_i[::-1], c='k', lw=2, ls='--')
+                #plt.scatter(tdelay_i, Mh_delay, c='b', lw=0, s=40)
+                #print 'tdelay = ', tdelay_i, UT.z_of_t(tdelay_i)
+                #print 'zdelay+dz = ', UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh']
+                #print 't(zdelay+dz) = ', UT.t_of_z(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh'])
+
+                #plt.scatter(UT.t_of_z(UT.z_of_t(tdelay_i) + theta_sfh['dz_dMh']), Mh_delay_dz, c='r', lw=0, s=40) 
+                #plt.show()
+                #if i_g > 10:
+                #    raise ValueError
+
+
+            # calculate the d(log SFR) amplitude at t_steps 
+            dlogSFR_amp = np.zeros(f_dMh.shape, dtype=np.float32)
+            for ii in range(f_dMh.shape[1]): 
+                f_dMh_i = f_dMh[:,ii]
+                Mh_step = np.log10(Mh_steps[:,ii]) + 10.
+                mh_bins = np.arange(Mh_step.min(), Mh_step.max()+0.2, 0.2)
+                
+                #fig = plt.figure(1, figsize=(8*np.int(np.ceil(np.float(len(mh_bins))/3.)+1.), 15))
+                for i_m in range(len(mh_bins)-1): 
+                    inbin = np.where((Mh_step >= mh_bins[i_m]) & 
+                            (Mh_step < mh_bins[i_m+1]))
+                    n_bin = len(inbin[0])
+                     
+                    isort = np.argsort(-1. * f_dMh_i[inbin])
+
+                    irank = np.zeros(n_bin)
+                    irank[isort] = (np.arange(n_bin) + 0.5)/np.float(n_bin)
+                    
+                    # i_rank = 1/2 (1 - erf(x/sqrt(2)))
+                    # x = (SFR - avg_SFR)/sigma_SFR
+                    # dSFR = sigma_SFR * sqrt(2) * erfinv(1 - 2 i_rank)
+                    dlogSFR_amp[inbin, ii] = \
+                            theta_sfh['sigma_corr'] * 1.41421356 * erfinv(1. - 2. * irank) 
+
+                    #sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
+                    #sub.scatter(f_dMh_i[inbin], 0.3 * np.random.randn(n_bin), c='k')
+                    #sub.scatter(f_dMh_i[inbin], dlogSFR_amp[inbin, ii] + \
+                    #        np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
+                    #sub.set_xlim([-1., 1.])
+                    #sub.set_ylim([-1., 1.])
+
+                #plt.show()
+                #raise ValueError
+            del f_dMh
+            del Mh_steps
+            
+            # add in intrinsic scatter
+            dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
+            dlogSFR_amp += dlogSFR_int
+
+            #dlogSFR_amp[:,0] = SHsnaps['sfr0'][indices] - mu_sfr0
+            SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0]
+            
+            F_sfr = _logSFR_dSFR_tsteps
+            
+            sfr_kwargs = {'dlogSFR_amp': dlogSFR_amp, 'tsteps': tsteps,'theta_sfms': theta_sfms}
+    '''
     return F_sfr, sfr_kwargs
 
 
