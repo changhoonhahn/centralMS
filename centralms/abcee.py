@@ -9,8 +9,7 @@ import time
 import numpy as np
 import scipy as sp 
 import abcpmc
-from mpi4py import MPI
-#from abcpmc import mpi_util
+from abcpmc import mpi_util
 # -- local -- 
 from . import util as UT
 from . import sfh as SFH
@@ -364,10 +363,7 @@ def Writeout(type, run, pool, **kwargs):
 
     if type == 'init': # initialize
         if not os.path.exists(abc_dir): # make directory if it doesn't exist 
-            try: 
-                os.makedirs(abc_dir)
-            except OSError: 
-                pass 
+            os.makedirs(abc_dir)
         
         # write specific info of the run  
         f = open(abc_dir+'info.md', 'w')
