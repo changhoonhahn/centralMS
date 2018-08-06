@@ -10,6 +10,6 @@ source /home/users/hahn/.bashrc
 #export CENTRALMS_DIR="/mount/sirocco1/hahn/centralms/"
 #export CENTRALMS_CODEDIR="/home/users/hahn/projects/centralMS/"
 
-run="randomSFH0.5gyr.sfsflex"
+run="randomSFH0.5gyr.sfsanchored"
 niter=14
-mpirun -np 24 python /home/users/hahn/projects/centralMS/run/modelabc.py $run $niter > "/home/users/hahn/projects/centralMS/run/"$run"."$niter".modelabc.log"
+mpirun -np $NPROCS python /home/users/hahn/projects/centralMS/run/modelabc.py $run $niter > "/home/users/hahn/projects/centralMS/run/"$run"."$niter".modelabc.log"

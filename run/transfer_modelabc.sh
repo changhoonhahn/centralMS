@@ -17,7 +17,7 @@ for i in $(seq 1 9); do
     cmd=$cmd",model.theta_median"$i".t"$2".p"
 done 
 
-for i in $(seq 0 999); do 
+for i in $(seq 0 99); do 
     cmd=$cmd",model.theta"$i".t"$2".p"
 done 
 cmd=$cmd"}"
