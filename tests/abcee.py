@@ -21,6 +21,11 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
+def testModel(): 
+    shcat = ABC.model('rSFH_abias0.99_5gyr.sfsflex', [0.5, 0.4], nsnap0=15, downsampled='20')
+    return None 
+
+
 def plotABC(run, T, prior='flex'): 
     ''' Corner plots of ABC runs  
     '''
@@ -194,7 +199,8 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
 
 
 if __name__=="__main__": 
-    for tduty in ['0.5', '1', '2', '5', '10']: 
-        plotABC('randomSFH'+tduty+'gyr.sfsflex', 14, prior='flex')
-        qaplotABC('randomSFH'+tduty+'gyr.sfsflex', 14)
-    #qaplotABC('randomSFH5gyr.sfsanchored', 12, theta=[1.25, 0.0], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
+    #testModel()
+    qaplotABC('rSFH_abias0.5_5gyr.sfsflex', 12, theta=[0.5, 0.4], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
+    #for tduty in ['0.5', '1', '2', '5', '10']: 
+    #    plotABC('randomSFH'+tduty+'gyr.sfsflex', 14, prior='flex')
+    #    qaplotABC('randomSFH'+tduty+'gyr.sfsflex', 14)

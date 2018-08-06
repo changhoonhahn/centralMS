@@ -112,8 +112,8 @@ def _model_theta(run, args):
         # random SFH with SFR correlated with halo growth over 2.5 Gyr (tdyn) with r=$CORR and 
         # on $TDUTY Gyr timescales
         theta['sfh'] = {'name': 'random_step_abias_dt'}
-        rcorr = float(run.split('.')[0].split('_')[1].split('bias')[-1])
-        tduty = float(run.split('.')[0].split('_')[2].split('gyr')[0])
+        rcorr = float(run.split('.sfs')[0].split('_')[1].split('bias')[-1])
+        tduty = float(run.split('.sfs')[0].split('_')[2].split('gyr')[0])
         theta['sfh']['tduty'] = tduty
         theta['sfh']['sigma_tot'] = 0.3 
         theta['sfh']['sigma_corr'] = rcorr * 0.3

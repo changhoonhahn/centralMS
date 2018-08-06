@@ -144,13 +144,12 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
     elif theta_sfh['name'] == 'random_step_abias_dt': 
         # SFH where the amplitude w.r.t. the SFS is correlated with halo mass growth over 
         # specifed `dt_dMh`. The amplitude is sampled at every time step specified by `tduty`
-        if UT.t_nsnap(SHsnaps['nsnap0']) + theta_sfh['dt_dMh'] < UT.t_nsnap(SHsnaps['nsnap0'] + 10):
+        if UT.t_nsnap(nsnap0) + theta_sfh['dt_dMh'] < UT.t_nsnap(nsnap0 + 10):
             # make sure we have sufficient snapshot history 
             raise ValueError("dt_dMh is too long; the halo snapshot history is not long enough")  
-
         dt_tot= UT.t_nsnap(1) - UT.t_nsnap(nsnap0) # total cosmic time of evolution 
-
         tduty = theta_sfh['tduty'] # dutycycle time
+        sigma_int = np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) # intrinsic sigma 
 
         # get the times when the amplitude changes 
         n_col = int(np.ceil(dt_tot / tduty))+2  # number of columns 
@@ -158,37 +157,37 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
         tshift = np.tile(tduty, (n_gal, n_col))
         tshift[:,0] = 0.
         tshift[:,1] = np.random.uniform(0., tduty, n_gal) 
-        tsteps = np.cumsum(tshift , axis=1) + np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
+        tsteps = np.cumsum(tshift , axis=1) + \
+                np.tile(UT.t_nsnap(SHsnaps['nsnap_start'][indices]), (n_col, 1)).T
         del tshift
 
         # M_h of the galaxies throughout the snapshots 
-        Mh_snaps = np.zeros((n_gal, SHsnaps['nsnap0']+9))#, dtype=np.float32)
-        Mh_snaps[:,0] =  SHsnaps['halo.m'][indices]
-        for isnap in range(2, SHsnaps['nsnap0']+10): 
+        Mh_snaps = np.zeros((n_gal, nsnap0+9), dtype=np.float32)
+        Mh_snaps[:,0] = SHsnaps['halo.m'][indices]
+        for isnap in range(2, nsnap0+10): 
             Mh_snaps[:,isnap-1] = SHsnaps['halo.m.snap'+str(isnap)][indices]
         
-        z_snaps = UT.z_nsnap(range(1, SHsnaps['nsnap0']+10))
-        t_snaps = UT.t_nsnap(range(1, SHsnaps['nsnap0']+10))
+        #z_snaps = UT.z_nsnap(range(1, nsnap0+10))
+        t_snaps = UT.t_nsnap(range(1, nsnap0+10))
 
         # now we need to use these M_h to calculate the halo growth rates
         # at every time step t_i over the range t_i - dt_dMh to t_i. This means
         # we need to get M_h at both t_i and t_i-dt_dMh...
-
         f_dMh = np.zeros(tsteps.shape, dtype=np.float32) # growth rate of halos over t_i and t_i - dt_Mh
         Mh_ts = np.zeros(tsteps.shape, dtype=np.float32)
         for i_g in range(n_gal): 
             in_sim = Mh_snaps[i_g,:] > 0.
             t_snaps_i = t_snaps[in_sim]
-            Mh_snaps_i = np.power(Mh_snaps[i_g, in_sim]) 
+            Mh_snaps_i = np.power(10., Mh_snaps[i_g, in_sim]) 
             
             t_i = tsteps[i_g,:] # t_i
-            t_imdt = tstep[i_g,:] - theta_sfh['dt_dMh'] # t_i - dt_dMh
+            t_imdt = tsteps[i_g,:] - theta_sfh['dt_dMh'] # t_i - dt_dMh
 
             Mh_ti = np.interp(t_i, t_snaps_i[::-1], Mh_snaps_i[::-1]) 
             Mh_timdt = np.interp(t_imdt, t_snaps_i[::-1], Mh_snaps_i[::-1]) 
             
             f_dMh[i_g,:] = 1. - Mh_timdt / Mh_ti 
-            Mh_ts[i_g,:] = Mh_ti
+            Mh_ts[i_g,:] = np.log10(Mh_ti)
 
         # calculate the d(log SFR) amplitude at t_steps 
         # at each t_step, for a given halo mass bin of 0.2 dex, 
@@ -196,12 +195,11 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
         dlogSFR_amp = np.zeros(f_dMh.shape, dtype=np.float32)
         for ii in range(f_dMh.shape[1]): 
             f_dMh_i = f_dMh[:,ii]
-            Mh_ti = Mh_ti
-
-            mh_bins = np.arange(Mh_ti.min(), Mh_step.max(), 0.2)
+            Mh_ti = Mh_ts[:,ii] 
+            mh_bins = np.arange(Mh_ti.min(), Mh_ti.max(), 0.2)
            
             if testing: 
-                fig = plt.figure(1, figsize=(8*np.int(np.ceil(float(len(mh_bins))/3.)+1.), 15))
+                fig = plt.figure(1, figsize=(4*np.int(np.ceil(float(len(mh_bins))/3.)+1.), 8))
             for i_m in range(len(mh_bins)-1): 
                 inbin = ((Mh_ti >= mh_bins[i_m]) & (Mh_ti < mh_bins[i_m]+0.2))
                 n_bin = np.sum(inbin)
@@ -219,18 +217,18 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
                 
                 if testing: 
                     sub = fig.add_subplot(3, np.int(np.ceil(np.float(len(mh_bins))/3.)+1), i_m+1)
-                    sub.scatter(f_dMh_i[inbin], 0.3 * np.random.randn(n_bin), c='k')
-                    sub.scatter(f_dMh_i[inbin], dlogSFR_amp[inbin, ii] + \
-                            np.sqrt(0.3**2 - theta_sfh['sigma_corr']**2) * np.random.randn(n_bin), c='r', lw=0)
-                    sub.set_xlim([-1., 1.])
+                    sub.scatter(f_dMh_i[inbin], 0.3 * np.random.randn(n_bin), c='k', s=2)
+                    sub.scatter(f_dMh_i[inbin], dlogSFR_amp[inbin, ii] + sigma_int * np.random.randn(n_bin), c='r', s=2, lw=0)
+                    sub.set_xlim([-0.5, 1.])
                     sub.set_ylim([-1., 1.])
             if testing: 
-                plt.savefig(''.join([UT.fig_dir(), 'random_step_abias_dt_test.png']), bbox_inches='tight')
+                plt.savefig(''.join([UT.fig_dir(), 'random_step_abias_dt_test', str(ii), '.png']), bbox_inches='tight')
+                plt.close()
         del f_dMh
-        del Mh_steps
+        del Mh_ts
         
         # add in intrinsic scatter
-        dlogSFR_int = np.random.randn(n_gal, n_col) * np.sqrt(theta_sfh['sigma_tot']**2 - theta_sfh['sigma_corr']**2) 
+        dlogSFR_int = np.random.randn(n_gal, n_col) * sigma_int 
         dlogSFR_amp += dlogSFR_int
         SHsnaps['sfr0'][indices] = mu_sfr0 + dlogSFR_amp[:,0] # change SFR_0 so that it's assembly biased as well
         
