@@ -32,11 +32,11 @@ def fig_dir():
 
 
 def doc_dir(): 
-    return ''.join([code_dir(), 'tex/']) 
+    return ''.join([code_dir(), 'doc/']) 
 
 
 def tex_dir(): 
-    return ''.join([code_dir(), 'tex/']) 
+    return ''.join([code_dir(), 'doc/']) 
 
 
 def bar_plot(bin_edges, values): 

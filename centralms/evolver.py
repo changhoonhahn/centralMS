@@ -7,7 +7,7 @@ from . import util as UT
 from . import sfh as SFH
 
 
-def Evolve(shcat, theta): 
+def Evolve(shcat, theta, testing=False): 
     '''
     '''
     # meta data 
@@ -55,10 +55,10 @@ def Evolve(shcat, theta):
     # not star-forming nsnap_f M* is just their SHAM M* 
     shcat['m.star'][shcat['galtype'] != 'sf'] = shcat['m.sham'][shcat['galtype'] != 'sf']
     
-    #if forTests: 
-    #    self.dlogSFR_amp = sfr_kwargs['dlogSFR_amp']
-    #    self.tsteps = sfr_kwargs['tsteps']
-    return shcat 
+    if not testing: 
+        return shcat 
+    else: 
+        return shcat, sfr_kwargs['tsteps'], sfr_kwargs['dlogSFR_amp']
 
 
 def initSF(shcat, theta): 

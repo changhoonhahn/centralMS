@@ -82,8 +82,11 @@ def model(run, args, **kwargs):
     else: 
         censub = Cat.CentralSubhalos(nsnap0=kwargs['nsnap0'])
     shcat = censub.Read(downsampled=kwargs['downsampled']) 
-    shcat = Evol.Evolve(shcat, theta) 
-    return shcat 
+    if 'testing' not in kwargs.keys(): 
+        shcat = Evol.Evolve(shcat, theta) 
+        return shcat 
+    else: 
+        return Evol.Evolve(shcat, theta, testing=True)
 
 
 def _model_theta(run, args): 

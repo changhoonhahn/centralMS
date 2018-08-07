@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: main.aux
+The style file: yahapj.bst
+Database file #1: centralMS.bib
+Warning--I didn't find a database entry for "hahn2017a"
+Warning--I didn't find a database entry for "elbaz2007"
+Warning--I didn't find a database entry for "cameron2012"
+Warning--I didn't find a database entry for "weyant2013"
+Warning--I didn't find a database entry for "ishida2015"
+Warning--I didn't find a database entry for "hahn2016"
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+You've used 46 entries,
+            3215 wiz_defined-function locations,
+            962 strings with 23350 characters,
+and the built_in function-call counts, 29826 in all, are:
+= -- 2056
+> -- 2776
+< -- 7
++ -- 1052
+- -- 987
+* -- 2990
+:= -- 5511
+add.period$ -- 46
+call.type$ -- 46
+change.case$ -- 305
+chr.to.int$ -- 45
+cite$ -- 46
+duplicate$ -- 1285
+empty$ -- 1619
+format.name$ -- 1036
+if$ -- 5786
+int.to.chr$ -- 2
+int.to.str$ -- 0
+missing$ -- 46
+newline$ -- 143
+num.names$ -- 184
+pop$ -- 466
+preamble$ -- 1
+purify$ -- 305
+quote$ -- 0
+skip$ -- 762
+stack$ -- 0
+substring$ -- 1194
+swap$ -- 45
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 414
+warning$ -- 0
+while$ -- 207
+width$ -- 0
+write$ -- 464
+(There were 6 warnings)

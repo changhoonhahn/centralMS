@@ -173,108 +173,107 @@ def fQ_fSFMS(logMfid=10.5):
     return None
 
 
-def SFHmodel(nsnap0=15):
+def SFHmodel(nsnap0=15, downsampled='20'):
     ''' Figure that illustrates the SFH of galaxies. 
     Two panel plot. Panel a) SFH of a galaxy plotted alongside SFMS 
     '''
-    pretty_colors = prettycolors()  
-    fig = plt.figure(figsize=(10,5))
+    fig = plt.figure(figsize=(10,4.5))
     # log SFR - log M* galaxy evolution 
     sub1 = fig.add_subplot(122)
     # Delta log SFR(t) evolution 
     sub2 = fig.add_subplot(121)
     sub2.fill_between([5., 14.], [0.3, 0.3], [-0.3, -0.3], color='k', alpha=0.15, linewidth=0)
-    #sub2.fill_between([5., 14.], [0.6, 0.6], [-0.6, -0.6], color='k', alpha=0.05, linewidth=0)
     
-    for i_m, method in enumerate(['randomSFH_1gyr', 'randomSFH_5gyr']): 
-        #if method == 'randomSFH_1gyr': 
-        #    theta = [1.21, -0.06]
-        #elif method == 'randomSFH_5gyr': 
-        #    theta = [0.91, -0.24]
-        theta = [1., -0.15]
-        subcat, eev = ABC.model(method, np.array(theta), nsnap0=nsnap0, 
-                downsampled='14', sigma_smhm=0.2, forTests=True)
+    for i_m, method in enumerate(['randomSFH1gyr.sfsflex', 'randomSFH5gyr.sfsflex']): 
+        # median theta 
+        if i_m == 0: 
+            abcout = ABC.readABC(method, 14)
+            theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+        tt = ABC._model_theta(method, theta_med)
+
+        subcat, tsteps, dlogSFR_amp = ABC.model(method, theta_med, nsnap0=nsnap0, downsampled=downsampled, testing=True) 
 
         # randomly pick a galaxy that match the below criteria
-        isSF = np.where(subcat['gclass'] == 'sf') 
-        eligible = np.where((subcat['nsnap_start'][isSF] == nsnap0) & 
+        isSF = np.where(subcat['galtype'] == 'sf')[0]
+        elig = ((subcat['nsnap_start'][isSF] == nsnap0) & 
                 (subcat['weights'][isSF] > 0.) & 
-                (subcat['m.star0'][isSF] > 10.15+0.3*float(i_m)) & 
-                (subcat['m.star0'][isSF] < 10.25+0.3*float(i_m)))
-        i_random = np.random.choice(eligible[0], size=1)
-        i_gal = isSF[0][i_random]
+                (np.amax(np.abs(dlogSFR_amp), axis=1) < 0.3) & 
+                (subcat['m.star'][isSF] > 10.5+0.2*float(i_m)) & 
+                (subcat['m.star'][isSF] < 10.6+0.2*float(i_m)))
+        ielig = np.random.choice(np.arange(len(isSF))[elig], size=1)[0]
+        i_gal = isSF[ielig]
+        
+        # plot dlogSFR_MS
+        if i_m == 0: 
+            sub2.plot([UT.t_nsnap(nsnap0), UT.t_nsnap(1)], [0.,0.], ls='--', c='k')
+        if '1gyr' in method:
+            lbl = '$t_\mathrm{duty} = 1\,\mathrm{Gyr}$'
+        elif '5gyr' in method: 
+            lbl = '$t_\mathrm{duty} = 5\,\mathrm{Gyr}$'
+        xx, yy = [], []
+        for i in range(dlogSFR_amp.shape[1]-1):
+            xx.append(tsteps[ielig,i]) 
+            yy.append(dlogSFR_amp[ielig,i])
+            xx.append(tsteps[ielig,i+1]) 
+            yy.append(dlogSFR_amp[ielig,i])
+        sub2.plot(xx, yy, c='C'+str(i_m), label=lbl)
 
         # track back it's M* and SFR
-        mstar_hist, sfr_hist = [subcat['m.star0'][i_gal][0]], [subcat['sfr0'][i_gal][0]] 
-        
+        mstar_hist, sfr_hist = [subcat['m.star0'][i_gal]], [subcat['sfr0'][i_gal]] 
         for isnap in range(2,nsnap0)[::-1]: 
-            mstar_hist.append(subcat['m.star.snap'+str(isnap)][i_gal][0])
-            sfr_hist.append(subcat['sfr.snap'+str(isnap)][i_gal][0])
-        mstar_hist.append(subcat['m.star'][i_gal][0]) 
-        sfr_hist.append(subcat['sfr'][i_gal][0]) 
+            mstar_hist.append(subcat['m.star.snap'+str(isnap)][i_gal])
+            sfr_hist.append(subcat['sfr.snap'+str(isnap)][i_gal])
+        mstar_hist.append(subcat['m.star'][i_gal]) 
+        sfr_hist.append(subcat['sfr'][i_gal]) 
         sfr_hist = np.array(sfr_hist)
         
         # SFMS 
-        sfr_sfms = [SFH.SFR_sfms(mstar_hist[0], UT.z_nsnap(nsnap0), subcat['theta_sfms'])]
+        sfr_sfms = [SFH.SFR_sfms(mstar_hist[0], UT.z_nsnap(nsnap0), tt['sfms'])]
         for ii, isnap in enumerate(range(2,nsnap0)[::-1]): 
-            sfr_sfms.append(SFH.SFR_sfms(mstar_hist[ii+1], UT.z_nsnap(isnap), 
-                subcat['theta_sfms']))
-        sfr_sfms.append(SFH.SFR_sfms(mstar_hist[-1], UT.z_nsnap(1), subcat['theta_sfms']))
+            sfr_sfms.append(SFH.SFR_sfms(mstar_hist[ii+1], UT.z_nsnap(isnap), tt['sfms']))
+        sfr_sfms.append(SFH.SFR_sfms(mstar_hist[-1], UT.z_nsnap(1), tt['sfms']))
         sfr_sfms = np.array(sfr_sfms)
         f_sfms = interp1d(mstar_hist, sfr_sfms, kind='slinear') #smooth
         t_mstar = interp1d(mstar_hist, UT.t_nsnap(range(1,nsnap0+1)[::-1]))
 
         marr = np.linspace(mstar_hist[0], mstar_hist[-1], 200)
-        sub1.plot(marr, f_sfms(marr), c='k', lw=1)
-        #sub1.plot(mstar_hist, sfr_hist, c=pretty_colors[2])
-
-        def dlogSFR_t(tt):
-            tsteps = eev.tsteps[i_random][0]
-            dlogSFR_amp = eev.dlogSFR_amp[i_random][0]
-            ishift = np.abs(tsteps - tt).argmin()
-            closest = tsteps[ishift]
-            if closest > tt: 
+        sub1.plot(10**marr, f_sfms(marr), c='k', lw=1, ls='--', label='$\log\,\overline{\mathrm{SFR}}_\mathrm{SFS}$')
+        if i_m == 0: 
+            sub1.legend(loc='lower right', handletextpad=0.1, fontsize=15)
+        def dlogSFR_t(ttt):
+            t_steps = tsteps[ielig,:]
+            dlogSFRamp = dlogSFR_amp[ielig,:]
+            ishift = np.abs(t_steps - ttt).argmin()
+            closest = t_steps[ishift]
+            if closest > ttt: 
                 ishift -= 1 
-            dlogsfr = dlogSFR_amp[ishift]
-            return dlogsfr
+            return dlogSFRamp[ishift]
 
-        sub1.plot(marr, f_sfms(marr)+np.array([dlogSFR_t(tt) for tt in t_mstar(marr)]), 
-                c=pretty_colors[2*i_m+1])
+        sub1.plot(10**marr, f_sfms(marr)+np.array([dlogSFR_t(ttt) for ttt in t_mstar(marr)]), c='C'+str(i_m))
         # plot SFMS(M*, z)
         m_arr = np.linspace(9., 12., 100)
         zs = np.arange(0., 1.2, 0.25)
         zs[0] = 0.05
         if i_m == 0: 
             for z in zs: 
-                mslope = SFH.SFR_sfms(11., z, subcat['theta_sfms']) - \
-                        SFH.SFR_sfms(10., z, subcat['theta_sfms'])
-                sub1.plot(m_arr, SFH.SFR_sfms(m_arr, z, subcat['theta_sfms']),
+                mslope = SFH.SFR_sfms(11., z, tt['sfms']) - SFH.SFR_sfms(10., z, tt['sfms'])
+                sub1.plot(10**m_arr, SFH.SFR_sfms(m_arr, z, tt['sfms']),
                         c='k', ls=':', lw=0.75)
-                sub1.text(10.05, SFH.SFR_sfms(10.05, z, subcat['theta_sfms']), 
-                        '$z = '+str(z)+'$', 
-                        rotation=0.5*np.arctan(mslope)*180./np.pi, 
-                        fontsize=12, va='bottom')
-        
-        xx, yy = [], []
-        for i in range(len(eev.dlogSFR_amp[i_random][0])-1):
-            xx.append(eev.tsteps[i_random][0][i]) 
-            yy.append(eev.dlogSFR_amp[i_random][0][i])
-            xx.append(eev.tsteps[i_random][0][i+1]) 
-            yy.append(eev.dlogSFR_amp[i_random][0][i])
-        if i_m == 0: 
-            sub2.plot([UT.t_nsnap(nsnap0), UT.t_nsnap(1)], [0.,0.], ls='--', c='k')
-        if method == 'randomSFH_1gyr': 
-            lbl = '$t_\mathrm{duty} = 0.5\,\mathrm{Gyr}$'
-        elif method == 'randomSFH_5gyr':
-            lbl = '$t_\mathrm{duty} = 5\,\mathrm{Gyr}$'
-            
-        sub2.plot(xx, yy, c=pretty_colors[2*i_m+1], label=lbl)
+                sub1.text(10**10.05, SFH.SFR_sfms(10.05, z, tt['sfms']), '$z = '+str(z)+'$', 
+                        rotation=0.5*np.arctan(mslope)*180./np.pi, fontsize=12, va='bottom')
 
-    sub1.set_xlim([10., 11.])
-    sub1.set_xticks([10., 10.5, 11.])
-    sub1.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
-    sub1.set_ylim([-1., 1.5])
+    sub1.set_xlabel('$\; M_*\; [M_\odot]$', fontsize=25)
+    sub1.set_xscale('log') 
+    sub1.set_xlim([10**10, 10**11])
+    sub1.set_xticks([10**10, 10**11])
+    sub1.get_xaxis().set_minor_formatter(mpl.ticker.NullFormatter())
+    sub1.get_xaxis().get_major_formatter().labelOnlyBase = False
+    #sub1.get_xaxis().set_major_formatter(mpl.ticker.ScalarFormatter())
+    sub1.set_ylim([-0.4, 1.6])
+    sub1.set_yticks([-0.4, 0., 0.4, 0.8, 1.2, 1.6]) 
     sub1.set_ylabel('log $(\; \mathrm{SFR}\; [M_\odot/\mathrm{yr}]\;)$', fontsize=25)
+    sub1.yaxis.tick_right()
+    sub1.yaxis.set_label_position("right")
 
     sub2.set_xlim([UT.t_nsnap(nsnap0), UT.t_nsnap(1)]) 
     sub2.set_xlabel('$t_\mathrm{cosmic}\;[\mathrm{Gyr}]$', fontsize=25)
@@ -282,9 +281,7 @@ def SFHmodel(nsnap0=15):
     sub2.set_yticks([-1., -0.5, 0., 0.5, 1.])
     sub2.set_ylabel('$\Delta$ log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}]\;)$', fontsize=25)
     sub2.legend(loc='lower right', prop={'size':15})
-    #sub2.yaxis.tick_right()
-    #sub2.yaxis.set_label_position("right")
-    fig.subplots_adjust(wspace=0.4)
+    fig.subplots_adjust(wspace=0.1)
     fig.savefig(''.join([UT.tex_dir(), 'figs/sfh_pedagogical.pdf']), bbox_inches='tight', dpi=150) 
     return None 
 
@@ -1077,7 +1074,7 @@ if __name__=="__main__":
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #qaplotABC(runs=['test0', 'randomSFH_1gyr'], Ts=[14, 14])
     #fQ_fSFMS()
-    #SFHmodel(nsnap0=15)
+    SFHmodel()
     #Illustris_SFH()
-    _SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
+    #_SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
 
