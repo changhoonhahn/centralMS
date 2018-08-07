@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  14 FEB 2018 16:13
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  6 AUG 2018 17:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -246,20 +246,20 @@ LaTeX Warning: Label `fig:abc_demo' multiply defined.
 )
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 38.
-LaTeX Font Info:    ... okay on input line 38.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 39.
+LaTeX Font Info:    ... okay on input line 39.
  (/usr/local/texlive/2015/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count107
@@ -290,7 +290,7 @@ e
 ))
 AAS preprint substyle, v5.2 <12 Dec 2003>.
 \AtBeginShipoutBox=\box33
-Package hyperref Info: Link coloring ON on input line 38.
+Package hyperref Info: Link coloring ON on input line 39.
 (/usr/local/texlive/2015/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
 
@@ -299,43 +299,43 @@ Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
 \c@section@level=\count113
 )
-LaTeX Info: Redefining \ref on input line 38.
-LaTeX Info: Redefining \pageref on input line 38.
-LaTeX Info: Redefining \nameref on input line 38.
+LaTeX Info: Redefining \ref on input line 39.
+LaTeX Info: Redefining \pageref on input line 39.
+LaTeX Info: Redefining \nameref on input line 39.
 
 (./main.out) (./main.out)
 \@outlinefile=\write3
 \openout3 = `main.out'.
 
-LaTeX Font Info:    Try loading font information for U+lasy on input line 55.
+LaTeX Font Info:    Try loading font information for U+lasy on input line 56.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-LaTeX Font Info:    Try loading font information for U+msa on input line 55.
+LaTeX Font Info:    Try loading font information for U+msa on input line 56.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 55.
+LaTeX Font Info:    Try loading font information for U+msb on input line 56.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Try loading font information for OMS+cmr on input line 78.
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 79.
 
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/omscmr.fd
 File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 78.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 79.
  [1
 
 {/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 <figs/groupcat.pdf, id=68, 630.36205pt x 344.32237pt>
 File: figs/groupcat.pdf Graphic file (type pdf)
  <use figs/groupcat.pdf>
-Package pdftex.def Info: figs/groupcat.pdf used on input line 93.
+Package pdftex.def Info: figs/groupcat.pdf used on input line 94.
 (pdftex.def)             Requested size: 422.77661pt x 230.93646pt.
 Missing character: There is no â in font cmr12!
 Missing character: There is no ˆ in font cmr12!
@@ -361,21 +361,21 @@ Package natbib Warning: Citation `daddi2007' on page 7 undefined on input line
 Package natbib Warning: Citation `whitaker2012' on page 7 undefined on input li
 ne 316.
 
-<figs/illustris_sfh.pdf, id=282, 444.69528pt x 336.88611pt>
+<figs/illustris_sfh.pdf, id=281, 444.69528pt x 336.88611pt>
 File: figs/illustris_sfh.pdf Graphic file (type pdf)
 
 <use figs/illustris_sfh.pdf>
 Package pdftex.def Info: figs/illustris_sfh.pdf used on input line 327.
 (pdftex.def)             Requested size: 281.85585pt x 213.52448pt.
 
-<figs/sfh_pedagogical.pdf, id=285, 653.84302pt x 348.01567pt>
+<figs/sfh_pedagogical.pdf, id=284, 653.84302pt x 348.01567pt>
 File: figs/sfh_pedagogical.pdf Graphic file (type pdf)
 
 <use figs/sfh_pedagogical.pdf>
 Package pdftex.def Info: figs/sfh_pedagogical.pdf used on input line 346.
 (pdftex.def)             Requested size: 422.77661pt x 225.03392pt.
 
-<figs/qaplot_abc.pdf, id=288, 983.18018pt x 348.01567pt>
+<figs/qaplot_abc.pdf, id=287, 983.18018pt x 348.01567pt>
 File: figs/qaplot_abc.pdf Graphic file (type pdf)
 
 <use figs/qaplot_abc.pdf>
@@ -436,15 +436,17 @@ Package natbib Warning: Citation `hahn2016' on page 10 undefined on input line
 Package natbib Warning: Citation `hahn2017' on page 10 undefined on input line 
 466.
 
-[10] <figs/sigMstar_tduty.pdf, id=410, 351.34497pt x 343.76328pt>
+[10] <figs/SHMRscatter_tduty.pdf, id=409, 635.92236pt x 351.85619pt>
+File: figs/SHMRscatter_tduty.pdf Graphic file (type pdf)
+
+<use figs/SHMRscatter_tduty.pdf>
+Package pdftex.def Info: figs/SHMRscatter_tduty.pdf used on input line 502.
+(pdftex.def)             Requested size: 422.77661pt x 233.92772pt.
+ [11]
+<figs/sigMstar_tduty.pdf, id=423, 351.34497pt x 343.76328pt>
 File: figs/sigMstar_tduty.pdf Graphic file (type pdf)
 
 <use figs/sigMstar_tduty.pdf>
-Package pdftex.def Info: figs/sigMstar_tduty.pdf used on input line 502.
-(pdftex.def)             Requested size: 234.87749pt x 229.80614pt.
- [11]
-File: figs/sigMstar_tduty.pdf Graphic file (type pdf)
- <use figs/sigMstar_tduty.pdf>
 Package pdftex.def Info: figs/sigMstar_tduty.pdf used on input line 541.
 (pdftex.def)             Requested size: 234.87749pt x 229.80614pt.
 
@@ -460,9 +462,12 @@ Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
 (hyperref)                removing `math shift' on input line 568.
 
-[12] [13 <./figs/sigMstar_tduty.pdf>] (./main.bbl [14] [15]pdfTeX warning (ext4
-): destination with the same identifier (name{Hfootnote.1}) has been already us
-ed, duplicate ignored
+[12] [13 <./figs/SHMRscatter_tduty.pdf> <./figs/sigMstar_tduty.pdf
+
+pdfTeX warning: pdflatex (file ./figs/sigMstar_tduty.pdf): PDF inclusion: multi
+ple pdfs with page group included in a single page
+>] (./main.bbl [14] [15]pdfTeX warning (ext4): destination with the same identi
+fier (name{Hfootnote.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
 l.273 \end{thebibliography}
@@ -477,7 +482,7 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 591.
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 591.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 591.
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 97FD8DA32AE534246616D73509CE8D7E;771.
+(rerunfilecheck)             Checksum: 936524E85B1F3D8F359078D092DC8BAF;763.
 
 
 LaTeX Warning: There were multiply-defined labels.
@@ -485,13 +490,13 @@ LaTeX Warning: There were multiply-defined labels.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 591.
  ) 
 Here is how much of TeX's memory you used:
- 6648 strings out of 493089
- 95073 string characters out of 6134842
- 192379 words of memory out of 5000000
- 9971 multiletter control sequences out of 15000+600000
+ 6654 strings out of 493089
+ 95224 string characters out of 6134842
+ 191366 words of memory out of 5000000
+ 9976 multiletter control sequences out of 15000+600000
  13195 words of font info for 57 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 34i,8n,31p,1989b,503s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 34i,8n,31p,1989b,495s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb>
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
@@ -509,10 +514,10 @@ e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss12.pfb></usr/local/texlive
 /texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2015/
 texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2015/t
 exmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb>
-Output written on main.pdf (16 pages, 507912 bytes).
+Output written on main.pdf (16 pages, 514253 bytes).
 PDF statistics:
- 597 PDF objects out of 1000 (max. 8388607)
- 545 compressed objects within 6 object streams
+ 618 PDF objects out of 1000 (max. 8388607)
+ 563 compressed objects within 6 object streams
  85 named destinations out of 1000 (max. 500000)
- 122 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 127 words of extra memory for PDF output out of 10000 (max. 10000000)
 

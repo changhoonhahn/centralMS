@@ -213,39 +213,38 @@ how we select star forming central galaxies in our model and initalize them.
 %\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Selecting Star Forming Central Galaxies}  \label{sec:sfcen}
-In our model, we're interested in tracking the evolution of the
-SFR and stellar mass of SF central galaxies. To construct such a model, 
-we first need to select star-forming galaxies from the central galaxies 
-in our simulation described earlier in this section. Since we later 
-compare our model to observation, our selection is based on 
-$f^\mathrm{cen}_\mathrm{SFMS}(M_*)$, the fraction of central galaxies 
-within the star-forming main sequence, measured from the SDSS DR7 VAGC 
-(Section~\ref{sec:sdss}). Below, we describe how we derive this 
-$f^\mathrm{cen}_\mathrm{SFMS}(M_*)$ and use it to select star-forming 
-central galaxies in our model. Afterwards we describe how we initalize 
-the SFRs and $M_*$ of these galaxies in our model.
+\subsection{Selecting Star Forming Centrals}  \label{sec:sfcen}
+In our model, we're interested in tracking the SFR and stellar mass 
+evolution of SF central galaxies. To construct such a model, we 
+first need to select SF galaxies from the central galaxies in our 
+simulation, described above. Since we want our model to reproduce 
+observations, our selection is based on $f^\mathrm{cen}_\mathrm{SFS}(M_*)$, 
+the fraction of central galaxies within the star forming sequence, 
+measured from the SDSS DR7 VAGC (Section~\ref{sec:sdss}). Below, we 
+describe how we derive this $f^\mathrm{cen}_\mathrm{SFMS}(M_*)$ and use 
+it to select SF central galaxies in our model. Afterwards we describe how 
+we initalize the SFRs and $M_*$ of these galaxies in our model.
 
 Often in the literature, an empirical color-color or SFR-$M_*$ cut 
 that separates the two main modes (red/blue or star-forming/quiescent) 
 in the distribution is chosen to classify 
 galaxies~\citep[\emph{e.g.}][]{baldry2006, blanton2009, drory2009, peng2010, moustakas2013, hahn2015}.
-The red/quiescent or blue/star-forming fractions derived from this sort of 
-classification, by construction, depend on the choice of cut and neglect the 
-transitioning galaxies~\emph{i.e.} the galaxies in the ``green valley''. 
-For our $f^\mathrm{cen}_\mathrm{SFMS}(M_*)$ measurement, we instead use a
-method from Hahn et al.~(in prep) and Tjitske et al.~(in prep), which is 
-based on fitting the SFMS from the SFR-$M_*$ distribution 
+The red/quiescent or blue/star-forming fractions derived from this sort 
+of classification, by construction, depend on the choice of cut and 
+neglect galaxy subpopulations such as transitioning galaxies~\emph{i.e.} 
+galaxies in the ``green valley''. For our $f^\mathrm{cen}_\mathrm{SFMS}(M_*)$, 
+we instead use a method from Hahn et al.~(in prep) and Tjitske et 
+al.~(in prep), which is a data-driven fitting of the SFS from the SFR-$M_*$ 
+distribution using Gaussian Mixture Models (GMMs). 
 
-The SFMS fitting scheme first divides the SDSS DR7 VAGC central 
-galaxy sample (Section~\ref{sec:sdss}) into stellar mass bins of 
-width $\Delta \log M_* = 0.2~\mathrm{dex}$. We then fit the SSFR 
-distribution of each bin using Gaussian mixture models (GMMs) with 
-$1 - 3$ components using the expectation-maximization 
+\todo{shorten: emphasize the advantages}
+Using the Hahn et al.~(in prep) SFS fitting, we fit the SSFR 
+distributions of the SDSS DR7 VAGC centrals in $\log\,M_*$ bins 
+of width $0.2~\mathrm{dex}$ using GMMs with $k = 1 - 3$ components 
+using the expectation-maximization 
 algorithm~\citep[EM;][]{dempster1977, neal1998}. We restrict 
 ourselves to models with a maximum of $3$ components for the three 
-possible galaxy classifications: quiescent, star-forming, and green 
-valley populations. From the three GMMs, we select the model with 
+possible galaxy classifications: quiescent, SF, and transitioning populations. From the three GMMs, we select the model with 
 the lowest Bayesian Information Criteria~\citep[BIC;][]{schwarz1978}. 
 The Gaussian component of this GMM with mean $\log \mathrm{SSFR} > -11$ 
 is identified as the SFMS. In the rare cases when more than one GMM 
@@ -262,8 +261,8 @@ for the SDSS DR7 central galaxies within $10.6 < \log M_* < 10.8$.
 The SFMS constitutes $f^\mathrm{cen}_\mathrm{SFMS} = 0.21$ of the 
 SDSS central galaxies in this stellar mass bin. 
 
-Next, with the $f^\mathrm{cen}_\mathrm{SFMS}$ values spanning 
-the different stellar mass bins, we fit $f^\mathrm{cen}_\mathrm{SFMS}$ as 
+Next, using the $f^\mathrm{cen}_\mathrm{SFMS}$ spanning the different 
+stellar mass bins, we fit $f^\mathrm{cen}_\mathrm{SFMS}$ as 
 a function of $\log\,M_*$. Using a fiducial stellar mass of 
 $\log\,M_\mathrm{fid} = 10.5$, we derive the following best-fit 
 \beq \label{eq:f_cen_sfms}
@@ -500,7 +499,7 @@ the SFHs of star forming galaxies.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{figs/sigMstar_tduty.pdf}
+\includegraphics[width=0.9\textwidth]{figs/SHMRscatter_tduty.pdf}
 \caption{}
 \label{fig:sigMstar_duty}
 \end{center}
