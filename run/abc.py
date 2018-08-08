@@ -57,12 +57,12 @@ if __name__=="__main__":
         npart = int(sys.argv[5]) 
         noAbiasABC(tduty, sfs=sfs, Niter=niter, Npart=npart) # test 
     elif name == 'abias': 
-        rcorr = sys.argv[2]
+        rcorr = float(sys.argv[2])
         tduty = sys.argv[3]
         sfs = sys.argv[4]
         niter = int(sys.argv[5]) 
         npart = int(sys.argv[6]) 
-        AbiasABC(tduty, sfs=sfs, Niter=niter, Npart=npart) # test 
+        AbiasABC(tduty, rcorr=rcorr, sfs=sfs, Niter=niter, Npart=npart) # test 
     elif name == 'modelrun': 
         run = sys.argv[2]
         niter = int(sys.argv[3]) 

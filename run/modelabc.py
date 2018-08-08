@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import os
 import sys 
-#import h5py
 import pickle
 import numpy as np 
 from mpi4py import MPI
@@ -10,7 +9,6 @@ from mpi4py import MPI
 from centralms import util as UT
 from centralms import abcee as ABC
 from centralms import observables as Obvs 
-
 
 run = sys.argv[1]
 T = int(sys.argv[2]) 
@@ -38,11 +36,6 @@ for i in range(10):
         out[key] = subcat_sim[key]
     pickle.dump(out, open(fname, 'wb'))
 
-    #fname = ''.join([abc_dir, 'model.theta_median', str(i), '.t', str(T), '.hdf5'])
-    #with h5py.File(fname, 'w') as f: 
-    #    for key in savekeys: 
-    #        f.create_dataset(key, data=subcat_sim[key])
-
 COMM = MPI.COMM_WORLD # default communicator
 
 def _split(container, count):
@@ -61,13 +54,8 @@ def model_thetai(i):
     for key in savekeys: 
         out[key] = subcat_sim[key]
     pickle.dump(out, open(fname, 'wb'))
-    
-    #fname = ''.join([abc_dir, 'model.theta', str(i), '.t', str(T), '.hdf5'])
-    #with h5py.File(fname, 'w') as f: 
-    #    for key in savekeys: 
-    #        f.create_dataset(key, data=subcat_sim_i[key])
     return i 
-    
+
 if COMM.rank == 0:
     jobs = range(len(abcout['w']))
     jobs = _split(jobs, COMM.size)
