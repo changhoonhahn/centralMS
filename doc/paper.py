@@ -737,20 +737,18 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     smhmr = Obvs.Smhmr()
     for i_a, abias in enumerate([0., 0.5, 0.99]): 
         if abias > 0.:
-            runs = ['rSFH_r'+str(abias)+'_tdyn_'+str(tt)+'gyr' for tt in [0.5, 1, 2, 5]]
-            tduties = [0.5, 1., 2., 5.]  #hardcoded
-            iters = [14, 14, 14, 14] # iterations of ABC
-            nparticles = [1000, 1000, 1000, 1000]
+            #runs = ['rSFH_r'+str(abias)+'_tdyn_'+str(tt)+'gyr' for tt in [0.5, 1, 2, 5]]
+            runs = ['rSFH_abias'+str(abias)+'_'+str(tt)+'gyr.sfsflex' for tt in [0.5, 1, 2, 5, 10.]]
             if abias == 0.99: mark='^'
             else: mark='s'
             ms=4
         else: 
-            runs = ['randomSFH_0.5gyr', 'randomSFH_1gyr', 'randomSFH_2gyr', 'randomSFH_5gyr', 'test0']
-            tduties = [0.5, 1., 2., 5., 7.47]  #hardcoded
-            iters = [14, 14, 14, 14, 14] # iterations of ABC
-            nparticles = [1000, 1000, 1000, 1000, 1000]
+            runs = ['randomSFH'+str(tt)+'gyr.sfsflex' for tt in [0.5, 1, 2, 5, 10]]
             mark=None
             ms=None
+        tduties = [0.5, 1., 2., 5., 7.47]  #hardcoded
+        iters = [14, 14, 14, 14, 14] # iterations of ABC
+        nparticles = [1000, 1000, 1000, 1000, 1000]
 
         sigMs = np.zeros((3, len(tduties)))
         sigMh = np.zeros((3, len(tduties)))
@@ -1071,10 +1069,10 @@ if __name__=="__main__":
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
-    #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
+    SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #qaplotABC(runs=['test0', 'randomSFH_1gyr'], Ts=[14, 14])
     #fQ_fSFMS()
-    SFHmodel()
+    #SFHmodel()
     #Illustris_SFH()
     #_SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
 
