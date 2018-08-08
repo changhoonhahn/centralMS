@@ -131,6 +131,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
         # testing the distribution of delta SFR
         if testing: 
             for i in range(n_col):
+                print('std of dlogSFR amp = %f' % np.std(dlogSFR_amp))
                 plt.hist(dlogSFR_amp[:,i], range=(-1., 1.), 
                         linewidth=2, histtype='step', density=True, label='Step '+str(i)) 
                 plt.legend()

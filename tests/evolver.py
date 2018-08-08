@@ -31,6 +31,7 @@ def initSF():
             nsnap0=15) 
     shcat = sh.Read(downsampled='20') 
     tt =  Evo.defaultTheta('constant_offset') 
+    tt['sfms']['sigma'] = 0.2
 
     t0 = time.time()
     shcat = Evo.initSF(shcat, tt) 
@@ -125,5 +126,6 @@ def Evolve(sfh='constant_offset'):
 
 
 if __name__=="__main__": 
-    Evolve()
-    Evolve('random_step')
+    initSF()
+    #Evolve()
+    #Evolve('random_step')
