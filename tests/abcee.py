@@ -22,7 +22,7 @@ mpl.rcParams['legend.frameon'] = False
 
 
 def testModel(): 
-    shcat = ABC.model('rSFH_0.2sfs_5gyr.sfsflex', [0.5, 0.4], nsnap0=15, downsampled='20', testing=True)
+    shcat = ABC.model('nodutycycle.sfsflex', [0.5, 0.4], nsnap0=15, downsampled='20', testing=True)
     return None 
 
 

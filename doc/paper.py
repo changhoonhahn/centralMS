@@ -736,15 +736,16 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
 
     # calculate the scatters from the ABC posteriors 
     smhmr = Obvs.Smhmr()
+    tscales = ['0.5', '1', '2', '5', '10']
     for i_a, abias in enumerate([0., 0.5, 0.99]): 
         if abias > 0.:
             #runs = ['rSFH_r'+str(abias)+'_tdyn_'+str(tt)+'gyr' for tt in [0.5, 1, 2, 5]]
-            runs = ['rSFH_abias'+str(abias)+'_'+str(tt)+'gyr.sfsflex' for tt in [0.5, 1, 2, 5, 10.]]
+            runs = ['rSFH_abias'+str(abias)+'_'+tt+'gyr.sfsflex' for tt in tscales]
             if abias == 0.99: mark='^'
             else: mark='s'
             ms=4
         else: 
-            runs = ['randomSFH'+str(tt)+'gyr.sfsflex' for tt in [0.5, 1, 2, 5, 10]]
+            runs = ['randomSFH'+tt+'gyr.sfsflex' for tt in tscales]
             mark=None
             ms=None
         tduties = [0.5, 1., 2., 5., 7.47]  #hardcoded
@@ -757,13 +758,17 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
         for i_t, tduty in enumerate(tduties): 
             abc_dir = UT.dat_dir()+'abc/'+runs[i_t]+'/model/' # ABC directory 
             sig_Mss, sig_Mhs = [], [] 
-            for i in range(10): 
-                f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
+            for i in range(100): 
+                #f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
+                #subcat_sim_i = {} 
+                #for key in f.keys(): 
+                #    subcat_sim_i[key] = f[key].value
+                f = pickle.load(open(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.p']), 'rb'))
                 subcat_sim_i = {} 
                 for key in f.keys(): 
-                    subcat_sim_i[key] = f[key].value
+                    subcat_sim_i[key] = f[key]
                 
-                isSF = np.where(subcat_sim_i['gclass'] == 'sf') # only SF galaxies 
+                isSF = np.where(subcat_sim_i['galtype'] == 'sf') # only SF galaxies 
 
                 sig_ms_i = smhmr.sigma_logMstar(
                         subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
@@ -1069,8 +1074,8 @@ if __name__=="__main__":
     #SFMSprior_z1()
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
-    SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
-    #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
+    #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
+    SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #qaplotABC(runs=['test0', 'randomSFH_1gyr'], Ts=[14, 14])
     #fQ_fSFMS()
     #SFHmodel()

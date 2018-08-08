@@ -55,10 +55,10 @@ def Evolve(shcat, theta, testing=False):
     # not star-forming nsnap_f M* is just their SHAM M* 
     shcat['m.star'][shcat['galtype'] != 'sf'] = shcat['m.sham'][shcat['galtype'] != 'sf']
     
-    if not testing: 
-        return shcat 
-    else: 
+    if testing and 'tsteps' in sfr_kwargs.keys(): 
         return shcat, sfr_kwargs['tsteps'], sfr_kwargs['dlogSFR_amp']
+    else:
+        return shcat 
 
 
 def initSF(shcat, theta): 

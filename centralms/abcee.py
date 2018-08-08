@@ -101,22 +101,13 @@ def _model_theta(run, args):
     elif run.split('.sfs')[-1] == 'anchored': 
         theta['sfms'] = {'name': 'anchored', 'amp': args[0], 'slope': args[1], 'sigma': 0.3}
     
-    if 'randomSFH' in run: 
+    if 'randomSFH' in run: # fiducial
         # run = randomSFH%fgyr.sfs
         # SFH that randomly fluctuates on a tduty timescale
         theta['sfh'] = {'name': 'random_step_fluct'} 
         tduty = float(run.split('randomSFH')[-1].split('gyr')[0]) 
         theta['sfh']['tduty'] = tduty
         theta['sfh']['sigma'] = 0.3 
-    elif 'rSFH_0.2sfs' in run: 
-        # run = rSFH_0.2sfs_%fgyr.sfs%s
-        # SFH that randomly fluctuates on a tduty timescale 
-        # SFS has width 0.2 dex rather than 0.3 dex
-        theta['sfh'] = {'name': 'random_step_fluct'} 
-        tduty = float(run.split('rSFH_0.2sfs_')[-1].split('gyr')[0]) 
-        theta['sfh']['tduty'] = tduty
-        theta['sfh']['sigma'] = 0.2 
-        theta['sfms']['sigma'] = 0.2
     elif 'rSFH_abias' in run: 
         # run = rSFH_abias$CORR_$TDUTYgyr.sfs$SFMS
         # random SFH with SFR correlated with halo growth over 2.5 Gyr (tdyn) with r=$CORR and 
@@ -129,6 +120,19 @@ def _model_theta(run, args):
         theta['sfh']['sigma_corr'] = rcorr * 0.3
         theta['sfh']['dt_delay'] = 0. # Gyr 
         theta['sfh']['dt_dMh'] = 2.5 # Gyr
+    elif 'rSFH_0.2sfs' in run: 
+        # run = rSFH_0.2sfs_%fgyr.sfs%s
+        # SFH that randomly fluctuates on a tduty timescale 
+        # SFS has width 0.2 dex rather than 0.3 dex
+        theta['sfh'] = {'name': 'random_step_fluct'} 
+        tduty = float(run.split('rSFH_0.2sfs_')[-1].split('gyr')[0]) 
+        theta['sfh']['tduty'] = tduty
+        theta['sfh']['sigma'] = 0.2 
+        theta['sfms']['sigma'] = 0.2
+    elif 'nodutycycle' in run:
+        # run = nodutycycle.sfs%s
+        # no duty cycle. 
+        theta['sfh'] = {'name': 'constant_offset'} 
     else: 
         raise ValueError
     '''
@@ -374,8 +378,10 @@ def Writeout(type, run, pool, **kwargs):
 
     if type == 'init': # initialize
         if not os.path.exists(abc_dir): # make directory if it doesn't exist 
-            os.makedirs(abc_dir)
-        
+            try: 
+                os.makedirs(abc_dir)
+            except OSError: 
+                pass 
         # write specific info of the run  
         f = open(abc_dir+'info.md', 'w')
         f.write('# '+run+' run specs \n')
