@@ -53,6 +53,16 @@ def narrowSFS_noAbiasABC(tduty, sfs='flex', Niter=14, Npart=1000):
     return None 
 
 
+def nodutycycle(sfs='flex', Niter=14, Npart=1000): 
+    ''' ABC run without assembly bias 
+    '''
+    run = ''.join(['nodutycycle.sfs', sfs]) 
+    print(run)
+    prior = ABC.Prior(sfs, shape='tophat') 
+    ABC.runABC(run, Niter, [1.e5], prior, N_p=Npart, sumstat=['smf'], nsnap0=15, downsampled='20') 
+    return None 
+
+
 def modelABCpool(run, t): 
     ''' evaluate model(theta) for all theta in ABC pool 
     '''
@@ -81,6 +91,11 @@ if __name__=="__main__":
         niter = int(sys.argv[4]) 
         npart = int(sys.argv[5]) 
         narrowSFS_noAbiasABC(tduty, sfs=sfs, Niter=niter, Npart=npart) # test 
+    elif name == 'nodutycycle': 
+        sfs = sys.argv[2]
+        niter = int(sys.argv[3]) 
+        npart = int(sys.argv[4]) 
+        nodutycycle(sfs=sfs, Niter=niter, Npart=npart) # test 
     elif name == 'modelrun': 
         run = sys.argv[2]
         niter = int(sys.argv[3]) 
