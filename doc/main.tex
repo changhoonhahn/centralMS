@@ -39,7 +39,7 @@
 
 \begin{document}\sloppy\sloppypar\frenchspacing
 
-\title{Star Formation Main Sequence in a Hierarchical Universe} 
+\title{Star Formation Sequence in a Hierarchical Universe} 
 %\title{Central Galaxies on the Main Sequence} 
 \date{\texttt{DRAFT~---~\githash~---~\gitdate~---~NOT READY FOR DISTRIBUTION}}
 \author{ChangHoon~Hahn\altaffilmark{1, 2}, 
@@ -80,6 +80,7 @@ galaxies: star formation -- cosmology: observations.}
 \item Motivate why we think SF galaxies evolve along the main sequence  
 \item Discuss the current thought process on galaxy assembly bias 
 \item Explain the limitation of SFH derivable from observations (Claire's fisher matrix paper would be really good; ask her about the details) 
+\item in fact we can't constrain sf variability very well even in simulations due to the time resolution (see \hahngmm).  
 \item Observations also can't provide detail host dark matter halo properties
 \item So the approach with combining observations with N-body (empirical modeling) is very effective in the context of the halo.
 \item Maybe talk about how the bigger context of why this is important?  
@@ -351,18 +352,19 @@ we describe how we evolve their SFR and $M_*$.
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.9\textwidth]{figs/sfh_pedagogical.pdf}
-    \caption{\emph{Left}: We illustrate the star formation duty 
-    cycle prescription for $\Delta \logsfr(t)$, described 
-    in Section~\ref{sec:modelevol}. The two examples we present have
-    $t_\mathrm{duty} = 0.5$ Gyr (blue) and $5$ Gyr (orange). The star 
-    formation duty cycle $\Delta \logsfr(t)$ combined with Eq.~\ref{eq:logsfr_sf}, 
-    describe the SFHs of the star-forming central galaxies in our model. 
-    \emph{Right}: We present the SFR and $M_*$ evolutions of two SF central 
-    galaxies in our model with $t_\mathrm{duty} = 0.5$ Gyr (blue) and $5$ 
-    Gyr (orange). The $\Delta \logsfr(t)$ for these galaxies correspond 
-    to the left panel and can be seen with respect to the $\musfms(M_*, t)$ 
-    plotted in black. For reference, we include the $\musfms(M_*)$ (dotted 
-    lines) at various redshifts between $z = 1$ to $0.05$.} \label{fig:sfh_model}
+    \caption{\emph{Left}: The $\Delta \logsfr$ evolution of two SF centrals
+    using the fiducial model that incorporates star formation variability through 
+    a ``star formation duty cycle'' on two timescales $t_\mathrm{duty} = 1$ Gyr 
+    (blue) and $5$ Gyr (orange). $\Delta \logsfr(t)$s determine the SFHs
+    (Eq.~\ref{eq:logsfr_sf}), hence it also determines the $M_*$ growth 
+    of the SF central galaxies in our model (Eq.~\ref{eq:integ_mass}).  
+    \emph{Right}: The $\mathrm{SFR}_i$ and $M_{*,i}$ evolutions of the same two 
+    SF central galaxies in our fiducial model with $t_\mathrm{duty} = 1$ Gyr (blue) 
+    and $5$ Gyr (orange). For reference we plot $\musfms(M_{*,i}(t), t)$ for 
+    each galaxy (black dashed) and $\musfms(M_*)$ at various redshifts between 
+    $z = 1$ to $0.05$ (dotted lines). As the $\mathrm{SFR}_i$ and $M_{*,i}$ 
+    evolutions illustrate, \emph{the SF centrals in our model evolve as their SFRs 
+    fluctate about the SFS.}} \label{fig:sfh_model}
 \end{center}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -380,7 +382,7 @@ we describe how we evolve their SFR and $M_*$.
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Evolving along the Main Sequence} \label{sec:modelevol} 
+\subsection{Evolving along the Star Formation Sequence} \label{sec:modelevol} 
 The tight correlation between the SFRs and stellar masses of SF 
 galaxies (the so-called SFS) has been observed to span over four 
 orders of magnitude in stellar mass and extends beyond the local 
@@ -426,7 +428,7 @@ but rather vary about the SFS.
 %Rather than remaining constant, Figure~\ref{fig:illsfh} illustrates that the $\Delta \logsfr(t)$s stochastically vary about SFS. 
 
 Motivated by the $\Delta \logsfr(t)$ of Illustris galaxies, we introduce 
-varability in the SFHs of our SF centrals in the form of a ``\emph{star 
+variability in the SFHs of our SF centrals in the form of a ``\emph{star 
 formation duty cycle}''. We parameterize $\Delta \logsfr$ to flucutate about 
 the mean SFS on some duty cycle timescale $t_\mathrm{duty}$ with amplitude
 randomly sampled from a log-normal distribution with $0.3\,\mathrm{dex}$ 
@@ -435,7 +437,7 @@ centrals follow Eq.~\ref{eq:logsfr_sf}.
 %Then the SFR of a given SF central in our model will follow Eq.~\ref{eq:logsfr_sf} where at every timestep $t_\mathrm{duty}$, $\Delta \logsfr$ is randomly sampled from a log-normal distribution with $0.3\,\mathrm{dex}$ scatter. 
 In the left panel of Figure~\ref{fig:sfh_model}, we 
 present $\Delta \logsfr(t)$ of SF centrals with our fiducial star formation 
-duty cycle prescription. The two $\Delta \logsfr(t)$s have $t_\mathrm{duty} = 0.5$ 
+duty cycle prescription. The two $\Delta \logsfr(t)$s have $t_\mathrm{duty}=1$ 
 Gyr (blue) and $5$ Gyr (orange). The shaded region represents the observed 
 $0.3\,\mathrm{dex}$ $1\sigma$ scatter of the SFS SFR. 
 Although, we do not expect such a simplified model to reflect the exact 
@@ -445,32 +447,49 @@ the timescale of such variabilities. Furthermore, this $\Delta \logsfr$
 prescription by construction reproduces the observed log-normal SFR 
 distribution of the SFS at any point in the model. 
 
-Using our $\Delta \logsfr$ prescription, we now evolve both the SFR and $M_*$ 
-of our SF centrals along the main sequence. Based on Eq.~\ref{eq:logsfr_sf},
-the SFRs of our SF centrals are functions of $M_*$. Meanwhile, $M_*$ is the
-integral of the SFR over time: 
+Next using our $\Delta \logsfr$ prescription, we now evolve both the 
+SFR and $M_*$ of our SF centrals along the SFS. Based on Eq.~\ref{eq:logsfr_sf},
+the SFRs of our SF centrals are functions of $M_*$. Meanwhile, $M_*$ 
+is the integral of the SFR over time: 
 \beq \label{eq:integ_mass} 
 M_*(t) = f_\mathrm{retain} \int\limits_{t_0}^{t} \mathrm{SFR(M_*, t)}\,\mathrm{d}t + M_0. 
 \eeq
-$f_\mathrm{retain}$ here is the fraction of stellar mass that is retained after 
-supernovae and stellar winds; we use $f_\mathrm{retain} = 0.6$~\citep{wetzel2013}. 
-$t_0$ and $M_0$ are the initial cosmic time and stellar mass at $z \sim 1$, respectively. 
-Combining Eqs.~\ref{eq:logsfr_sf} and~\ref{eq:integ_mass}, we get a different 
-equation, which we solve to evolve the SFR and $M_*$ of our SF centrals.  
-The right panel of Figure~\ref{fig:sfh_model} presents the SFR and $M_*$ 
-evolutions for the two SF centrals with different $t_\mathrm{duty}$ from the
-left panel. The behavior of the star formation duty cycle $\Delta \logsfr(t)$ 
-is clearly evident with respect to $\musfms(M_*, t)$ (black solid). 
-For reference, we include the $\musfms$ (dotted lines) at various redshifts 
-between $z = 1$ to $0.05$. 
+$t_0$ and $M_0$ are the initial cosmic time and stellar mass at $z \sim 1$, 
+respectively. $f_\mathrm{retain}$ here is the fraction of stellar mass 
+that is retained after supernovae and stellar winds; we use $f_\mathrm{retain} = 0.6$~\citep{wetzel2013}. 
+By solving the differential equation from combining Eqs.~\ref{eq:logsfr_sf} 
+and~\ref{eq:integ_mass}, we evolve the SFR and $M_*$ of our SF centrals.  
+The right panel of Figure~\ref{fig:sfh_model} presents the $\mathrm{SFR}_i$ 
+and $M_{*,i}$ evolutions for the two SF centrals with different 
+$t_\mathrm{duty}$ timescales in the left panel. For reference, we include 
+$\musfms(M_{*,i}(t), t)$ (black dashed) and $\musfms(M_*)$ 
+(dotted lines) at various redshifts between $z = 1$ to $0.05$. As 
+Figure~\ref{fig:sfh_model} illustrates, using our $\Delta \logsfr$ 
+prescription the SF centrals evolve as their SFRs fluctuate along the SFS 
+throughout the timesteps of our model. 
 
-Now that we have a model that evolves the SFRs and $M_*$s of SF centrals, 
-we can compare this model to observations. Our model is constructed using the 
-SMF and SMHMR at $z = 1$ and based on the observed evolution of the SFS. 
-It has two free parameters $A_z$ and $m_z$, which allow for a flexible redshift 
-dependence of the SFS. At the final snapshot, $z \sim 0$, our model reproduces 
-the observed SFR distribution by construction. However, we also want our model to 
-reproduce the observed SMF of central galaxies in SDSS. In order to do a principled
+
+We continue to evolve our SF central galaxies until the $z = 0.05$ snapshot 
+of the $\mathtt{TreePM}$ simulation. At this snapshot, from the $\mathtt{TreePM}$ 
+$N$-body simulation, we have the host halo masses, $M_h$, of the SF centrals. 
+Furthermore, we have the SFR and $M_*$ evolved by our model. Next, using the 
+output (SFR, $M_*$, and $M_h$) we compare our model to observations and present 
+how our model can be used better constrain the role and timescale of star 
+formation variability in galaxies.  
+
+\section{Results}
+Our model, described in the previous section, is 
+
+initialized using the SMF 
+and SHMR at $z = 1.08$ then evolved using SFHs with a star formation duty 
+cycle and a flexible parameterization of the SFS evolution to $z = 0.05$. 
+The $z= 0.05$ SFR, $M_*$, and host halo mass $M_h$ of our SF galaxies can 
+now be compared to observations in order to constrain the timescale of the 
+star formation duty cycle. Although the SFS is parameterized using the free
+parameters $m_{M_*}$ and $m_z$ and thus cannot be used as an observable, 
+the SMF of our SF central galaxies can be compared to the observed SMF from 
+SDSS. 
+In order to do a principled
 comparison of our model to observation, we use the parameter estimation framework 
 of Approximate Bayesian Computation (ABC). ABC has the advantage over standard 
 approaches to parameter inference in that it does not 
@@ -522,11 +541,7 @@ the SFHs of star forming galaxies.
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Results}
 \subsection{The Star Formation Duty Cycle}
-Our model, described in the previous section, tracks the SFR and $M_*$ 
-evolutions of SF central galaxies. After using ABC, 
-
 %Now that we have a model that evolves the SFRs and $M_*$s of SF centrals, we can compare this model to observations. Our model is constructed using the SMF and SMHMR at $z = 1$ and based on the observed evolution of the SFS.  It has two free parameters $A_z$ and $m_z$, which allow for a flexible redshift dependence of the SFS. At the final snapshot, $z \sim 0$, our model reproduces the observed SFR distribution by construction. However, we also want our model to 
 
 
