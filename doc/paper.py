@@ -576,8 +576,9 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
             'randomSFH1gyr.sfsflex', 
             'randomSFH2gyr.sfsflex', 
             'randomSFH5gyr.sfsflex', 
-            'randomSFH10gyr.sfsflex']
-    tduties = [0.5, 1., 2., 5., 7.47]  #hardcoded
+            'nodutycycle.sfsflex']
+            #'randomSFH10gyr.sfsflex']
+    tduties = [0.5, 1., 2., 5., 9.75]  #hardcoded
     iters = [14 for i in range(len(tduties))] # 13, 13, 12, 12, 12] # iterations of ABC
     nparticles = [1000, 1000, 1000, 1000, 1000]
 
@@ -660,15 +661,14 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
         subplt = sub.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.C'+str(ii), markersize=10)
         subplts.append(subplt) 
-
-    legend1 = sub.legend(subplts[:3], lit_siglogMs[:3], loc='upper left', prop={'size': 15})
-    sub.legend(subplts[3:], lit_siglogMs[3:], loc='lower right', handletextpad=0.1, prop={'size': 15})
+    legend1 = sub.legend(subplts[:3], lit_siglogMs[:3], handletextpad=0., loc='upper left', prop={'size': 15})
+    sub.legend(subplts[3:], lit_siglogMs[3:], loc='lower right', handletextpad=0., prop={'size': 15})
     plt.gca().add_artist(legend1)
     sub.set_xlim([0.45, 10.]) # x-axis
     sub.set_xscale('log') 
     sub.set_ylabel(r'$\sigma_{M_*} \Big(M_\mathrm{halo} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=20) # y-axis
-    sub.set_ylim([0., 0.6]) 
-    sub.set_yticks([0., 0.2, 0.4, 0.6]) 
+    sub.set_ylim([0.1, 0.5]) 
+    sub.set_yticks([0.1, 0.2, 0.3, 0.4])#, 0.6]) 
     
     sub = fig.add_subplot(122) 
     # ABC posteriors 
@@ -699,7 +699,6 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sigma_logM*(M_h = 10^12) and sigma_logMhalo(M* = 10^10.5)) as a function of duty 
     cycle timescale (t_duty) from the ABC posteriors. 
     '''
-
     # constraints from literature 
     # constraints for sigma_logM*
     lit_siglogMs = [
@@ -746,9 +745,10 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
             ms=4
         else: 
             runs = ['randomSFH'+tt+'gyr.sfsflex' for tt in tscales]
+            runs[-1] = 'nodutycycle.sfsflex'
             mark=None
             ms=None
-        tduties = [0.5, 1., 2., 5., 7.47]  #hardcoded
+        tduties = [0.5, 1., 2., 5., 9.75]  #hardcoded
         iters = [14, 14, 14, 14, 14] # iterations of ABC
         nparticles = [1000, 1000, 1000, 1000, 1000]
 
@@ -803,14 +803,13 @@ def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
         subplt = sub1.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.C'+str(ii), markersize=10)
         subplts.append(subplt) 
-
-    legend1 = sub1.legend(subplts[:3], lit_siglogMs[:3], loc='upper left', prop={'size': 12})
-    sub1.legend(subplts[3:], lit_siglogMs[3:], loc='lower right', prop={'size': 12})
+    legend1 = sub1.legend(subplts[:3], lit_siglogMs[:3], loc='upper left', handletextpad=0., prop={'size': 15})
+    sub1.legend(subplts[3:], lit_siglogMs[3:], loc='lower right', handletextpad=0., prop={'size': 15})
     sub1.add_artist(legend1)
     sub1.set_xlim([0.45, 10.]) # x-axis
     sub1.set_xscale('log') 
     sub1.set_ylabel(r'$\sigma_{M_*} \Big(M_\mathrm{halo} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=20) # y-axis
-    sub1.set_ylim([0.1, 0.425]) 
+    sub1.set_ylim([0.1, 0.5]) 
     sub1.set_yticks([0.1, 0.2, 0.3, 0.4])#, 0.6]) 
 
     # ABC posteriors 
@@ -1069,16 +1068,105 @@ def _SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMsta
     return None 
 
 
+def _SHMRscatter_tduty_narrowSFS(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
+    ''' Comparison of the SHMR(t_duty) for SFS with 0.3 dex scatter 
+    versus SFS with 0.2 dex scatter.
+    '''
+    tduties = [0.5, 1., 2., 5., 10.]  #hardcoded
+    iters = [14 for i in range(len(tduties))] # 13, 13, 12, 12, 12] # iterations of ABC
+
+    smhmr = Obvs.Smhmr()
+    # calculate the scatters from the ABC posteriors 
+    for prefix in ['randomSFH', 'rSFH_0.2sfs_']:  
+        runs = [prefix+str(t)+'gyr.sfsflex' for t in [0.5, 1, 2, 5, 10]] 
+        sigMs = np.zeros((3, len(tduties)))
+        sigMh = np.zeros((3, len(tduties)))
+        for i_t, tduty in enumerate(tduties): 
+            abc_dir = ''.join([UT.dat_dir(), 'abc/', runs[i_t], '/model/']) # ABC directory 
+            sig_Mss, sig_Mhs = [], [] 
+            for i in range(100): 
+                #f = h5py.File(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.hdf5']), 'r') 
+                #subcat_sim_i = {} 
+                #for key in f.keys(): 
+                #    subcat_sim_i[key] = f[key].value
+                f = pickle.load(open(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.p']), 'rb'))
+                subcat_sim_i = {} 
+                for key in f.keys(): 
+                    subcat_sim_i[key] = f[key]
+                
+                isSF = np.where(subcat_sim_i['galtype'] == 'sf') # only SF galaxies 
+
+                sig_ms_i = smhmr.sigma_logMstar(
+                        subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
+                        weights=subcat_sim_i['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
+                sig_mh_i = smhmr.sigma_logMhalo(
+                        subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
+                        weights=subcat_sim_i['weights'][isSF], Mstar=Mstar, dmstar=dMstar)
+                sig_Mss.append(sig_ms_i)  
+                sig_Mhs.append(sig_mh_i) 
+
+            sig_ms_low, sig_ms_med, sig_ms_high = np.percentile(np.array(sig_Mss), [16, 50, 84]) 
+            sig_mh_low, sig_mh_med, sig_mh_high = np.percentile(np.array(sig_Mhs), [16, 50, 84]) 
+
+            sigMs[0, i_t] = sig_ms_med
+            sigMs[1, i_t] = sig_ms_low
+            sigMs[2, i_t] = sig_ms_high
+            
+            sigMh[0, i_t] = sig_mh_med
+            sigMh[1, i_t] = sig_mh_low
+            sigMh[2, i_t] = sig_mh_high
+        if prefix == 'randomSFH':  
+            sigMs0 = sigMs
+            sigMh0 = sigMh
+        elif prefix == 'rSFH_0.2sfs_':
+            sigMs_narr = sigMs
+            sigMh_narr = sigMh
+            
+    # make figure 
+    fig = plt.figure(figsize=(10,5)) 
+    bkgd = fig.add_subplot(111, frameon=False)
+    sub = fig.add_subplot(121)
+    # ABC posteriors 
+    sub.errorbar(tduties, sigMs0[0,:], yerr=[sigMs0[0,:]-sigMs0[1,:], sigMs0[2,:]-sigMs0[0,:]], fmt='.k', 
+            label=r'$\sigma_\mathrm{SFS} = 0.3$ dex') 
+    sub.errorbar(tduties, sigMs_narr[0,:], yerr=[sigMs_narr[0,:]-sigMs_narr[1,:], sigMs_narr[2,:]-sigMs_narr[0,:]], 
+            fmt='.C1', label=r'$\sigma_\mathrm{SFS} = 0.2$ dex') 
+    sub.legend(loc='lower right', fontsize=20) 
+    sub.set_xlim([0.45, 10.]) # x-axis
+    sub.set_xscale('log') 
+    sub.set_ylabel(r'$\sigma_{M_*} \Big(M_\mathrm{halo} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=20) # y-axis
+    sub.set_ylim([0., 0.6]) 
+    sub.set_yticks([0., 0.2, 0.4, 0.6]) 
+    
+    sub = fig.add_subplot(122) 
+    # ABC posteriors 
+    sub.errorbar(tduties, sigMh0[0,:], yerr=[sigMh0[0,:]-sigMh0[1,:], sigMh0[2,:]-sigMh0[0,:]], fmt='.k') 
+    sub.errorbar(tduties, sigMh_narr[0,:], yerr=[sigMh_narr[0,:]-sigMh_narr[1,:], sigMh_narr[2,:]-sigMh_narr[0,:]], fmt='.C1') 
+    sub.set_xlim([0.45, 10.]) # x-axis
+    sub.set_xscale('log') 
+    sub.set_ylabel(r'$\sigma_{M_\mathrm{halo}} \Big(M_* = 10^{'+str(Mstar)+r'} M_\odot \Big)$', fontsize=20) # y-axis
+    sub.set_ylim([0., 0.75]) 
+    sub.set_yticks([0., 0.2, 0.4, 0.6]) 
+    
+    bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    bkgd.set_xlabel('$t_\mathrm{duty}$ [Gyr]', labelpad=10, fontsize=22) 
+    fig.subplots_adjust(wspace=0.3)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/_SHMRscatter_tduty_narrowSFS.pdf']), 
+            bbox_inches='tight', dpi=150) 
+    plt.close()
+    return None 
+
+
 if __name__=="__main__": 
     #groupcatSFMS(mrange=[10.6,10.8])
     #SFMSprior_z1()
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
-    #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
-    SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
+    #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
+    SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #qaplotABC(runs=['test0', 'randomSFH_1gyr'], Ts=[14, 14])
     #fQ_fSFMS()
     #SFHmodel()
     #Illustris_SFH()
     #_SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
-
+    #_SHMRscatter_tduty_narrowSFS(Mhalo=12, dMhalo=0.2, Mstar=10.5, dMstar=0.2)
