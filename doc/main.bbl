@@ -107,11 +107,6 @@ Genel, S., Vogelsberger, M., Springel, V., {et~al.} 2014,
   \href{http://dx.doi.org/10.1093/mnras/stu1654}{\JournalTitle{Monthly Notices
   of the Royal Astronomical Society}, 445, 175}
 
-\bibitem[{Gu {et~al.}(2016)Gu, Conroy, \& Behroozi}]{gu2016}
-Gu, M., Conroy, C., \& Behroozi, P. 2016,
-  \href{http://dx.doi.org/10.3847/0004-637X/833/1/2}{\JournalTitle{The
-  Astrophysical Journal}, 833, 2}
-
 \bibitem[{Hahn {et~al.}(2017{\natexlab{a}})Hahn, Tinker, \& Wetzel}]{hahn2017}
 Hahn, C., Tinker, J.~L., \& Wetzel, A.~R. 2017{\natexlab{a}},
   \href{http://dx.doi.org/10.3847/1538-4357/aa6d6b}{\JournalTitle{The
@@ -168,6 +163,12 @@ Li, C., \& White, S. D.~M. 2009,
 Magdis, G.~E., Daddi, E., B\'ethermin, M., {et~al.} 2012,
   \href{http://dx.doi.org/10.1088/0004-637X/760/1/6}{\JournalTitle{The
   Astrophysical Journal}, 760, 6}
+
+\bibitem[{Mamon {et~al.}(2004)Mamon, Sanchis, {Salvador-Sol\'e}, \&
+  Solanes}]{mamon2004}
+Mamon, G.~A., Sanchis, T., {Salvador-Sol\'e}, E., \& Solanes, J.~M. 2004,
+  \href{http://dx.doi.org/10.1051/0004-6361:20034155}{\JournalTitle{Astronomy
+  and Astrophysics}, 414, 445}
 
 \bibitem[{Marchesini {et~al.}(2009)Marchesini, {van Dokkum},
   F\"orster~Schreiber, Franx, Labb\'e, \& Wuyts}]{marchesini2009}

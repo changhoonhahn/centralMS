@@ -163,45 +163,44 @@ using the Friends-of-Friends (FoF) algorithm of \cite{davis1985} with
 linking length of $b = 0.168$ times the mean inter-partcile spacing. Within 
 these host halos, \cite{wetzel2013} identifies `subhalos' as overdensities 
 in phase space through a six-dimensional FoF algorithm~\citep[FoF6D][]{white2010}. 
-The host halos and subhalos are then tracked across the $45$ simulation 
-outputs from $z = 10$ to $0$ to build merger trees~\citep{wetzel2009,wetzel2010}. 
+The host halos and subhalos are then tracked across the simulation outputs 
+from $z = 10$ to $0$ to build merger trees~\citep{wetzel2009,wetzel2010}. 
 The most massive subhalos in newly-formed host halos at a given simulation 
 output are defined as the `central' subhalo. A central subhalo retains its 
 `central' definition until it falls into a more massive host halo, at which 
 point it becomes a `satellite' subhalo. 
 
-Each subhalo is assigned a $M_\mathrm{peak}$, the maxmum host halo mass that 
-it ever had as a central subhalo. Using $M_\mathrm{peak}$, we construct a galaxy 
-catalog from the subhalos using subhalo abundance 
-matching~\citep[SHAM;][]{conroy2006,vale2006,yang2009,wetzel2012,leja2013,wetzel2013,wetzel2014,hahn2017a}. 
-In principle, SHAM assumes a one-to-one mapping between subhalo 
-$M_\mathrm{peak}$ and galaxy stellar mass $M_*$: $n(> M_\mathrm{peak}) > n(> M_*)$
-that preserves the rank ordering. In practice, we apply a $0.2$ dex log-normal 
-scatter in $M_∗$ at fixed $M_\mathrm{peak}$ based on observations of the stellar 
-mass to halo mass relation (SMHMR; \todo{bunch of SMHMR citations}). \cite{gu2016} 
-compile empirical constraints on the scatter of this stellar mass to halo 
-mass relation ($\sigma_{\log M_*}$). Using the SHAM mapping, we can 
-assign galaxy stellar mass to subhalos based on observed stellar mass 
-functions (SMFs) at the redshifts of the simulation outputs (snapshots). 
-
-We use the SMF from \cite{li2009} at $z = 0.05$ and at higher redshifts 
-interpolate between the \cite{li2009} SMF and the SMF from \cite{marchesini2009} 
-at $z = 1.6$. We choose the \cite{li2009} SMF because it is based on the 
-same SDSS NYU-VAGC sample as our SDSS DR7 group catalog (Section~\ref{sec:sdss}). 
-We choose the \cite{marchesini2009} SMF, amongst others, because it produces 
-interpolated SMFs that monotonically increase at $z < 1$. As noted in 
-\cite{hahn2017a}, at $z \approx 1$, the SMF interpolated between the 
-\cite{li2009} and \cite{marchesini2009} SMFs is consistent with more 
-recent measurements from \cite{muzzin2013} and \cite{ilbert2013}. 
-At each snapshot, we independently use SHAM to assign galaxy $M_*$. 
-This way, we not only track the evolution of subhalos, but also the 
-the galaxies' $M_*$. With the $45$ snapshots outputs from our simulation, 
-we can in principle track the central galaxies back to $z \sim 10$. 
-However, we restrict ourselves to snapshots at $z \lesssim 1$, where we 
-have the most statistically meaningful observations. We next describe
-how we select star forming central galaxies in our model and initalize them. 
-%As we desribe later in this section, however, we're only interested in the snapshots at $z \approx 0.05$ and $1$, respectively. 
+At a given snapshot, we assign stellar masses used only for initializing
+our model to each subhalo by subhalo abundance matching~\citep[SHAM;][]{conroy2006,vale2006,yang2009,wetzel2012,leja2013,wetzel2013,wetzel2014,hahn2017a}
+to $M_\mathrm{peak}$, the maxmum host halo mass that it ever had as a 
+central subhalo. SHAM, in its simplest form, assumes a one-to-one mapping 
+between subhalo $M_\mathrm{peak}$ and galaxy stellar mass $M_*$ that 
+preserves rank order: $n(> M_\mathrm{peak}) > n(> M_*)$. In practice, we 
+apply a $0.2$ dex log-normal scatter in $M_∗$ at fixed $M_\mathrm{peak}$ 
+based on the observed stellar to halo mass relation (SHMR; \todo{bunch of SMHMR citations}). %\cite{gu2016} compile empirical constraints on the scatter of this stellar mass to halo mass relation ($\sigma_{\log M_*}$). 
+For $n(> M_*)$, we use observed stellar mass functions (SMFs) at the redshift 
+corresponding to the snapshot. At $z=0.05$, the lowest redshift snapshot of 
+our model, we use the SMF from \cite{li2009}, which is based on the same 
+SDSS NYU-VAGC sample as our group catalog. At higher redshifts, we interpolate 
+between the \cite{li2009} SMF and the SMF from \cite{marchesini2009} at 
+$z = 1.6$. We choose the \cite{marchesini2009} SMF, among others, because it 
+produces interpolated SMFs that monotonically increase at $z < 1$. As noted 
+in \cite{hahn2017a}, at $z \approx 1$, the SMF interpolated between the 
+\cite{li2009} and \cite{marchesini2009} SMFs is consistent with more recent 
+measurements from \cite{muzzin2013} and \cite{ilbert2013}. 
 \todo{TBD: Perhaps mention in appendix how we test different SMF assumptions}% (In Section~\ref{app:z1},)
+
+Throughout its $45$ snapshot outs, $\mathtt{TreePM}$ simulation tracks 
+the evolution of subhalos back to $z \sim 10$. We restrict ourselves to $15$ 
+snapshots from $z = 1.08$ to $z=0.05$, where we have the most statistically 
+meaningful observations. Furthermore, since we're interested in centrals we only 
+keep subhalos that are classified as centrals throughout the redshift 
+range. This criterion removes ``black splash'' or ``ejected'' satellite 
+galaxies~\citep[\emph{e.g.}][]{mamon2004,wetzel2014} misclassified as 
+centrals. Finally, we have a model based on the $\mathtt{TreePM}$ $N$-body 
+simulation that tracks the evolution of central subhalos from $z = 1.08$ to 
+$z=0.05$. Next, we describe how we select and initialize the star forming 
+central galaxies from the central subhalos in our model. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 2 
@@ -412,7 +411,7 @@ in the initial SFRs of our SF central galaxies at $z\sim1$.
 SF centrals with higher than average initial SFRs continue evolving 
 above the average SFS, while SF centrals with lower than average 
 initial SFRs continue evolving below the average SFS. In addition to 
-the fact that such a SFH cannot reproduce observations, we will later 
+the fact that such a SFH cannot reproduce observations, which we later 
 demonstrate, we do not find such a SFH in SF galaxies of hydrodynamic 
 simulations such as Illustris~\cite{vogelsberger2014,genel2014}. 
 %the observed scatter in the stellar mass of SF centrals at fixed halo mass. % With such SFHs, as we demonstrate later in detail, the scatter in stellar mass of the SF centrals at fixed halo mass diverges substantially with cosmic time. 
@@ -442,10 +441,10 @@ Gyr (blue) and $5$ Gyr (orange). The shaded region represents the observed
 $0.3\,\mathrm{dex}$ $1\sigma$ scatter of the SFS SFR. 
 Although, we do not expect such a simplified model to reflect the exact 
 individual SFHs of SF centrals, for the SF population it captures the 
-stochasticity from gas accretion and star-bursts and allows us to measure
-the timescale of such variabilities. Furthermore, this $\Delta \logsfr$ 
-prescription by construction reproduces the observed log-normal SFR 
-distribution of the SFS at any point in the model. 
+stochasticity from gas accretion, star-bursts, and feedback mechanisms.
+Furthermore, it allows us to measure the timescale of such variabilities. 
+Also this $\Delta \logsfr$ prescription by construction reproduces the 
+observed log-normal SFR distribution of the SFS at any point in the model. 
 
 Next using our $\Delta \logsfr$ prescription, we now evolve both the 
 SFR and $M_*$ of our SF centrals along the SFS. Based on Eq.~\ref{eq:logsfr_sf},
@@ -468,25 +467,30 @@ Figure~\ref{fig:sfh_model} illustrates, using our $\Delta \logsfr$
 prescription the SF centrals evolve as their SFRs fluctuate along the SFS 
 throughout the timesteps of our model. 
 
-
-We continue to evolve our SF central galaxies until the $z = 0.05$ snapshot 
-of the $\mathtt{TreePM}$ simulation. At this snapshot, from the $\mathtt{TreePM}$ 
-$N$-body simulation, we have the host halo masses, $M_h$, of the SF centrals. 
-Furthermore, we have the SFR and $M_*$ evolved by our model. Next, using the 
-output (SFR, $M_*$, and $M_h$) we compare our model to observations and present 
-how our model can be used better constrain the role and timescale of star 
-formation variability in galaxies.  
+We continue to evolve our SF central galaxies until the final $z = 0.05$ 
+snapshot of our model. For the SF centrals and their host subhalos in our 
+model, not only do we have SFRs and $M_*$s that we evolved but we also 
+have halo histories from the $\mathtt{TreePM}$ $N$-body simulation. With 
+these properties, we can compare our model to observations using standard 
+observables such as the SMF. Since we have host halo histories, we can also 
+use observables such as the SHMR. Next, we present the comparison between 
+our model and observations and the constraints we derive on the role and 
+timescale of star formation variability in SF galaxies.
 
 \section{Results}
-Our model, described in the previous section, is 
+Our model takes central subhalos from $\mathtt{TreePM}$ and tracks their 
+$SFR$ and $M_*$ evolution using a flexible parameterization of the SFS and 
+SFHs that incorporate variability through a star formation duty cycle 
+(Section~\ref{sec:modelevol}). At $z=0.05$, our model provides SFR, $M_*$, 
+and host halo mass, $M_h$, of its SF central galaxies. We now use these 
+properties to compare our model to observations. 
 
-initialized using the SMF 
-and SHMR at $z = 1.08$ then evolved using SFHs with a star formation duty 
-cycle and a flexible parameterization of the SFS evolution to $z = 0.05$. 
-The $z= 0.05$ SFR, $M_*$, and host halo mass $M_h$ of our SF galaxies can 
-now be compared to observations in order to constrain the timescale of the 
-star formation duty cycle. Although the SFS is parameterized using the free
-parameters $m_{M_*}$ and $m_z$ and thus cannot be used as an observable, 
+
+Although the SFS is parameterized using the free
+parameters $m_{M_*}$ and $m_z$ and hence the SFR distribution cannot be used as an observable, 
+
+the smf is a baller observable to compare to. 
+
 the SMF of our SF central galaxies can be compared to the observed SMF from 
 SDSS. 
 In order to do a principled

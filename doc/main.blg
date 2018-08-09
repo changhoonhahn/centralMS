@@ -12,36 +12,36 @@ Warning--I didn't find a database entry for "hahn2016"
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 You've used 46 entries,
             3215 wiz_defined-function locations,
-            962 strings with 23350 characters,
-and the built_in function-call counts, 29826 in all, are:
-= -- 2056
-> -- 2776
+            962 strings with 23432 characters,
+and the built_in function-call counts, 29913 in all, are:
+= -- 2063
+> -- 2784
 < -- 7
-+ -- 1052
-- -- 987
-* -- 2990
-:= -- 5511
++ -- 1059
+- -- 991
+* -- 2998
+:= -- 5524
 add.period$ -- 46
 call.type$ -- 46
-change.case$ -- 305
+change.case$ -- 306
 chr.to.int$ -- 45
 cite$ -- 46
-duplicate$ -- 1285
-empty$ -- 1619
-format.name$ -- 1036
-if$ -- 5786
+duplicate$ -- 1289
+empty$ -- 1621
+format.name$ -- 1039
+if$ -- 5802
 int.to.chr$ -- 2
 int.to.str$ -- 0
 missing$ -- 46
 newline$ -- 143
 num.names$ -- 184
-pop$ -- 466
+pop$ -- 468
 preamble$ -- 1
-purify$ -- 305
+purify$ -- 306
 quote$ -- 0
-skip$ -- 762
+skip$ -- 763
 stack$ -- 0
-substring$ -- 1194
+substring$ -- 1204
 swap$ -- 45
 text.length$ -- 0
 text.prefix$ -- 0
