@@ -175,7 +175,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
         # at every time step t_i over the range t_i - dt_dMh to t_i. This means
         # we need to get M_h at both t_i and t_i-dt_dMh...
         f_dMh = np.zeros(tsteps.shape, dtype=np.float32) # growth rate of halos over t_i and t_i - dt_Mh
-        Mh_ts = np.zeros(tsteps.shape, dtype=np.float32)
+        #Mh_ts = np.zeros(tsteps.shape, dtype=np.float32)
         Mm_ts = np.zeros(tsteps.shape, dtype=np.float32)
         iii, iiii = 0, 0 
         for i_g in range(n_gal): 
@@ -185,14 +185,14 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
             Mm_snaps_i = np.power(10., Mm_snaps[i_g, in_sim]) 
             
             t_i = tsteps[i_g,:] # t_i
-            #t_imdt = tsteps[i_g,:] - theta_sfh['dt_dMh'] # t_i - dt_dMh
             t_imdt = t_i - UT.tdyn_t(t_i) # t_i - tdyn 
+            #t_imdt = tsteps[i_g,:] - theta_sfh['dt_dMh'] # t_i - dt_dMh
 
             Mh_ti = np.interp(t_i, t_snaps_i[::-1], Mh_snaps_i[::-1]) 
             Mh_timdt = np.interp(t_imdt, t_snaps_i[::-1], Mh_snaps_i[::-1]) 
             
             f_dMh[i_g,:] = Mh_ti / Mh_timdt #1. - Mh_timdt /  
-            Mh_ts[i_g,:] = np.log10(Mh_ti)
+            #Mh_ts[i_g,:] = np.log10(Mh_ti)
             Mm_ti = np.interp(t_i, t_snaps_i[::-1], Mm_snaps_i[::-1]) 
             Mm_ts[i_g,:] = np.log10(Mm_ti)
             
@@ -300,7 +300,7 @@ def logSFR_initiate(SHsnaps, indices, theta_sfh=None, theta_sfms=None, testing=F
                 plt.close()
 
         del f_dMh
-        del Mh_ts
+        del Mm_ts
         
         # add in intrinsic scatter
         dlogSFR_int = np.random.randn(n_gal, n_col) * sigma_int 

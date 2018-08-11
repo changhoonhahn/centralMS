@@ -1,3 +1,4 @@
+import time 
 import numpy as np 
 # -- centralms -- 
 from centralms import util as UT
@@ -21,10 +22,11 @@ mpl.rcParams['ytick.major.width'] = 1.5
 mpl.rcParams['legend.frameon'] = False
 
 
-def testModel(): 
-    shcat = ABC.model('nodutycycle.sfsflex', [0.5, 0.4], nsnap0=15, downsampled='20', testing=True)
+def testModel(run): 
+    t0 = time.time() 
+    shcat = ABC.model(run, [0.5, 0.4], nsnap0=15, downsampled='20', testing=True)
+    print time.time() - t0 
     return None 
-
 
 def plotABC(run, T, prior='flex'): 
     ''' Corner plots of ABC runs  
@@ -229,8 +231,9 @@ if __name__=="__main__":
         #plotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14)
         #qaplotABC('rSFH_abias0.99_'+tduty+'gyr.sfsflex', 14)
+    testModel('rSFH_abias0.5_5gyr.sfsflex')
     
-    qaplotABC('rSFH_abias0.99_0.5gyr.sfsflex', 14)
+    #qaplotABC('rSFH_abias0.99_0.5gyr.sfsflex', 14)
     # no duty cycle run
     #plotABC('nodutycycle.sfsflex', 14, prior='flex')
     #qaplotABC('nodutycycle.sfsflex', 14)
