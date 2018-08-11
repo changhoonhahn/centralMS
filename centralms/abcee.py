@@ -119,7 +119,7 @@ def _model_theta(run, args):
         theta['sfh']['sigma_tot'] = 0.3 
         theta['sfh']['sigma_corr'] = rcorr * 0.3
         theta['sfh']['dt_delay'] = 0. # Gyr 
-        theta['sfh']['dt_dMh'] = 2.5 # Gyr
+        #theta['sfh']['dt_dMh'] = 2.5 # Gyr
     elif 'rSFH_0.2sfs' in run: 
         # run = rSFH_0.2sfs_%fgyr.sfs%s
         # SFH that randomly fluctuates on a tduty timescale 

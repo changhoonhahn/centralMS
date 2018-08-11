@@ -7,6 +7,9 @@ import os
 import sys
 import numpy as np
 from scipy import interpolate
+from astropy import units as U
+from astropy import constants as Const
+from astropy.cosmology import WMAP7
 
 
 def check_env(): 
@@ -80,6 +83,20 @@ def median(data, weights=None):
                 return sum(bounds) / float(len(bounds))
 
             return sorted_data[below_midpoint_index-1]
+
+
+def tdyn_t(tt, deg=6): 
+    if deg == 6: 
+        coeff = np.array([ 9.29206984e-09, -3.11237220e-07, 6.89619438e-06, 1.49737134e-04, 2.60164944e-04, 1.49149975e-01, 4.31546682e-04])
+    else: raise NotImplementedError 
+    tdyn_t = np.poly1d(coeff)
+    return tdyn_t(tt)
+
+
+def tdyn_nsnap(nsnap): 
+    z_t = z_nsnap(nsnap)
+    rho_m = WMAP7.Om(z_t) * WMAP7.critical_density(z_t)
+    return ((4./3. * np.pi * 200. * rho_m * Const.G)**-0.5).to(U.Gyr).value
 
 
 def z_from_t(tcosmic): 
@@ -157,6 +174,7 @@ def t_from_z(redshift):
     t_of_z = interpolate.interp1d(z, t, kind='cubic') 
 
     return t_of_z(redshift) 
+
 
 def dt_dz(zz, t_of_z=None): 
     # dt/dz estimate from Hogg 1999 per Gyr because it's faster

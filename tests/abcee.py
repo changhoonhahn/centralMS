@@ -81,11 +81,11 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
     theta_info = ABC.Theta() 
     sim_lbl = ', \n'.join([ttt+'='+str(round(tm,2)) for ttt, tm in zip(theta_info['label'], theta_med)]) 
     
-    fig = plt.figure(figsize=(5*(len(sumstat)+3),4))
+    fig = plt.figure(figsize=(5*(len(sumstat)+4),4))
     mbin = np.arange(8.1, 11.9, 0.1) - 2.*np.log10(0.7)
     for i_s, stat in enumerate(sumstat): 
         if stat == 'smf': 
-            sub = fig.add_subplot(1, len(sumstat)+3, i_s+1)
+            sub = fig.add_subplot(1, len(sumstat)+4, i_s+1)
             # Li-White SMF 
             marr, phi, phierr = Obvs.dataSMF(source='li-white')  
             phi *= (1. - np.array([Obvs.f_sat(mm, 0.05) for mm in marr])) # sallite fraction 
@@ -102,8 +102,30 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
             sub.legend(loc='lower left', fontsize=20) 
         else: 
             raise NotImplementedError
-    
-    sub = fig.add_subplot(1,len(sumstat)+3,len(sumstat)+1) # SMHMR panel of SF galaxies  
+
+    # SHMR panel of SF galaxies  
+    sub = fig.add_subplot(1,len(sumstat)+4,len(sumstat)+1) # SMHMR panel of SF galaxies  
+    isSF = (subcat_sim['galtype'] == 'sf') # only SF galaxies 
+    # SHAM SMHMR 
+    DFM.hist2d(subcat_sim['halo.m'][isSF], subcat_sim['m.sham'][isSF], 
+            weights=subcat_sim['weights'][isSF], 
+            levels=[0.68, 0.95], range=[[10., 14.], [9., 12.]], color='k', 
+            plot_datapoints=True, fill_contours=False, plot_density=True, ax=sub) 
+    # model 
+    DFM.hist2d(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
+            weights=subcat_sim['weights'][isSF], 
+            levels=[0.68, 0.95], range=[[10., 14.], [9., 12.]], color='C1', 
+            plot_datapoints=True, fill_contours=False, plot_density=True, ax=sub) 
+    sub.plot([0.,0.], [0.,0.], c='k', lw=2, label='SHAM') 
+    sub.plot([0.,0.], [0.,0.], c='C1', lw=2, label='model') 
+    sub.legend(loc='lower right', fontsize=15) 
+    sub.set_xlabel('$log\;M_{halo}$', fontsize=25)
+    sub.set_xlim([10.5, 14]) 
+    sub.set_ylabel('$log\,M_*$', fontsize=25)
+    sub.set_ylim([9.0, 11.5]) 
+
+    # scatter in the SHMR panel of SF galaxies  
+    sub = fig.add_subplot(1,len(sumstat)+4,len(sumstat)+2) 
     isSF = np.where(subcat_sim['galtype'] == 'sf') # only SF galaxies 
     smhmr = Obvs.Smhmr()
     # simulation 
@@ -136,7 +158,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
 
     # SFMS panel 
     tt = ABC._model_theta(run, theta_med)
-    sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+2)
+    sub = fig.add_subplot(1, len(sumstat)+4, len(sumstat)+3)
     DFM.hist2d(
             subcat_sim['m.star'][isSF], 
             subcat_sim['sfr'][isSF], 
@@ -149,7 +171,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
     sub.set_ylim([-4., 2.])
     
     # dSFR as a function of t_cosmic 
-    sub = fig.add_subplot(1, len(sumstat)+3, len(sumstat)+3)
+    sub = fig.add_subplot(1, len(sumstat)+4, len(sumstat)+4)
     mbins = np.linspace(9., 12., 10) 
 
     i_r = [] # select random SF galaxies over mass bins
@@ -202,11 +224,13 @@ if __name__=="__main__":
     #testModel()
     #qaplotABC('rSFH_abias0.5_5gyr.sfsflex', 12, theta=[0.5, 0.4], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
     #for tduty in ['0.5', '1', '2', '5', '10']: 
-    #    plotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14, prior='flex')
-    #    qaplotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14)
         #plotABC('randomSFH'+tduty+'gyr.sfsflex', 14, prior='flex')
-    #    qaplotABC('randomSFH'+tduty+'gyr.sfsflex', 14)
+        #qaplotABC('randomSFH'+tduty+'gyr.sfsflex', 14)
+        #plotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14, prior='flex')
+        #qaplotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14)
+        #qaplotABC('rSFH_abias0.99_'+tduty+'gyr.sfsflex', 14)
     
+    qaplotABC('rSFH_abias0.99_0.5gyr.sfsflex', 14)
     # no duty cycle run
     #plotABC('nodutycycle.sfsflex', 14, prior='flex')
-    qaplotABC('nodutycycle.sfsflex', 14)
+    #qaplotABC('nodutycycle.sfsflex', 14)
