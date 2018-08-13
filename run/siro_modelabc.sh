@@ -11,7 +11,13 @@ source /home/users/hahn/.bashrc
 #export CENTRALMS_CODEDIR="/home/users/hahn/projects/centralMS/"
 
 niter=14
-tscale="0.5"
+#tscale="0.5"
 #run="randomSFH0.5gyr.sfsanchored"
-run="rSFH_abias0.99_"$tscale"gyr.sfsflex"
-mpirun -np $NPROCS python /home/users/hahn/projects/centralMS/run/modelabc.py $run $niter > "/home/users/hahn/projects/centralMS/run/"$run"."$niter".modelabc.log"
+#run="rSFH_abias0.99_"$tscale"gyr.sfsflex"
+#run="rSFH_0.2sfs_"$tscale"gyr.sfsflex"
+#run="nodutycycle.sfsflex"
+for tscale in "2" "5" "10"; do 
+    run="rSFH_abias0.5_"$tscale"gyr.sfsflex"
+    echo $run
+    mpirun -np $NPROCS python /home/users/hahn/projects/centralMS/run/modelabc.py $run $niter > "/home/users/hahn/projects/centralMS/run/"$run"."$niter".modelabc.log"
+done 

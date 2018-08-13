@@ -14,3 +14,4 @@ tduty="0.5"
 sfs="flex"
 
 mpirun -np $NPROCS python /home/users/hahn/projects/centralMS/run/abc.py abias 0.99 $tduty $sfs 15 1000 > "/home/users/hahn/projects/centralMS/run/rSFH_abias0.99_"$tduty"gyr.sfs"$sfs".log"
+#mpirun -np $NPROCS python /home/users/hahn/projects/centralMS/run/abc.py abias 0.5 $tduty $sfs 15 1000 > "/home/users/hahn/projects/centralMS/run/rSFH_abias0.5_"$tduty"gyr.sfs"$sfs".log"

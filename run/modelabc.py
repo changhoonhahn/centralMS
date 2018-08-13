@@ -16,16 +16,18 @@ T = int(sys.argv[2])
 nsnap0 = 15
 sigma_smhm = 0.2
 downsampled = '20'
-    
-abcout = ABC.readABC(run, T) # read in the abc particles 
-savekeys = ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'galtype']
 
+savekeys = ['m.star', 'halo.m', 'm.max', 'weights', 'sfr', 'galtype']
+    
 abc_dir = ''.join([UT.dat_dir(), 'abc/', run, '/model/'])  # directory where all the ABC files are stored
 if not os.path.exists(abc_dir): # make directory if it doesn't exist 
-    os.makedirs(abc_dir)
+    try: 
+        os.makedirs(abc_dir)
+    except OSError:
+        pass 
 
 # save the median theta separately (evaluate it a bunch of times) 
-#theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))]
+abcout = ABC.readABC(run, T) # read in the abc particles 
 theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
 for i in range(10):  
     subcat_sim = ABC.model(run, theta_med, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled) 
