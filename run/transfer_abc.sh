@@ -13,11 +13,13 @@ mkdir -p $local_dir$run"/"
 
 cmd=$remote":"$remote_dir$run"/{info.md"
 
-for t in $(seq 0 $2); do 
-    cmd=$cmd",theta.t"$t"."$run".dat"
-    cmd=$cmd",w.t"$t"."$run".dat"
-    cmd=$cmd",rho.t"$t"."$run".dat"
-done 
+#for t in $(seq 0 $2); do 
+#done 
+t=$2
+cmd=$cmd",theta.t"$t"."$run".dat"
+cmd=$cmd",w.t"$t"."$run".dat"
+cmd=$cmd",rho.t"$t"."$run".dat"
 cmd=$cmd"}"
+
 #echo $cmd
 scp $cmd $local_dir$run

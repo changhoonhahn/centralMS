@@ -225,13 +225,14 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
 if __name__=="__main__": 
     #testModel()
     #qaplotABC('rSFH_abias0.5_5gyr.sfsflex', 12, theta=[0.5, 0.4], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
-    #for tduty in ['0.5', '1', '2', '5', '10']: 
+    for tduty in ['0.5', '1', '2', '5', '10']: 
         #plotABC('randomSFH'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('randomSFH'+tduty+'gyr.sfsflex', 14)
         #plotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14)
-        #qaplotABC('rSFH_abias0.99_'+tduty+'gyr.sfsflex', 14)
-    testModel('rSFH_abias0.5_5gyr.sfsflex')
+        plotABC('rSFH_abias0.99_'+tduty+'gyr.sfsflex', 14, prior='flex')
+        qaplotABC('rSFH_abias0.99_'+tduty+'gyr.sfsflex', 14)
+    #testModel('rSFH_abias0.5_5gyr.sfsflex')
     
     #qaplotABC('rSFH_abias0.99_0.5gyr.sfsflex', 14)
     # no duty cycle run
