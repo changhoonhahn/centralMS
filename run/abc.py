@@ -7,6 +7,7 @@ from centralms import util as UT
 from centralms import abcee as ABC
 from centralms import observables as Obvs 
 
+
 def minimize(tduty): 
     ''' 
     '''
@@ -22,10 +23,10 @@ def noAbiasABC(tduty, sfs='flex', Niter=14, Npart=1000):
     '''
     if tduty not in ['0.5', '1', '2', '5', '10']: 
         raise ValueError 
-    run = ''.join(['randomSFH', tduty, 'gyr.sfs', sfs]) 
+    run = ''.join(['randomSFH', tduty, 'gyr.sfsmf.sfs', sfs]) 
     print(run)
     prior = ABC.Prior(sfs, shape='tophat') 
-    ABC.runABC(run, Niter, [1.e5], prior, N_p=Npart, sumstat=['smf'], nsnap0=15, downsampled='20') 
+    ABC.runABC(run, Niter, [1.e5], prior, N_p=Npart, sumstat=['sfsmf'], nsnap0=15, downsampled='20') 
     return None 
 
 

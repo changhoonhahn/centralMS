@@ -65,6 +65,11 @@ def dataSum(sumstat=['smf']):
         marr, smf, _ = Obvs.dataSMF(source='li-white') # Li & White SMF 
         fcen = (1. - np.array([Obvs.f_sat(mm, 0.05) for mm in marr])) # sallite fraction 
         sums.append(fcen * smf) 
+    elif 'sfsmf' in sumstat: 
+        marr, smf, _ = Obvs.dataSMF(source='li-white') # Li & White SMF 
+        fcen = (1. - np.array([Obvs.f_sat(mm, 0.05) for mm in marr])) # sallite fraction 
+        fsf = Evol.Fsfms(marr) 
+        sums.append(fsf * fcen * smf) 
     else: 
         raise NotImplementedError
     return sums
@@ -220,6 +225,13 @@ def modelSum(cencat, sumstat=['smf']):
         if stat == 'smf': # central stellar mass function 
             try:
                 m_arr, smf = Obvs.getMF(cencat['m.star'], weights=cencat['weights'])
+            except ValueError: 
+                smf = np.zeros(38)
+            sums.append(smf) 
+        elif stat == 'sfsmf': 
+            try:
+                isSF = (censat['galtype'] == 'sf') 
+                m_arr, smf = Obvs.getMF(cencat['m.star'][isSF], weights=cencat['weights'][isSF])
             except ValueError: 
                 smf = np.zeros(38)
             sums.append(smf) 
