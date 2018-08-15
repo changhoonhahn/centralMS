@@ -270,8 +270,9 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
 
     # get uncertainties of central SMF
     m_arr, _, phi_err = Obvs.dataSMF(source='li-white')
-    # now scale err by f_cen 
+    # now scale err by f_cen and fSF
     phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in m_arr])))
+    phi_err *= np.sqrt(1./(1.-Evol.Fsfms(m_arr)))
 
     # summary statistics of simulation 
     def Sim(tt): 
