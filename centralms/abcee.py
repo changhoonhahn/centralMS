@@ -68,7 +68,7 @@ def dataSum(sumstat=['smf']):
     elif 'sfsmf' in sumstat: 
         marr, smf, _ = Obvs.dataSMF(source='li-white') # Li & White SMF 
         fcen = (1. - np.array([Obvs.f_sat(mm, 0.05) for mm in marr])) # sallite fraction 
-        fsf = Evol.Fsfms(marr) 
+        fsf = np.clip(Evol.Fsfms(marr), 0., 1.) 
         sums.append(fsf * fcen * smf) 
     else: 
         raise NotImplementedError
@@ -230,7 +230,7 @@ def modelSum(cencat, sumstat=['smf']):
             sums.append(smf) 
         elif stat == 'sfsmf': 
             try:
-                isSF = (censat['galtype'] == 'sf') 
+                isSF = (cencat['galtype'] == 'sf') 
                 m_arr, smf = Obvs.getMF(cencat['m.star'][isSF], weights=cencat['weights'][isSF])
             except ValueError: 
                 smf = np.zeros(38)
@@ -272,7 +272,10 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
     m_arr, _, phi_err = Obvs.dataSMF(source='li-white')
     # now scale err by f_cen and fSF
     phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in m_arr])))
-    phi_err *= np.sqrt(1./(1.-Evol.Fsfms(m_arr)))
+    fsfs = np.clip(Evol.Fsfms(m_arr), 0., 1.) 
+    fsfs_errscale = np.ones(len(m_arr))
+    fsfs_errscale[fsfs < 1.] = np.sqrt(1./(1.-fsfs[fsfs < 1.]))
+    phi_err *= fsfs_errscale
 
     # summary statistics of simulation 
     def Sim(tt): 
