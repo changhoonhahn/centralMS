@@ -99,7 +99,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
             #sub.errorbar(marr, phi, phierr, fmt='.k', label='Data')
             sub.fill_between(marr, phi-phierr, phi+phierr, color='k', alpha=0.5, linewidth=0, label='Data') 
             #sub.plot(0.5*(mbin[1:]+mbin[:-1]), sumdata[0], c='k', ls='--', label='Data')
-            sub.plot(0.5*(mbin[1:]+mbin[:-1]), sumsim[0], c='C0', label='Sim. \n'+sim_lbl)
+            sub.plot(0.5*(mbin[1:]+mbin[:-1]), sumsim[0], c='C0', label='Sim.')# \n'+sim_lbl)
         
             # SF central SMF
             isSF = (subcat_sim['galtype'] == 'sf') 
@@ -108,7 +108,7 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
             fsfs_errscale[fsfs < 1.] = np.sqrt(1./(1.-fsfs[fsfs < 1.]))
             sub.errorbar(marr, fsfs * phi, fsfs_errscale * phierr, fmt='.k') # data 
             mmm, smf_sf = Obvs.getMF(subcat_sim['m.star'][isSF], weights=subcat_sim['weights'][isSF])
-            sub.plot(mmm, smf_sf, c='C0', ls=':')
+            sub.plot(mmm, smf_sf, c='C0', ls='--')
             
             sub.set_xlabel('$log\;M_*$', fontsize=25)
             sub.set_xlim([9., 12.])
@@ -237,8 +237,6 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
         inmbin = ((subcat_sim['m.star'] > mbins[im]) & (subcat_sim['m.star'] < mbins[im+1]) & (subcat_sim['weights'] > 0))
         inmbin0 = ((subcat_sim['m.sham'] > mbins[im]) & (subcat_sim['m.sham'] < mbins[im+1]) & (subcat_sim['weights'] > 0))
         if np.sum(inmbin) > 0:  
-            print mbins[im], mbins[im+1]
-            print np.sum(subcat_sim['weights'][inmbin & (subcat_sim['galtype'] == 'sf')])
             fq[im] = np.sum(subcat_sim['weights'][inmbin & (subcat_sim['galtype'] == 'sf')])/np.sum(subcat_sim['weights'][inmbin])
         if np.sum(inmbin0) > 0: 
             fq_sham[im] = np.sum(subcat_sim['weights'][inmbin0 & (subcat_sim['galtype'] == 'sf')])/np.sum(subcat_sim['weights'][inmbin0])
@@ -445,7 +443,7 @@ def shmr_distribution(runs=['randomSFH0.5gyr.sfsflex', 'rSFH_abias0.5_0.5gyr.sfs
 if __name__=="__main__": 
     #testModel()
     #qaplotABC('rSFH_abias0.5_5gyr.sfsflex', 12, theta=[0.5, 0.4], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
-    for tduty in ['5', '10']: #['0.5', '1', '2', '5']:#, '10']: 
+    for tduty in ['0.5', '1', '2', '5', '10']: 
         #plotABC('randomSFH'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('randomSFH'+tduty+'gyr.sfsflex', 14)
         #plotABC('randomSFH'+tduty+'gyr.sfsmf.sfsflex', 14, prior='flex')
