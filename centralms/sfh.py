@@ -472,5 +472,22 @@ def SFR_sfms(logm, z, theta):
         return (0.5757 * (logm - 10.5) - 0.13868) + \
                 (z - 0.05) * (theta['slope'] * (logm - 10.5) + theta['amp']) 
 
+    elif theta['name'] == 'broken': # broken power law 
+        # mslope0 : high mass slope
+        # mslope1 : low mass slope
+        # zslope : redshift slope
+        amp_z = theta['zslope'] * (z - 0.05) - 0.19 
+        if isinstance(logm, float):  
+            if logm > 10.: 
+                amp_m = theta['mslope0'] * (logm - 10.) 
+            elif logm <= 10.: 
+                amp_m = theta['mslope1'] * (logm - 10.) 
+        elif isinstance(logm, np.ndarray):
+            lowm = (logm <= 10.) 
+            amp_m = theta['mslope0'] * (logm - 10.) 
+            amp_m[lowm] = theta['mslope1'] * (logm - 10.) 
+        return amp_m + amp_z
+
+
 def SSFR_sfms(logm, z, theta): 
     return SFR_sfms(logm, z, theta) - logm 
