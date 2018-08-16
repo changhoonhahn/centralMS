@@ -61,7 +61,7 @@ def Prior(name, shape='tophat'):
         prior_max = [2., 0.8]#, -0.06]
     elif name == 'broken': 
         # SFMS_zslope, SFMS_mslope0, SFMS_mslope1
-        prior_min = [1., 0.0, 0.0]
+        prior_min = [0.5, 0.0, 0.0]
         prior_max = [2., 0.8, 0.8]
     return  abcpmc.TophatPrior(prior_min, prior_max) 
 
