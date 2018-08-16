@@ -10,7 +10,7 @@ export PATH="/home/users/hahn/anaconda2/bin:$PATH"
 export CENTRALMS_DIR="/mount/sirocco1/hahn/centralms/"
 export CENTRALMS_CODEDIR="/home/users/hahn/projects/centralMS/"
 
-tduty="0.5"
+tduty="2"
 sfs="flex"
 
 mpirun -np $NPROCS python /home/users/hahn/projects/centralMS/run/abc.py noabias $tduty $sfs 15 1000 > "/home/users/hahn/projects/centralMS/run/randomSFH"$tduty"gyr.sfs"$sfs".log"
