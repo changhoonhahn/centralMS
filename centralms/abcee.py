@@ -18,12 +18,17 @@ from . import evolver as Evol
 from . import observables as Obvs
 
 
-def Theta(): 
+def Theta(prior='flex'): 
     tt = {} 
     #tt['variable'] = ['SFMS z slope', 'SFMS m slope']#, 'SFMS offset']
     #tt['label'] = ['$m_{z; SFMS}$', '$m_{M_*; SFMS}$']#, '$c_\mathrm{SFMS}$']
-    tt['variable'] = ['SFMS amp z param', 'SFMS slope z param']
-    tt['label'] = ['$m_{z; amp}$', '$m_{z; slope}$']
+    if prior in ['flex', 'anchored']: 
+        tt['variable'] = ['SFMS amp z param', 'SFMS slope z param']
+        tt['label'] = ['$m_{z; amp}$', '$m_{z; slope}$']
+    elif prior in ['broken']: 
+        tt['variable'] = ['SFS z slope', 'SFS m slope 0', 'SFS m slope 1']
+        tt['label'] = ['$m_{z; amp}$', '$m^{(0)}_{M_*; slope}$', '$m^{(1)}_{M_*; slope}$']
+
     return tt
 
 

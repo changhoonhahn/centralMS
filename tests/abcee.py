@@ -37,7 +37,7 @@ def plotABC(run, T, prior='flex'):
     abcout = ABC.readABC(run, T) 
     theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) 
             for i in range(len(abcout['theta'][0]))]
-    theta_info = ABC.Theta() 
+    theta_info = ABC.Theta(prior=prior) 
     prior_obj = ABC.Prior(prior) # prior
     prior_range = [(prior_obj.min[i], prior_obj.max[i]) for i in range(len(prior_obj.min))]
     
@@ -445,15 +445,17 @@ def shmr_distribution(runs=['randomSFH0.5gyr.sfsflex', 'rSFH_abias0.5_0.5gyr.sfs
 if __name__=="__main__": 
     #testModel()
     #qaplotABC('rSFH_abias0.5_5gyr.sfsflex', 12, theta=[0.5, 0.4], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
-    for tduty in ['0.5', '1', '2', '5']:#, '10']: 
+    for tduty in ['5', '10']: #['0.5', '1', '2', '5']:#, '10']: 
         #plotABC('randomSFH'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('randomSFH'+tduty+'gyr.sfsflex', 14)
-        plotABC('randomSFH'+tduty+'gyr.sfsmf.sfsflex', 14, prior='flex')
-        qaplotABC('randomSFH'+tduty+'gyr.sfsmf.sfsflex', 14)
+        #plotABC('randomSFH'+tduty+'gyr.sfsmf.sfsflex', 14, prior='flex')
+        #qaplotABC('randomSFH'+tduty+'gyr.sfsmf.sfsflex', 14)
         #plotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14)
         #plotABC('rSFH_abias0.99_'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('rSFH_abias0.99_'+tduty+'gyr.sfsflex', 14)
+        plotABC('randomSFH'+tduty+'gyr.sfsmf.sfsbroken', 14, prior='broken')
+        qaplotABC('randomSFH'+tduty+'gyr.sfsmf.sfsbroken', 14)
     #testModel('rSFH_abias0.5_5gyr.sfsflex')
     
     #qaplotABC('randomSFH0.5gyr.sfsflex', 14)
