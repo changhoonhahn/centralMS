@@ -42,7 +42,7 @@ def Prior(name, shape='tophat'):
     '''
     if shape != 'tophat': 
         raise NotImpelementError
-    if name not in ['anchored', 'flex']: 
+    if name not in ['anchored', 'flex', 'broken']: 
         raise ValueError
     
     if name == 'anchored': 
@@ -54,6 +54,10 @@ def Prior(name, shape='tophat'):
         # SFMS_zslope, SFMS_mslope
         prior_min = [1., 0.0]#, -0.15]
         prior_max = [2., 0.8]#, -0.06]
+    elif name == 'broken': 
+        # SFMS_zslope, SFMS_mslope0, SFMS_mslope1
+        prior_min = [1., 0.0, 0.0]
+        prior_max = [2., 0.8, 0.8]
     return  abcpmc.TophatPrior(prior_min, prior_max) 
 
 
@@ -105,6 +109,9 @@ def _model_theta(run, args):
         theta['sfms'] = {'name': 'flex', 'zslope': args[0], 'mslope': args[1], 'sigma': 0.3}
     elif run.split('.sfs')[-1] == 'anchored': 
         theta['sfms'] = {'name': 'anchored', 'amp': args[0], 'slope': args[1], 'sigma': 0.3}
+    elif run.split('.sfs')[-1] == 'broken': 
+        theta['sfms'] = {'name': 'broken', 'zslope': args[0], 
+                'mslope0': args[1], 'mslope1': args[2], 'sigma': 0.3}
     
     if 'randomSFH' in run: # fiducial
         # run = randomSFH%fgyr.sfs

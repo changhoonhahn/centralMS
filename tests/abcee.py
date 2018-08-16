@@ -4,6 +4,7 @@ import numpy as np
 from centralms import util as UT
 from centralms import sfh as SFH 
 from centralms import abcee as ABC
+from centralms import evolver as Evol
 from centralms import observables as Obvs
 # -- plotting --
 import corner as DFM 
@@ -92,17 +93,22 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
             # Li-White SMF 
             marr, phi, phierr = Obvs.dataSMF(source='li-white')  
             phi *= (1. - np.array([Obvs.f_sat(mm, 0.05) for mm in marr])) # sallite fraction 
+
+            # central SMF 
             phierr *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in marr])))
             #sub.errorbar(marr, phi, phierr, fmt='.k', label='Data')
             sub.fill_between(marr, phi-phierr, phi+phierr, color='k', alpha=0.5, linewidth=0, label='Data') 
             #sub.plot(0.5*(mbin[1:]+mbin[:-1]), sumdata[0], c='k', ls='--', label='Data')
             sub.plot(0.5*(mbin[1:]+mbin[:-1]), sumsim[0], c='C0', label='Sim. \n'+sim_lbl)
         
+            # SF central SMF
             isSF = (subcat_sim['galtype'] == 'sf') 
+            fsfs = np.clip(Evol.Fsfms(marr), 0., 1.) 
+            fsfs_errscale = np.ones(len(marr))
+            fsfs_errscale[fsfs < 1.] = np.sqrt(1./(1.-fsfs[fsfs < 1.]))
+            sub.errorbar(marr, fsfs * phi, fsfs_errscale * phierr, fmt='.k') # data 
             mmm, smf_sf = Obvs.getMF(subcat_sim['m.star'][isSF], weights=subcat_sim['weights'][isSF])
             sub.plot(mmm, smf_sf, c='C0', ls=':')
-            mmm, smf_sf = Obvs.getMF(subcat_sim['m.sham'][isSF], weights=subcat_sim['weights'][isSF])
-            sub.plot(mmm, smf_sf, c='k', ls=':')
             
             sub.set_xlabel('$log\;M_*$', fontsize=25)
             sub.set_xlim([9., 12.])
@@ -236,9 +242,6 @@ def qaplotABC(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsampled='2
             fq[im] = np.sum(subcat_sim['weights'][inmbin & (subcat_sim['galtype'] == 'sf')])/np.sum(subcat_sim['weights'][inmbin])
         if np.sum(inmbin0) > 0: 
             fq_sham[im] = np.sum(subcat_sim['weights'][inmbin0 & (subcat_sim['galtype'] == 'sf')])/np.sum(subcat_sim['weights'][inmbin0])
-    print 0.5*(mbins[1:] + mbins[:-1])
-    print fq
-    print fq_sham
     
     sub.plot(0.5*(mbins[1:] + mbins[:-1]), 1.-fq, c='C1')  
     sub.plot(0.5*(mbins[1:] + mbins[:-1]), 1.-fq_sham, c='k', ls='--')  
@@ -442,18 +445,20 @@ def shmr_distribution(runs=['randomSFH0.5gyr.sfsflex', 'rSFH_abias0.5_0.5gyr.sfs
 if __name__=="__main__": 
     #testModel()
     #qaplotABC('rSFH_abias0.5_5gyr.sfsflex', 12, theta=[0.5, 0.4], figure=''.join([UT.fig_dir(), 'evolvertest.png']))
-    #for tduty in ['0.5', '1', '2', '5', '10']: 
+    for tduty in ['0.5', '1', '2', '5']:#, '10']: 
         #plotABC('randomSFH'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('randomSFH'+tduty+'gyr.sfsflex', 14)
+        plotABC('randomSFH'+tduty+'gyr.sfsmf.sfsflex', 14, prior='flex')
+        qaplotABC('randomSFH'+tduty+'gyr.sfsmf.sfsflex', 14)
         #plotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('rSFH_abias0.5_'+tduty+'gyr.sfsflex', 14)
         #plotABC('rSFH_abias0.99_'+tduty+'gyr.sfsflex', 14, prior='flex')
         #qaplotABC('rSFH_abias0.99_'+tduty+'gyr.sfsflex', 14)
     #testModel('rSFH_abias0.5_5gyr.sfsflex')
     
-    qaplotABC('randomSFH0.5gyr.sfsflex', 14)
-    qaplotABC('rSFH_abias0.5_0.5gyr.sfsflex', 14)
-    qaplotABC('rSFH_abias0.99_0.5gyr.sfsflex', 14)
+    #qaplotABC('randomSFH0.5gyr.sfsflex', 14)
+    #qaplotABC('rSFH_abias0.5_0.5gyr.sfsflex', 14)
+    #qaplotABC('rSFH_abias0.99_0.5gyr.sfsflex', 14)
     #qaplotABC_Mhacc('rSFH_abias0.99_0.5gyr.sfsflex', 14)
     #shmr_slope()
     #shmr_distribution()
