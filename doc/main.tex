@@ -369,18 +369,6 @@ we describe how we evolve their SFR and $M_*$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Figure 5 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.9\textwidth]{figs/qaplot_abc.pdf}
-\caption{}
-\label{fig:abc_demo}
-\end{center}
-\end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \subsection{Evolving along the Star Formation Sequence} \label{sec:modelevol} 
 The tight correlation between the SFRs and stellar masses of SF 
 galaxies (the so-called SFS) has been observed to span over four 
@@ -468,71 +456,100 @@ prescription the SF centrals evolve as their SFRs fluctuate along the SFS
 throughout the timesteps of our model. 
 
 We continue to evolve our SF central galaxies until the final $z = 0.05$ 
-snapshot of our model. For the SF centrals and their host subhalos in our 
-model, not only do we have SFRs and $M_*$s that we evolved but we also 
-have halo histories from the $\mathtt{TreePM}$ $N$-body simulation. With 
-these properties, we can compare our model to observations using standard 
-observables such as the SMF. Since we have host halo histories, we can also 
-use observables such as the SHMR. Next, we present the comparison between 
-our model and observations and the constraints we derive on the role and 
-timescale of star formation variability in SF galaxies.
+snapshot. For the SF centrals in our model, not only do we have SFRs and 
+$M_*$s that we evolved but we also have their host halo properties from the 
+$\mathtt{TreePM}$ $N$-body simulation. Using these properties, we can compare 
+our model to observations and constrain the free parameters using observables 
+such as the quiescent fraction and SMF. Once we have a model that reproduces 
+the standard observables we can use the host halo properties to examine 
+observables such as the SHMR. Next, we present this comparison between 
+our model and observations and present the constraints we derive on the role 
+and timescale of star formation variability in the evolution of SF galaxies.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure 5 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figs/qaplot_abc.pdf}
+\caption{The observables of two models with different SFH prescriptions run 
+    using their respective ABC posterior distributions. One model has \todo{no star formation duty cycle} (red) 
+    while the other has a duty cycle of $t_\mathrm{duty} = 1\,\mathrm{Gyr}$ (blue). 
+    }
+\label{fig:abc_demo}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Results}
-Our model takes central subhalos from $\mathtt{TreePM}$ and tracks their 
-$SFR$ and $M_*$ evolution using a flexible parameterization of the SFS and 
-SFHs that incorporate variability through a star formation duty cycle 
-(Section~\ref{sec:modelevol}). At $z=0.05$, our model provides SFR, $M_*$, 
-and host halo mass, $M_h$, of its SF central galaxies. We now use these 
-properties to compare our model to observations. The parameterization of 
-the SFS 
+Our model takes $\mathtt{TreePM}$ central subhalos and tracks their $SFR$ 
+and $M_*$ evolution using a flexible parameterization of the SFS and 
+SFHs that incorporate variability through a star formation duty cycle.
+At $z = 0.05$, its final timestep, our model provides properties such 
+as the SFR, $M_*$, and host halo mass, $M_h$, of central galaxies it 
+classifies as SF. We now use these resulting properties to compare our 
+model to observations and constrain its free parameters---the parameters 
+of the Eq.~\ref{eq:logsfr_ms} SFS. Since the focus of our model and this 
+paper is on SF centrals, the main observable we use is the SMF of SF SDSS 
+centrals, which we estimate as 
+\beq \label{eq:smf_sf_cen} 
+\Phi^\mathrm{SDSS}_\mathrm{SF,cen} = f^\mathrm{cen}_\mathrm{SFS} \times f_\mathrm{cen} \times \Phi^\mathrm{Li\&White(2009)}.
+\eeq
+$f^\mathrm{cen}_\mathrm{SFS}$ is the fraction of central galaxies on the 
+SFS, which we fit in Eq.~\ref{eq:f_cen_sfms}. $f_\mathrm{cen}$ is the 
+central galaxy fraction from \cite{wetzel2013} and $\Phi^\mathrm{Li\&White(2009)}$ 
+is the SMF of the SDSS from \cite{li2009}. If our model reproduces the 
+observed $\Phi^\mathrm{SDSS}_\mathrm{SF,cen}$, by construction, it also 
+reproduces the observed quiescent fraction. 
 
-
-Although the SFS is parameterized using the free
-parameters $m_{M_*}$ and $m_z$ and hence the SFR distribution cannot be used as an observable, 
-
-the smf is a baller observable to compare to. 
-
-the SMF of our SF central galaxies can be compared to the observed SMF from 
-SDSS. 
-In order to do a principled
-comparison of our model to observation, we use the parameter estimation framework 
-of Approximate Bayesian Computation (ABC). ABC has the advantage over standard 
-approaches to parameter inference in that it does not 
+For the actual comparison of our model to observation, we use the parameter 
+estimation framework of Approximate Bayesian Computation (ABC). ABC has the 
+advantage over standard approaches to parameter inference in that it does not 
 require evaluating the likelihood. It relies only on a simulation of the observed 
 data and a distance metric to quantify the ``closeness'' between the observed data
 and simulation. Many variations of ABC has been used in astronomy and 
 cosmology~\citep[\emph{e.g.}][]{cameron2012,weyant2013,ishida2015,alsing2018}. 
 We use ABC in conjunction with the efficient Population Monte Carlo (PMC)
-importance sampling as in~\citep{hahn2016, hahn2017}. For the priors of $A_z$ and $m_z$, 
-we use uniform distributions spanning the ranges \todo{numbers} and \todo{numbers}, 
-respectively. As we mentioned in Section~\ref{sec:sfcen}, the range of the prior 
-were conservatively chosen to encompass the best-fit SFS from~\cite{speagle2014} 
+importance sampling as in~\citep{hahn2016, hahn2017}. For initial range of our
+ABC particles, \emph{i.e.} the priors of our Eq.~\ref{eq:logsfr_ms} SFS parameters
+\todo{$A_z$ and $m_z$}, we use uniform distributions spanning the ranges 
+\todo{numbers} and \todo{numbers}, respectively. As we mentioned in Section~\ref{sec:sfcen}, 
+the range of the prior were conservatively chosen to encompass the best-fit SFS from~\cite{speagle2014} 
 and measurements from~\cite{moustakas2013} and~\cite{lee2015} at $z \sim 1$. 
-Finally, to compare the SMF of our model to the SMF of SDSS central galaxies, 
-we use the following distance metric: 
+Finally, for our distance metric, we formulate a distance between the SMF of
+the SF centrals in our model to the observed $\Phi^\mathrm{SDSS}_\mathrm{SF,cen}$ 
+(Eq.~\ref{eq:smf_sf_cen}): 
 \beq
-\rho_\Phi = \sum\limits_{M} \left( \frac{\Phi^\mathrm{sim}(M) - f^\mathrm{cen}(M) \Phi^\mathrm{SDSS}(M)}{\sigma_\Phi(M)}\right)^2.
+\rho_\Phi = \sum\limits_{M} \left( \frac{\Phi^\mathrm{sim} - \Phi^\mathrm{SDSS}_\mathrm{SF,cen}}{\sigma'_\Phi}\right)^2.
 \eeq
-$\Phi^\mathrm{sim}(M)$ is the SMF of our model, $f^\mathrm{cen}(M)$ is the
-central galaxy fraction~\cite{wetzel2013}, $\Phi^\mathrm{SDSS}(M)$ is 
-the~\cite{li2009} SDSS DR7 SMF, and $\sigma_\Phi(M)$ is the SMF uncertainty 
-derived using mock catalogs from~\cite{li2009}. For the rest of our ABC-PMC 
-implementation, we strictly follow the implementation of \cite{hahn2017b} 
-and~\cite{hahn2017a}. We refer reader to those papers for further details.
+$\Phi^\mathrm{sim}(M)$ is the SMF of the SF centrals in our model and 
+\todo{$\sigma'_\Phi(M)$ is the SMF uncertainty derived using mock catalogs from~\cite{li2009}}. 
+For the rest of our ABC-PMC implementation, we strictly follow the implementation 
+of \cite{hahn2017b} and~\cite{hahn2017a}. We refer reader to those papers for 
+further details.
 
-In Figure~\ref{fig:abc_demo}, we present the SMFs (left), SFSs (center), and 
-$\sigma_{\log\,M_*}(\mathrm{log}\,M_\mathrm{halo})$ (right) of the resulting
-ABC posterior distributions of $A_z$ and $m_z$ for two models with different 
-SFH prescriptions: one with no star formation duty cycle (red) and the other 
-with star formation duty cycle $t_\mathrm{duty} = 1\,\mathrm{Gyr}$ (blue). 
-On the left, we illustrate that the ABC posteriors successfully reproduce
-the $z \sim 0$ SMF of SDSS centrals. In the center, we demonstrate how our 
-models by construction, reproduce the $z\sim0$ SFS. Lastly, on the right, 
-we demonstrate that different prescriptions for SFHs in our model produce significantly
-different scatter in $\log\,M_*$ for a given $\log\,M_\mathrm{halo}$ --- 
-\emph{i.e.} scatter in the SMHMR. Since there are observation constraints on 
-the SMHMR, this means that we can them to better understand and constrain 
-the SFHs of star forming galaxies. 
+In Figure~\ref{fig:abc_demo}, we present the SMFs (left), SFSs (middle), and 
+$\sigma_{\log\,M_*}(\mathrm{log}\,M_\mathrm{halo})$ (right) of two models 
+with different SFH prescriptions run using their respective ABC posterior 
+distributions. One model has \todo{no star formation duty cycle} (red) while the 
+other has a duty cycle of $t_\mathrm{duty} = 1\,\mathrm{Gyr}$ (blue). 
+%the resulting ABC posterior distributions of \todo{parameters} for two models with different SFH prescriptions: one with no star formation duty cycle (red) and the other with a duty cycle of $t_\mathrm{duty} = 1\,\mathrm{Gyr}$ (blue). 
+For both ABC posteriors, the models successfully reproduce $\Phi^\mathrm{SDSS}_\mathrm{SF,cen}$, 
+the SDSS SF central SMF (left).  %On the left, we illustrate that the ABC posteriors successfully reproduce the $z \sim 0$ SMF of SDSS centrals. 
+They also have similar SFSs (middle). Despite the similarity in the SFRs and 
+$M_*$s, \emph{depending on the timescale of the star formation duty cycle, the models 
+produce significantly different scatter in $\log\,M_*$ for a given $
+\log\,M_\mathrm{halo}$ --- \emph{i.e.} scatter in the SHMR} (right).
+Measurements of the scatter in SHMR of our models can be compared to observational 
+constraints on the SHMR in order to better understand and constrain the 
+SFHs of star forming galaxies.
+%on the right, 
+%we demonstrate that different prescriptions for SFHs in our model produce significantly
+%different scatter in $\log\,M_*$ for a given $\log\,M_\mathrm{halo}$ --- 
+%\emph{i.e.} scatter in the SMHMR. 
+%Since there are observation constraints on 
+%the SMHMR, this means that we can them to better understand and constrain 
+%the SFHs of star forming galaxies. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 5 
