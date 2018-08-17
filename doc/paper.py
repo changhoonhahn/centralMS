@@ -16,6 +16,7 @@ from centralms import util as UT
 from centralms import sfh as SFH 
 from centralms import abcee as ABC
 from centralms import catalog as Cat
+from centralms import evolver as Evol
 from centralms import observables as Obvs
 
 from ChangTools.plotting import prettycolors
@@ -431,136 +432,120 @@ def SFMSprior_z1():
     return None
 
 
-def qaplotABC(runs=['test0', 'randomSFH_0.5gyr'], Ts=[14, 11]): 
+def qaplotABC(runs=None, Ts=None): 
     ''' Figure that illustrates how the ABC fitting works using two different
     runs overplotted on it each other
     '''
     nsnap0 = 15
     sigma_smhm = 0.2
-    sumstat = ['smf']
+    sumstat = ['sfsmf']
 
-    # summary statistics of data (i.e. the SMF) 
-    subcat_dat = ABC.Data(nsnap0=nsnap0, sigma_smhm=sigma_smhm) # 'data'
-    sumdata = ABC.SumData(sumstat, info=True, nsnap0=nsnap0, sigma_smhm=sigma_smhm)  
-    
-    subcat_sims, sumsims = [], [] 
+    # summary statistics of data (i.e. the SMF of SF centrals) 
+    marr, smf, phi_err = Obvs.dataSMF(source='li-white') # Li & White SMF 
+    fcen = (1. - np.array([Obvs.f_sat(mm, 0.05) for mm in marr])) # sallite fraction 
+    fsf = np.clip(Evol.Fsfms(marr), 0., 1.) 
+    phi_sf_cen = fsf * fcen * smf 
+    phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in marr]))) # now scale err by f_cen 
+    fsfs = np.clip(Evol.Fsfms(marr), 0., 1.) 
+    fsfs_errscale = np.ones(len(marr))
+    fsfs_errscale[fsfs < 1.] = np.sqrt(1./(1.-fsfs[fsfs < 1.]))
+    phi_err *= fsfs_errscale
+        
+    # read in model(theta_median)
+    sims_meds = []   
     for run, T in zip(runs, Ts): 
-        # get median theta from ABC runs 
-        abcout = ABC.readABC(run, T)
-        theta_med = [np.median(abcout['theta'][:,i]) for i in range(abcout['theta'].shape[1])]
-        # read in Model(theta_med) 
-        abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # directory where all the ABC files are stored
-        f = h5py.File(''.join([abc_dir, 'model.theta_median0.t', str(T), '.hdf5']), 'r') 
-        subcat_sim = {} 
-        for key in f.keys(): 
-            subcat_sim[key] = f[key].value
-        subcat_sims.append(subcat_sim)
-        sumsims.append(ABC.SumSim(sumstat, subcat_sim, info=True))
-    colors = ['#EE6A50', '#1F77B4']
+        sim_meds = [] 
+        for i in range(100): 
+            f = pickle.load(open(''.join([UT.dat_dir()+'abc/'+run+'/model/', 
+                'model.theta', str(i), '.t', str(T), '.p']), 'rb'))
+            sim_i = {} 
+            for key in f.keys(): 
+                sim_i[key] = f[key]
+            sim_meds.append(sim_i) 
+        sims_meds.append(sim_meds)
+
+    colors = ['C3', 'C0']
     #labels = [r'model($\theta_\mathrm{median}$)', r'model($\theta_\mathrm{median}$)']
     labels = [None for r in runs]
-    if 'test0' in runs: 
-        labels[runs.index('test0')] = 'No duty cycle'
-    if 'randomSFH_1gyr' in runs: 
-        labels[runs.index('randomSFH_1gyr')] = '$t_\mathrm{duty} = 1$ Gyr'
-    if 'randomSFH_0.5gyr' in runs: 
-        labels[runs.index('randomSFH_0.5gyr')] = '$t_\mathrm{duty} = 0.5$ Gyr'
+    if 'nodutycycle.sfsmf.sfsbroken' in runs: 
+        labels[runs.index('nodutycycle.sfsmf.sfsbroken')] = 'No duty cycle'
+    if 'randomSFH1gyr.sfsmf.sfsbroken' in runs: 
+        labels[runs.index('randomSFH1gyr.sfsmf.sfsbroken')] = '$t_\mathrm{duty} = 1\,$Gyr'
+    if 'randomSFH10gyr.sfsmf.sfsbroken' in runs: 
+        labels[runs.index('randomSFH10gyr.sfsmf.sfsbroken')] = '$t_\mathrm{duty} = 10\,$Gyr'
 
     fig = plt.figure(figsize=(16,5))
-    _, _, phi_err = Obvs.MF_data(source='li-white', m_arr=sumdata[0][0]) # get uncertainties of central SMF
-    phi_err *= np.sqrt(1./(1.-np.array([Obvs.f_sat(mm, 0.05) for mm in sumdata[0][0]]))) # now scale err by f_cen 
-    
     # --- SMF panel ---
-    sub = fig.add_subplot(1,3,1)
-    sub.errorbar(sumdata[0][0], sumdata[0][1], yerr=phi_err, fmt='.k', 
-            label=r'$\Phi_\mathrm{cen}^{\footnotesize \mathrm{Li}\&\mathrm{White}(2009)}$') 
-    #label='$f_\mathrm{cen} \Phi^{\mathrm{Li}\&\mathrm{White}(2009)}$')
-    for i_s, sumsim in enumerate(sumsims): 
-        if i_s == len(sumsims)-1: 
-            sub.plot(sumsim[0][0], sumsim[0][1], c=colors[i_s], ls='--')#, label=r'model($\theta_\mathrm{median}$)')
-        else: 
-            sub.plot(sumsim[0][0], sumsim[0][1], c=colors[i_s])#, label=r'model($\theta_\mathrm{median}$)')
-    sub.set_xlim([9.5, 11.75])
+    sub = fig.add_subplot(131)
+    sub.fill_between(marr, phi_sf_cen-phi_err, phi_sf_cen+phi_err,
+            linewidth=0., color='k', alpha=0.3, label=r'SDSS')#'$\Phi_\mathrm{SF, cen}^{\footnotesize \mathrm{SDSS}}$') 
+    for i_s, meds in enumerate(sims_meds): 
+        phi_sim = [] 
+        for med in meds: 
+            phi_sim_i = ABC.modelSum(med, sumstat=['sfsmf']) 
+            phi_sim.append(phi_sim_i[0]) 
+        sub.plot(marr, np.percentile(phi_sim, [50], axis=0)[0], c=colors[i_s]) #label=labels[i_s])#, label=r'model($\theta_\mathrm{median}$)')
+    sub.plot([0.,0.], [0.,0.], c='k', label=r'model($\theta_\mathrm{median}$)')
+    sub.set_xlim([9.4, 11.25])
     sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
-    sub.set_ylim([1e-5, 10**-1.75])
+    sub.set_ylim([1e-5, 10**-2.])
     sub.set_yscale('log')
     sub.set_ylabel('log $(\;\Phi\; / \mathrm{Mpc}^{-3}\,\mathrm{dex}^{-1}\;)$', fontsize=25)
-    sub.legend(loc='lower left', prop={'size':20}) 
+    sub.legend(loc='lower left', handletextpad=0.2, prop={'size':20}) 
+    sub.text(0.95, 0.9, r'SF centrals', 
+            ha='right', va='center', transform=sub.transAxes, fontsize=20)
 
     # --- SFMS panel ---
-    sub = fig.add_subplot(1,3,2)
-    #gc = Cat.Observations('group_catalog', Mrcut=18, position='central')
-    #gc_cat = gc.Read() 
-    #sub.scatter(gc_cat['mass'], gc_cat['sfr'], s=2)
-    for i_s, subcat_sim in enumerate(subcat_sims): 
-        isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
+    sub = fig.add_subplot(132)
+    for i_s, meds in enumerate(sims_meds): 
+        med = meds[0] 
+        isSF = np.where(med['galtype'] == 'sf') # only SF galaxies 
         DFM.hist2d(
-                subcat_sim['m.star'][isSF], 
-                subcat_sim['sfr'][isSF], 
-                weights=subcat_sim['weights'][isSF], 
-                levels=[0.68, 0.95], range=[[9., 12.], [-3., 1.]], color=colors[i_s], 
+                med['m.star'][isSF], 
+                med['sfr'][isSF], 
+                weights=med['weights'][isSF], 
+                levels=[0.68, 0.95], range=[[9., 12.], [-2., 1.]], color=colors[i_s], 
                 bins=20, plot_datapoints=False, fill_contours=False, plot_density=True, ax=sub) 
-    
-    # observations 
-    #m_arr = np.arange(8., 12.1, 0.1)
-    #sfr_arr = SFH.SFR_sfms(m_arr, UT.z_nsnap(1), subcat_sim['theta_sfms'])
-    #sub.plot(m_arr, sfr_arr+0.3, ls='--', c='k') 
-    #sub.plot(m_arr, sfr_arr-0.3, ls='--', c='k') 
-    sub.set_xlim([9., 11.5])
-    sub.set_xticks([9., 10., 11.]) 
+    sub.set_xlim([9., 11.])
+    sub.set_xticks([9., 9.5, 10., 10.5, 11.]) 
     sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
-    sub.set_ylim([-2.5, 1.])
+    sub.set_ylim([-2., 1.])
     sub.set_yticks([-2., -1., 0., 1.])
     sub.set_ylabel('log $(\;\mathrm{SFR}\;[M_\odot/\mathrm{yr}])$', fontsize=25)
 
     # --- sigma_logM* panel ---
-    sub = fig.add_subplot(1,3,3)
+    sub = fig.add_subplot(133)
     smhmr = Obvs.Smhmr()
     # simulation 
     mhalo_bin = np.linspace(10., 15., 11)
-    for i_s, subcat_sim in enumerate(subcat_sims): 
-        abc_dir = UT.dat_dir()+'abc/'+runs[i_s]+'/model/' # directory where all the ABC files are stored
-        isSF = np.where(subcat_sim['gclass'] == 'sf') # only SF galaxies 
-        m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(
-                subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
-                dmhalo=0.5, weights=subcat_sim['weights'][isSF], m_bin=mhalo_bin)
-        #sub.plot(m_mid, sig_mhalo, c='#1F77B4', lw=2, label='Model') 
-        for i in range(1000): 
-            f = h5py.File(
-                    ''.join([abc_dir, 'model.theta', str(i), '.t', str(Ts[i_s]), '.hdf5']), 
-                    'r') 
-            subcat_sim_i = {} 
-            for key in f.keys(): 
-                subcat_sim_i[key] = f[key].value
-            #subcat_sim_i = ABC.model(run, theta_i, 
-            #        nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled='14') 
-            isSF = np.where(subcat_sim_i['gclass'] == 'sf') # only SF galaxies 
-            m_mid_i, _, sig_mhalo_i, cnt_i = smhmr.Calculate(subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
-                    dmhalo=0.5, weights=subcat_sim_i['weights'][isSF], m_bin=mhalo_bin)
-            #sub.plot(m_mid_i, sig_mhalo_i, c='k', lw=1, alpha=0.1) 
-            if i == 0:  
-                sig_mhalos = np.zeros((1000, len(cnt_i)))
-                counts = np.zeros((1000, len(cnt_i)))
-            sig_mhalos[i,:] = sig_mhalo_i
-            counts[i,:] = cnt_i
-        
-        sig_mhalo_low = np.zeros(len(m_mid))
-        sig_mhalo_high = np.zeros(len(m_mid))
-        for im in range(len(m_mid)): 
+    for i_s, meds in enumerate(sims_meds): 
+        for ii, med in enumerate(meds): 
+            isSF = np.where(med['galtype'] == 'sf') # only SF galaxies 
+            m_mid_i, _, sig_mhalo_i, cnt_i = smhmr.Calculate(med['halo.m'][isSF], med['m.star'][isSF], 
+                    dmhalo=0.5, weights=med['weights'][isSF], m_bin=mhalo_bin)
+
+            if ii == 0: 
+                sig_mhalos = np.zeros((len(meds), len(cnt_i)))
+                counts = np.zeros((len(meds), len(cnt_i)))
+            sig_mhalos[ii,:] = sig_mhalo_i
+            counts[ii,:] = cnt_i
+        sig_mhalo_low = np.zeros(len(m_mid_i))
+        sig_mhalo_high = np.zeros(len(m_mid_i))
+        for im in range(len(m_mid_i)): 
             if np.mean(counts[:,im]) > 50.: 
                 above_zero = np.where(counts[:,im] > 0) 
                 sig_mhalo_low[im], sig_mhalo_high[im] = np.percentile((sig_mhalos[:,im])[above_zero], [16, 84])#, axis=0)
-
         above_zero = np.where(sig_mhalo_high > 0) 
-        sub.fill_between(m_mid[above_zero], sig_mhalo_low[above_zero], sig_mhalo_high[above_zero], color=colors[i_s], linewidth=0, alpha=0.3, label=labels[i_s]) 
+        sub.fill_between(m_mid_i[above_zero], sig_mhalo_low[above_zero], sig_mhalo_high[above_zero], 
+                color=colors[i_s], linewidth=0, alpha=0.5, label=labels[i_s]) 
     sub.set_xlim([11.5, 13.25])
     sub.set_xlabel('log $(\; M_\mathrm{halo}\; [M_\odot]\;)$', fontsize=25)
-    sub.set_ylim([0., 0.6])
-    sub.set_ylabel('$\sigma_{\mathrm{log}\,M_*}$', fontsize=27)
-    sub.legend(loc='lower left', prop={'size': 20}) 
-    sub.text(0.95, 0.9, r'model($\theta_\mathrm{median}$)', 
-            ha='right', va='center', transform=sub.transAxes, fontsize=20)
-
+    sub.set_ylim([0.1, 0.5])
+    sub.set_yticks([0.1, 0.2, 0.3, 0.4, 0.5]) 
+    sub.set_ylabel('$\sigma_{\mathrm{log}\,M_*}$', fontsize=32)
+    sub.legend(loc='lower right', handletextpad=0.5, prop={'size': 20}) 
+    #sub.text(0.95, 0.9, r'model($\theta_\mathrm{median}$)', 
+    #        ha='right', va='center', transform=sub.transAxes, fontsize=20)
     fig.subplots_adjust(wspace=0.3)
     fig.savefig(''.join([UT.tex_dir(), 'figs/qaplot_abc.pdf']), bbox_inches='tight', dpi=150) 
     plt.close()
@@ -572,11 +557,11 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sigma_logM*(M_h = 10^12) and sigma_logMhalo(M* = 10^10.5)) as a function of duty 
     cycle timescale (t_duty) from the ABC posteriors. 
     '''
-    runs = ['randomSFH0.5gyr.sfsflex', 
-            'randomSFH1gyr.sfsflex', 
-            'randomSFH2gyr.sfsflex', 
-            'randomSFH5gyr.sfsflex', 
-            'nodutycycle.sfsflex']
+    runs = ['randomSFH0.5gyr.sfsmf.sfsbroken', 
+            'randomSFH1gyr.sfsmf.sfsbroken', 
+            'randomSFH2gyr.sfsmf.sfsbroken', 
+            'randomSFH5gyr.sfsmf.sfsbroken', 
+            'nodutycycle.sfsmf.sfsbroken']
             #'randomSFH10gyr.sfsflex']
     tduties = [0.5, 1., 2., 5., 9.75]  #hardcoded
     iters = [14 for i in range(len(tduties))] # 13, 13, 12, 12, 12] # iterations of ABC
@@ -1162,9 +1147,9 @@ if __name__=="__main__":
     #SFMSprior_z1()
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
-    SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
+    #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
-    #qaplotABC(runs=['test0', 'randomSFH_1gyr'], Ts=[14, 14])
+    qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14])
     #fQ_fSFMS()
     #SFHmodel()
     #Illustris_SFH()
