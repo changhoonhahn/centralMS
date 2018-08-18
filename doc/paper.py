@@ -951,26 +951,26 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sub1.add_artist(legend1)
     sub1.set_xlim([0.5, 10.]) # x-axis
     sub1.set_xscale('log') 
-    sub1.set_ylabel(r'$\sigma_{M_*} \Big(M_\mathrm{halo} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=15) # y-axis
+    sub1.set_ylabel(r'$\sigma_{M_*} \Big(M_\mathrm{halo} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=20) # y-axis
     sub1.set_ylim([0.1, 0.4]) 
     sub1.set_yticks([0.1, 0.2, 0.3, 0.4])#, 0.6]) 
     # ABC posteriors 
     subplts = [] 
-    marks2 = ['P', '*', 'p', 'd'] 
+    marks2 = ['+', '*', 'p', 'd'] 
     for ii, tt, sig in zip(range(len(lit_siglogMh)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMh)), lit_siglogMh_median):
         #subplt = sub2.plot([tt/1.03, tt*1.03], [sig, sig], color='C'+str(ii))#, yerr=0.02, uplims=True)
         #subplt = sub2.errorbar([tt], [sig], yerr=0.02, uplims=True, color='C'+str(ii))
-        subplt = sub2.scatter([tt], [sig], color='k', marker=marks2[ii], s=40)#, label=lit_siglogMh[ii]) #fmt='.C'+str(ii), markersize=10)
+        subplt = sub2.scatter([tt], [sig], color='k', marker=marks2[ii], s=60)#, label=lit_siglogMh[ii]) #fmt='.C'+str(ii), markersize=10)
         subplts.append(subplt) 
-    leg1 = sub2.legend(subplts, lit_siglogMh, loc='lower right', handletextpad=-0.5, markerscale=1, prop={'size': 15})
+    leg1 = sub2.legend(subplts, lit_siglogMh, loc='lower right', handletextpad=-0.5, markerscale=0.66, prop={'size': 15})
     #abc_post1 = sub2.errorbar([0], [0], yerr=[0.1], fmt='.k', marker=None, markersize=None) 
     #abc_post2 = sub2.errorbar([0], [0], yerr=[0.1], fmt='.k', marker='s', markersize=3) 
     #abc_post3 = sub2.errorbar([0], [0], yerr=[0.1], fmt='.k', marker='^', markersize=3) 
     abc_post1 = sub2.fill_between([0], [0], [0.1], color='C0', label='no assembly bias') 
     abc_post2 = sub2.fill_between([0], [0], [0.1], color='C1', label='$r=0.5$') 
     abc_post3 = sub2.fill_between([0], [0], [0.1], color='C2', label='$r=0.99$') 
-    sub2.text(0.05, 0.95, 'Hahn+(2018) posteriors', ha='left', va='top', transform=sub2.transAxes, fontsize=15)
-    sub2.legend(loc=(0.01, 0.65), handletextpad=0.4, fontsize=15) 
+    sub2.text(0.03, 0.97, 'Hahn+(2018) posteriors', ha='left', va='top', transform=sub2.transAxes, fontsize=15)
+    sub2.legend(loc=(0.01, 0.68), handletextpad=0.4, fontsize=15) 
     sub2.add_artist(leg1)
     sub2.set_xlim([0.5, 10.]) # x-axis
     sub2.set_xscale('log') 
