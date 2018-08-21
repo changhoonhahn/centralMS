@@ -1,5 +1,6 @@
 \documentclass[12pt, letterpaper, preprint]{aastex}
 \usepackage[breaklinks,colorlinks, urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
+\usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{color}
 \input{vc}
@@ -547,12 +548,12 @@ further details.
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.75\textwidth]{figs/SHMRscatter_tduty.pdf}
-    \caption{Our models with shorter star formation duty cycle timescales, $t_\mathrm{duty}$, 
-    produce smaller scatter in the SHMR: $\sigma_{\log\,M_*}$ at $M_h{=}10^{12} M_\odot$ (left) 
+    \caption{With shorter star formation duty cycle timescales, $t_\mathrm{duty}$, our model
+    produces smaller scatter in the SHMR---$\sigma_{\log\,M_*}$ at $M_h{=}10^{12} M_\odot$ (left) 
     and $\sigma_{\log\,M_h}$ at $M_*{=}10^{10} M_\odot$. For $t_\mathrm{duty} = 10\,\mathrm{Gyr}$, 
-    $\sigma_{\log\,M_*} = 0.32$ and $\sigma_{\log\,M_h} = 0.30$. Meanwhile for $
-    t_\mathrm{duty} = 0.5\,\mathrm{Gyr}$, $\sigma_{\log\,M_*}= 0.26$ and 
-    $\sigma_{\log\,M_h} = 0.20$. We include $\sigma_{\log\,M_*}$ 
+    $\sigma_{\log\,M_*} = 0.32\,\mathrm{dex}$ and $\sigma_{\log\,M_h} = 0.30\,\mathrm{dex}$. 
+    Meanwhile for $t_\mathrm{duty} = 0.5\,\mathrm{Gyr}$, $\sigma_{\log\,M_*}= 0.26\,\mathrm{dex}$ 
+    and $\sigma_{\log\,M_h} = 0.20$. We include $\sigma_{\log\,M_*}$ 
     constraints from \cite{yang2009, more2011, leauthaud2012, reddick2013, tinker2013, zu2015} 
     and $\sigma_{\log\,M_h}$ constraints from~\cite{mandelbaum2006, more2011, velander2014, han2015}.
     The~\cite{mandelbaum2006, han2015} $\sigma_{\log\,M_h}$ constraints serve as upper limits. 
@@ -568,39 +569,54 @@ In Figure~\ref{fig:abc_demo}, we present the SMFs (left), SFSs (middle), and
 $\sigma_{\log\,M_*}(\mathrm{log}\,M_\mathrm{halo})$ (right) of two models 
 with different SFH prescriptions each run using the medians parameter values 
 of their ABC posterior distributions --- $\theta_\mathrm{median}$. One model 
-has \todo{no star formation duty cycle} (red) while the other has a duty cycle 
-of $t_\mathrm{duty} = 1\,\mathrm{Gyr}$ (blue). Both models successfully reproduce 
-the SDSS SMF, $\Phi^\mathrm{SDSS}_\mathrm{SF,cen}$. By construction, they also 
-produce SFSs that are consistent with observations based on the priors. \todo{something something}
-
-, \emph{the difference in the star formation duty cycle timescales of the models 
-results in dramatically different scatter in $\log\,M_*$ for a given $
-\log\,M_\mathrm{halo}$ (\emph{i.e.} scatter in the SHMR)}, particularly at
+has duty cycle of $t_\mathrm{duty} = 10\,\mathrm{Gyr}$ (red) while the other 
+has a duty cycle of $t_\mathrm{duty} = 1\,\mathrm{Gyr}$ (blue). Both models, 
+as expected from the ABC posteriors, successfully reproduce the SDSS SMF 
+($\Phi^\mathrm{SDSS}_\mathrm{SF,cen}$). By construction, \emph{i.e.} the priors, 
+they also have SFSs consistent with observations. Despite their consistency, 
+however, \emph{the difference in the star formation duty cycle timescales of 
+the models results in dramatically different scatter in $\log\,M_*$ at a given 
+$\log\,M_\mathrm{halo}$ (\emph{i.e.} scatter in the SHMR)}, particularly below 
 $M_\mathrm{halo} < 10^{12.5}M_\odot$. 
 
-In other words the scatter in the SHMRs of our models with different timescale 
-star formation duty cycles can be compared to observational constraints on the 
-SHMR in order to constrain the star formation duty cycle and the SFHs of star 
+Since the scatter in SHMR of our model depends on the star formation duty cycle
+timescale, we can compare the scatter from our model to observational constraints
+on the SHMR in order to constrain the star formation duty cycle and the SFHs of star 
 forming galaxies (Figure~\ref{fig:sigMstar_duty}). More specifically in 
 Figure~\ref{fig:sigMstar_duty}, we present $\sigma_{\log\,M_*}$, the scatter in 
 $\log\,M_*$ at fixed halo mass, at $M_h = 10^{12} M_\odot$) and $\sigma_{\log\,M_h}$, 
-the scatter in $\log\,M_h$ at fixed stellar mass, at $M_* = 10^{10} M_\odot$. 
+the scatter in $\log\,M_h$ at fixed stellar mass, at $M_* = 10^{10} M_\odot$  
+as a function of $t_\mathrm{duty}$. For $t_\mathrm{duty}$ ranging from $10$ to 
+$0.5\,\mathrm{Gyr}$, $\sigma_{\log\,M_*}$ ranges from \todo{$0.32\substack{+5.1\\ -4.0}$ to 
+$0.26\substack{+5.1\\ -4.0}\,\mathrm{dex}$ and $\sigma_{\log\,M_h}$ ranges from 
+number to number}. With a shorter star formation duty timescale, our model 
+produces significantly smaller scatter in the SHMR. 
+
+In order to constrain $t_\mathrm{duty}$ of our model, we compare the scatter
+in our model to $\sigma_{\log\,M_*}$s and $\sigma_{\log\,M_h}$s from observational 
+constraints in the literature. In the left panel of Figure~\ref{fig:sigMstar_duty}, 
+we include~\cite{yang2009, more2011, leauthaud2012, reddick2013, tinker2013, zu2015}. 
+These works mainly derive their $\sigma_{\log\,M_*}$ measurements using some sort of 
+halo occupation based models. \cite{more2011} use a halo occupation based model and 
+kinematics of satellite galaxies to infer a fixed $\sigma_{\log\,M*}$ from the SDSS NYU-VAGC for 
+blue central galaxies. In~\cite{leauthaud2012}, they use weak lesning, galaxy clustering, 
+and galaxy number densities of the COSMOS survey\todo{cite} to constrain $sigma_{\log\,M*}$ for all 
+galaxies. 
+
+Unlike the rest, \cite{yang2009} uses a group catalog constructed from SDSS DR4\todo{cite}
+to measure conditional SMF. Based on the CSMF for blue centrals they find $\sigma_{\log\,M_*}(M_h \sim 10^{12.16}M_\odot) = 0.122 \pm 0.03$ 
+    averaged over two SDSS samples and two group mass difference.
 
 
+In the
+right, we include~\cite{mandelbaum2006a, more2011, velander2013, han2015}. 
 
-as a function of their star formation duty cycle timescale in Figure~\ref{fig:sigMstar_duty}.
-
-%Now that we have a model that evolves the SFRs and $M_*$s of SF centrals, we can compare this model to observations. Our model is constructed using the SMF and SMHMR at $z = 1$ and based on the observed evolution of the SFS.  It has two free parameters $A_z$ and $m_z$, which allow for a flexible redshift dependence of the SFS. At the final snapshot, $z \sim 0$, our model reproduces the observed SFR distribution by construction. However, we also want our model to 
-
-
-%In the previous section we describe our model constructed from blah with different
-%prescriptions for the star formation histories of star-forming galaxies. As the 
-%right panel of Figure~\ref{fig:abc_demo} demonstrates, different prescriptions for 
-%the star-forming galaxy star formation predicts different $\sigma_{\log\,M_*}$ 
 
 
 \bitem
-\item No duty cycle model obviously ruled out 
+\item \cite{yang2009} uses a group catalog constructed from SDSS DR4 to measure conditional 
+    SMF. Based on the CSMF for blue centrals they find $\sigma_{\log\,M_*}(M_h \sim 10^{12.16}M_\odot) = 0.122 \pm 0.03$ 
+    averaged over two SDSS samples and two group mass difference.
 
 \item \cite{more2011} use kinematics of satellite galaxies in a dark matter halo to 
     infer the scaling relations between halo mass and central galaxy properties. 
@@ -635,9 +651,6 @@ as a function of their star formation duty cycle timescale in Figure~\ref{fig:si
     The best-fit model has $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.22 \pm 0.02$ 
     for all galaxies. 
 
-\item \cite{yang2009} uses a group catalog constructed from SDSS DR4 to measure conditional 
-    SMF. Based on the CSMF for blue centrals they find $\sigma_{\log\,M_*}(M_h \sim 10^{12.16}M_\odot) = 0.122 \pm 0.03$ 
-    averaged over two SDSS samples and two group mass difference.
 \eitem
 
 from weak lensing:

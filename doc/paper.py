@@ -651,8 +651,12 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sub = fig.add_subplot(121) 
     # ABC posteriors 
     #abc_post = sub.errorbar(tduties, sigMs[0,:], yerr=[sigMs[0,:]-sigMs[1,:], sigMs[2,:]-sigMs[0,:]], fmt='.C0') 
+    print tduties, sigMs[1,:]
     print tduties, sigMs[0,:]
+    print tduties, sigMs[2,:]
+    print tduties, sigMh[1,:]
     print tduties, sigMh[0,:]
+    print tduties, sigMh[2,:]
     sub.fill_between(tduties, sigMs[3,:], sigMs[4,:], color='C0', alpha=0.1, linewidth=0) 
     sub.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C0', alpha=0.5, linewidth=0) 
     # literature 
