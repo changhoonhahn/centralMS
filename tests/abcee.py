@@ -369,11 +369,12 @@ def qaplotABC_Mhacc(run, T, sumstat=['smf'], nsnap0=15, sigma_smhm=0.2, downsamp
     return None 
 
 
-def shmr_slope(runs=['randomSFH0.5gyr.sfsflex', 'rSFH_abias0.5_0.5gyr.sfsflex', 'rSFH_abias0.99_0.5gyr.sfsflex'], T=14, nsnap0=15, downsampled='20'):  
+def shmr_slope(runs=['randomSFH0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], T=14, nsnap0=15, downsampled='20'):  
     smhmr = Obvs.Smhmr()
-    fig = plt.figure(figsize=(10,4))
-    sub = fig.add_subplot(121) 
-    sub0 = fig.add_subplot(122) 
+    fig = plt.figure(figsize=(15,4))
+    sub = fig.add_subplot(131) 
+    sub0 = fig.add_subplot(132) 
+    sub1 = fig.add_subplot(133)
     for i_run, run in enumerate(runs): 
         abcout = ABC.readABC(run, T)
         # median theta 
@@ -387,9 +388,15 @@ def shmr_slope(runs=['randomSFH0.5gyr.sfsflex', 'rSFH_abias0.5_0.5gyr.sfsflex', 
         # simulation 
         m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['halo.m'][isSF], subcat_sim['m.star'][isSF], 
                 dmhalo=0.2, weights=subcat_sim['weights'][isSF])
-
+        i0 = np.argmin(m_mid[m_mid > 12.] - 12.) 
+        i1 = np.argmax(m_mid[m_mid < 12.] - 12.)
+        print run
+        print (mu_mhalo[i0] - mu_mhalo[i1])/(m_mid[i0] - m_mid[i1])
         sub.errorbar(m_mid+0.02*i_run, mu_mhalo, sig_mhalo, fmt='.C'+str(i_run), label=''.join(run.split('_')))
         sub0.plot(m_mid, mu_mhalo, c='C'+str(i_run)) 
+        m_mid, mu_mhalo, sig_mhalo, cnts = smhmr.Calculate(subcat_sim['m.star'][isSF], subcat_sim['halo.m'][isSF], 
+                dmhalo=0.2, weights=subcat_sim['weights'][isSF])
+        sub1.errorbar(m_mid+0.02*i_run, mu_mhalo, sig_mhalo, fmt='.C'+str(i_run), label=''.join(run.split('_')))
     sub.legend(loc='lower right', handletextpad=0.1, fontsize=15) 
     sub.set_xlabel('$\log\,M_{halo}$', fontsize=25)
     sub.set_xlim([11., 14.])
@@ -398,13 +405,16 @@ def shmr_slope(runs=['randomSFH0.5gyr.sfsflex', 'rSFH_abias0.5_0.5gyr.sfsflex', 
     sub0.set_xlabel('$\log\,M_{halo}$', fontsize=25)
     sub0.set_xlim([11., 14.])
     sub0.set_ylim([9., 11.5])
+    sub1.set_xlabel('$\log\,M_*$', fontsize=25)
+    sub1.set_xlim([9., 11.5])
+    sub1.set_ylim([11., 14])
     fig_name = ''.join([UT.fig_dir(), 'smhr_comp.png'])
     fig.savefig(fig_name, bbox_inches='tight')
     plt.close()
     return None 
 
 
-def shmr_distribution(runs=['randomSFH0.5gyr.sfsflex', 'rSFH_abias0.5_0.5gyr.sfsflex', 'rSFH_abias0.99_0.5gyr.sfsflex'], T=14, nsnap0=15, downsampled='20'):  
+def shmr_distribution(runs=['randomSFH0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], T=14, nsnap0=15, downsampled='20'):  
     smhmr = Obvs.Smhmr()
     fig = plt.figure(figsize=(10,4))
     sub = fig.add_subplot(121) 
@@ -466,7 +476,7 @@ if __name__=="__main__":
     #qaplotABC('rSFH_abias0.5_0.5gyr.sfsflex', 14)
     #qaplotABC('rSFH_abias0.99_0.5gyr.sfsflex', 14)
     #qaplotABC_Mhacc('rSFH_abias0.99_0.5gyr.sfsflex', 14)
-    #shmr_slope()
+    shmr_slope()
     #shmr_distribution()
     # no duty cycle run
     #plotABC('nodutycycle.sfsflex', 14, prior='flex')
