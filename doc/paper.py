@@ -572,15 +572,18 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
             'More+(2011)', 
             'Yang+(2009)', 
             'Leauthaud+(2012)', 
-            'Tinker+(2013)', 
-            'Reddick+(2013)', 
+            'Tinker+(2013)', #'Reddick+(2013)', 
             'Zu+(2015)'
             ]
-    lit_siglogMs_median = [0.15, 0.122, 0.206, 0.21, 0.20, 0.22]
-    lit_siglogMs_upper = [0.26, 0.152, 0.206+0.031, 0.27, 0.23, 0.24]
-    lit_siglogMs_lower = [0.07, 0.092, 0.206-0.031, 0.15, 0.17, 0.20] 
+    lit_siglogMs_median = [0.15, 0.122, 0.206, 0.21, #0.20, 
+            0.22]
+    lit_siglogMs_upper = [0.26, 0.152, 0.206+0.031, 0.27, #0.23, 
+            0.24]
+    lit_siglogMs_lower = [0.07, 0.092, 0.206-0.031, 0.15, #0.17, 
+            0.20] 
 
     # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 (COSMOS)
+    # Yang et al. (2009) for blue galaxies Table 4 (SDSS DR4) 
     # More et al. (2011) SMHMR of starforming centrals (SDSS)
     # Leauthaud et al. (2012) all galaxies 0.2 < z < 0.48 (COSMOS)
     # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
