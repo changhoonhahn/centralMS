@@ -607,7 +607,7 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     # Conroy+(2007) table 4 all central galaxies
     # More+ (2011) Figure 9 blue central galaxies
     # van Uitert+(2011) Table 3 late central galaxies 
-    # Velander+(2013) Table 4 blue central galaxies (scatter corrected so not really an upper bound)
+    # Velander+(2013) Table 4 blue central galaxies (scatter corrected so sort of like a lower-bound?)
     # Han+(2015) from Figure 9 all central galaxies. 
 
     # calculate the scatters from the ABC posteriors 

@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \usepackage{hyperref}
 \usepackage{color}
+\usepackage{comment}
 \input{vc}
 
 % typesetting shih
@@ -554,9 +555,9 @@ further details.
     $\sigma_{\log\,M_*} = 0.32\,\mathrm{dex}$ and $\sigma_{\log\,M_h} = 0.30\,\mathrm{dex}$. 
     Meanwhile for $t_\mathrm{duty} = 0.5\,\mathrm{Gyr}$, $\sigma_{\log\,M_*}= 0.26\,\mathrm{dex}$ 
     and $\sigma_{\log\,M_h} = 0.20$. We include $\sigma_{\log\,M_*}$ 
-    constraints from \cite{yang2009, more2011, leauthaud2012, reddick2013, tinker2013, zu2015} 
-    and $\sigma_{\log\,M_h}$ constraints from~\cite{mandelbaum2006, more2011, velander2014, han2015}.
-    The~\cite{mandelbaum2006, han2015} $\sigma_{\log\,M_h}$ constraints serve as upper limits. 
+    constraints from \cite{yang2009, more2011, leauthaud2012, tinker2013, zu2015} and 
+    $\sigma_{\log\,M_h}$ constraints from~\cite{mandelbaum2006, conroy2007, more2011, velander2014, han2015} 
+    (see text). The~\cite{mandelbaum2006, han2015} $\sigma_{\log\,M_h}$ constraints serve as upper limits. 
     A short star formation duty cycle timescale is necessary to produce a tight SHMR roughly
     consistent with constraints from observations. 
     }
@@ -609,106 +610,95 @@ is a $< 1\sigma$ difference in $\sigma_{\log\,M_*}$ between star-forming and
 quiescent central galaxies~\citep{yang2009, more2011, tinker2013}. Hence we 
 include them in Figure~\ref{fig:sigMstar_duty}. 
 
+\begin{comment}
+    \bitem
+        \item \cite{yang2009} uses a galaxy group catalog constructed from SDSS DR4 to 
+            directly measure the log-normal distribution of $M_*$ at a given $M_h$.
+            For blue centrals they find $\sigma_{\log\,M_*}(M_h \sim 10^{12.16}M_\odot) = 0.122 \pm 0.03$ 
+            averaged over two SDSS samples and two group mass difference.
 
-%On the left panel of Figure~\ref{fig:sigMstar_duty}, we 
-%include~\cite{yang2009, more2011, leauthaud2012, tinker2013, zu2015}. 
-%These works mainly derive their $\sigma_{\log\,M_*}$ measurements using some 
-%sort of halo occupation based models. \cite{more2011, zu2015} use halo occupation 
-%based models to fit various observables of SDSS (satellite kinematics, clustering, 
-%and galaxy-galaxy lensing) while \cite{leauthaud2012, tinker2013} fit to 
-%observables of COSMOS (SMF, clustering, and galaxy–galaxy lensing). \cite{yang2009} 
-%use a group catalog constructed from SDSS DR4\todo{cite} to measure 
-%$\sigma_{\log\,M_*}$ from the conditional SMF. \cite{yang2009, more2011, tinker2013} 
-%measure $\sigma_{\log\,M_*}$ for blue/star-forming galaxies while 
-%\cite{leauthaud2012, zu2015} measure $\sigma_{\log\,M_*}$ for all galaxies. As  
-%\cite{yang2009, more2011, tinker2013}, however, do not find significantly different
-%$\sigma_{\log\,M_*}$ ($< 1\sigma$) between blue/star-forming versus red/quiescent 
-%galaxies.
-%
+        \item \cite{more2011} uses a halo occupation based model to fit the stacked 
+            velocity dispersion of satellite galaxies as a function of $M_*$ in SDSS VAGC.  
+            One of the free parameters in their model is $\sigma_{\log\,M*}$, constant
+            across $M_h$, for blue centrals. The best-fit model also predicts 
+            $\sigma_{\log\,M_h}$ as a function $M_*$ for blue centrals. 
+            
+        \item \cite{leauthaud2012} joint analysis of galaxy–galaxy weak lensing, galaxy 
+            spatial clustering, and galaxy number densities of the COSMOS data. 
+            $\sigma_{\log\,M*}$ is constant. They get the constraint 
+            $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.206 \pm 0.031$ at 
+            $0.2 < z < 0.48$ for all galaxies.
+
+        \item \cite{tinker2013} uses the stellar mass function, galaxy clustering, and 
+            galaxy–galaxy lensing within the COSMOS survey to constrain the stellar-to-halo 
+            mass relation (SHMR) of star forming and quiescent galaxies over the redshift 
+            range $z = [0.2, 1.0]$. They constrain the constant 
+            $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.21 \pm 0.06$ at 
+            $0.22 < z < 0.48$ for star-forming galaxies.
+
+        %\item \cite{reddick2013} constrain a model that abundance matches galaxies with the 
+        %    peak circular velocity of their halos with the SDSS NYU-VAGC projected two-point 
+        %    galaxy clustering and the observed conditional stellar mass functions. The model
+        %    that best reproduces the data has a scatter of $0.20 \pm 0.03$ dex for all 
+        %    galaxies.
+
+        \item \cite{zu2015} 
+            $\mathtt{iHOD}$: an exteded HOD model, to fit the galaxy clustering and 
+            the galaxy-galaxy lensing measured from SDSS main galaxy sample and NYU-VAGC. 
+            The best-fit model has $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.22 \pm 0.02$ 
+            for all galaxies. 
+    \eitem
+\end{comment}
+
 On the right panel, we include $\sigma_{\log\,M_h}$ constraints from \cite{more2011}
-along with measurements from galaxy-galaxy weak lensing analysis of SDSS~\citep{mandelbaum2006a} 
-and CFHTLenS~\citep{velander2013}, satellite kinematics of SDSS~\citep{conroy2007}, 
-and of optically selected spectroscopic groups $\mathrm{G}^3\mathrm{Cv5}$ in 
-GAMA~\citep{han2015}. \cite{mandelbaum2006a, more2011, velander2013} 
-measure $\sigma_{\log\,M_h}$ for blue/star-forming galaxies while~\citep{han2015} 
-measure $\sigma_{\log\,M_h}$ for all central galaxies. 
+along with constraints from \cite{mandelbaum2006a, conroy2007, velander2013, han2015}. 
+\cite{mandelbaum2006a, velander2013} use halo occupation models to analyze galaxy-galaxy 
+weak lensing measurements of SDSS and CFHTLenS\todo{cite}, respectively. 
+\cite{conroy2007}, similar to \cite{more2011}, use halo model to fit the stacked 
+satellite velocity disperions for SDSS VAGC. Lastly, \cite{han2015} 
+use a maximum likelihood weak lensing analysis to fit shapes of SDSS source galaxies 
+individually (unlike the other \emph{stacked} weak lensing analyses) for the G3Cv5 GAMA 
+group catalog. Each of these works ultimately measure $M_h$ in $M_*$ bins. We derive 
+$\sigma_{\log\,M_h}$ from the uncertainties in these $M_h$ measurements at $M_*$ bin 
+$\sim 10^{10}M_\odot$. From \cite{mandelbaum2006a, more2011, velander2013} we have 
+$\sigma_{\log\,M_h}$ for blue/late-type/star forming centrals while we have 
+$\sigma_{\log\,M_h}$ for all centrals for \cite{conroy2007, han2015}. 
 
+\begin{comment}
+    \bitem
+        \item \cite{mandelbaum2006a} use halo occupation based model to fit SDSS galaxy-galaxy 
+            weak lensing in $M_*$ bins in order to constrain the distribution of $M_h$ of 
+            early/late-type centrals. 
 
+        \item \cite{conroy2007} use halo occupation based model to fit the stacked satellite velocity
+            disperions for SDSS VAGC in bins of $M_*$. For each $M_*$ bin they measure $M_h$ for 
+            all central galaxies. We can convert this measurement to an upper limit on 
+            $\sigma_{\log\,M_h}$.  
 
+        %\item \cite{vanuiter2011}: weak lensing from imaging data from the $\sim 300\,\mathrm{deg}^2$ 
+        %    overalp between the second Red Sequence Cluster Survey (RCS2) and SDSS DR7 using halo model 
+        %    that accounts for the clustering of the lenses and distinguishes between satellite
+        %    and centrals.  At $\log\,M_* = [10.0-10.5]$ $M_\mathrm{halo} = 0.56\substack{+1.66\\ -0.55}\times 10^{11}h^{-1} M_\odot$. 
 
-\bitem
-\item \cite{yang2009} uses a galaxy group catalog constructed from SDSS DR4 to 
-    directly measure the log-normal distribution of $M_*$ at a given $M_h$.
-    For blue centrals they find $\sigma_{\log\,M_*}(M_h \sim 10^{12.16}M_\odot) = 0.122 \pm 0.03$ 
-    averaged over two SDSS samples and two group mass difference.
+        \item \cite{velander2013} conducts a stacked galaxy-galaxy weak lensing analysis
+            using a HOD model on CFHTLenS data. They measure $M_h$ in bins of $M_*$ for blue/red 
+            centrals at $z \sim 0.3$. We note that they correct for the scatter added from 
+            the $M_*$ binning due to $M_*$ uncertainties using simulated lens and source 
+            catalogs. At $< M_*> = 0.54 \times 10^10 M_\odot/h^2$ 
+            $M_\mathrm{halo} = 2\substack{+0.64\\ -0.62}\times 10^{11}h^{-1} M_\odot$. 
 
-\item \cite{more2011} uses a halo occupation based model to fit the stacked 
-    velocity dispersion of satellite galaxies as a function of $M_*$ in SDSS VAGC.  
-    One of the free parameters in their model is $\sigma_{\log\,M*}$, constant
-    across $M_h$, for blue centrals. The best-fit model also predicts 
-    $\sigma_{\log\,M_h}$ as a function $M_*$ for blue centrals. 
-    
-\item \cite{leauthaud2012} joint analysis of galaxy–galaxy weak lensing, galaxy 
-    spatial clustering, and galaxy number densities of the COSMOS data. 
-    $\sigma_{\log\,M*}$ is constant. They get the constraint 
-    $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.206 \pm 0.031$ at 
-    $0.2 < z < 0.48$ for all galaxies.
+        \item \cite{han2015} uses a maximum likelihood weak lensing analysis to fits
+            shape of SDSS source galaxies individually and derive $M_h$ measurements 
+            of the G3Cv5 GAMA group catalog in bins of central galaxy $M_*$. Unlike 
+            the other weak lensing measurements, they do not use stacked lensing 
+            measurements or a HOD model to derive the SHMR.
+    \eitem
+\end{comment}
 
-\item \cite{tinker2013} uses the stellar mass function, galaxy clustering, and 
-    galaxy–galaxy lensing within the COSMOS survey to constrain the stellar-to-halo 
-    mass relation (SHMR) of star forming and quiescent galaxies over the redshift 
-    range $z = [0.2, 1.0]$. They constrain the constant 
-    $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.21 \pm 0.06$ at 
-    $0.22 < z < 0.48$ for star-forming galaxies.
-
-%\item \cite{reddick2013} constrain a model that abundance matches galaxies with the 
-%    peak circular velocity of their halos with the SDSS NYU-VAGC projected two-point 
-%    galaxy clustering and the observed conditional stellar mass functions. The model
-%    that best reproduces the data has a scatter of $0.20 \pm 0.03$ dex for all 
-%    galaxies.
-
-\item \cite{zu2015} 
-    $\mathtt{iHOD}$: an exteded HOD model, to fit the galaxy clustering and 
-    the galaxy-galaxy lensing measured from SDSS main galaxy sample and NYU-VAGC. 
-    The best-fit model has $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.22 \pm 0.02$ 
-    for all galaxies. 
-\eitem
-
-from weak lensing:
-\bitem
-\item \cite{mandelbaum2006a} use halo occupation based model to fit SDSS galaxy-galaxy 
-    weak lensing in $M_*$ bins in order to constrain the distribution of $M_h$ of 
-    early/late-type centrals. 
-
-\item \cite{conroy2007} use halo occupation based model to fit the stacked satellite velocity
-    disperions for SDSS VAGC in bins of $M_*$. For each $M_*$ bin they measure $M_h$ for 
-    all central galaxies. We can convert this measurement to an upper limit on 
-    $\sigma_{\log\,M_h}$.  
-
-
-%\item \cite{vanuiter2011}: weak lensing from imaging data from the $\sim 300\,\mathrm{deg}^2$ 
-%    overalp between the second Red Sequence Cluster Survey (RCS2) and SDSS DR7 using halo model 
-%    that accounts for the clustering of the lenses and distinguishes between satellite
-%    and centrals.  At $\log\,M_* = [10.0-10.5]$ $M_\mathrm{halo} = 0.56\substack{+1.66\\ -0.55}\times 10^{11}h^{-1} M_\odot$. 
-
-
-\item \cite{velander2013}: 
-    154 deg2 CFHTLenS lensing and photometric data using a galaxy-galaxy lensing halo model which 
-    allows us to constrain the halo mass and satellite fraction. There's some scatter correction 
-    which reduces the uncertainties significantly. At $< M_*> = 0.54 \times 10^10 M_\odot/h^2$ 
-    $M_\mathrm{halo} = 2\substack{+0.64\\ -0.62}\times 10^{11}h^{-1} M_\odot$. 
-
-\item \cite{han2015}: weak lensing analysis of optically selected spectroscopic galaxy 
-    groups (G3Cv5) in GAMA survey using background SDSS photometric galaxies.
-
-    
-\item We find that by decreasing the timescale of stochasticity on a simple SFH model that traces the overall 
+We find that by decreasing the timescale of stochasticity on a simple SFH model that traces the overall 
 SFS evolution does in fact decrease the scatter seen in the SMHMR. However, even with timescales less
 than XXXX, we cannot reproduce observations. Ultimately to reproduce observations, we need to add in 
 assembly bias. 
-\eitem
-
-Figure~\ref{fig:sigMstar_duty} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 6 
