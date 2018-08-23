@@ -582,28 +582,30 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     lit_siglogMs_lower = [0.07, 0.092, 0.206-0.031, 0.15, #0.17, 
             0.20] 
 
-    # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 (COSMOS)
+    # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 Table 2 (COSMOS)
     # Yang et al. (2009) for blue galaxies Table 4 (SDSS DR4) 
     # More et al. (2011) SMHMR of starforming centrals (SDSS)
     # Leauthaud et al. (2012) all galaxies 0.2 < z < 0.48 (COSMOS)
     # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
-    # Zu & Mandelbaum (2015) SDSS constraints on iHOD parameters
+    # Zu & Mandelbaum (2015) SDSS constraints on iHOD parameters (abstract & Section 7.2) 
     # Meng Gu et al. (2016) 
     
     # constraints for sigma_logMh
     lit_siglogMh = [
             'More+(2011)',
             'Mandelbaum+(2006)', #'van Uitert+(2011)', 
+            'Conroy+(2007)', 
             'Velander+(2014)', 
             'Han+(2015)' 
             ]
-    lit_siglogMh_median = [0.125, 0.25, #0.60, 
+    lit_siglogMh_median = [0.125, 0.25, 0.15, #0.60, 
             0.122, 0.58]
-    lit_siglogMh_upper = [0.055, None, None, None]
-    lit_siglogMh_lower = [0.195, None, None, None]
+    lit_siglogMh_upper = [0.055, None, None, None, None]
+    lit_siglogMh_lower = [0.195, None, None, None, None]
     
-    # More+ (2011) Figure 9 
     # Mandelbaum+(2006) @ 1.5e10 Table 3 late central galaxies 
+    # Conroy+(2007) table 4 all central galaxies
+    # More+ (2011) Figure 9 blue central galaxies
     # van Uitert+(2011) Table 3 late central galaxies 
     # Velander+(2013) Table 4 blue central galaxies (scatter corrected so not really an upper bound)
     # Han+(2015) from Figure 9 all central galaxies. 
@@ -664,7 +666,7 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sub.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C0', alpha=0.5, linewidth=0) 
     # literature 
     subplts = [] 
-    marks = ['^', 's', 'o', 'v', '8', 'x', 'D']
+    marks = ['^', 's', 'o', '8', 'x', 'D']
     for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), 
             lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
         subplt = sub.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.k', marker=marks[ii], markersize=5)
@@ -687,7 +689,7 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sub.fill_between(tduties, sigMh[3,:], sigMh[4,:], color='C0', alpha=0.1, linewidth=0) 
     sub.fill_between(tduties, sigMh[1,:], sigMh[2,:], color='C0', alpha=0.5, linewidth=0, label='Hahn+(2018)') 
     subplts = [] 
-    marks = ['^', '+', '*', 'd']
+    marks = ['^', '+', '*', 'v', 'd']
     for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMh)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMh)), 
             lit_siglogMh_median, lit_siglogMh_lower, lit_siglogMh_upper):
         if siglow is None: 

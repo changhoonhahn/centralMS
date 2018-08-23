@@ -10,11 +10,10 @@ Warning--I didn't find a database entry for "weyant2013"
 Warning--I didn't find a database entry for "ishida2015"
 Warning--I didn't find a database entry for "hahn2016"
 Warning--I didn't find a database entry for "velander2013"
-Warning--I didn't find a database entry for "vanuiter2011"
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 You've used 55 entries,
             3215 wiz_defined-function locations,
-            1018 strings with 26780 characters,
+            1017 strings with 26768 characters,
 and the built_in function-call counts, 35597 in all, are:
 = -- 2493
 > -- 3266
@@ -53,4 +52,4 @@ warning$ -- 0
 while$ -- 249
 width$ -- 0
 write$ -- 554
-(There were 8 warnings)
+(There were 7 warnings)
