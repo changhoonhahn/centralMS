@@ -723,13 +723,12 @@ in the literature.}
 \begin{figure}
 \begin{center}
 \includegraphics[width=0.5\textwidth]{figs/Mhacc_dSFR.pdf}
-\caption{We illustrate how we incorporate assembly bias into the SF 
-    centrals of our model by correlating host halo accretion history with 
-    the SFH with respect to the SFS SFR. We plot the relative halo accretion 
-    history, $M_h(t)/M_h(z{=}0.05)$ for two arbitrarily chosen SF centrals 
-    with $M_h(z{=}0.05)\sim10^{12}M_\odot$, in the top panel. In the two 
-    panels below we present $\Delta\log\,\mathrm{SFR}$, SFH with 
-    respect to the SFS, of these galaxies for our model with correlation 
+\caption{We incorporate assembly bias into the SF centrals of our model by 
+    correlating host halo accretion history with the SFH with respect to the 
+    SFS SFR. We plot the relative halo accretion history, $M_h(t)/M_h(z{=}0.05)$ 
+    for two arbitrarily chosen SF centrals with $M_h(z{=}0.05)\sim10^{12}M_\odot$, 
+    in the top panel. In the two panels below we present $\Delta\log\,\mathrm{SFR}$, 
+    SFH with respect to the SFS, of these galaxies for our model with correlation 
     coefficients $r=0.5$ and $0.99$ (middle and bottom). At some $t$ (dotted), 
     $\Delta\log\,\mathrm{SFR}(t)$ is correlated with halo accretion over the 
     range $t - t_\mathrm{dyn}$ to $t_\mathrm{dyn}$ (shaded top panel). The 
@@ -809,20 +808,35 @@ our model decreases significantly with stronger assembly bias in our model.}
 For $t_\mathrm{duty} = 0.5\,\mathrm{Gyr}$, we find $\sigma_{\log\,M_*} = $
 \todo{final numbers} for $r = 0., 0.5$, and $0.99$, respectively. 
 
-Comparing to the observational constraints from Figure~\ref{fig:sigMstar_duty}, 
-we find that incorporating assembly bias significantly reduces the tensions 
-with observations (right panel). In fact, with both a short star formation duty cycle
+Comparing to the constraints from Figure~\ref{fig:sigMstar_duty}, we find that 
+incorporating assembly bias significantly reduces the tensions with observations 
+(right panel). In fact, with a short star formation duty cycle 
 ($t_\mathrm{duty} \leq 1\,\mathrm{Gyr}$) and strong assembly bias, our model
 can conservatively reproduce most of the $\sigma_{\log\,M_*}$ constraints from
-the literature. There is still tension with the \cite{yang2009} constraint. 
-We, however, note that \todo{read campbell and find some reasons why this might 
-be wrong}
+the literature. There is, however, still some tension with the \cite{yang2009} 
+constraint. We note that \todo{the yang2009 results should be taken with a grain of salt. 
+Here's why: }
+\bitem
+    \item Yang's satellite fraction for the sample split by color is significantly 
+        lower. This means that a significant fraction of satellite galaxies considered
+        centrals. 
+    \item red fraction is off for centrals at $M_h\sim10^{12}M_\odot$. 
+\eitem
 
-In addition to the comparison with observations, we also compare the SHMR scatters 
-from our models to hydro simulations, SAM, and the UniverseMachine -- an empirial 
-model. Describe which hydro sims and which SAMs are included here. Talk about the 
-comparison here and draw some conclusions? Reference Wechsler and Tinker's comparison. 
-
+In addition to the comparison with observational constraints, we also compare the 
+SHMR scatters of our models to $\sigma_{\log\,M_*}$ from modern galaxy formation 
+models: hydrodynamic simulations (dot filled), semi-analytic models (hatched), and 
+an empirial model (dashed line). For the hydrodynamic simulations, the dotted region 
+encompasses the constraints from EAGLE\todo{cite}, Massive Black II\todo{cite}, and 
+Illustris TNG\todo{cite}, as in Figure 8 of \cite{wechsler2018}. For the semi-analytic 
+models, the hatched region includes Lu et al. (2014), Somerville et al. (2012), and 
+the SAGE model\footnote{\href{https://tao.asvo.org.au/tao/}}. Finally for the empirical 
+model, we include the Universe Machine from \cite{behroozi2018a}.
+\todo{There's not much to this figure besides the same conclusion as \cite{wechsler2018}. 
+Hydros are consistent with literature; SAMs and empirical models don't do so great. 
+In fact, our model with a short duty cycle alone (even without assembly bias) produces 
+smaller $\sigma_{\log\,M_*}$. 
+}
 
 Lots of papers coming out recently talking about how the SFS is just CLT or 
 that SFH can just be log-normal distributions. But none of those works connect
