@@ -712,6 +712,93 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     return None 
 
 
+def Mhacc_dSFR(runs, T): 
+    '''
+    '''
+    # calculate Mhalo history and dSFR 
+    mhacc_run, dsfr_run = [], [] 
+    for i_run, run in enumerate(runs): 
+        abcout = ABC.readABC(run, T)
+        theta_med = [UT.median(abcout['theta'][:, i], weights=abcout['w'][:]) for i in range(len(abcout['theta'][0]))] # median theta 
+        tt = ABC._model_theta(run, theta_med)
+        dsfrs = np.array([10.]) 
+        while np.abs(dsfrs).max() > 1.: 
+            np.random.RandomState(0)
+            # summary statistics of model 
+            subcat_sim = ABC.model(run, theta_med, nsnap0=15, downsampled='20') 
+            n_halo = len(subcat_sim['m.star'])
+
+            if i_run == 0: 
+                mhlim = ((subcat_sim['galtype'] == 'sf') & (subcat_sim['weights'] > 0.) & 
+                        (subcat_sim['halo.m'] > 12.) & (subcat_sim['halo.m'] < 12.1)) 
+                i_halo = np.random.choice(np.arange(n_halo)[mhlim], 2, replace=False) 
+
+            # get Mh accretion history 
+            mhacc = np.zeros((len(i_halo), 20))
+            mhacc[:,0] = subcat_sim['halo.m'][i_halo]
+            for i in range(2, 21): 
+                mhacc[:,i-1] = subcat_sim['halo.m.snap'+str(i)][i_halo]
+
+            msacc = np.zeros((len(i_halo), 15))
+            dsfrs = np.zeros((len(i_halo), 15))
+            dsfrs[:,0] = subcat_sim['sfr'][i_halo] - SFH.SFR_sfms(subcat_sim['m.star'][i_halo], UT.z_nsnap(1), tt['sfms'])
+            for i in range(2, 16): 
+                if i != 15: 
+                    msacc[:,i-1] = subcat_sim['m.star.snap'+str(i)][i_halo]
+                    dsfrs[:,i-1] = subcat_sim['sfr.snap'+str(i)][i_halo] - \
+                            SFH.SFR_sfms(subcat_sim['m.star.snap'+str(i)][i_halo], UT.z_nsnap(i), tt['sfms'])
+                else: 
+                    msacc[:,i-1] = subcat_sim['m.star0'][i_halo]
+                    dsfrs[:,i-1] = subcat_sim['sfr0'][i_halo] - \
+                            SFH.SFR_sfms(subcat_sim['m.star0'][i_halo], UT.z_nsnap(i), tt['sfms'])
+            print dsfrs
+            print np.abs(dsfrs).max()
+        mhacc_run.append(mhacc) 
+        dsfr_run.append(dsfrs)
+
+    fig = plt.figure(figsize=(6,8))
+    sub = fig.add_subplot(311)
+    for ii in range(mhacc.shape[0]): 
+        sub.plot(UT.t_nsnap(np.arange(1,21)), # - UT.tdyn_t(UT.t_nsnap(np.arange(1,21))), 
+                10**(mhacc[ii,:]-mhacc[ii,0]), c='C'+str(ii))
+    sub.vlines(UT.t_nsnap(5), -1., 1., color='k', linestyle=':', linewidth=2) 
+    sub.fill_between([UT.t_nsnap(5), UT.t_nsnap(5) - UT.tdyn_t(UT.t_nsnap(5))], [0.,0.], [1.,1.], 
+            linewidth=0., color='k', alpha=0.15)  
+    sub.text(0.575, 0.05, r"$t_\mathrm{dyn}$", ha='left', va='bottom', transform=sub.transAxes, fontsize=20)
+    sub.text(0.025, 0.925, r"$M_h(z{=}0.05) \sim 10^{12} M_\odot$", ha='left', va='top', 
+            transform=sub.transAxes, fontsize=17)
+    sub.set_xlim([UT.t_nsnap(20), UT.t_nsnap(1)]) 
+    sub.set_ylabel('$M_h / M_h(z{=}0.05)$', fontsize=20)
+    sub.set_ylim([0., 1.]) 
+
+    for i_run, run in enumerate(runs): 
+        mhacc = mhacc_run[i_run] 
+        dsfrs = dsfr_run[i_run]
+        sub = fig.add_subplot(3,1,i_run+2)
+        sub.fill_between([0., 20.], [-0.3, -0.3], [0.3, 0.3], linewidth=0., color='k', alpha=0.15)  
+        for ii in range(dsfrs.shape[0]): 
+            sub.plot(UT.t_nsnap(np.arange(1,16)), dsfrs[ii,:], c='C'+str(ii))
+        sub.plot([0., 15.], [0., 0.,], c='k', lw=2, ls='--') 
+        sub.vlines(UT.t_nsnap(5), -1., 1., color='k', linestyle=':', linewidth=2) 
+        # parse run name 
+        str_r = run.split('_')[1].split('abias')[-1]
+        sub.text(0.025, 0.925, r"$r="+str_r+"$", ha='left', va='top', transform=sub.transAxes, fontsize=20)
+
+        if i_run != 0: sub.set_xlabel('$t_\mathrm{cosmic}$ [Gyr]', fontsize=25) 
+        sub.set_xlim([UT.t_nsnap(20), UT.t_nsnap(1)]) 
+        sub.set_ylabel('$\Delta \log\,\mathrm{SFR}$', fontsize=20)
+        sub.set_ylim([-1., 1.]) 
+        sub.set_yticks([-1., -0.5, 0., 0.5, 1.]) 
+        #if i_run == 0: sub.set_title("Assembly Bias $r="+str_r+"$", fontsize=20) 
+        #else: sub.set_title("$r="+str_r+"$", fontsize=20) 
+
+        fig.subplots_adjust(wspace=0.2, hspace=0.225)
+        fig.savefig(''.join([UT.tex_dir(), 'figs/Mhacc_dSFR.pdf']), 
+                bbox_inches='tight', dpi=150) 
+        plt.close()
+    return None 
+
+
 def SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     ''' Figure plotting the scatter in the Stellar to Halo Mass Relation (i.e. 
     sigma_logM*(M_h = 10^12) and sigma_logMhalo(M* = 10^10.5)) as a function of duty 
@@ -1425,7 +1512,8 @@ if __name__=="__main__":
     #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14])
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
-    SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
+    #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
+    Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
     #fQ_fSFMS()
     #SFHmodel()
     #Illustris_SFH()
@@ -1433,4 +1521,3 @@ if __name__=="__main__":
     #_SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #_SHMRscatter_tduty_narrowSFS(Mhalo=12, dMhalo=0.2, Mstar=10.5, dMstar=0.2)
     #_convert_sigma_lit('han2015')
-
