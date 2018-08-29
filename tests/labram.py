@@ -243,5 +243,5 @@ def SHassignSFH(nsnap=15):
 if __name__=="__main__": 
     #LAbramCatalog()
     #matchSMF(n_boot=100)
-    #assignHalo(nsnap=15)
-    SHassignSFH(nsnap=15)
+    assignHalo(nsnap=15)
+    #SHassignSFH(nsnap=15)

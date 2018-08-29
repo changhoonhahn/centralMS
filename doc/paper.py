@@ -570,17 +570,19 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     # constraints from literature 
     # constraints for sigma_logM*
     lit_siglogMs = [
-            'More+(2011)', 
-            'Yang+(2009)', 
+            'More+(2011)', #'Yang+(2009)', # group finder results can't really be included because they use abundance matching to assign halos 
             'Leauthaud+(2012)', 
             'Tinker+(2013)', #'Reddick+(2013)', 
             'Zu+(2015)'
             ]
-    lit_siglogMs_median = [0.15, 0.122, 0.206, 0.21, #0.20, 
+    lit_siglogMs_median = [0.15, #0.122, 
+            0.206, 0.21, #0.20, 
             0.22]
-    lit_siglogMs_upper = [0.26, 0.152, 0.206+0.031, 0.27, #0.23, 
+    lit_siglogMs_upper = [0.26, #0.152, 
+            0.206+0.031, 0.27, #0.23, 
             0.24]
-    lit_siglogMs_lower = [0.07, 0.092, 0.206-0.031, 0.15, #0.17, 
+    lit_siglogMs_lower = [0.07, #0.092, 
+            0.206-0.031, 0.15, #0.17, 
             0.20] 
 
     # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 Table 2 (COSMOS)
@@ -958,16 +960,18 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
     # Zu & Mandelbaum (2015) SDSS constraints on iHOD parameters
     lit_siglogMs = [
-            'More+(2011)', 
-            'Yang+(2009)', 
+            'More+(2011)', #'Yang+(2009)', 
             'Leauthaud+(2012)', 
             'Tinker+(2013)', #'Reddick+(2013)', 
             'Zu+(2015)']
-    lit_siglogMs_median = [0.15, 0.122, 0.206, 0.21, #0.20, 
+    lit_siglogMs_median = [0.15, #0.122, 
+            0.206, 0.21, #0.20, 
             0.22]
-    lit_siglogMs_upper = [0.26, 0.152, 0.206+0.031, 0.27, #0.23, 
+    lit_siglogMs_upper = [0.26, #0.152, 
+            0.206+0.031, 0.27, #0.23, 
             0.24]
-    lit_siglogMs_lower = [0.07, 0.092, 0.206-0.031, 0.15, #0.17, 
+    lit_siglogMs_lower = [0.07, #0.092, 
+            0.206-0.031, 0.15, #0.17, 
             0.20] 
     
     # make figure 
@@ -1073,7 +1077,7 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sub2.plot(np.linspace(0., 10., 100), np.repeat(0.28, 100), c='k', ls='--')
     sub2.text(0.975, 0.59, 'Universe Machine', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
     # Abramson+(2016)
-    sim_plt = sub2.plot(np.linspace(0., 10., 100), np.repeat(0.35, 100), c='k', ls=':')
+    sim_plt = sub2.plot(np.linspace(0., 10., 100), np.repeat(0.33, 100), c='k', ls=':')
     #sim_plts.append(sim_plt) 
     r = Rectangle((2.08, 0.335), 7.5, 0.0125, linewidth=0., fc='white') 
     plt.gca().add_patch(r)
@@ -1126,36 +1130,127 @@ def _lAbramson2016SHMR(nsnap0=15, n_boot=20):
     mstar0 = np.log10(cat['MSTEL_T'][:,i_z0]) # M* @ z = z(nsnap0)  
     
     i_zf = np.argmin(np.abs(cat['REDSHIFT'] - UT.z_nsnap(1))) #  index that best match to snapshot 
+    sfrf = np.log10(cat['SFR_T'][:,i_zf]) # SFR @ z = z(nsnap0)  
     mstarf = np.log10(cat['MSTEL_T'][:,i_zf]) # M* @ z = 0.05
     smhmr = Obvs.Smhmr()
+    
+    mh = sh['halo.m'][hasmatch]
+    ms = mstarf[i_la2016[hasmatch]]
+    sfr = sfrf[i_la2016[hasmatch]]
+
+    sfcut = (sfr - ms > -11.) 
+    print('%f out of %f above SF cut' % (np.sum(sfcut), len(mh))) 
 
     # sigma_logM* comparison 
     fig = plt.figure(figsize=(5,5))
     sub = fig.add_subplot(111)
-    mbin = np.arange(11.8, 14., 0.1) 
+    mbin = np.arange(12.3, 14., 0.1) 
+    #m_mid, mu_logMs, sig_logMs, _ = smhmr.Calculate(mh[sfcut], ms[sfcut], m_bin=mbin)
+    #sub.plot(m_mid, sig_logMs, c='C1', label='SF cut')#, label='$z='+str(round(UT.z_nsnap(1),2))+'$') 
+
     m_mid, mu_logMs, sig_logMs, _ = smhmr.Calculate(sh['halo.m.snap'+str(nsnap0)][hasmatch], 
             mstar0[i_la2016[hasmatch]], m_bin=mbin)
     sub.plot(m_mid, sig_logMs, c='k', label='$z='+str(round(UT.z_nsnap(nsnap0),2))+'$') 
 
-    m_mid, mu_logMs, sig_logMs, _ = smhmr.Calculate(sh['halo.m'][hasmatch], mstar0[i_la2016[hasmatch]], m_bin=mbin)
-    i_hasmatch = np.where(hasmatch)[0]
+    #m_mid, mu_logMs, sig_logMs, _ = smhmr.Calculate(sh['halo.m'][hasmatch], mstarf[i_la2016[hasmatch]], m_bin=mbin)
+    m_mid, mu_logMs, sig_logMs, _ = smhmr.Calculate(mh[sfcut], ms[sfcut], m_bin=mbin)
+    #sub.plot(m_mid, sig_logMs, c='C1', label='SF cut')#, label='$z='+str(round(UT.z_nsnap(1),2))+'$') 
+    i_sfcut = np.where(sfcut)[0]
 
     siglogMs_boots = np.zeros((n_boot, len(sig_logMs)))
     for ib in range(n_boot): 
-        iboot = np.random.choice(i_hasmatch, size=np.sum(hasmatch), replace=True) 
-        _, _, sig_logMs_i, _ = smhmr.Calculate(sh['halo.m'][iboot], mstar0[i_la2016[iboot]], m_bin=mbin)
+        #iboot = np.random.choice(i_hasmatch, size=np.sum(hasmatch), replace=True) 
+        #_, _, sig_logMs_i, _ = smhmr.Calculate(sh['halo.m'][iboot], mstarf[i_la2016[iboot]], m_bin=mbin)
+        iboot = np.random.choice(i_sfcut, size=np.sum(sfcut), replace=True) 
+        _, _, sig_logMs_i, _ = smhmr.Calculate(mh[iboot], ms[iboot], m_bin=mbin)
         siglogMs_boots[ib,:] = sig_logMs_i
     sig_siglogMs = np.std(siglogMs_boots, axis=0)
     for imh in range(len(m_mid)): 
         print('at log Mh = %f sigma_Ms = %f pm %f' % (m_mid[imh], sig_logMs[imh], sig_siglogMs[imh]))
     sub.errorbar(m_mid, sig_logMs, sig_siglogMs, label='$z='+str(round(UT.z_nsnap(1),2))+'$')
-    #sub.plot(m_mid, sig_logMs, c='C1', label='$z='+str(round(UT.z_nsnap(1),2))+'$') 
+
     sub.set_xlabel('log $M_h$', fontsize=25) 
     sub.set_xlim([11., 14.]) 
     sub.set_ylabel('$\sigma_{\log\,M_*}$', fontsize=25) 
     sub.set_ylim([0., 0.5]) 
     sub.legend(loc='upper left', fontsize=20)
     fig.savefig(''.join([UT.tex_dir(), 'figs/_lAbramson2016SHMR.pdf']), 
+            bbox_inches='tight', dpi=150) 
+    plt.close()
+    return None 
+
+
+def _lAbramson2016SHMR_assignHalo(nsnap0=15, n_boot=20): 
+    ''' Assign halos to Abramson's SFHs indirectly using abundance matching 
+    then measure sigma_logM*. 
+    '''
+    np.random.RandomState(0)
+    # read in subhalo catalog
+    cat = Cat.CentralSubhalos(sigma_smhm=0.2, smf_source='li-march', nsnap0=15) 
+    sh = cat.Read()
+    # read in Louis's catalog
+    cat = LA2016.catalogAbramson2016() 
+    i_z0 = np.argmin(np.abs(cat['REDSHIFT'] - UT.z_nsnap(nsnap0))) #  index that best match to snapshot 
+    mstar0 = np.log10(cat['MSTEL_T'][:,i_z0]) # M* @ z = z(nsnap0)  
+    ws = LA2016.matchSMF(mstar0, UT.z_nsnap(nsnap0), logM_range=[9., 12.]) # get the weights to match SMF
+    
+    i_zf = np.argmin(np.abs(cat['REDSHIFT'] - UT.z_nsnap(1))) #  index that best match to snapshot 
+    sfrf = np.log10(cat['SFR_T'][:,i_zf]) # SFR @ z = z(nsnap0)  
+    mstarf = np.log10(cat['MSTEL_T'][:,i_zf]) # M* @ z = 0.05
+
+    # assign halo to the SFHs
+    mhalo0, mmax0, i_halo = LA2016.assignHalo(mstar0, nsnap0, sh, logM_range=[9., 12.], dlogMs=0.2) 
+
+    mhalof = sh['halo.m'][i_halo]
+    mmaxf = sh['m.max'][i_halo]
+
+    sfcut = (sfrf - mstarf > -11.) 
+    print('%f out of %f above SF cut' % (np.sum(sfcut), len(mstarf))) 
+    smhmr = Obvs.Smhmr()
+
+    # sigma_logM* comparison 
+    fig = plt.figure(figsize=(5,5))
+    sub = fig.add_subplot(111)
+    mbin = np.arange(12.3, 14., 0.1) 
+    m_mid, mu_logMs, sig_logMs, _ = smhmr.Calculate(mhalo0, mstar0, weights=ws, m_bin=mbin)
+    sub.plot(m_mid, sig_logMs, c='k', label='$z='+str(round(UT.z_nsnap(nsnap0),2))+'$') 
+
+    #m_mid, mu_logMs, sig_logMs, _ = smhmr.Calculate(mhalof, mstarf, weights=ws, m_bin=mbin)
+    m_mid, mu_logMs, sig_logMs, _ = smhmr.Calculate(mhalof[sfcut], mstarf[sfcut], weights=ws[sfcut], m_bin=mbin)
+    #sub.plot(m_mid, sig_logMs, c='C1', label='SF cut')#, label='$z='+str(round(UT.z_nsnap(1),2))+'$') 
+    i_sfcut = np.where(sfcut)[0]
+
+    siglogMs_boots = np.zeros((n_boot, len(sig_logMs)))
+    for ib in range(n_boot): 
+        _, _, i_halo = LA2016.assignHalo(mstar0, nsnap0, sh, logM_range=[9., 12.], dlogMs=0.2) 
+        mhalof = sh['halo.m'][i_halo]
+        mmaxf = sh['m.max'][i_halo]
+
+        iboot = np.random.choice(i_sfcut, size=np.sum(sfcut), replace=True) 
+        _, _, sig_logMs_i, _ = smhmr.Calculate(mhalof[iboot], mstarf[iboot], weights=ws[iboot], m_bin=mbin)
+        siglogMs_boots[ib,:] = sig_logMs_i
+
+    sig_siglogMs = np.zeros(len(sig_logMs))
+    for i in range(len(sig_logMs)):
+        nonzero = (siglogMs_boots[:,i] > 0.)
+        sig_siglogMs[i] = np.std(siglogMs_boots[:,i][nonzero])
+
+    sub.errorbar(m_mid, sig_logMs, sig_siglogMs, label='$z='+str(round(UT.z_nsnap(1),2))+'$')
+
+    f_sigma = open(''.join([UT.tex_dir(), 'dat/', 'Abramson_sigma_logMs_estimates.txt']), 'w') 
+    f_sigma.write("# sigma_logM* for Abramson et al. (2016)'s ~2000 SFHs \n")
+    f_sigma.write("# the SFHs are connected to halos using abundance matching \n") 
+    f_sigma.write("# log M*: sigma_logM* \pm sigma_sigma_logM* \n") 
+    for imh in range(len(m_mid)): 
+        print('at log Mh = %f sigma_Ms = %f pm %f' % (m_mid[imh], sig_logMs[imh], sig_siglogMs[imh]))
+        f_sigma.write('%f: %f +/- %f \n' % (m_mid[imh], sig_logMs[imh], sig_siglogMs[imh]))
+    f_sigma.close() 
+    sub.set_xlabel('log $M_h$', fontsize=25) 
+    sub.set_xlim([11., 14.]) 
+    sub.set_ylabel('$\sigma_{\log\,M_*}$', fontsize=25) 
+    sub.set_ylim([0., 0.5]) 
+    sub.legend(loc='upper left', fontsize=20)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/_lAbramson2016SHMR_assignHalo.pdf']), 
             bbox_inches='tight', dpi=150) 
     plt.close()
     return None 
@@ -1512,12 +1607,13 @@ if __name__=="__main__":
     #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14])
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
-    #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
-    Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
+    SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
+    #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
     #fQ_fSFMS()
     #SFHmodel()
     #Illustris_SFH()
     #_lAbramson2016SHMR(nsnap0=15, n_boot=100)
+    #_lAbramson2016SHMR_assignHalo(nsnap0=15, n_boot=100)
     #_SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #_SHMRscatter_tduty_narrowSFS(Mhalo=12, dMhalo=0.2, Mstar=10.5, dMstar=0.2)
     #_convert_sigma_lit('han2015')

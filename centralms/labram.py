@@ -96,5 +96,3 @@ def assignHalo(mstar, nsnap, shcat, logM_range=[9., 12.], dlogMs=0.2):
         if len(labm_mbin) > 0: 
             i_halo[labm_mbin] = np.random.choice(sham_mbin, size=len(labm_mbin), replace=False)
     return mhalo[i_halo], mmax[i_halo], i_halo
-
-
