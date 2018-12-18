@@ -16,8 +16,16 @@ niter=14
 #run="rSFH_abias0.99_"$tscale"gyr.sfsflex"
 #run="rSFH_0.2sfs_"$tscale"gyr.sfsflex"
 #run="nodutycycle.sfsflex"
-for tscale in "0.5" "1" "2" "5" "10"; do 
-    run="rSFH_abias0.99_"$tscale"gyr.sfsflex"
+#run="rSFH_abias0.99_"$tscale"gyr.sfsflex"
+
+#run="nodutycycle.sfsmf.sfsbroken"
+#echo $run
+#mpirun -np $NPROCS python /home/users/hahn/projects/centralMS/run/modelabc.py $run $niter > "/home/users/hahn/projects/centralMS/run/"$run"."$niter".modelabc.log"
+
+for tscale in "10"; do #"0.5" "1" "2" "5"; do # "10"; do 
+    #run="randomSFH"$tscale"gyr.sfsmf.sfsbroken"
+    run="rSFH_abias0.5_"$tscale"gyr.sfsmf.sfsbroken"
+    #run="rSFH_abias0.99_"$tscale"gyr.sfsmf.sfsbroken"
     echo $run
     mpirun -np $NPROCS python /home/users/hahn/projects/centralMS/run/modelabc.py $run $niter > "/home/users/hahn/projects/centralMS/run/"$run"."$niter".modelabc.log"
 done 

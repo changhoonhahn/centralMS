@@ -35,10 +35,10 @@ def AbiasABC(tduty, rcorr=0.5, sfs='flex', Niter=14, Npart=1000):
     '''
     if tduty not in ['0.5', '1', '2', '5', '10']: 
         raise ValueError 
-    run = ''.join(['rSFH_abias', str(rcorr), '_', tduty, 'gyr.sfs', sfs]) 
+    run = ''.join(['rSFH_abias', str(rcorr), '_', tduty, 'gyr.sfsmf.sfs', sfs]) 
     print(run)
     prior = ABC.Prior(sfs, shape='tophat') 
-    ABC.runABC(run, Niter, [1.e5], prior, N_p=Npart, sumstat=['smf'], nsnap0=15, downsampled='20') 
+    ABC.runABC(run, Niter, [1.e5], prior, N_p=Npart, sumstat=['sfsmf'], nsnap0=15, downsampled='20') 
     return None 
 
 
@@ -57,7 +57,7 @@ def narrowSFS_noAbiasABC(tduty, sfs='flex', Niter=14, Npart=1000):
 def nodutycycle(sfs='flex', Niter=14, Npart=1000): 
     ''' ABC run without assembly bias 
     '''
-    run = ''.join(['nodutycycle.sfs', sfs]) 
+    run = ''.join(['nodutycycle.sfsmf.sfs', sfs]) 
     print(run)
     prior = ABC.Prior(sfs, shape='tophat') 
     ABC.runABC(run, Niter, [1.e5], prior, N_p=Npart, sumstat=['smf'], nsnap0=15, downsampled='20') 

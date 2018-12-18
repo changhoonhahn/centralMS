@@ -28,7 +28,6 @@ def Theta(prior='flex'):
     elif prior in ['broken']: 
         tt['variable'] = ['SFS z slope', 'SFS m slope 0', 'SFS m slope 1']
         tt['label'] = ['$m_{z; amp}$', '$m^{(0)}_{M_*; slope}$', '$m^{(1)}_{M_*; slope}$']
-
     return tt
 
 
@@ -152,69 +151,6 @@ def _model_theta(run, args):
         theta['sfh'] = {'name': 'constant_offset'} 
     else: 
         raise ValueError
-    '''
-        elif run == 'rSFH_r1.0_most': 
-            theta['sfh'] = {'name': 'random_step_most_abias'}
-            theta['sfh']['dt_min'] = 0.5 
-            theta['sfh']['dt_max'] = 0.5 
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.3
-        elif run == 'rSFH_r0.66_delay': 
-            theta['sfh'] = {'name': 'random_step_abias_delay_dz'}
-            theta['sfh']['dt_min'] = 0.5 
-            theta['sfh']['dt_max'] = 0.5 
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.66 * 0.3
-            theta['sfh']['dt_delay'] = 1. # Gyr 
-            theta['sfh']['dz_dMh'] = 0.5 
-        elif run == 'rSFH_r0.99_delay': 
-            theta['sfh'] = {'name': 'random_step_abias_delay_dz'}
-            theta['sfh']['dt_min'] = 0.5 
-            theta['sfh']['dt_max'] = 0.5 
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.99 * 0.3
-            theta['sfh']['dt_delay'] = 1. # Gyr 
-            theta['sfh']['dz_dMh'] = 0.5 
-        elif run == 'rSFH_r0.99_tdyn_5gyr': 
-            # random SFH with 0.99 correlation with halo growth 
-            # over t_dyn and duty cycle of 5 Gyr 
-            theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-            theta['sfh']['dt_min'] = 5. 
-            theta['sfh']['dt_max'] = 5. 
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.99 * 0.3
-            theta['sfh']['dt_delay'] = 0. # Gyr 
-            theta['sfh']['dt_dMh'] = 2.5 # Gyr
-        elif run == 'rSFH_r0.99_tdyn_0.5gyr_narrSFMS': 
-            # random SFH with 0.99 correlation with halo growth 
-            # over t_dyn and duty cycle of 0.5 Gyr 
-            theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-            theta['sfh']['dt_min'] = 0.5 
-            theta['sfh']['dt_max'] = 0.5 
-            theta['sfh']['sigma_tot'] = 0.2 # note narrower SFMS
-            theta['sfh']['sigma_corr'] = 0.99 * 0.2 # note narrower SFMS
-            theta['sfh']['dt_delay'] = 0. # Gyr 
-            theta['sfh']['dt_dMh'] = 2.5 # Gyr
-            theta['sfms']['sigma'] = 0.2 # note narrower SFMS
-        elif run == 'rSFH_r0.99_delay_dt_test': 
-            theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-            theta['sfh']['dt_min'] = args[2]
-            theta['sfh']['dt_max'] = args[2] 
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = 0.99 * 0.3
-            theta['sfh']['dt_delay'] = args[3] # Gyr 
-            theta['sfh']['dt_dMh'] = args[4]  # Gyr
-        elif run == 'rSFH_r_delay_dt_test': 
-            theta['sfh'] = {'name': 'random_step_abias_delay_dt'}
-            theta['sfh']['dt_min'] = args[3]
-            theta['sfh']['dt_max'] = args[3] 
-            theta['sfh']['sigma_tot'] = 0.3 
-            theta['sfh']['sigma_corr'] = args[2] * 0.3
-            theta['sfh']['dt_delay'] = args[4] # Gyr 
-            theta['sfh']['dt_dMh'] = args[5]  # Gyr
-        else: 
-            raise NotImplementedError
-    '''
     return theta
 
 
