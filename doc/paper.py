@@ -434,7 +434,7 @@ def SFMSprior_z1():
     return None
 
 
-def qaplotABC(runs=None, Ts=None): 
+def qaplotABC(runs=None, Ts=None, dMhalo=0.1): 
     ''' Figure that illustrates how the ABC fitting works using two different
     runs overplotted on it each other
     '''
@@ -507,7 +507,7 @@ def qaplotABC(runs=None, Ts=None):
                 med['sfr'][isSF], 
                 weights=med['weights'][isSF], 
                 levels=[0.68, 0.95], range=[[9., 12.], [-2., 1.]], color=colors[i_s], 
-                bins=20, plot_datapoints=False, fill_contours=False, plot_density=True, ax=sub) 
+                bins=10, plot_datapoints=False, fill_contours=False, plot_density=True, ax=sub) 
     sub.set_xlim([9., 11.])
     sub.set_xticks([9., 9.5, 10., 10.5, 11.]) 
     sub.set_xlabel('log $(\; M_*\; [M_\odot]\;)$', fontsize=25)
@@ -519,12 +519,12 @@ def qaplotABC(runs=None, Ts=None):
     sub = fig.add_subplot(133)
     smhmr = Obvs.Smhmr()
     # simulation 
-    mhalo_bin = np.linspace(10., 15., 11)
+    mhalo_bin = np.linspace(10., 15., int(5./dMhalo)+1)
     for i_s, meds in enumerate(sims_meds): 
         for ii, med in enumerate(meds): 
             isSF = np.where(med['galtype'] == 'sf') # only SF galaxies 
             m_mid_i, _, sig_mhalo_i, cnt_i = smhmr.Calculate(med['halo.m'][isSF], med['m.star'][isSF], 
-                    dmhalo=0.5, weights=med['weights'][isSF], m_bin=mhalo_bin)
+                    weights=med['weights'][isSF], m_bin=mhalo_bin)
 
             if ii == 0: 
                 sig_mhalos = np.zeros((len(meds), len(cnt_i)))
@@ -540,7 +540,7 @@ def qaplotABC(runs=None, Ts=None):
         above_zero = np.where(sig_mhalo_high > 0) 
         sub.fill_between(m_mid_i[above_zero], sig_mhalo_low[above_zero], sig_mhalo_high[above_zero], 
                 color=colors[i_s], linewidth=0, alpha=0.5, label=labels[i_s]) 
-    sub.set_xlim([11.5, 13.25])
+    sub.set_xlim([11.5, 13])
     sub.set_xlabel('log $(\; M_{h}\; [M_\odot]\;)$', fontsize=25)
     sub.set_ylim([0.1, 0.5])
     sub.set_yticks([0.1, 0.2, 0.3, 0.4, 0.5]) 
@@ -1114,6 +1114,61 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     return None 
 
 
+def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14): 
+    '''     
+    '''
+    tduties = [0.5, 1, 2, 5, 10]
+    r_abias = [0., 0.5, 1.]
+
+    # get sigma_M*(log M_h = 12.) for a grid of tduty and r
+    sigma_grid = np.zeros((len(tduties), len(r_abias)))
+    sigma_grid_low = np.zeros((len(tduties), len(r_abias)))
+    sigma_grid_high = np.zeros((len(tduties), len(r_abias)))
+    for i, tduty in enumerate(tduties): 
+        for j, r in enumerate(r_abias): 
+            if r_abias > 0: 
+                run = 'rSFH_abias'+str(r)+'_'+str(tduty)+'gyr.sfsmf.sfsbroken'
+            else: 
+                run = 'randomSFH'+str(tduty)+'gyr.sfsmf.sfsbroken'
+
+            abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # ABC directory 
+            sig_Mss, sig_Mhs = [], [] 
+            for i in range(10): 
+                f = pickle.load(open(''.join([abc_dir, 'model.theta', str(i), '.t', str(niter), '.p']), 'rb'))
+                subcat_sim_i = {} 
+                for key in f.keys(): 
+                    subcat_sim_i[key] = f[key]
+                
+                isSF = np.where(subcat_sim_i['galtype'] == 'sf') # only SF galaxies 
+
+                sig_ms_i = smhmr.sigma_logMstar(
+                        subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
+                        weights=subcat_sim_i['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
+                sig_mh_i = smhmr.sigma_logMhalo(
+                        subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
+                        weights=subcat_sim_i['weights'][isSF], Mstar=Mstar, dmstar=dMstar)
+                sig_Mss.append(sig_ms_i)  
+                sig_Mhs.append(sig_mh_i) 
+
+            sig_ms_low, sig_ms_med, sig_ms_high, sig_ms_lowlow, sig_ms_hihi = np.percentile(np.array(sig_Mss), [16, 50, 84, 2.5, 97.5])
+            sig_mh_low, sig_mh_med, sig_mh_high, sig_mh_lowlow, sig_mh_hihi = np.percentile(np.array(sig_Mhs), [16, 50, 84, 2.5, 97.5]) 
+
+            sigma_grid[i,j] = sig_ms_med
+            sigma_grid_low[i,j] = sig_ms_low
+            sigma_grid_high[i,j] = sig_ms_high
+
+    fig = plt.figure(figsize=(10,10)) 
+    sub = fig.add_subplot(111)
+    X, Y = np.meshgrid(tduties, r_abias) 
+    sub.scatter(X, Y, s=10, c=sigma_grid) 
+    sub.set_xlim([0., 10.]) 
+    sub.set_ylim([0., 1.]) 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/SHMRscatter_tduty_abis_contour.pdf']), 
+            bbox_inches='tight', dpi=150) 
+    plt.close()
+    return None 
+
+
 def _lAbramson2016SHMR(nsnap0=15, n_boot=20): 
     '''
     '''
@@ -1604,10 +1659,11 @@ if __name__=="__main__":
     #SFMSprior_z1()
     #sigMstar_tduty_fid(Mhalo=12, dMhalo=0.1)
     #sigMstar_tduty(Mhalo=12, dMhalo=0.1)
-    #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14])
+    #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14], dMhalo=0.1)
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
-    SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
+    #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
+    SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
     #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
     #fQ_fSFMS()
     #SFHmodel()
