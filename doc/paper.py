@@ -4,13 +4,15 @@
 figures for centralMS paper 
 
 '''
+import matplotlib as mpl 
+mpl.use('agg')
 import h5py
 import pickle
 import numpy as np 
 import corner as DFM
 from scipy.interpolate import interp1d
 from scipy.stats import multivariate_normal as MNorm
-from letstalkaboutquench.fstarforms import fstarforms
+#from letstalkaboutquench.fstarforms import fstarforms
 
 from centralms import util as UT
 from centralms import sfh as SFH 
@@ -20,11 +22,10 @@ from centralms import evolver as Evol
 from centralms import labram as LA2016
 from centralms import observables as Obvs
 
-from ChangTools.plotting import prettycolors
-import matplotlib as mpl 
 import matplotlib.pyplot as plt 
+from ChangTools.plotting import prettycolors
 from matplotlib.patches import Rectangle
-mpl.rcParams['text.usetex'] = True
+#mpl.rcParams['text.usetex'] = True
 mpl.rcParams['font.family'] = 'serif'
 mpl.rcParams['axes.linewidth'] = 1.5
 mpl.rcParams['axes.xmargin'] = 1
@@ -1118,7 +1119,9 @@ def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14):
     '''     
     '''
     tduties = [0.5, 1, 2, 5, 10]
-    r_abias = [0., 0.5, 1.]
+    r_abias = [0., 0.5, 0.99]
+    
+    smhmr = Obvs.Smhmr()
 
     # get sigma_M*(log M_h = 12.) for a grid of tduty and r
     sigma_grid = np.zeros((len(tduties), len(r_abias)))
@@ -1126,15 +1129,15 @@ def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14):
     sigma_grid_high = np.zeros((len(tduties), len(r_abias)))
     for i, tduty in enumerate(tduties): 
         for j, r in enumerate(r_abias): 
-            if r_abias > 0: 
+            if r > 0: 
                 run = 'rSFH_abias'+str(r)+'_'+str(tduty)+'gyr.sfsmf.sfsbroken'
             else: 
                 run = 'randomSFH'+str(tduty)+'gyr.sfsmf.sfsbroken'
 
             abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # ABC directory 
             sig_Mss, sig_Mhs = [], [] 
-            for i in range(10): 
-                f = pickle.load(open(''.join([abc_dir, 'model.theta', str(i), '.t', str(niter), '.p']), 'rb'))
+            for ii in range(10): 
+                f = pickle.load(open(''.join([abc_dir, 'model.theta', str(ii), '.t', str(niter), '.p']), 'rb'))
                 subcat_sim_i = {} 
                 for key in f.keys(): 
                     subcat_sim_i[key] = f[key]
@@ -1144,26 +1147,32 @@ def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14):
                 sig_ms_i = smhmr.sigma_logMstar(
                         subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
                         weights=subcat_sim_i['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
-                sig_mh_i = smhmr.sigma_logMhalo(
-                        subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
-                        weights=subcat_sim_i['weights'][isSF], Mstar=Mstar, dmstar=dMstar)
                 sig_Mss.append(sig_ms_i)  
-                sig_Mhs.append(sig_mh_i) 
 
             sig_ms_low, sig_ms_med, sig_ms_high, sig_ms_lowlow, sig_ms_hihi = np.percentile(np.array(sig_Mss), [16, 50, 84, 2.5, 97.5])
-            sig_mh_low, sig_mh_med, sig_mh_high, sig_mh_lowlow, sig_mh_hihi = np.percentile(np.array(sig_Mhs), [16, 50, 84, 2.5, 97.5]) 
-
             sigma_grid[i,j] = sig_ms_med
             sigma_grid_low[i,j] = sig_ms_low
             sigma_grid_high[i,j] = sig_ms_high
 
-    fig = plt.figure(figsize=(10,10)) 
-    sub = fig.add_subplot(111)
     X, Y = np.meshgrid(tduties, r_abias) 
-    sub.scatter(X, Y, s=10, c=sigma_grid) 
-    sub.set_xlim([0., 10.]) 
+
+    fig = plt.figure(figsize=(6,6)) 
+    sub = fig.add_subplot(111)
+    origin = 'lower'
+    _CS = sub.contourf(X, Y, sigma_grid.T, origin=origin)
+    CS = sub.contour(X, Y, sigma_grid.T, levels=_CS.levels, colors=('k',), linewidths=(0,), origin=origin) 
+    sub.clabel(CS, inline=True, colors='k', fontsize=10)
+    sub.fill_between([0.5, 10.], [0.57, 0.57], [0.69, 0.69],
+            facecolor='none', hatch='X', edgecolor='k', linewidth=0.5)
+    #sub.fill_between([0.5, 10.], [0.57, 0.57], [0.69, 0.69],
+    #        color='k', alpha=0.15, linewidth=0)
+    sub.text(0.5, 0.63, 'Tinker+(2018)', ha='center', va='center', transform=sub.transAxes, fontsize=12)
+    sub.set_xlabel(r'$t_\mathrm{duty}$ [Gyr]', fontsize=25)  
+    sub.set_xlim([0.5, 10.]) 
+    sub.set_xscale("log") 
+    sub.set_ylabel(r'$r$ correlation coefficient', fontsize=25)  
     sub.set_ylim([0., 1.]) 
-    fig.savefig(''.join([UT.tex_dir(), 'figs/SHMRscatter_tduty_abis_contour.pdf']), 
+    fig.savefig(''.join([UT.tex_dir(), 'figs/SHMRscatter_tduty_abias_contour.pdf']), 
             bbox_inches='tight', dpi=150) 
     plt.close()
     return None 
@@ -1652,6 +1661,7 @@ def _convert_sigma_lit(name):
                 bbox_inches='tight', dpi=150) 
         plt.close()
         return None 
+"""
 
 if __name__=="__main__": 
     #groupcatSFMS(mrange=[10.6,10.8])
