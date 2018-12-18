@@ -342,6 +342,7 @@ class SDSSgroupcat(Subhalos):
         gal_data = fgal[1].data 
     
         catalog = {} 
+        catalog['id_gal'] = gal_data['id_gal']
         catalog['ra']   = gal_data['ra'] * 57.2957795
         catalog['dec']  = gal_data['dec'] * 57.2957795
         catalog['z']    = gal_data['cz']/299792.458

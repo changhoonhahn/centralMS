@@ -472,8 +472,9 @@ class Smhmr(object):
         ''' 
         ''' 
         if weights is not None: 
-            if len(mhalo) != len(weights): 
-                raise ValueError('lenghts of mhalo and weights do not match!')
+            assert len(mhalo) == len(weights)
+        else: 
+            weights = np.ones(len(mhalo)) 
         
         if m_bin is None: 
             m_low = np.arange(mhalo.min(), mhalo.max(), dmhalo)
@@ -486,45 +487,31 @@ class Smhmr(object):
         sig_mstar = np.zeros(len(m_low))
         counts = np.zeros(len(m_low))
         for i_m in range(len(m_low)):
-            inbin = np.where((mhalo >= m_low[i_m]) & (mhalo < m_high[i_m]))
-            
-            if weights is None: 
-                if len(inbin[0]) == 0: 
-                    continue
-                counts[i_m] = len(inbin[0])
-                mu_mstar[i_m] = np.mean(mstar[inbin])
-                sig_mstar[i_m] = np.std(mstar[inbin]) 
-            else: 
-                if np.sum(weights[inbin]) == 0.: 
-                    continue
-                counts[i_m] = np.sum(weights[inbin])
-                mu_mstar[i_m] = np.average(mstar[inbin], weights=weights[inbin])
-                sig_mstar[i_m] = np.sqrt(np.average((mstar[inbin]-mu_mstar[i_m])**2, weights=weights[inbin]) )
- 
+            inbin = ((mhalo >= m_low[i_m]) & (mhalo < m_high[i_m]))
+            if np.sum(weights[inbin]) == 0.: 
+                continue
+            counts[i_m] = np.sum(weights[inbin])
+            mu_mstar[i_m] = np.average(mstar[inbin], weights=weights[inbin])
+            sig_mstar[i_m] = np.sqrt(np.average((mstar[inbin]-mu_mstar[i_m])**2, weights=weights[inbin]))
+
         return [0.5*(m_low + m_high), mu_mstar, sig_mstar, counts]
 
     def sigma_logMstar(self, mhalo, mstar, weights=None, Mhalo=12., dmhalo=0.1): 
         ''' Calculate sigma_logM* for a specific Mhalo. Default Mhalo is 10**12
         '''
-        inbin = np.where((mhalo >= Mhalo-dmhalo) & (mhalo < Mhalo+dmhalo)) 
-        if weights is not None: 
-            mu_mstar = np.average(mstar[inbin], weights=weights[inbin])
-            sig_mstar = np.sqrt(np.average((mstar[inbin]-mu_mstar)**2, weights=weights[inbin]))
-        else: 
-            mu_mstar = np.mean(mstar[inbin])
-            sig_mstar = np.std(mstar[inbin])
+        if weights is None: weights = np.ones(len(mhalo))
+        inbin = ((mhalo >= Mhalo - 0.5*dmhalo) & (mhalo < Mhalo + 0.5*dmhalo)) 
+        mu_mstar = np.average(mstar[inbin], weights=weights[inbin])
+        sig_mstar = np.sqrt(np.average((mstar[inbin]-mu_mstar)**2, weights=weights[inbin]))
         return sig_mstar
     
     def sigma_logMhalo(self, mhalo, mstar, weights=None, Mstar=10.5, dmstar=0.1): 
         ''' Calculate sigma_logMhalo for a specific stellar mass. Default Mstar is 10**10.5
         '''
-        inbin = np.where((mstar >= Mstar-dmstar) & (mstar < Mstar+dmstar)) 
-        if weights is not None: 
-            mu_mhalo = np.average(mhalo[inbin], weights=weights[inbin])
-            sig_mhalo = np.sqrt(np.average((mhalo[inbin]-mu_mhalo)**2, weights=weights[inbin]))
-        else: 
-            mu_mhalo = np.mean(mhalo[inbin])
-            sig_mhalo = np.std(mhalo[inbin])
+        inbin = ((mstar >= Mstar-dmstar) & (mstar < Mstar+dmstar)) 
+        if weights is None: weights = np.ones(len(mhalo))
+        mu_mhalo = np.average(mhalo[inbin], weights=weights[inbin])
+        sig_mhalo = np.sqrt(np.average((mhalo[inbin]-mu_mhalo)**2, weights=weights[inbin]))
         return sig_mhalo
 
 
