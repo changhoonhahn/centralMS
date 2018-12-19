@@ -5,14 +5,14 @@ figures for centralMS paper
 
 '''
 import matplotlib as mpl 
-mpl.use('agg')
+mpl.use('agg') 
 import h5py
 import pickle
 import numpy as np 
 import corner as DFM
 from scipy.interpolate import interp1d
 from scipy.stats import multivariate_normal as MNorm
-#from letstalkaboutquench.fstarforms import fstarforms
+from letstalkaboutquench.fstarforms import fstarforms
 
 from centralms import util as UT
 from centralms import sfh as SFH 
@@ -328,8 +328,15 @@ def Illustris_SFH():
     dlogsfrs, t_skip = [], [] 
     for i in range(len(t_mid)-12): 
         fSFMS = fstarforms() 
-        fit_logm_i, fit_logsfr_i = fSFMS.fit(np.log10(Msh[:,i]), np.log10(sfhs[:,i]),
-                method='gaussmix', fit_range=[9.0, 10.5], dlogm=0.2)
+        sfr_lim = (sfhs[:,i] > 0.) 
+        fit_logm_i, fit_logsfr_i, _ = fSFMS.fit(
+                np.log10(Msh[sfr_lim,i]), 
+                np.log10(sfhs[sfr_lim,i]),
+                method='gaussmix', 
+                fit_range=[9.0, 10.5], 
+                fit_error='bootstrap',
+                n_bootstrap=10, 
+                dlogm=0.2)
         sfms_fit_i = fSFMS.powerlaw(logMfid=10.5)
 
         fig = plt.figure() 
@@ -355,8 +362,10 @@ def Illustris_SFH():
 
     # now fit SFMS at z ~ 0  
     fSFMS = fstarforms() 
-    fit_logm, fit_logsfr = fSFMS.fit(np.log10(galpop['M*']), np.log10(sfhs[:,0]), 
-            method='gaussmix', fit_range=[9.0, 10.5], dlogm=0.2)
+    sfr_lim = (sfhs[:,0] > 0.) 
+    fit_logm, fit_logsfr, _ = fSFMS.fit(np.log10(galpop['M*'][sfr_lim]), np.log10(sfhs[sfr_lim,0]), 
+            method='gaussmix', fit_range=[9.0, 10.5], dlogm=0.2, 
+            fit_error='bootstrap', n_bootstrap=10)
     sfms_fit = fSFMS.powerlaw(logMfid=10.5)
 
     # star-forming galaxies at z ~ 0 
@@ -1674,11 +1683,11 @@ if __name__=="__main__":
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
-    SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
+    #SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
     #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
     #fQ_fSFMS()
     #SFHmodel()
-    #Illustris_SFH()
+    Illustris_SFH()
     #_lAbramson2016SHMR(nsnap0=15, n_boot=100)
     #_lAbramson2016SHMR_assignHalo(nsnap0=15, n_boot=100)
     #_SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
