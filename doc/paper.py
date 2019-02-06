@@ -368,7 +368,7 @@ def Illustris_SFH():
     sfms_fit = fSFMS.powerlaw(logMfid=10.5)
 
     # star-forming galaxies at z ~ 0 
-    z0sf = ((np.log10(sfhs[:,0]) > sfms_fit(np.log10(galpop['M*']))-0.5) & 
+    z0sf = ((np.log10(sfhs[:,0]) > sfms_fit(np.log10(galpop['M*']))-0.6) & 
             (np.log10(galpop['M*']) > 10.5) &  (np.log10(galpop['M*']) < 10.6)) 
     #z0q = ((np.log10(sfhs[:,0]) < sfms_fit(np.log10(galpop['M*']))-0.9) & 
     #        (np.log10(galpop['M*']) > 10.5) &  (np.log10(galpop['M*']) < 10.6)) 
@@ -377,7 +377,7 @@ def Illustris_SFH():
     sub = fig.add_subplot(111)
     for i in np.arange(len(z0sf))[z0sf]: 
         sub.plot(t_bins[-1] - t_skip, np.array(dlogsfrs)[:,i], c='k', alpha=0.1, lw=0.1) 
-    z0sf = ((np.log10(sfhs[:,0]) > sfms_fit(np.log10(galpop['M*']))-0.1) & 
+    z0sf = ((np.log10(sfhs[:,0]) > sfms_fit(np.log10(galpop['M*']))-0.6) & 
             (np.log10(galpop['M*']) > 10.5) &  (np.log10(galpop['M*']) < 10.6)) 
     for ii, i in enumerate(np.random.choice(np.arange(len(z0sf))[z0sf], 10)): 
         sub.plot(t_bins[-1] - t_skip, np.array(dlogsfrs)[:,i], lw=1, c='C'+str(ii)) 
@@ -846,6 +846,7 @@ def Mhacc_dSFR(runs, T):
                 mhacc[:,i-1] = subcat_sim['halo.m.snap'+str(i)][i_halo]
 
             msacc = np.zeros((len(i_halo), 15))
+            msacc[:,0] = subcat_sim['m.star'][i_halo]
             dsfrs = np.zeros((len(i_halo), 15))
             dsfrs[:,0] = subcat_sim['sfr'][i_halo] - SFH.SFR_sfms(subcat_sim['m.star'][i_halo], UT.z_nsnap(1), tt['sfms'])
             for i in range(2, 16): 
@@ -867,6 +868,9 @@ def Mhacc_dSFR(runs, T):
     for ii in range(mhacc.shape[0]): 
         sub.plot(UT.t_nsnap(np.arange(1,21)), # - UT.tdyn_t(UT.t_nsnap(np.arange(1,21))), 
                 10**(mhacc[ii,:]-mhacc[ii,0]), c='C'+str(ii))
+    for ii in range(msacc.shape[0]): 
+        sub.plot(UT.t_nsnap(np.arange(1,16)), 10**(msacc[ii,:]-msacc[ii,0])-0.5, c='C'+str(ii), ls=":")
+
     sub.vlines(UT.t_nsnap(5), -1., 1., color='k', linestyle=':', linewidth=2) 
     sub.fill_between([UT.t_nsnap(5), UT.t_nsnap(5) - UT.tdyn_t(UT.t_nsnap(5))], [0.,0.], [1.,1.], 
             linewidth=0., color='k', alpha=0.15)  
@@ -1776,11 +1780,11 @@ if __name__=="__main__":
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14], dMhalo=0.1)
-    SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
+    #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
-    #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
+    Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
     #fQ_fSFMS()
     #SFHmodel()
     #Illustris_SFH()

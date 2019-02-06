@@ -1,7 +1,21 @@
-dat
-*pyc
-fig/*
+# python
+*.pyc
+__pycache__
 .ipynb_checkpoints/
-*hdf5
-run/*o6*
-*log
+.DS_Store
+
+# tex
+*.aux
+*.blg
+*.log
+*.out
+
+# other 
+figs/*
+*png
+
+# build 
+build
+dist
+figs
+*.egg*
