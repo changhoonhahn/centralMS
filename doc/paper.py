@@ -742,16 +742,16 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.5):
             'More+(2011)', #'Yang+(2009)', # group finder results can't really be included because they use abundance matching to assign halos 
             'Leauthaud+(2012)', 
             'Tinker+(2013)', #'Reddick+(2013)', 
-            'Zu+(2015)', 'Cao+(2019)']
+            'Zu+(2015)', 'Cao+(2019)'][::-1]
     lit_siglogMs_median = [0.15, #0.122, 
             0.206, 0.21, #0.20, 
-            0.22, 0.34]
+            0.22, 0.33][::-1]
     lit_siglogMs_upper = [0.26, #0.152, 
             0.206+0.031, 0.27, #0.23, 
-            0.24, 0.31]
+            0.24, 0.30][::-1]
     lit_siglogMs_lower = [0.07, #0.092, 
             0.206-0.031, 0.15, #0.17, 
-            0.20, 0.37 ] 
+            0.20, 0.36][::-1]
 
     # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 Table 2 (COSMOS)
     # Yang et al. (2009) for blue galaxies Table 4 (SDSS DR4) 
@@ -801,18 +801,20 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.5):
     #marks = ['^', 's', 'o', '8', 'x', 'D']
     for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), 
             lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
-        subplt = sub.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.k', marker=marks[ii], markersize=5)
+        subplt = sub.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.k', marker=marks[ii], markersize=8)
         #fmt='.C'+str(ii), markersize=10)
         subplts.append(subplt) 
-    legend1 = sub.legend(subplts[:3], lit_siglogMs[:3], handletextpad=-0.5, loc=(-0.02, 0.7), prop={'size': 15})
-    sub.legend(subplts[3:], lit_siglogMs[3:], loc=(0.575, 0.), handletextpad=-0.5, prop={'size': 15})
+    #legend1 = sub.legend(subplts[:2], lit_siglogMs[:2], handletextpad=-0.5, loc=(-0.02, 0.7), prop={'size': 15})
+    #sub.legend(subplts[2:], lit_siglogMs[2:], loc=(0.575, 0.), handletextpad=-0.5, prop={'size': 15})
+    legend1 = sub.legend(subplts[:2], lit_siglogMs[:2], handletextpad=-0.5, loc=(-0.02, 0.05), prop={'size': 15})
+    sub.legend(subplts[2:], lit_siglogMs[2:], loc=(0.45, 0.72), handletextpad=-0.5, prop={'size': 15})
     plt.gca().add_artist(legend1)
     sub.set_xlim([0.5, 10.]) # x-axis
     sub.set_xscale('log') 
     sub.set_ylabel(r'$\sigma_{\log\,M_*} \Big(M_h = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=25) # y-axis
     sub.set_ylim([0.1, 0.4]) 
     sub.set_yticks([0.1, 0.2, 0.3, 0.4]) 
-    sub.set_xlabel('$t_\mathrm{duty}$ [Gyr]', labelpad=10, fontsize=22) 
+    sub.set_xlabel('$t_\mathrm{duty}$ [Gyr]', labelpad=5, fontsize=22) 
     fig.savefig(''.join([UT.tex_dir(), 'figs/SHMRscatter_tduty.pdf']), bbox_inches='tight', dpi=150) 
     plt.close()
     return None 
@@ -1780,11 +1782,11 @@ if __name__=="__main__":
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14], dMhalo=0.1)
-    #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
+    SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
-    Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
+    #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
     #fQ_fSFMS()
     #SFHmodel()
     #Illustris_SFH()

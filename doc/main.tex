@@ -313,25 +313,27 @@ the SFS GMM component shaded in blue.
 The SFS constitutes $f^\mathrm{cen}_\mathrm{SFS} = 0.21$ of the SDSS 
 central galaxies in this stellar mass bin. Using the $f^\mathrm{cen}_\mathrm{SFS}$ 
 estimates, we fit $f^\mathrm{cen}_\mathrm{SFS}$ as a linear function of 
-$\log M_*$ similar to \cite{wetzel2013,hahn2017}: 
+$\log M_*$ similar to \cite{wetzel2013,hahn2017b}: 
 \beq \label{eq:f_cen_sfms}
 f^\mathrm{cen}_\mathrm{SFS, bestfit}(M_*) = -0.627\,(\log\,M_* - 10.5) + 0.354. 
 \eeq
 We note that this is in good agreement with the $f_\mathrm{Q}^\mathrm{cen}(M_*; z \sim 0)$ 
-fit from \cite{hahn2017}. 
+fit from \cite{hahn2017b}. 
 
 For each central subhalo in our simulation, we assign a probability of it 
 being on the SFS, using Eq.~\ref{eq:f_cen_sfms} with $M_*$ at $z \sim 0$ 
 assigned through subhalo abundance matching (SHAM) to $M_\mathrm{peak}$, 
-the maxmum host halo mass that it ever had as a central subhalo~\citep{conroy2006,vale2006,yang2009,wetzel2012,leja2013,wetzel2013,wetzel2014,hahn2017}. 
+the maxmum host halo mass that it ever had as a central subhalo~\citep{conroy2006,vale2006,yang2009,wetzel2012,leja2013,wetzel2013,wetzel2014,hahn2017b}. 
 SHAM, in its simplest form, assumes a one-to-one mapping between subhalo 
 $M_\mathrm{peak}$ and galaxy stellar mass, $M_*$, that preserves rank 
 order: $n({>}M_\mathrm{peak}) > n({>}M_*)$. In practice, we apply a $0.2$ 
 dex log-normal scatter in $M_*$ at fixed $M_\mathrm{peak}$ based on the 
 observed SHMR. For $n({>}M_*)$, we use observed stellar mass function (SMF) 
 from \cite{li2009}, which is based on the same SDSS NYU-VAGC sample as our 
-group catalog. Based on the Eq.~\ref{eq:f_cen_sfms} and SHAM $M_*$ probablities, 
-we randomly identify centrals from our simulation as SF at $z \sim 0$. 
+group catalog. Based on the probabilities from Eq.~\ref{eq:f_cen_sfms} and 
+SHAM $M_*$, we randomly identify centrals from our simulation as SF at 
+$z \sim 0$. \cite{tinker2017b,tinker2018} found that quenching is 
+independent of halo growth rate and therefore we randomly select SF subhalos.  
 In our model, we assume that once a SF galaxy quenches its star formation, 
 it remains quiescent.  %\todo{maybe something about rejuvenation?} 
 Without any quiescent galaxies rejuvenating their star formation, galaxies
@@ -344,10 +346,10 @@ relation of the SFS with $M_*$ assigned using SHAM with a SMF interpolated
 between the \cite{li2009} SMF and the SMF from \cite{marchesini2009} at 
 $z = 1.6$. We choose the \cite{marchesini2009} SMF, among others, because it 
 produces interpolated SMFs that monotonically increase at $z < 1$. As noted 
-in \cite{hahn2017}, at $z \approx 1$, the SMF interpolated between the 
+in \cite{hahn2017b}, at $z \approx 1$, the SMF interpolated between the 
 \cite{li2009} and \cite{marchesini2009} SMFs is consistent with more recent 
 measurements from \cite{muzzin2013} and \cite{ilbert2013}. Observations in 
-the literature at these redshifts, however, not only use galaxy properties 
+the literature at $z \sim 1$, however, not only use galaxy properties 
 derived differently from the SDSS VAGC but they also find SFS with significant 
 discrepancies from one another. \cite{speagle2014} compiles the SFR-$M_*$ 
 relation of the SFS from 25 studies in the literature, each with different 
@@ -567,7 +569,7 @@ data and a distance metric to quantify the ``closeness'' between the observed da
 and simulation. Many variations of ABC has been used in astronomy and 
 cosmology~\citep[\emph{e.g.}][]{cameron2012,weyant2013,ishida2015,alsing2018}. 
 We use ABC in conjunction with the efficient Population Monte Carlo (PMC)
-importance sampling as in~\citep{hahn2017b, hahn2017}. For initial sampling 
+importance sampling as in~\citep{hahn2017b, hahn2017a}. For initial sampling 
 of our ABC particles, \emph{i.e.} the priors of our parameters 
 $m^\mathrm{low}_{M_*}$, $m^\mathrm{high}_{M_*}$, and $m_z$, we use uniform 
 distributions over the ranges $[0.0, 0.8]$, $[0.0, 0.8]$, and 
@@ -586,7 +588,7 @@ and $\sigma'_\Phi(M)$ is the uncertainty of $\Phi^\mathrm{SDSS}_\mathrm{SF,cen}$
 which we derive by scaling the~\cite{li2009} uncertainty of $\Phi^\mathrm{SDSS}$ 
 derived from mock catalogs. %\todo{We emphasize that ABC is not very sensitive to the distance metric.}
 For the rest of our ABC-PMC implementation, we strictly follow the implementation 
-of~\cite{hahn2017} and \cite{hahn2017b}. We refer reader to those papers for 
+of~\cite{hahn2017a} and \cite{hahn2017b}. We refer reader to those papers for 
 further details.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -594,79 +596,66 @@ further details.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.5\textwidth]{figs/SHMRscatter_tduty.pdf}
+\includegraphics[width=0.45\textwidth]{figs/SHMRscatter_tduty.pdf}
     \caption{With shorter star formation duty cycle timescales, $t_\mathrm{duty}$, our 
-    model produces smaller scatter in the SHMR---$\sigma_{\log\,M_*}$ at 
-    $M_h{=}10^{12} M_\odot$ (left) and $\sigma_{\log\,M_h}$ at $M_*{=}10^{10} M_\odot$. 
-    For $t_\mathrm{duty} = 10\,\mathrm{Gyr}$, $\sigma_{\log\,M_*} = 0.32\,\mathrm{dex}$ 
-    and $\sigma_{\log\,M_h} = 0.30\,\mathrm{dex}$. Meanwhile for 
-    $t_\mathrm{duty} = 0.5\,\mathrm{Gyr}$, $\sigma_{\log\,M_*}= 0.26\,\mathrm{dex}$ 
-    and $\sigma_{\log\,M_h} = 0.20$. We include $\sigma_{\log\,M_*}$ constraints 
-    from \cite{yang2009, more2011, leauthaud2012, tinker2013, zu2015} and 
-    $\sigma_{\log\,M_h}$ constraints 
-    from~\cite{mandelbaum2006, conroy2007, more2011, velander2014, han2015} (see text).
-    The~\cite{mandelbaum2006, han2015} $\sigma_{\log\,M_h}$ constraints serve as upper 
-    limits. A short star formation duty cycle timescale is necessary to produce a tight 
-    SHMR roughly consistent with constraints from observations. 
+    model produces smaller scatter in $\log M_*$ at $M_h{=}10^{12} M_\odot$, 
+    $\sigma_{\log\,M_*}$. For $t_\mathrm{duty}$ ranging from $10$ to $0.5\,\mathrm{Gyr}$, 
+    $\sigma_{\log\,M_*}$ ranges from {\ch $0.32\substack{+0.019\\ -0.021}$ to 
+    $0.26\substack{+0.010\\-0.012}$}. For comparison, we include observational 
+    $\sigma_{\log\,M_*}$ constraints from \cite{yang2009, more2011, leauthaud2012, tinker2013, zu2015} 
+    (see Section~\ref{sec:sfdutycycle}). Star formation varability on short 
+    timescales is necessary to produce a tight SHMR roughly consistent with 
+    constraints from observations. 
     }
 \label{fig:sigMstar_duty}
 \end{center}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Timescale of the Star Formation Duty Cycle} \label{sec:sfdutycycle}
-In Figure~\ref{fig:abc_demo}, we present the SMFs (left), SFSs (middle), and 
-$\sigma_{\log\,M_*}$ (right) of two models with different SFH prescriptions 
-each run using $\theta_\mathrm{median}$, the medians parameter values 
-of their ABC posterior distributions. One model has duty cycle of 
-$t_\mathrm{duty} = 10\,\mathrm{Gyr}$ (red) while the other has a duty cycle 
-of $t_\mathrm{duty} = 1\,\mathrm{Gyr}$ (blue). Both models, as expected from 
-the ABC posteriors, successfully reproduce the SDSS SMF, 
-$\Phi^\mathrm{SDSS}_\mathrm{SF,cen}$, and SFSs consistent with observations, 
-through the priors. Despite their consistency with observations, however, 
-the different star formation duty cycle timescales of the models predict 
-in significantly different scatter in $\log M_*$ at a given $\log M_h$ 
-(\emph{i.e.} scatter in the SHMR), particularly below $M_h < 10^{12.5}M_\odot$. 
 
-Since the scatter in SHMR of our model depends on the star formation duty 
-cycle timescale, we can compare it to observational constraints on the 
-SHMR in order to constrain $t_\mathrm{duty}$ and hence the SFHs of star 
-forming galaxies. We present $\sigma_{\log M_*}$, the scatter in $\log M_*$ 
-at fixed halo mass at $M_h = 10^{12} M_\odot$, and $\sigma_{\log M_h}$, 
-the scatter in $\log\,M_h$ at fixed stellar mass at $M_* = 10^{10} M_\odot$,
-as a function of $t_\mathrm{duty}$ in the left and right panels of  
-Figure~\ref{fig:sigMstar_duty}. Each $\sigma_{\log M_*}$ and 
-$\sigma_{\log M_h}$ value in Figure~\ref{fig:sigMstar_duty} is a prediction 
-from the ABC posterior and the width represents the $68\%$ confidence 
-intervals. For $t_\mathrm{duty}$ ranging from $10$ to $0.5\,\mathrm{Gyr}$,
+\subsection{Timescale of the Star Formation Duty Cycle} \label{sec:sfdutycycle}
+We present the SMFs (left), SFSs (center), and the scatter in $\log M_*$ at a 
+given $\log M_h$, $\sigma_{\log\,M_*}$, (right) of our model run using SFHs with 
+two different duty cycle timescales, $t_\mathrm{duty} = 10\,\mathrm{Gyr}$ (red) 
+and $1\,\mathrm{Gyr}$ (blue), in Figure~\ref{fig:abc_demo}. For each 
+$t_\mathrm{duty}$, we evaluate our model at the median parameter values of the respective posterior distributions derived 
+using ABC. For both $t_\mathrm{duty}$, our model successfully produces SMFs, 
+$\Phi^\mathrm{SDSS}_\mathrm{SF,cen}$, and SFSs consistent with observations, 
+as expected (left and center panels). Despite their consistency with observations, 
+however, different $t_{\rm duty}$ of the models predict significantly different 
+$\sigma_{\log\,M_*}$, particularly below $M_h < 10^{12.5}M_\odot$. We further
+illustrate the sensitivity of $\sigma_{\log\,M_*}$ of our model to $t_{\rm duty}$
+in Figure~\ref{fig:sigMstar_duty}, where we present $\sigma_{\log\,M_*}$ at
+fixed halo mass $M_h = 10^{12} M_\odot$ as a function of $t_{\rm duty}$. As in 
+Figure~\ref{fig:abc_demo}, $\sigma_{\log\,M_*}$ at each $t_{\rm duty}$ is predicted 
+from our model run with $t_{\rm duty}$ and $\theta$ from the corresponding ABC 
+posterior distribution. The shaded width represents the $68\%$ and $95\%$ 
+confidence intervals. For $t_\mathrm{duty}$ ranging from $10$ to $0.5\,\mathrm{Gyr}$,
 $\sigma_{\log\,M_*}$ ranges from 
 {\color{red}
-$0.32\substack{+0.019\\ -0.021}$ to $0.26\substack{+0.010\\-0.012}$ and 
+$0.32\substack{+0.019\\ -0.021}$ to $0.26\substack{+0.010\\-0.012}$ 
 }
-$\sigma_{\log\,M_h}$ ranges from 
-{\color{red}
-$0.30\substack{+0.005\\ -0.006}$ to $0.19\substack{+0.008\\-0.006}$. 
-}
-\emph{With a shorter star formation duty cycle timescale, our model produces 
-significantly smaller scatter in the SHMR.}
+--- a shorter star formation duty cycle timescale produces significantly 
+smaller scatter in the SHMR. Hence, \emph{observational constraints on 
+the SHMR can be used to constrain the timescale of star formation variability 
+and SFH of SF central galaxies.} 
 
-In order to constrain $t_\mathrm{duty}$, we compare $\sigma_{\log M_*}$ 
-and $\sigma_{\log M_h}$ predicted from our model to observational 
+We compare $\sigma_{\log M_*}$ predicted from our model to observational 
 constraints in the literature. These constraints are mainly derived from 
-fitting some sort of 
-halo occupation based models to observations of galaxy clustering, SMF, 
-satellite kinematics, or galaxy-galaxy weak lensing. On the left panel, 
-we include $\sigma_{\log M_*}$ constraints 
-from~\cite{more2011, leauthaud2012, tinker2013, zu2015}. %yang2009, 
-Using SDSS VAGC, \cite{more2011} fit satellite kinematics and \cite{zu2015} 
-fit galaxy clustering and galaxy-galaxy lensing measurements. Meanwhile, 
-\cite{leauthaud2012, tinker2013} fit the SMF, galaxy clustering, and 
-galaxy-galaxy lensing to COSMOS. We note that \cite{leauthaud2012, zu2015} 
-measure $\sigma_{\log M_*}$ for all central galaxies, not just star-forming. 
-At $M_h\sim 10^{12}M_\odot$, however, there is only a $< 1\sigma$ difference 
-in $\sigma_{\log M_*}$ between star-forming and quiescent central
-galaxies~\citep{more2011, tinker2013} so we include them in our comparison.
-\todo{need to discuss whether these measurements are necessarily applicaable 
-for $M_h = 10^{12}M_\odot$}
+fitting some sort of halo occupation based models to observations of galaxy 
+clustering, SMF, satellite kinematics, or galaxy-galaxy weak lensing. In 
+Figure~\ref{fig:sigMstar_duty}, we include $\sigma_{\log M_*}$ constraints 
+from~\cite{more2011, leauthaud2012, tinker2013, zu2015} and Cao et al. (in preparation).
+\cite{more2011} and \cite{zu2015} use SDSS VAGC to fit satellite kinematics 
+and galaxy clustering and galaxy-galaxy lensing measurements, repsectively.
+Meanwhile, \cite{leauthaud2012, tinker2013} use COSMOS to fit the SMF, galaxy 
+clustering, and galaxy-galaxy lensing. Finally, Cao et al. (in preparation) 
+uses the kurtosis of the line-of-sight pairwise velocity dispersion between 
+central galaxies and all neighboring galaxies to constrain the scatter in SHMR 
+at low halo masses. We note that \cite{leauthaud2012, zu2015} measure 
+$\sigma_{\log M_*}$ for all central galaxies, not only star-forming. At 
+$M_h\sim 10^{12}M_\odot$, however, \cite{more2011, tinker2013} find only 
+only a $< 1\sigma$ difference in $\sigma_{\log M_*}$ between SF and quiescent 
+centrals, so we include their measurements in our comparison. 
 
 \begin{comment}
     \bitem
@@ -708,21 +697,21 @@ for $M_h = 10^{12}M_\odot$}
     \eitem
 \end{comment}
 
-On the right panel, we include $\sigma_{\log\,M_h}$ constraints from \cite{more2011}
-along with constraints from \cite{mandelbaum2006a, conroy2007, velander2014, han2015}. 
-\cite{mandelbaum2006a} and \cite{velander2014} use halo occupation models to 
-analyze galaxy-galaxy weak lensing measurements of SDSS and the 
-Canada-France-Hawaii Telescope Lensing Survey~\citep[CFHTLenS;][]{heymans2012}, 
-respectively. \cite{conroy2007}, similar to \cite{more2011}, use a halo model 
-to fit the stacked satellite velocity dispersions for SDSS VAGC. Lastly, 
-\cite{han2015} use a maximum likelihood weak lensing analysis to fit shapes 
-of SDSS source galaxies individually (unlike the other stacked weak lensing
-analyses) for the G3Cv5 GAMA group catalog~\citep{robotham2011}. From these 
-works, we use $\sigma_{\log M_h}$ from the uncertainties in their $M_h$ 
-measurements at $M_*{\sim}10^{10}M_\odot$. From 
-\cite{mandelbaum2006a, more2011, velander2014} we have $\sigma_{\log\,M_h}$ 
-for blue/late-type/star forming centrals while we have $\sigma_{\log\,M_h}$ 
-for all centrals from \cite{conroy2007, han2015}. 
+%On the right panel, we include $\sigma_{\log\,M_h}$ constraints from \cite{more2011}
+%along with constraints from \cite{mandelbaum2006a, conroy2007, velander2014, han2015}. 
+%\cite{mandelbaum2006a} and \cite{velander2014} use halo occupation models to 
+%analyze galaxy-galaxy weak lensing measurements of SDSS and the 
+%Canada-France-Hawaii Telescope Lensing Survey~\citep[CFHTLenS;][]{heymans2012}, 
+%respectively. \cite{conroy2007}, similar to \cite{more2011}, use a halo model 
+%to fit the stacked satellite velocity dispersions for SDSS VAGC. Lastly, 
+%\cite{han2015} use a maximum likelihood weak lensing analysis to fit shapes 
+%of SDSS source galaxies individually (unlike the other stacked weak lensing
+%analyses) for the G3Cv5 GAMA group catalog~\citep{robotham2011}. From these 
+%works, we use $\sigma_{\log M_h}$ from the uncertainties in their $M_h$ 
+%measurements at $M_*{\sim}10^{10}M_\odot$. From 
+%\cite{mandelbaum2006a, more2011, velander2014} we have $\sigma_{\log\,M_h}$ 
+%for blue/late-type/star forming centrals while we have $\sigma_{\log\,M_h}$ 
+%for all centrals from \cite{conroy2007, han2015}. 
 
 \begin{comment}
     \bitem
@@ -757,22 +746,19 @@ for all centrals from \cite{conroy2007, han2015}.
 
 %We find that by decreasing the timescale of stochasticity on a simple SFH model that traces the overall 
 %SFS evolution does in fact decrease the scatter seen in the SMHMR. 
-The $\sigma_{\log\,M_h}$ constraints from the literature are significantly scatter 
-from $0.12$ to $0.6\,\mathrm{dex}$, right panel of Figure~\ref{fig:sigMstar_duty}.
-$\sigma_{\log\,M_h}$ from our model, regardless of $t_\mathrm{duty}$ is well 
-within this range, so the comparison does not provide much constraint on 
-$t_\mathrm{duty}$. On the other hand, the constraints for $\sigma_{\log\,M_h}$ 
+%The $\sigma_{\log\,M_h}$ constraints from the literature are significantly scatter from $0.12$ to $0.6\,\mathrm{dex}$, right panel of Figure~\ref{fig:sigMstar_duty}.  $\sigma_{\log\,M_h}$ from our model, regardless of $t_\mathrm{duty}$ is well within this range, so the comparison does not provide much constraint on $t_\mathrm{duty}$. On the other hand, 
+Besides Cao et al. (in preparation), the $\sigma_{\log\,M_*}$ constraints 
 in the literature are relatively consistent: $\sigma_{\log\,M_*} \lesssim 0.2$.
-Some of these constraints come from analyses that use halo models that 
-fix $\sigma_{\log\,M_*}$, independent of 
-$M_h$~\citep{leauthaud2012, tinker2013, zu2015}. Such analyses are not ideal 
-measurements of $\sigma_{\log\,M_*}$ at a specific $M_h\sim 10^{12}M_\odot$.
-If we exclude these analyses, we are left with an overall lower 
-$\sigma_{\log\,M_*}$. 
-These constraints are likely even lower, since observational constraints measure
-the quadratic sum of the intrinsic scatter and measurement scatter. 
-Hence, it's clear from the comparison that, with a longer duty cycle timescale, 
-our mode produces scatters too large to reconcile with observations.
+However, it's important to note that these constraints are derived using halo
+models that fix $\sigma_{\log\,M_*}$, independent of $M_h$. As constraining 
+power comes from a wide range of halo masses, such analyses are not ideal 
+measurements of $\sigma_{\log\,M_*}$ at a specific $M_h\sim 10^{12}M_\odot$. 
+{\ch something on the discrepancy}. 
+These constraints are likely overestimates of the intrinsic $\sigma_{\log\,M_*}$,
+since observational constraints measure the quadratic sum of the intrinsic scatter 
+and measurement scatter. Hence, a longer duty cycle timescale predicts $\sigma_{\log\,M_*}$
+in tension with observations. 
+%it's clear from the comparison that, with a longer duty cycle timescale, our mode produces scatters too large to reconcile with observations.
 \emph{A short duty cycle timescale--- $t_\mathrm{duty} \lesssim 0.5\,\mathrm{Gyr}$--- 
 is necessary for our model to ameliorate the tension with $\sigma_{\log\,M_*}$ 
 constraints in the literature}. This $t_\mathrm{duty}$ constraint implies
@@ -1060,10 +1046,10 @@ It's a pleasure to thank
     and 
     Tjitske~Starkenburg 
 for valuable discussions and feedback. We also thank Louis E. Abramson, 
-Shy Genel, and Cheng Li for providing us with data used in the analysis. 
-This material is based upon work supported by the U.S. Department
-of Energy, Office of Science, Office of High Energy Physics, under
-contract No. DE-AC02-05CH11231.
+Junzhi Cao, Shy Genel, and Cheng Li for providing us with data used in 
+the analysis. This material is based upon work supported by the U.S. 
+Department of Energy, Office of Science, Office of High Energy Physics, 
+under contract No. DE-AC02-05CH11231.
 
 \bibliographystyle{aasjournal}
 \bibliography{centralMS}
