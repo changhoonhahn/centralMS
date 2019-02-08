@@ -742,16 +742,20 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.5):
             'More+(2011)', #'Yang+(2009)', # group finder results can't really be included because they use abundance matching to assign halos 
             'Leauthaud+(2012)', 
             'Tinker+(2013)', #'Reddick+(2013)', 
-            'Zu+(2015)', 'Cao+(2019)'][::-1]
+            'Zu+(2015)', 
+            'Lange+(2018)*', 
+            'Cao+(2019)'][::-1]
     lit_siglogMs_median = [0.15, #0.122, 
             0.206, 0.21, #0.20, 
-            0.22, 0.33][::-1]
+            0.22, 
+            0.2275, 
+            0.33][::-1]
     lit_siglogMs_upper = [0.26, #0.152, 
             0.206+0.031, 0.27, #0.23, 
-            0.24, 0.30][::-1]
+            0.24, 0.21, 0.30][::-1]
     lit_siglogMs_lower = [0.07, #0.092, 
             0.206-0.031, 0.15, #0.17, 
-            0.20, 0.36][::-1]
+            0.20, 0.245, 0.36][::-1]
 
     # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 Table 2 (COSMOS)
     # Yang et al. (2009) for blue galaxies Table 4 (SDSS DR4) 
@@ -806,8 +810,8 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.5):
         subplts.append(subplt) 
     #legend1 = sub.legend(subplts[:2], lit_siglogMs[:2], handletextpad=-0.5, loc=(-0.02, 0.7), prop={'size': 15})
     #sub.legend(subplts[2:], lit_siglogMs[2:], loc=(0.575, 0.), handletextpad=-0.5, prop={'size': 15})
-    legend1 = sub.legend(subplts[:2], lit_siglogMs[:2], handletextpad=-0.5, loc=(-0.02, 0.05), prop={'size': 15})
-    sub.legend(subplts[2:], lit_siglogMs[2:], loc=(0.45, 0.72), handletextpad=-0.5, prop={'size': 15})
+    legend1 = sub.legend(subplts[:3], lit_siglogMs[:3], handletextpad=-0.5, loc=(-0.02, 0.05), prop={'size': 15})
+    sub.legend(subplts[3:], lit_siglogMs[3:], loc=(0.45, 0.72), handletextpad=-0.5, prop={'size': 15})
     plt.gca().add_artist(legend1)
     sub.set_xlim([0.5, 10.]) # x-axis
     sub.set_xscale('log') 
@@ -816,6 +820,117 @@ def SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.5):
     sub.set_yticks([0.1, 0.2, 0.3, 0.4]) 
     sub.set_xlabel('$t_\mathrm{duty}$ [Gyr]', labelpad=5, fontsize=22) 
     fig.savefig(''.join([UT.tex_dir(), 'figs/SHMRscatter_tduty.pdf']), bbox_inches='tight', dpi=150) 
+    plt.close()
+    return None 
+
+
+def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
+    ''' Figure comparing the scatter in the Stellar to Halo Mass Relation (i.e. 
+    sigma_logM*(M_h = 10^12) as a function of duty cycle timescale (t_duty) from 
+    the ABC posteriors to observations and different simulations. 
+    '''
+    runs = ['randomSFH0.5gyr.sfsmf.sfsbroken', 
+            'randomSFH1gyr.sfsmf.sfsbroken', 
+            'randomSFH2gyr.sfsmf.sfsbroken', 
+            'randomSFH5gyr.sfsmf.sfsbroken', 
+            'randomSFH10gyr.sfsmf.sfsbroken']
+    tduties = [0.5, 1., 2., 5., 10.]  #hardcoded
+    iters = [14 for i in range(len(tduties))] # iterations of ABC
+    nparticles = [1000, 1000, 1000, 1000, 1000]
+    # sigma_logM* constraints from literature 
+    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Tinker+(2013)', 'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
+    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.22, 0.2275, 0.33][::-1]
+    lit_siglogMs_upper = [0.26, 0.206+0.031, 0.27, 0.24, 0.21, 0.30][::-1]
+    lit_siglogMs_lower = [0.07, 0.206-0.031, 0.15, 0.20, 0.245, 0.36][::-1]
+
+    # calculate the scatters from the ABC posteriors 
+    smhmr = Obvs.Smhmr()
+    sigMs = np.zeros((5, len(tduties)))
+    for i_t, tduty in enumerate(tduties): 
+        abc_dir = ''.join([UT.dat_dir(), 'abc/', runs[i_t], '/model/']) # ABC directory 
+        sig_Mss, sig_Mhs = [], [] 
+        for i in range(10): 
+            f = pickle.load(open(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.p']), 'rb'))
+            subcat_sim_i = {} 
+            for key in f.keys(): 
+                subcat_sim_i[key] = f[key]
+            
+            isSF = np.where(subcat_sim_i['galtype'] == 'sf') # only SF galaxies 
+
+            sig_ms_i = smhmr.sigma_logMstar(
+                    subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
+                    weights=subcat_sim_i['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
+            sig_Mss.append(sig_ms_i)  
+
+        sig_ms_low, sig_ms_med, sig_ms_high, sig_ms_lowlow, sig_ms_hihi = np.percentile(np.array(sig_Mss), [16, 50, 84, 2.5, 97.5])
+        sigMs[0, i_t] = sig_ms_med
+        sigMs[1, i_t] = sig_ms_low
+        sigMs[2, i_t] = sig_ms_high
+        sigMs[3, i_t] = sig_ms_lowlow
+        sigMs[4, i_t] = sig_ms_hihi
+        
+    ##############################
+    # sigma_logM* vs observaitons 
+    ##############################
+    fig = plt.figure(figsize=(10,5)) # make figure 
+    sub = fig.add_subplot(121) 
+    # abc posteriors 
+    sub.fill_between(tduties, sigMs[3,:], sigMs[4,:], color='C0', alpha=0.1, linewidth=0) 
+    sub.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C0', alpha=0.5, linewidth=0) 
+    # literature 
+    subplts = [] 
+    marks = ['^', 's', 'o', 'v', 'x', 'D']
+    for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), 
+            lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
+        subplt = sub.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.k', marker=marks[ii], markersize=8)
+        subplts.append(subplt) 
+    legend1 = sub.legend(subplts[:3], lit_siglogMs[:3], handletextpad=-0.5, loc=(-0.02, 0.05), prop={'size': 15})
+    sub.legend(subplts[3:], lit_siglogMs[3:], loc=(0.4, 0.72), handletextpad=-0.5, prop={'size': 15})
+    plt.gca().add_artist(legend1)
+    sub.set_xlim([0.5, 10.]) # x-axis
+    sub.set_xscale('log') 
+    sub.set_ylabel(r'$\sigma_{\log\,M_*} \Big(M_h = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=25) # y-axis
+    sub.set_ylim([0.1, 0.4]) 
+    sub.set_yticks([0.1, 0.2, 0.3, 0.4]) 
+    #sub.set_xlabel('$t_\mathrm{duty}$ [Gyr]', labelpad=5, fontsize=22) 
+
+    ################################################
+    # sigma_logM* vs siulations 
+    ################################################
+    sub2 = fig.add_subplot(122) 
+    # abc posteriors 
+    abs_post = sub2.fill_between(tduties, sigMs[3,:], sigMs[4,:], color='C0', alpha=0.1, linewidth=0, 
+            label='Hahn+(2018) posteriors') 
+    sub2.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C0', alpha=0.5, linewidth=0) 
+    sim_plts = [] 
+    # hydro sims
+    sim_plt = sub2.fill_between(np.linspace(0., 10., 100), np.repeat(0.16, 100), np.repeat(0.22, 100), 
+            facecolor='none', hatch='...', edgecolor='k', linewidth=0., zorder=1)
+    sim_plts.append(sim_plt) 
+    # SAMs
+    sim_plt = sub2.fill_between(np.linspace(0., 10., 100), np.repeat(0.30, 100), np.repeat(0.37, 100), 
+            facecolor='none', hatch='X', edgecolor='k', linewidth=0.)
+    sim_plts.append(sim_plt) 
+    # universe machine
+    sub2.plot(np.linspace(0., 10., 100), np.repeat(0.28, 100), c='k', ls='--')
+    sub2.text(0.975, 0.59, 'Universe Machine', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
+    
+    sub2.text(0.5, 0.3, 'hydro. sims', ha='center', va='center', transform=sub2.transAxes, fontsize=15)
+    r = Rectangle((1.4, 0.183), 2.125, 0.017, linewidth=0., fc='white') 
+    plt.gca().add_patch(r)
+    sub2.text(0.5, 0.78, 'semi-analytic models', ha='center', va='center', transform=sub2.transAxes, fontsize=15)
+    r = Rectangle((1., 0.325), 3.9, 0.018, linewidth=0., fc='white') 
+    plt.gca().add_patch(r)
+    sub2.legend(loc=(0.2, 0.025), handletextpad=0.4, frameon=False, fontsize=15) 
+    sub2.set_xlim([0.5, 10.]) # x-axis
+    sub2.set_xscale('log') 
+    sub2.set_ylim([0.1, 0.4]) 
+    sub2.set_yticks([0.1, 0.2, 0.3, 0.4])#, 0.6]) 
+    bkgd = fig.add_subplot(111, frameon=False)
+    bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    bkgd.set_xlabel('$t_\mathrm{duty}$ [Gyr]', labelpad=10, fontsize=22) 
+    fig.subplots_adjust(wspace=0.2)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/SHMRscatter_tduty_v2.pdf']), bbox_inches='tight', dpi=150) 
     plt.close()
     return None 
 
@@ -1782,7 +1897,8 @@ if __name__=="__main__":
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14], dMhalo=0.1)
-    SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
+    #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
+    SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)

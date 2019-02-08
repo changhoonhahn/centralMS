@@ -55,6 +55,11 @@ Baldry, I.~K., Balogh, M.~L., Bower, R.~G., {et~al.} 2006, Monthly Notices of
   the Royal Astronomical Society, 373, 469,
   \dodoi{10.1111/j.1365-2966.2006.11081.x}
 
+\bibitem[{Behroozi {et~al.}(2018)Behroozi, Wechsler, Hearin, \&
+  Conroy}]{behroozi2018}
+Behroozi, P., Wechsler, R., Hearin, A., \& Conroy, C. 2018, ArXiv e-prints,
+  1806, arXiv:1806.07893
+
 \bibitem[{Blanton \& Moustakas(2009)}]{blanton2009}
 Blanton, M.~R., \& Moustakas, J. 2009, Annual Review of Astronomy and
   Astrophysics, 47, 159, \dodoi{10.1146/annurev-astro-082708-101734}
@@ -218,6 +223,12 @@ Kelson, D.~D. 2014, arXiv:1406.5191 [astro-ph].
 \bibitem[{Lacerna {et~al.}(2014)Lacerna, Padilla, \& Stasyszyn}]{lacerna2014}
 Lacerna, I., Padilla, N., \& Stasyszyn, F. 2014, Monthly Notices of the Royal
   Astronomical Society, 443, 3107, \dodoi{10.1093/mnras/stu1318}
+
+\bibitem[{Lange {et~al.}(2018)Lange, van~den Bosch, Zentner, Wang, \&
+  Villarreal}]{lange2018a}
+Lange, J.~U., van~den Bosch, F.~C., Zentner, A.~R., Wang, K., \& Villarreal,
+  A.~S. 2018, arXiv:1811.03596 [astro-ph].
+\newblock \doarXiv{1811.03596}
 
 \bibitem[{Leauthaud {et~al.}(2012)Leauthaud, Tinker, Bundy, Behroozi, Massey,
   Rhodes, George, Kneib, Benson, Wechsler, Busha, Capak, Cort\^es, Ilbert,
