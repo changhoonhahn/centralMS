@@ -838,10 +838,10 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     iters = [14 for i in range(len(tduties))] # iterations of ABC
     nparticles = [1000, 1000, 1000, 1000, 1000]
     # sigma_logM* constraints from literature 
-    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Tinker+(2013)', 'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
-    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.22, 0.2275, 0.33][::-1]
-    lit_siglogMs_upper = [0.26, 0.206+0.031, 0.27, 0.24, 0.21, 0.30][::-1]
-    lit_siglogMs_lower = [0.07, 0.206-0.031, 0.15, 0.20, 0.245, 0.36][::-1]
+    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2013)', 'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
+    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.21, 0.22, 0.2275, 0.33][::-1]
+    lit_siglogMs_upper = [0.26, 0.206+0.031, 0.235, 0.27, 0.24, 0.21, 0.30][::-1]
+    lit_siglogMs_lower = [0.07, 0.206-0.031, 0.185, 0.15, 0.20, 0.245, 0.36][::-1]
 
     # calculate the scatters from the ABC posteriors 
     smhmr = Obvs.Smhmr()
@@ -879,13 +879,13 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     sub.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C0', alpha=0.5, linewidth=0) 
     # literature 
     subplts = [] 
-    marks = ['^', 's', 'o', 'v', 'x', 'D']
+    marks = ['^', 's', 'o', 'v', 'x', 'D', 'H']
     for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), 
             lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
         subplt = sub.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.k', marker=marks[ii], markersize=8)
         subplts.append(subplt) 
-    legend1 = sub.legend(subplts[:3], lit_siglogMs[:3], handletextpad=-0.5, loc=(-0.02, 0.05), prop={'size': 15})
-    sub.legend(subplts[3:], lit_siglogMs[3:], loc=(0.4, 0.72), handletextpad=-0.5, prop={'size': 15})
+    legend1 = sub.legend(subplts[:4], lit_siglogMs[:4], handletextpad=-0.5, loc=(-0.02, 0.00), prop={'size': 15})
+    sub.legend(subplts[4:], lit_siglogMs[4:], loc=(0.4, 0.72), handletextpad=-0.5, prop={'size': 15})
     plt.gca().add_artist(legend1)
     sub.set_xlim([0.5, 10.]) # x-axis
     sub.set_xscale('log') 
@@ -899,9 +899,9 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     ################################################
     sub2 = fig.add_subplot(122) 
     # abc posteriors 
-    abs_post = sub2.fill_between(tduties, sigMs[3,:], sigMs[4,:], color='C0', alpha=0.1, linewidth=0, 
+    abs_post = sub2.fill_between(tduties, sigMs[3,:], sigMs[4,:], color='C0', alpha=0.1, linewidth=0)
+    sub2.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C0', alpha=0.5, linewidth=0,
             label='Hahn+(2018) posteriors') 
-    sub2.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C0', alpha=0.5, linewidth=0) 
     sim_plts = [] 
     # hydro sims
     sim_plt = sub2.fill_between(np.linspace(0., 10., 100), np.repeat(0.16, 100), np.repeat(0.22, 100), 
@@ -975,8 +975,6 @@ def Mhacc_dSFR(runs, T):
                     msacc[:,i-1] = subcat_sim['m.star0'][i_halo]
                     dsfrs[:,i-1] = subcat_sim['sfr0'][i_halo] - \
                             SFH.SFR_sfms(subcat_sim['m.star0'][i_halo], UT.z_nsnap(i), tt['sfms'])
-            print dsfrs
-            print np.abs(dsfrs).max()
         mhacc_run.append(mhacc) 
         dsfr_run.append(dsfrs)
 
@@ -985,13 +983,19 @@ def Mhacc_dSFR(runs, T):
     for ii in range(mhacc.shape[0]): 
         sub.plot(UT.t_nsnap(np.arange(1,21)), # - UT.tdyn_t(UT.t_nsnap(np.arange(1,21))), 
                 10**(mhacc[ii,:]-mhacc[ii,0]), c='C'+str(ii))
-    for ii in range(msacc.shape[0]): 
-        sub.plot(UT.t_nsnap(np.arange(1,16)), 10**(msacc[ii,:]-msacc[ii,0])-0.5, c='C'+str(ii), ls=":")
+    #for ii in range(msacc.shape[0]): 
+    #    sub.plot(UT.t_nsnap(np.arange(1,16)), 10**(msacc[ii,:]-msacc[ii,0])-0.5, c='C'+str(ii), ls=":")
 
     sub.vlines(UT.t_nsnap(5), -1., 1., color='k', linestyle=':', linewidth=2) 
-    sub.fill_between([UT.t_nsnap(5), UT.t_nsnap(5) - UT.tdyn_t(UT.t_nsnap(5))], [0.,0.], [1.,1.], 
-            linewidth=0., color='k', alpha=0.15)  
-    sub.text(0.575, 0.05, r"$t_\mathrm{dyn}$", ha='left', va='bottom', transform=sub.transAxes, fontsize=20)
+    sub.vlines(UT.t_nsnap(5) - UT.tdyn_t(UT.t_nsnap(5)), -1., 1., color='k', linestyle=':', linewidth=1.25) 
+    #sub.fill_between([UT.t_nsnap(5), UT.t_nsnap(5) - UT.tdyn_t(UT.t_nsnap(5))], [0.,0.], [1.,1.], 
+    #        linewidth=0., color='k', alpha=0.15)  
+    sub.text(0.58, 0.1, r"$t_\mathrm{dyn}$", ha='left', va='bottom', transform=sub.transAxes, fontsize=15)
+    sub.annotate(s='', 
+            xy=(UT.t_nsnap(5), 0.1), 
+            xytext=(UT.t_nsnap(5) - UT.tdyn_t(UT.t_nsnap(5)), 0.1), 
+            arrowprops=dict(arrowstyle='<->'))
+
     sub.text(0.025, 0.925, r"$M_h(z{=}0.05) \sim 10^{12} M_\odot$", ha='left', va='top', 
             transform=sub.transAxes, fontsize=17)
     sub.set_xlim([UT.t_nsnap(20), UT.t_nsnap(1)]) 

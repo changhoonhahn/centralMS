@@ -49,6 +49,11 @@ Abramson, L.~E., Gladders, M.~D., Dressler, A., {et~al.} 2016, The
 Alsing, J., Wandelt, B., \& Feeney, S. 2018, arXiv:1801.01497 [astro-ph].
 \newblock \doarXiv{1801.01497}
 
+\bibitem[{Artale {et~al.}(2018)Artale, Zehavi, Contreras, \&
+  Norberg}]{artale2018}
+Artale, M.~C., Zehavi, I., Contreras, S., \& Norberg, P. 2018, Monthly Notices
+  of the Royal Astronomical Society, 480, 3978, \dodoi{10.1093/mnras/sty2110}
+
 \bibitem[{Baldry {et~al.}(2006)Baldry, Balogh, Bower, Glazebrook, Nichol,
   Bamford, \& Budavari}]{baldry2006}
 Baldry, I.~K., Balogh, M.~L., Bower, R.~G., {et~al.} 2006, Monthly Notices of
@@ -220,6 +225,11 @@ Karim, A., Schinnerer, E., {Mart\'inez-Sansigre}, A., {et~al.} 2011, The
 Kelson, D.~D. 2014, arXiv:1406.5191 [astro-ph].
 \newblock \doarXiv{1406.5191}
 
+\bibitem[{Khandai {et~al.}(2015)Khandai, Di~Matteo, Croft, Wilkins, Feng,
+  Tucker, DeGraf, \& Liu}]{khandai2015}
+Khandai, N., Di~Matteo, T., Croft, R., {et~al.} 2015, Monthly Notices of the
+  Royal Astronomical Society, 450, 1349, \dodoi{10.1093/mnras/stv627}
+
 \bibitem[{Lacerna {et~al.}(2014)Lacerna, Padilla, \& Stasyszyn}]{lacerna2014}
 Lacerna, I., Padilla, N., \& Stasyszyn, F. 2014, Monthly Notices of the Royal
   Astronomical Society, 443, 3107, \dodoi{10.1093/mnras/stu1318}
@@ -260,6 +270,10 @@ Li, C., \& White, S. D.~M. 2009, Monthly Notices of the Royal Astronomical
 \bibitem[{Li {et~al.}(2008)Li, Mo, \& Gao}]{li2008}
 Li, Y., Mo, H.~J., \& Gao, L. 2008, Monthly Notices of the Royal Astronomical
   Society, 389, 1419, \dodoi{10.1111/j.1365-2966.2008.13667.x}
+
+\bibitem[{Lim {et~al.}(2016)Lim, Mo, Wang, \& Yang}]{lim2016}
+Lim, S.~H., Mo, H.~J., Wang, H., \& Yang, X. 2016, Monthly Notices of the Royal
+  Astronomical Society, 455, 499, \dodoi{10.1093/mnras/stv2282}
 
 \bibitem[{Lu {et~al.}(2014)Lu, Wechsler, Somerville, Croton, Porter, Primack,
   Behroozi, Ferguson, Koo, Guo, Safarzadeh, Finlator, Castellano, White,
@@ -335,6 +349,21 @@ Noeske, K.~G., Weiner, B.~J., Faber, S.~M., {et~al.} 2007, The Astrophysical
 Peng, Y.-j., Lilly, S.~J., Kova{\v c}, K., {et~al.} 2010, The Astrophysical
   Journal, 721, 193, \dodoi{10.1088/0004-637X/721/1/193}
 
+\bibitem[{Pillepich {et~al.}(2018)Pillepich, Springel, Nelson, Genel, Naiman,
+  Pakmor, Hernquist, Torrey, Vogelsberger, Weinberger, \&
+  Marinacci}]{pillepich2018}
+Pillepich, A., Springel, V., Nelson, D., {et~al.} 2018, Monthly Notices of the
+  Royal Astronomical Society, 473, 4077, \dodoi{10.1093/mnras/stx2656}
+
+\bibitem[{Reddick {et~al.}(2013)Reddick, Wechsler, Tinker, \&
+  Behroozi}]{reddick2013}
+Reddick, R.~M., Wechsler, R.~H., Tinker, J.~L., \& Behroozi, P.~S. 2013, The
+  Astrophysical Journal, 771, 30, \dodoi{10.1088/0004-637X/771/1/30}
+
+\bibitem[{Roediger \& Courteau(2015)}]{roediger2015}
+Roediger, J.~C., \& Courteau, S. 2015, Monthly Notices of the Royal
+  Astronomical Society, 452, 3209, \dodoi{10.1093/mnras/stv1499}
+
 \bibitem[{Salim {et~al.}(2007)Salim, Rich, Charlot, Brinchmann, Johnson,
   Schiminovich, Seibert, Mallery, Heckman, Forster, Friedman, Martin,
   Morrissey, Neff, Small, Wyder, Bianchi, Donas, Lee, Madore, Milliard, Szalay,
@@ -381,11 +410,17 @@ Sunayama, T., Hearin, A.~P., Padmanabhan, N., \& Leauthaud, A. 2016, Monthly
 Tinker, J., Wetzel, A., \& Conroy, C. 2011, ArXiv e-prints, 1107,
   arXiv:1107.5046
 
-\bibitem[{Tinker {et~al.}(2018)Tinker, Hahn, Mao, Wetzel, \&
+\bibitem[{Tinker {et~al.}(2018{\natexlab{a}})Tinker, Hahn, Mao, \&
+  Wetzel}]{tinker2018b}
+Tinker, J.~L., Hahn, C., Mao, Y.-Y., \& Wetzel, A.~R. 2018{\natexlab{a}},
+  Monthly Notices of the Royal Astronomical Society, 478, 4487,
+  \dodoi{10.1093/mnras/sty1263}
+
+\bibitem[{Tinker {et~al.}(2018{\natexlab{b}})Tinker, Hahn, Mao, Wetzel, \&
   Conroy}]{tinker2018}
-Tinker, J.~L., Hahn, C., Mao, Y.-Y., Wetzel, A.~R., \& Conroy, C. 2018, Monthly
-  Notices of the Royal Astronomical Society, 477, 935,
-  \dodoi{10.1093/mnras/sty666}
+Tinker, J.~L., Hahn, C., Mao, Y.-Y., Wetzel, A.~R., \& Conroy, C.
+  2018{\natexlab{b}}, Monthly Notices of the Royal Astronomical Society, 477,
+  935, \dodoi{10.1093/mnras/sty666}
 
 \bibitem[{Tinker {et~al.}(2013)Tinker, Leauthaud, Bundy, George, Behroozi,
   Massey, Rhodes, \& Wechsler}]{tinker2013}
@@ -402,6 +437,12 @@ Tojeiro, R., Wilkins, S., Heavens, A.~F., Panter, B., \& Jimenez, R. 2009, The
   Astrophysical Journal Supplement Series, 185, 1,
   \dodoi{10.1088/0067-0049/185/1/1}
 
+\bibitem[{Tojeiro {et~al.}(2017)Tojeiro, Eardley, Peacock, Norberg, Alpaslan,
+  Driver, Henriques, Hopkins, Kafle, Robotham, Thomas, Tonini, \&
+  Wild}]{tojeiro2017}
+Tojeiro, R., Eardley, E., Peacock, J.~A., {et~al.} 2017, Monthly Notices of the
+  Royal Astronomical Society, 470, 3720, \dodoi{10.1093/mnras/stx1466}
+
 \bibitem[{Vale \& Ostriker(2006)}]{vale2006}
 Vale, A., \& Ostriker, J.~P. 2006, Monthly Notices of the Royal Astronomical
   Society, 371, 1173, \dodoi{10.1111/j.1365-2966.2006.10605.x}
@@ -417,6 +458,12 @@ Velander, M., {van Uitert}, E., Hoekstra, H., {et~al.} 2014, Monthly Notices of
   Sijacki, Xu, Snyder, Nelson, \& Hernquist}]{vogelsberger2014}
 Vogelsberger, M., Genel, S., Springel, V., {et~al.} 2014, Monthly Notices of
   the Royal Astronomical Society, 444, 1518, \dodoi{10.1093/mnras/stu1536}
+
+\bibitem[{Wang {et~al.}(2013)Wang, Farrah, Oliver, Amblard, B\'ethermin, Bock,
+  Conley, Cooray, Halpern, Heinis, Ibar, Ilbert, Ivison, Marsden, Roseboom,
+  {Rowan-Robinson}, Schulz, Smith, Viero, \& Zemcov}]{wang2013}
+Wang, L., Farrah, D., Oliver, S.~J., {et~al.} 2013, Monthly Notices of the
+  Royal Astronomical Society, 431, 648, \dodoi{10.1093/mnras/stt190}
 
 \bibitem[{Wang {et~al.}(2008)Wang, Yang, Mo, {van den Bosch}, Weinmann, \&
   Chu}]{wang2008}
@@ -489,6 +536,11 @@ Yang, X., Mo, H.~J., \& {van den Bosch}, F.~C. 2006, The Astrophysical Journal
 \bibitem[{Yang {et~al.}(2009)Yang, Mo, \& {van den Bosch}}]{yang2009}
 ---. 2009, The Astrophysical Journal, 695, 900,
   \dodoi{10.1088/0004-637X/695/2/900}
+
+\bibitem[{Zehavi {et~al.}(2018)Zehavi, Contreras, Padilla, Smith, Baugh, \&
+  Norberg}]{zehavi2018}
+Zehavi, I., Contreras, S., Padilla, N., {et~al.} 2018, The Astrophysical
+  Journal, 853, 84, \dodoi{10.3847/1538-4357/aaa54a}
 
 \bibitem[{Zu \& Mandelbaum(2015)}]{zu2015}
 Zu, Y., \& Mandelbaum, R. 2015, Monthly Notices of the Royal Astronomical
