@@ -360,6 +360,12 @@ Pillepich, A., Springel, V., Nelson, D., {et~al.} 2018, Monthly Notices of the
 Reddick, R.~M., Wechsler, R.~H., Tinker, J.~L., \& Behroozi, P.~S. 2013, The
   Astrophysical Journal, 771, 30, \dodoi{10.1088/0004-637X/771/1/30}
 
+\bibitem[{{Rodr\'iguez-Puebla} {et~al.}(2016){Rodr\'iguez-Puebla}, Primack,
+  Behroozi, \& Faber}]{rodriguez-puebla2016a}
+{Rodr\'iguez-Puebla}, A., Primack, J.~R., Behroozi, P., \& Faber, S.~M. 2016,
+  Monthly Notices of the Royal Astronomical Society, 455, 2592,
+  \dodoi{10.1093/mnras/stv2513}
+
 \bibitem[{Roediger \& Courteau(2015)}]{roediger2015}
 Roediger, J.~C., \& Courteau, S. 2015, Monthly Notices of the Royal
   Astronomical Society, 452, 3209, \dodoi{10.1093/mnras/stv1499}
@@ -469,6 +475,11 @@ Wang, L., Farrah, D., Oliver, S.~J., {et~al.} 2013, Monthly Notices of the
   Chu}]{wang2008}
 Wang, Y., Yang, X., Mo, H.~J., {et~al.} 2008, The Astrophysical Journal, 687,
   919, \dodoi{10.1086/591836}
+
+\bibitem[{Watson {et~al.}(2015)Watson, Hearin, Berlind, Becker, Behroozi,
+  Skibba, Reyes, Zentner, \& {van den Bosch}}]{watson2015}
+Watson, D.~F., Hearin, A.~P., Berlind, A.~A., {et~al.} 2015, Monthly Notices of
+  the Royal Astronomical Society, 446, 651, \dodoi{10.1093/mnras/stu2065}
 
 \bibitem[{Wechsler \& Tinker(2018)}]{wechsler2018}
 Wechsler, R.~H., \& Tinker, J.~L. 2018, ArXiv e-prints, 1804, arXiv:1804.03097
