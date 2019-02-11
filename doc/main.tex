@@ -771,22 +771,20 @@ observations and hydrodynamic simulations.
 \begin{center}
 \includegraphics[width=0.75\textwidth]{figs/SHMRscatter_tduty_abias2.pdf}
     \caption{When we incorporate assembly bias, $\sigma_{\log\,M_*}$ of our 
-    model spans the various observational constraints and predictions from 
-    galaxy formation models. We plot $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot)$ 
+    model flexibly spans the various observational constraints and predictions 
+    from galaxy formation models. We plot $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot)$ 
     as a function of the star formation duty cycle timescale, $t_\mathrm{duty}$,
     for our best-fit model with no assembly bias (blue) and with correlation 
-    coefficients between host halo accretion history and SFH of $r{=}0.5$ 
+    coefficients between host halo accretion history and SFH of $r = 0.5$ 
     (orange) and $0.99$ (green).  Stronger assembly bias at 
-    $t_\mathrm{duty}{<}5\,\mathrm{Gyr}$ significantly reduces the scatter 
-    in SHMR, $\sigma_{\log\,M_*}$. In the left panel, we include observational 
-    cosntraints from Figure~\ref{fig:sigMstar_duty}; in the right, we include 
-    predictions from hydrodyanmical simulations (dotted region), semi-analytic
-    models (hatched), and the {\sc UniverseMachine}~\citep{behroozi2018} 
-    (dashed). We also include on the right $\sigma_{\log\,M_*}$ derived from 
-    matching \cite{abramson2016} SFHs to halos via abundance matching.
-    With strong assembly bias and $t_\mathrm{duty} < 1\,\mathrm{Gyr}$, our 
-    model conservatively agrees with $\sigma_{\log\,M_*}$ observational 
-    cosntraints and  predictions from hydrodynamic simulations. 
+    $t_\mathrm{duty} < 5\,\mathrm{Gyr}$ significantly reduces the scatter 
+    in SHMR, $\sigma_{\log\,M_*}$. In the left and right panels, we include observational 
+    cosntraints and predictions from galaxy formation models from 
+    Figure~\ref{fig:sigMstar_duty}. We also include on the right $\sigma_{\log\,M_*}$ 
+    derived from matching \cite{abramson2016} SFHs to halos via abundance matching.
+    Strong assembly bias $r > 0.5$ and $t_\mathrm{duty} < 1\,\mathrm{Gyr}$ are necessary  
+    to produce the tight scatter in SHMR ($\sigma_{\log\,M_*}\sim 0.2$ dex) found in 
+    some of the observational cosntraints and predicted by hydrodynamic simulations. 
     }
 \label{fig:sigMstar_duty_abias}
 \end{center}
@@ -885,34 +883,11 @@ In addition to the observations, on the right panel, we compare our updated
 model to predictions from galaxy formation models included in Figure~\ref{fig:sigMstar_duty}.
 By varying $r$ and $t_\mathrm{duty}$, $\sigma_{\log\,M_*}$ of our model 
 can reproduce all of the model predictions. Focusing again on hydrodynamic
-simulations, which are the only models that reproduce the high $M_h$ 
-$\sigma_{\log\,M_*}$ constraints, we find that galaxy assembly bias 
+simulations, which are the only models that reproduce $\sigma_{\log\,M_*}$ 
+constraints at high $M_h$, we find that galaxy assembly bias 
 improves the tension with our model. With a short duty cycle timescale, 
 $t_\mathrm{duty} < 1$ Gyr and $r > 0.5$, our model produces the tight
 scatter in SHMR found in hydrodynamic simulations. 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Figure 8 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.45\textwidth]{figs/SHMRscatter_tduty_abias_contour.pdf}
-    \caption{}
-\label{fig:r_tduty}
-\end{center}
-\end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-The $\sigma_{\log\,M_*}$ in Figure~\ref{fig:sigMstar_duty_abias} also 
-reveal degeneracy between $t_\mathrm{duty}$ and $r$. A shorter
-$t_{\rm duty}$ or higher $r$ can produce smaller $\sigma_{\log\,M_*}$. 
-We further illustrate this degeneracy in Figure~\ref{fig:r_tduty}, where we
-plot $\sigma_{\log\,M_*}$ (contour and color map) as a function of 
-$t_{\rm duty}$ and $r$. Regardless of the degeneracy, to produce 
-$\sigma_{\log\,M_*} \sim 0.2$ dex, as found in some observations and 
-predicted by hydrodynamic simulations, both $t_{\rm duty} \leq 1$ Gyr and 
-$r > 0.5$.  {\ch there are some constraints on $r$ from the literature} 
-
 
 A key element of our model is the SFH prescription for SF central galaxies where 
 the SFH evolves about the SFS. Contrary to our SFH prescription, \cite{kelson2014}, 
@@ -929,7 +904,7 @@ their $M_*$ to $M_h$ at $z{\sim}1$. We then restrict the SFHs to those that woul
 be classified as star-forming based on a rough $\log\,\mathrm{SSFR} > -11.$ cut.
 Afterwards we measure $\sigma_{\log\,M_*}$ at the lowest $M_h$ where it can be 
 reliably measured given the \cite{abramson2016} sample's $M_*{>}10^{10}M_\odot$ 
-limit. Based o our abundance matching prescription, we find \cite{abramson2016}
+limit. Based on our abundance matching prescription, we find \cite{abramson2016}
 predicts a scatter of $\sigma_{\log\,M_*}(M_h=10^{12.4}) = 0.33\pm0.04$ (dotted 
 line in Figure~\ref{fig:sigMstar_duty_abias}). Despite the \cite{abramson2016} SFHs 
 can reproduce a number of galaxy observations, $\sigma_{\log\,M_*}$ derived from 
@@ -938,22 +913,82 @@ constraints from observations and predictions from hydrodynamic simulations.
 This estimate is, however, derived from a simple abundance matching scheme. 
 As \cite{diemer2017} find from their log-normal fits to the SFHs of Illustris 
 galaxies, halo formation history correlates with the fits. Incorporating such 
-assembly bias into our abundance matching may reduce $\sigma_{\log\,M_*}$.
+correlations into our abundance matching may reduce $\sigma_{\log\,M_*}$. 
+{\ch @JLT perhaps this paragraph and this comparison in general is out of place?} 
 
-In this section, we demonstrate that incorporating assembly bias into our model
-by correlating $\Delta\logsfr$ to $\Delta M_h$ reduces the tension with the 
-SHMR scatter in observations. With assembly bias added, our model can produce 
-the range of $\sigma_{\log\,M_*}$ constraints from observations as well as 
-modern galaxy formation models. However, even with assembly bias a short duty 
-cycle is \emph{necessary} to produce tight scatter in the SHMR. This further 
-confirms our conclusion from the previous section that the SFRs of star-forming 
-central galaxies have variations on $\lesssim 0.5\,\mathrm{Gyr}$ timescales.
-Furthermore, with a short star formation duty cycle timescale and strong 
-assembly bias $r > 0.5$, our model conservatively agrees with observational 
-constraints and produces tight scatter in the SHMR, unlike predictions from
-semi-analytic models and {\sc UniverseMachine}. Our comparison not only provides 
-constraints on the timescale of star formation variability, but it also confirms
-the role of assembly bias in the SFH of star-forming galaxies.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure 8 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.45\textwidth]{figs/SHMRscatter_tduty_abias_contour.pdf}
+    \caption{$\sigma_{\log\,M_*}$ predicted by our model as a function of 
+    $t_{\rm duty}$ and $r$ illustrates the degeneracy between the timescale of 
+    SF variability and the correlation between SFH and halo assembly history. 
+    We plot constraints on the correlation coefficient, $r$, from previous
+    works in the literature: \cite{tinker2018b} (dashed) and \cite{behroozi2018} 
+    (dotted). Using these $r$ constraints, to produce $\sigma_{\log\,M_*} \sim 0.2$ dex
+    found in~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} and 
+    hydrodynamic simulations,SF variability on timescales $< 0.5$ Gyr is necessary.
+    The $\sigma_{\log\,M_*}$ constraint of Cao et al. (in preparation) and predictions 
+    from SAMs and {\sc UniverseMachine}, however, requires a less stringent 
+    restriction, $t_\mathrm{duty} < 5$ Gyr. 
+    }
+\label{fig:r_tduty}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+The $\sigma_{\log\,M_*}$ values in Figure~\ref{fig:sigMstar_duty_abias} 
+also reveal degeneracy between $t_\mathrm{duty}$ and $r$. A shorter
+$t_{\rm duty}$ or higher $r$ both produce smaller $\sigma_{\log\,M_*}$. 
+We further highlight this degeneracy in Figure~\ref{fig:r_tduty}, where 
+we plot $\sigma_{\log\,M_*}$ (contour and color map) as a function of 
+$t_{\rm duty}$ and $r$. Regardless of the degeneracy, to produce 
+$\sigma_{\log\,M_*} \sim 0.2$ dex, as found in some the observations 
+and predicted by hydrodynamic simulations, both $t_{\rm duty} \leq 1$ Gyr 
+and $r > 0.5$. In the literature, \cite{tinker2018b} find correlation 
+between $\dot{M_h}$ and $\log$ SSFR with $r = 0.63$ (dashed) and 
+\cite{behroozi2018} similarly find a correlation between SFH and halo 
+assembly history with $r_c \sim 0.6$ for halos with $M_h \sim 10^{12}M_\odot$ 
+(dotted). Using these $r$ constraints, we find that SF variability on 
+timescales $< 0.5$ Gyr is necessary to produce $\sigma_{\log\,M_*} \sim 0.2$ dex
+as found in~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} 
+and hydrodynamic simulations. The $\sigma_{\log\,M_*}$ constraint of 
+Cao et al. (in preparation) and predictions from SAMs and {\sc UniverseMachine}, 
+however, requires a less stringent restriction on $t_\mathrm{duty}$ ($< 5$ Gyr). 
+
+
+In this section, we incorporate galaxy assembly into our model by correlating 
+SFH with halo assembly history --- \emph{i.e.} $\Delta\logsfr$ with $\Delta M_h$. 
+Overall, stronger correlation between SFH with halo assembly history reduces
+the $\sigma_{\log\,M_*}$ predicted by our model. With assembly bias added, our 
+model can flexibly produce $\sigma_{\log\,M_*}$ constraints from observations 
+as well as modern galaxy formation models ranging $0.2 - 0.35$ dex. Although 
+the lack of conensus among observational constraints remains the main bottleneck, 
+to reproduce $\sigma_{\log\,M_*}\sim 0.2$ dex from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} 
+and hydrodynamic simulations both $t_{\rm duty} \leq 1$ Gyr and $r > 0.5$. If
+we use $r\sim0.6$ constraints from the literature, $t_{\rm duty} < 0.5$ Gyr is 
+necessary. Such a short timescale, however, is not necessary to reproduce 
+$\sigma_{\log\,M_*}$ found in Cao et al. (in preparation), SAMs, and 
+{\sc UniverseMachine}. The main obstacle for precisely constraining $t_\mathrm{duty}$ 
+is the lack of consensus among observational constraints. A better consensus among
+observations will enable better constraints on $t_\mathrm{duty}$. Future surveys 
+such as the Bright Galaxy Survey of the Dark Energy Spectroscopic Instrument~\citep[DESI;][]{desicollaboration2016}, 
+which will observe $\sim$10 million galaxies down to the magnitude limit 
+$r \sim 20$, will likely play a key role in further constraining $\sigma_{\log\,M_*}$ 
+and, thus, constraining the timescale of SF variability.
+
+%However, even with assembly bias a short duty 
+%cycle is \emph{necessary} to produce tight scatter in the SHMR. This further 
+%confirms our conclusion from the previous section that the SFRs of star-forming 
+%central galaxies have variations on $\lesssim 0.5\,\mathrm{Gyr}$ timescales.
+%Furthermore, with a short star formation duty cycle timescale and strong 
+%assembly bias $r > 0.5$, our model conservatively agrees with observational 
+%constraints and produces tight scatter in the SHMR, unlike predictions from
+%semi-analytic models and {\sc UniverseMachine}. Our comparison not only provides 
+%constraints on the timescale of star formation variability, but it also confirms
+%the role of assembly bias in the SFH of star-forming galaxies.
 
 \section{Summary and Conclusion} \label{sec:summary}
 \todo{some brief intro paragraph consistent with the intro} 
