@@ -1188,21 +1188,11 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     # Leauthaud et al. (2012) all galaxies 0.2 < z < 0.48 (COSMOS)
     # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
     # Zu & Mandelbaum (2015) SDSS constraints on iHOD parameters
-    lit_siglogMs = [
-            'More+(2011)', #'Yang+(2009)', 
-            'Leauthaud+(2012)', 
-            'Tinker+(2013)', #'Reddick+(2013)', 
-            'Zu+(2015)']
-    lit_siglogMs_median = [0.15, #0.122, 
-            0.206, 0.21, #0.20, 
-            0.22]
-    lit_siglogMs_upper = [0.26, #0.152, 
-            0.206+0.031, 0.27, #0.23, 
-            0.24]
-    lit_siglogMs_lower = [0.07, #0.092, 
-            0.206-0.031, 0.15, #0.17, 
-            0.20] 
-    
+    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2013)', 'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
+    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.21, 0.22, 0.2275, 0.33][::-1]
+    lit_siglogMs_upper = [0.26, 0.206+0.031, 0.235, 0.27, 0.24, 0.21, 0.30][::-1]
+    lit_siglogMs_lower = [0.07, 0.206-0.031, 0.185, 0.15, 0.20, 0.245, 0.36][::-1]
+
     # make figure 
     fig = plt.figure(figsize=(10,5)) 
     bkgd = fig.add_subplot(111, frameon=False)
@@ -1275,13 +1265,13 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
 
     # literature 
     subplts = [] 
-    marks = ['^', 's', 'o', 'v', 'x', 'D']
+    marks = ['^', 's', 'o', 'v', 'x', 'D', 'H']
     for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), 
             lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
         subplt = sub1.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.k', marker=marks[ii], markersize=5) #fmt='.C'+str(ii), markersize=10)
         subplts.append(subplt) 
-    legend1 = sub1.legend(subplts[:4], lit_siglogMs[:4], handletextpad=-0.5, loc=(-0.02, 0.65), prop={'size': 15})
-    sub1.legend(subplts[4:], lit_siglogMs[4:], loc=(0.6, 0.), handletextpad=-0.5, prop={'size': 15})
+    legend1 = sub1.legend(subplts[:3], lit_siglogMs[:3], handletextpad=-0.5, loc=(-0.02, 0.00), prop={'size': 15})
+    sub1.legend(subplts[3:], lit_siglogMs[3:], loc=(0.325, 0.66), handletextpad=-0.5, prop={'size': 15})
     sub1.add_artist(legend1)
     sub1.set_xlim([0.5, 10.]) # x-axis
     sub1.set_xscale('log') 
@@ -1387,21 +1377,26 @@ def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14):
     fig = plt.figure(figsize=(6,6)) 
     sub = fig.add_subplot(111)
     origin = 'lower'
-    _CS = sub.contourf(X, Y, sigma_grid.T, origin=origin)
+    _CS = sub.contourf(X, Y, sigma_grid.T, origin=origin, cmap='viridis_r')
     CS = sub.contour(X, Y, sigma_grid.T, levels=_CS.levels, colors=('k',), linewidths=(0,), origin=origin) 
-    sub.clabel(CS, inline=True, colors='k', fontsize=10)
-    #sub.plot([0.5, 10.], [0.63, 0.63], c='k', ls='--', linewidth=2) 
-    sub.fill_between([0.5, 10.], [0.57, 0.57], [0.69, 0.69], color='k', alpha=0.15, linewidth=0)
-    sub.plot([0.5, 10.], [0.57, 0.57], c='k', ls='--', linewidth=1) 
-    sub.plot([0.5, 10.], [0.69, 0.69], c='k', ls='--', linewidth=1) 
+    sub.clabel(CS, inline=1, colors='k', fontsize=15)
+    sub.plot([0.5, 10.], [0.63, 0.63], c='k', ls='--', linewidth=2, label='Tinker+(2018)') 
+    sub.plot([0.5, 10.], [0.58, 0.58], c='k', ls=':', linewidth=2, label='Behroozi+(2018)') 
+    #sub.fill_between([0.5, 10.], [0.57, 0.57], [0.69, 0.69], color='k', alpha=0.15, linewidth=0)
+    #sub.plot([0.5, 10.], [0.57, 0.57], c='k', ls='--', linewidth=1) 
+    #sub.plot([0.5, 10.], [0.69, 0.69], c='k', ls='--', linewidth=1) 
     #sub.fill_between([0.5, 10.], [0.57, 0.57], [0.69, 0.69],
     #        facecolor='none', hatch='X', edgecolor='k', linewidth=0.5)
-    sub.text(0.75, 0.63, 'Tinker+(2018)', ha='center', va='center', transform=sub.transAxes, fontsize=15)
+    #sub.text(0.75, 0.63, 'Tinker+(2018)', ha='center', va='bottom', transform=sub.transAxes, fontsize=15)
+    #sub.text(0.75, 0.6, 'Behroozi+(2018)', ha='center', va='top', transform=sub.transAxes, fontsize=15)
+    sub.legend(loc='lower left', fontsize=18) 
     sub.set_xlabel(r'$t_\mathrm{duty}$ [Gyr]', fontsize=20)  
     sub.set_xlim([0.5, 10.]) 
     sub.set_xscale("log") 
     sub.set_ylabel(r'$r$ correlation coefficient', fontsize=20)  
-    sub.set_ylim([0., 1.]) 
+    sub.set_ylim([0., 0.99]) 
+    sub.set_yticks([0., 0.2, 0.4, 0.6, 0.8, 0.99]) 
+    sub.set_yticklabels([0., 0.2, 0.4, 0.6, 0.8, 1.]) 
     fig.savefig(''.join([UT.tex_dir(), 'figs/SHMRscatter_tduty_abias_contour.pdf']), 
             bbox_inches='tight', dpi=150) 
     plt.close()
@@ -1902,10 +1897,10 @@ if __name__=="__main__":
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14], dMhalo=0.1)
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
-    SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1)
+    #SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
-    #SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
+    SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
     #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
     #fQ_fSFMS()
     #SFHmodel()

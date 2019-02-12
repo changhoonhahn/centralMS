@@ -90,51 +90,55 @@ galaxies: star formation -- cosmology: observations.}
 %By combining a high-resolution cosmological $N$-body  simulation with observed evolutionary trends of the SFS, we present a model that  tracks the star formation, stellar mass, and host halo mass histories of  star-forming central galaxies over $z < 1$ and 
 
 \section{Introduction}
-Observations from surveys such as the Sloan Digital Sky 
-Survey~\citep[SDSS;][]{york2000}, Cosmic Evolution
-Survey~\citep[COSMOS;][]{scoville2007},
-and the PRIsm MUlti-object Survey~\citep[PRIMUS;][]{coil2011, cool2013} 
-have provided statistically meaningful samples of galaxies, 
-which have been critical for establishing the global trends of 
-galaxies in the local universe. Broadly speaking, galaxies 
-fall into two categories: quiescent and star-forming galaxies. 
-Quiescent galaxies have little to no star formation, are red 
-in color, and have ellipitical morphologies. Meanwhile, 
-star-forming galaxies have significant star formation, are blue 
+Observations from large surveys such as the Sloan Digital Sky 
+Survey~\citep[SDSS;][]{york2000} have provided statistically 
+meaningful samples of galaxies, which have been critical for 
+establishing the global trends of galaxies in the local universe. 
+Broadly speaking, galaxies fall into two categories: quiescent 
+and star-forming (hereafter SF) galaxies. Quiescent galaxies have little to no 
+star formation, are red in color, and have ellipitical morphologies. 
+Meanwhile, SF galaxies have significant star formation, are blue 
 in color, and have disk-like morphologies (\citealt{kauffmann2003, blanton2003, baldry2006, taylor2009, moustakas2013}; 
 see~\citealt{blanton2009} and references therein). 
-
-Star-forming galaxies, furthermore, are found on the so-called 
-``star-forming sequence'' (hereafter SFS), a tight relationship 
-between their star formation rates (SFR) and stellar 
-masses~\citep[][see also Figure~\ref{fig:groupcat}]{noeske2007, daddi2007, salim2007, speagle2014, lee2015}.
+SF galaxies, furthermore, are found on the so-called ``star-forming sequence'' 
+(hereafter SFS), a tight relationship between their star formation rates 
+(hereafter SFR) and stellar masses~\citep[][see also Figure~\ref{fig:groupcat}]{noeske2007, daddi2007, salim2007, speagle2014, lee2015}.
 This sequence, which is observed out to $z > 2$~\citep{wang2013, 
-leja2015, schreiber2015}, plays a crucial role in characterizing 
-galaxy evolution over the past ${\sim}10\,\mathrm{Gyr}$. 
+leja2015}, plays a crucial role in characterizing 
+galaxy evolution over the past ${\sim}10\,\mathrm{Gyr}$~\citep[see][for an alternative point of view]{kelson2014,abramson2016}. 
 The significant fraction of star-forming galaxies that quench their 
 star formation and migrate off of the SFS reflects the significant 
 growth in the fraction of quiescent galaxies~\citep{blanton2006, borch2006, bundy2006, moustakas2013}. 
 Meanwhile, the decline of star formation in the entire SFS~\citep{lee2015, schreiber2015} 
-over time reflects the decline in overall cosmic star formation~\citep{hopkins2006, behroozi2013a, madau2014}.
+over time reflects the decline in overall cosmic star formation~\citep{hopkins2006, behroozi2013, madau2014}.
 The SFS and its evolution also connects star formation history
-and stellar mass growth of star-forming galaxies. 
+and stellar mass growth of SF galaxies. 
 
-
-{\ch some blanket statements about connection between galaxy-halo connection} 
-For instance, the stellar-to-halo mass relation (SHMR) is constrained
-from 
-\todo{papers that look at SHMR or sigma of that from high redsihft }
-~\citep{mandelbaum2006a, conroy2007, more2011, leauthaud2012, tinker2013, velander2014, han2015, zu2015, gu2016}
-Constraints on the SHMR at $z\sim 1$ from observations find 
-Remarkably, at $z\sim 0$, observational constraints find little 
-evolution in the scatter in the SHMR. 
-These observational constraints suggest that stellar mass growth 
-of galaxies are closely linked to the hierarchical growth of their 
-host dark matter halos. 
+Along with improving our understanding of galaxy evolution, these
+observations have also allowed us to investigate how galaxies fit 
+into the context of hierarchical structure formation predicted
+by $\Lambda$CDM cosmology. In addition to traditional theoretical 
+models of hydrodynamic simulations and semi-analytic 
+models~\citep[see][for reviews]{silk2012, somerville2015}, 
+empirical models halos have been remarkably successful for 
+understanding the galaxy-halo connection. These models relate galaxy 
+properties to properties of their host dark matter using a wide 
+range of methods including halo occupation distribution 
+modeling~\citep[HOD; \emph{e.g.}][]{zheng2007,zehavi2011,leauthaud2012,parejko2013,zu2015}, 
+luminosity function modeling~\citep[\emph{e.g.}][]{yang2009}, and abundance 
+matching~\citep[\emph{e.g.}][]{kravtsov2004, vale2006, conroy2009, moster2013, reddick2013}.
+Using these models, we find that more massive halos host more 
+massive galaxies with a relatively tight scatter in the stellar-to-halo 
+mass relation~\citep[hereafter SHMR;][]{mandelbaum2006a, conroy2007, more2011, leauthaud2012, tinker2013, velander2014, han2015, zu2015, gu2016, lange2018a}. An equally tight SHMR is found at higher 
+$z\sim1$~\citep{leauthaud2012, tinker2013, patel2015}, which suggest
+little evolution in the scatter of the SHMR. This clearly suggests
+that stellar mass growth of galaxies is linked somehow to the growth 
+of their host dark matter halos.
 
 Despite our understanding of the evolving galaxy population in a
 hierarchical unvierse, we face a number of challenges when it comes 
-to understanding their detailed star formation histories (SFH). 
+to understanding the detailed connection between galaxy star formation 
+histories (SFH) and host halo assembly history. 
 For instance, SFHs at lookback times longer than $200\,\mathrm{Myr}$ 
 do not contribute to SFR indicators such as $H\alpha$ or $FUV$ fluxes.
 Measuring SFHs from fitting photometry or spectroscopy typically 
@@ -144,21 +148,35 @@ variability~\citep[\emph{e.g.}][]{wilkinson2017, carnall2018}.
 Even methods that recover non-parametric SFHs from high signal-to-noise 
 observations can only retrieve SFHs in coarse temporal resolutions~\citep[\emph{e.g.}][]{tojeiro2009, leja2018a}. 
 While simulations provide another means for understanding SFHs, 
-are also subject to their specific time and mass resolutions that 
+they are also subject to their specific time and mass resolutions that 
 suppress the variability of their star formation, especially in 
 analytic models, semi-analytic models, and large-volume cosmological 
-simulations~\citep{sparre2017a}. These challenges make difficult to constrain certain things like 
-the timescale of star formation variability.
+hydrodynamic simulations~\citep{sparre2015, sparre2017}.
 
-{\ch paragraph on assembly bias and how we've look at it w.r.t. 
-quenching and stuff but it's still unclear at a sfh level. Also 
-talk about previous empirical models that do this but emphasize
-that they do not focus on the timescale. Something along the lines of 
-Along with the fraction of random variations in galaxy SFRs, the random 
-variations’ timescales also need parameterization. Longer-timescale random variations can arise from galactic feed- back interacting with the circumgalactic medium and larger-scale environment. At the same time, short-timescale ( 10 100 Myr) variations occur due to internal processes affecting local galac- tic cold gas.}
+Empirical models, with its flexibility provides an effective method for
+examining the connection between SFH and host halo assembly history. A 
+number of empirical models~\citep{taghizadeh-popp2015, becker2015, rodriguez-puebla2016a, mitra2017, cohn2017, moster2017}, 
+have related SFHs of galaxies linearly to their host halo mass accretion 
+rates and have had success in reproducing a number of observations. Such 
+models make a strong assumption that SFH of galaxies are perfectly
+correlated to halo accretion history. Recent analysis of the observed 
+correlation between the SFRs and large-scale environment of SF galaxies 
+in \cite{tinker2018b}, however, find a correlation coefficient of 
+$\sim 0.63$. Furthermore, these models ignores variation in star formation, 
+independent from halo accretion, that may provide constraints on galaxy 
+formation. Longer-timescale variations in star formation may come from 
+galactic feedback interacting with the circumgalactic medium while
+shorter timerscale ($\sim 100$ Myr) variations may occur due to internal 
+processes affecting cold gas in the galaxy. More recently, the empirical 
+model of \cite{behroozi2018} ({\sc UniverseMachine}) go beyond these models
+and incorporate variability in star formation. {\ch sentence describing 
+the universemachine model.} While this parameterization allows us to identify 
+the way they parameterize things doesn't allow us to explicitly examine
+the timescale of star formation variability. 
 
-{\ch emphasize how we're focusing on the SFH} 
-In this paper, we take advantage of this connection between SFH and 
+{\ch In this paper, we construct an empirical model that explicitly focuses
+on the connection between SFH of SF galaxies and the timescale of SF variability
+to halo accretion history.} We take advantage of this connection between SFH and 
 the underlying dark matter to constrain the SFH of star-forming central 
 galaxies. We focus on central galaxies since the SFHs of satellites 
 are likely influenced by environmentally-driven external mechanisms 
