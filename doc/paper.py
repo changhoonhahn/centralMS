@@ -1389,7 +1389,7 @@ def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14):
     #        facecolor='none', hatch='X', edgecolor='k', linewidth=0.5)
     #sub.text(0.75, 0.63, 'Tinker+(2018)', ha='center', va='bottom', transform=sub.transAxes, fontsize=15)
     #sub.text(0.75, 0.6, 'Behroozi+(2018)', ha='center', va='top', transform=sub.transAxes, fontsize=15)
-    sub.legend(loc='lower left', fontsize=18) 
+    sub.legend(loc='lower left', frameon=True, fontsize=18) 
     sub.set_xlabel(r'$t_\mathrm{duty}$ [Gyr]', fontsize=20)  
     sub.set_xlim([0.5, 10.]) 
     sub.set_xscale("log") 
