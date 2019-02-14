@@ -59,28 +59,29 @@
 \begin{abstract}
     We measure the timescale of star formation variability and the connection 
     between star formation and host halo accretion histories of star-forming
-    central galaxies. Star-forming galaxies have a tight relationship between 
-    their star formation rates and stellar masses on the so-called ``star-forming 
+    central galaxies. Star-forming galaxies are found to have a tight relationship 
+    between their star formation rates and stellar masses on the so-called ``star-forming 
     sequence'' (SFS), which characterizes both their star formation histories and 
     stellar mass growths. Meanwhile, observed constraints on the stellar-to-halo
-    mass relation (SHMR) connect the stellar mass growth of galaxies to their host 
-    halo halo accretion history. Combining these observed trends with a high-resolution 
-    cosmological $N$-body simulation, we present a flexible model that tracks the 
-    star formation, stellar mass, and host halo accretion histories of star-forming 
-    central galaxies over $z < 1$. Comparing this model to the observed stellar 
-    mass function and SFS of central galaxies in SDSS Data Release 7, we find 
-    that star formation variability on shorter timescales produce tighter scatter 
-    in the SHMR, $\sigma_{\log M_*}$, at $M_h{=}10^{12}M_\odot$. Stronger correlation 
-    between star formation and host halo accretion histories (higher correlation 
-    coefficient $r$) also produce tighter scatter in the SHMR. Although, there is 
-    yet to be a clear consensus among the observed $\sigma_{\log M_*}(M_h=10^{12}M_\odot)$ 
-    constraints, $r > 0.5$ and star formation variability on $\leq 0.5$ Gyr is 
-    necessary to produce $\sigma_{\log M_*}(M_h=10^{12}M_\odot) \sim 0.2$ dex measured 
-    by certain halo model based observational constraints and predicted by hydrodynamic 
-    simulations. Nevertheless, the timescale of star formation variability and the 
-    correlation between star formation and halo accretion history we infer, provide 
-    key constraints on the star formation history and the evolution of star-forming 
-    central galaxies.
+    mass relation (SHMR) connect stellar mass growth to host halo halo accretion 
+    history. Combining these observed trends with a high-resolution cosmological 
+    $N$-body simulation, we present a flexible model that tracks the star formation, 
+    stellar mass, and host halo accretion histories of star-forming central galaxies 
+    over $z < 1$. We then compare this model to the observed stellar mass function 
+    and SFS of central galaxies in SDSS Data Release 7 to find that the scatter
+    in SHMR at $M_h{=}10^{12}M_\odot$, $\sigma_{\log M_*}$, is sensitive to the 
+    timescale of star formation variability, $t_{\rm duty}$. Variations on shorter 
+    timescales produce tighter $\sigma_{\log M_*}$. Stronger correlation between 
+    star formation and host halo accretion histories (higher correlation coefficient $r$) also 
+    produce tighter scatter in the SHMR. To reproduce $\sigma_{\log M_*}(M_h=10^{12}M_\odot) \sim 0.2$ dex
+    from many halo model based observational constraints and hydrodynamic simulations,
+    we find that a correlation of $r > 0.5$ and $t_{\rm duty} \leq 1$ Gyr is necessary. 
+    For $r \sim 0.6$ constraints found in the literature, $t_{\rm duty} < 0.5$ Gyr
+    is necessary. The lack of consensus among observations and galaxy formation model, 
+    however, remains the primary bottleneck in precisely constraining $r$ and 
+    $t_\mathrm{duty}$. Nevertheless, we demonstrate that SHMR constraints can be used 
+    to constrain the timescale of star formation variability and the correlation 
+    between star formation and halo accretion history.
 \end{abstract}
 \keywords{methods: numerical -- galaxies: evolution -- galaxies: haloes -- 
 galaxies: star formation -- galaxies: groups: general -- cosmology: observations.}
@@ -91,68 +92,62 @@ galaxies: star formation -- galaxies: groups: general -- cosmology: observations
 %By combining a high-resolution cosmological $N$-body  simulation with observed evolutionary trends of the SFS, we present a model that  tracks the star formation, stellar mass, and host halo mass histories of  star-forming central galaxies over $z < 1$ and 
 
 \section{Introduction}
-Observations from large surveys such as the Sloan Digital Sky 
-Survey~\citep[SDSS;][]{york2000} have provided statistically 
-meaningful samples of galaxies, which have been critical for 
-establishing the global trends of galaxies in the local universe. 
-Broadly speaking, galaxies fall into two categories: quiescent 
-and star-forming (hereafter SF) galaxies. Quiescent galaxies have little to no 
-star formation, are red in color, and have ellipitical morphologies. 
-Meanwhile, SF galaxies have significant star formation, are blue 
+Observations from large surveys such as the Sloan Digital Sky Survey~\citep[SDSS;][]{york2000} 
+have been critical for establishing the global trends of galaxies in 
+the local universe. Broadly speaking, galaxies fall into two categories: 
+quiescent and star-forming (hereafter SF) galaxies. Quiescent galaxies 
+have little to no star formation, are red in color, and have ellipitical 
+morphologies. Meanwhile, SF galaxies have significant star formation, are blue 
 in color, and have disk-like morphologies (\citealt{kauffmann2003, blanton2003, baldry2006, taylor2009, moustakas2013}; 
 see~\citealt{blanton2009} and references therein). 
 SF galaxies, furthermore, are found on the so-called ``star-forming sequence'' 
-(hereafter SFS), a tight relationship between their star formation rates 
-(hereafter SFR) and stellar masses~\citep[][see also Figure~\ref{fig:groupcat}]{noeske2007, daddi2007, salim2007, speagle2014, lee2015}.
-This sequence, which is observed out to $z > 2$~\citep{wang2013, 
-leja2015}, plays a crucial role in characterizing 
-galaxy evolution over the past ${\sim}10\,\mathrm{Gyr}$~\citep[see][for an alternative point of view]{kelson2014,abramson2016}. 
-The significant fraction of star-forming galaxies that quench their 
-star formation and migrate off of the SFS reflects the significant 
-growth in the fraction of quiescent galaxies~\citep{blanton2006, borch2006, bundy2006, moustakas2013}. 
-Meanwhile, the decline of star formation in the entire SFS~\citep{lee2015, schreiber2015} 
+(hereafter SFS), a tight relationship between their star formation rates (SFR) 
+and stellar masses~\citep[][see also Figure~\ref{fig:groupcat}]{noeske2007, daddi2007, salim2007, speagle2014, lee2015}.
+This sequence, which is observed out to $z > 2$~\citep{wang2013, leja2015} 
+plays a crucial role in characterizing galaxy evolution over the past ${\sim}10\,\mathrm{Gyr}$~\citep[see][for an alternative point of view]{kelson2014,abramson2016}. 
+The significant fraction of SF galaxies that quench their 
+star formation and migrate off of the SFS reflects the growth in the 
+fraction of quiescent galaxies~\citep{blanton2006, borch2006, bundy2006, moustakas2013}. 
+The decline of star formation in the entire SFS~\citep{lee2015, schreiber2015} 
 over time reflects the decline in overall cosmic star formation~\citep{hopkins2006, behroozi2013, madau2014}.
-The SFS and its evolution also connects star formation history
-and stellar mass growth of SF galaxies. 
+With its evolution, the SFS also connects the star formation histories of SF 
+galaxies to their stellar mass growths.
 
-Along with improving our understanding of galaxy evolution, these
-observations have also allowed us to investigate how galaxies fit 
+These observations have also allowed us to investigate how galaxies fit 
 into the context of hierarchical structure formation predicted
 by $\Lambda$CDM cosmology. In addition to traditional theoretical 
 models of hydrodynamic simulations and semi-analytic 
 models~\citep[see][for reviews]{silk2012, somerville2015}, 
 empirical models halos have been remarkably successful for 
 understanding the galaxy-halo connection. These models relate galaxy 
-properties to properties of their host dark matter using a wide 
-range of methods including halo occupation distribution 
-modeling~\citep[HOD; \emph{e.g.}][]{zheng2007,zehavi2011,leauthaud2012,parejko2013,zu2015}, 
+properties to their host dark matter halo properties using methods such as 
+halo occupation distribution modeling~\citep[HOD; \emph{e.g.}][]{zheng2007,zehavi2011,leauthaud2012,parejko2013,zu2015}, 
 luminosity function modeling~\citep[\emph{e.g.}][]{yang2009}, and abundance 
 matching~\citep[\emph{e.g.}][]{kravtsov2004, vale2006, conroy2009, moster2013, reddick2013}.
 Using these models, we find that more massive halos host more 
-massive galaxies with a relatively tight scatter in the stellar-to-halo 
+massive galaxies with a tight scatter in the stellar-to-halo 
 mass relation~\citep[hereafter SHMR;][]{mandelbaum2006a, conroy2007, more2011, leauthaud2012, tinker2013, velander2014, han2015, zu2015, gu2016, lange2018a}. An equally tight SHMR is found at higher 
-$z\sim1$~\citep{leauthaud2012, tinker2013, patel2015}, which suggest
-little evolution in the scatter of the SHMR. This clearly suggests
-that stellar mass growth of galaxies is linked somehow to the growth 
+$z\sim1$~\citep{leauthaud2012, tinker2013, patel2015}. This lack of
+evolution in the scatter of the SHMR clearly suggests that stellar 
+mass growth of galaxies is linked somehow to the growth 
 of their host dark matter halos.
 
-Despite our understanding of the evolving galaxy population in a
-hierarchical unvierse, we face a number of challenges when it comes 
-to understanding the detailed connection between galaxy star formation 
-histories (SFH) and host halo assembly history. 
+Despite these developments, we face a number of challenges when it comes 
+to understanding the detailed star formation histories (SFH) and its 
+connection to host halo assembly history of galaxies. 
 For instance, SFHs at lookback times longer than $200\,\mathrm{Myr}$ 
-do not contribute to SFR indicators such as $H\alpha$ or $FUV$ fluxes.
+do not contribute to SFR indicators such as $H\alpha$ or $FUV$ fluxes~\cite{sparre2017}.
 Measuring SFHs from fitting photometry or spectroscopy typically 
 assume a specific functional form of the SFH, such as exponentially 
-declining or lognormal, that do not include short timescale 
-variability~\citep[\emph{e.g.}][]{wilkinson2017, carnall2018}. 
+declining or lognormal, that do not include variations on short 
+timescales~\citep[\emph{e.g.}][]{wilkinson2017, carnall2018}. 
 Even methods that recover non-parametric SFHs from high signal-to-noise 
 observations can only retrieve SFHs in coarse temporal resolutions~\citep[\emph{e.g.}][]{tojeiro2009, leja2018a}. 
 While simulations provide another means for understanding SFHs, 
 they are also subject to their specific time and mass resolutions that 
 suppress the variability of their star formation, especially in 
 analytic models, semi-analytic models, and large-volume cosmological 
-hydrodynamic simulations~\citep{sparre2015, sparre2017}.
+hydrodynamic simulations~\citep[][see also Figure~\ref{fig:illustris_sfh}]{sparre2015, sparre2017}.
 
 Empirical models, with its flexibility provides an effective method for
 examining the connection between SFH and host halo assembly history. A 
@@ -164,28 +159,28 @@ to halo accretion history. Recent analysis of the observed correlation
 between the SFRs and large-scale environment of SF galaxies in \cite{tinker2018b}, 
 however, find a correlation coefficient of only $r \sim 0.63$. These models, 
 therefore, ignore variation in star formation independent from halo accretion, 
-which provide constraints on galaxy formation. More recently, the empirical
+which may come from physical processes in galaxies. More recently, the empirical
 model of \cite{behroozi2018} ({\sc UniverseMachine}) correlate SFH 
 with halo assembly while also incorporating star formation variability in 
 the SFH. For halos at a given $v_{\rm M_{peak}}$ (the maximum circular 
 velocity of the halo at the redshift of max halo mass) and $z$, they 
 assign higher SFRs to halos with higher values of $\Delta v_{\rm max}$ 
 (logarithmic growth in the maximum circular velocity of the halo over past dynamical time)
-allowing for random scatter. Through this random scatter they incorporate 
-star formation variability, where the scatter is further separated into 
-contributions from shorter and longer timescale. Although it incorporates 
-star formation variability, this paramterization makes it difficult to 
-examine and constrain the timescale of star formation variability. 
+allowing for random scatter in the assignment. Through this random scatter, 
+which is further separated into contributions from shorter and longer timescales, 
+they incorporate star formation variability. Explicitly examining and constraining 
+the timescale of star formation variability, however, is difficult with such a 
+parameterization.  
 
 Constraints on the timescale of star formation variability can be used to 
 shed light on physical processes involved in galaxy star formation and 
 constrain galaxy feedback models~\citep{sparre2015}. For instance, 
-constraints can be used to differentiate between physical processes such 
+it can be used to differentiate between physical processes such 
 as galactic feedback interacting with the circumgalactic medium, which 
 would cause longer timescale variations, or internal processes affecting 
-the cold gas in the galaxy, which would cause shorter timescale 
-($\sim 100$ Myr) variations. Using the Feedback In Realistic Environments (FIRE) 
-high resolution cosmological simulations, \cite{hopkins2014} find that 
+the cold gas in the galaxy, which would cause $\sim 100$ Myr variations. 
+Using the Feedback In Realistic Environments (FIRE) high resolution 
+cosmological simulations, \cite{hopkins2014} find that 
 explicit and resolved feedback increases time varaibility in SFRs. 
 Also using FIRE, \cite{sparre2017} find that varying the strength of 
 Type II supernova feedback can change the burstiness of SFHs. 
@@ -193,8 +188,8 @@ Type II supernova feedback can change the burstiness of SFHs.
 early feedback from young stars would also produce small scale star 
 formation variability.
 
-In this paper, we construct an empirical model that focuses on SF 
-central galaxies, the timescale of star formation variability in their 
+In this paper, we construct an empirical model of SF central galaxies, 
+the timescale of star formation variability in their 
 SFH, and the connection between their SFH and host halo accretion history. 
 We focus on central galaxies since the SFHs of satellites are influenced 
 by environmentally-driven external mechanisms such as ram pressure 
@@ -309,8 +304,8 @@ meaningful observations. Furthermore, since we're interested in centrals we only
 keep subhalos that are classified as centrals throughout the redshift 
 range. This criterion removes ``black splash'' or ``ejected'' satellite 
 galaxies~\citep[\emph{e.g.}][]{mamon2004,wetzel2014} misclassified as 
-centrals. Next, we describe how we select and initialize the star-forming 
-central galaxies from the central subhalos of the $\mathtt{TreePM}$ 
+centrals. Next, we describe how we select and initialize the SF central
+galaxies from the central subhalos of the $\mathtt{TreePM}$ 
 simulation in our model.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -324,8 +319,9 @@ we want our model to reproduce observations, our selection is based
 on $f^\mathrm{cen}_\mathrm{SFS}(M_*)$, the fraction of central galaxies 
 within the SFS measured from the SDSS DR7 VAGC (Section~\ref{sec:sdss}). 
 Below, we describe how we derive $f^\mathrm{cen}_\mathrm{SFS}(M_*)$ and 
-use it to select star-forming central galaxies in our model. Afterwards 
-we describe how we initialize the SFRs and $M_*$ of these galaxies.
+use it to select SF central galaxies in our model. Afterwards 
+we describe how we initialize the SFRs and $M_*$ of these galaxies at 
+$z = 1$.
 
 Often in the literature, an empirical color-color or SFR--$M_*$ cut 
 that separates the two main modes (red/blue or star-forming/quiescent) 
@@ -357,9 +353,8 @@ f^\mathrm{cen}_\mathrm{SFS, bestfit}(M_*) = -0.627\,(\log\,M_* - 10.5) + 0.354.
 We note that this is in good agreement with the $f_\mathrm{Q}^\mathrm{cen}(M_*; z \sim 0)$ 
 fit from \cite{hahn2017b}. 
 
-For each central subhalo in our simulation, we assign a probability of it 
-being on the SFS, using Eq.~\ref{eq:f_cen_sfms} with $M_*$ at $z \sim 0$ 
-assigned through subhalo abundance matching (SHAM) to $M_\mathrm{peak}$, 
+To select the SF centrals from the subhalos, we begin by assigning $M_*$ 
+at $z\sim 0$ to the subhalos by subhalo abundance matching (SHAM) to $M_\mathrm{peak}$, 
 the maxmum host halo mass that it ever had as a central subhalo~\citep{conroy2006,vale2006,yang2009,wetzel2012,leja2013,wetzel2013,wetzel2014,hahn2017b}. 
 SHAM, in its simplest form, assumes a one-to-one mapping between subhalo 
 $M_\mathrm{peak}$ and galaxy stellar mass, $M_*$, that preserves rank 
@@ -367,9 +362,9 @@ order: $n({>}M_\mathrm{peak}) > n({>}M_*)$. In practice, we apply a $0.2$
 dex log-normal scatter in $M_*$ at fixed $M_\mathrm{peak}$ based on the 
 observed SHMR. For $n({>}M_*)$, we use observed stellar mass function (SMF) 
 from \cite{li2009}, which is based on the same SDSS NYU-VAGC sample as our 
-group catalog. Based on the probabilities from Eq.~\ref{eq:f_cen_sfms} and 
-SHAM $M_*$, we randomly identify centrals from our simulation as SF at 
-$z \sim 0$. \cite{tinker2017b,tinker2018} found that quenching is 
+group catalog. Then using the SHAM $M_*$, we randomly select subhalos as
+SF based on based on the probabilities of being on the SFS using Eq.~\ref{eq:f_cen_sfms}. 
+\cite{tinker2017b,tinker2018} found that quenching is 
 independent of halo growth rate and therefore we randomly select SF subhalos.  
 In our model, we assume that once a SF galaxy quenches its star formation, 
 it remains quiescent.  %\todo{maybe something about rejuvenation?} 
@@ -382,7 +377,7 @@ We next initialize the SF centrals at $z\sim1$ using the observed SFR-$M_*$
 relation of the SFS with $M_*$ assigned using SHAM with a SMF interpolated
 between the \cite{li2009} SMF and the SMF from \cite{marchesini2009} at 
 $z = 1.6$. We choose the \cite{marchesini2009} SMF, among others, because it 
-produces interpolated SMFs that monotonically increase at $z < 1$. As noted 
+produces interpolated SMFs that monotonically increase over $z < 1$. As noted 
 in \cite{hahn2017b}, at $z \approx 1$, the SMF interpolated between the 
 \cite{li2009} and \cite{marchesini2009} SMFs is consistent with more recent 
 measurements from \cite{muzzin2013} and \cite{ilbert2013}. Observations in 
@@ -398,20 +393,19 @@ evolution, we flexibly parameterize the SFS SFR,
 $\log\mathrm{SFR}_\mathrm{SFS}(M_*, z)$, 
 with free parameters $m^\mathrm{low}_{M_*}$, $m^\mathrm{high}_{M_*}$, and 
 $m_z$. These parameters characterize the stellar mass dependence of the SFS 
-below and above $10^{10} M_\sun$ and its redshift dependence, respectively. 
+below and above $10^{10} M_\sun$ and the redshift dependence, respectively. 
 
 We parameterize the $\log\mathrm{SFR}$ of the SFS as, 
 \beq \label{eq:logsfr_ms}
-\logsfr(M_*, z) =  \begin{cases}
+\logsfr_{\rm SFS}(M_*, z) =  \begin{cases}
 m^\mathrm{low}_{M_*}\,(\log M_* - 10.)  & \text{for}\,M_* < 10^{10}M_\sun \\
 m^\mathrm{high}_{M_*}\,(\log M_* - 10.)  & \text{for}\,M_* \geq 10^{10}M_\sun.
 \end{cases}
 + m_z (z - 0.05) - 0.19.
 \eeq
 We assign SFRs to our SF centrals at $z\sim1$ by sampling a log-normal 
-distribution centered about $\log\,\mathrm{SFR}_\mathrm{MS}(M_*, z=1)$ 
-with a constant scatter of $0.3\,\mathrm{dex}$, motivated from 
-observations~\citep{daddi2007, noeske2007, magdis2012, whitaker2012}.
+distribution centered about $\log\,\mathrm{SFR}_\mathrm{SFS}(M_*, z=1)$ 
+with a constant scatter of $0.3\,\mathrm{dex}$ from observations~\citep{daddi2007, noeske2007, magdis2012, whitaker2012}.
 Later when comparing to observations, we choose conservative priors 
 for the parameters $m^\mathrm{low}_{M_*}$, $m^\mathrm{high}_{M_*}$ and $m_z$
 that encompass the best-fit SFS from~\cite{speagle2014} and measurements 
@@ -480,8 +474,7 @@ with respect to the $\logsfr$ of the SFS} (Eq.~\ref{eq:logsfr_ms}):
 \logsfr_i(M_*, t) = \logsfrsfs(M_*, t) + \Delta\logsfr_i(t).
 \eeq
 Since SFHs determine the $M_*$ growth of galaxies, in this prescription, 
-$\Delta \logsfr_i(t)$ dictates the SFH and $M_*$ evolution a star-forming 
-central. Next, we describe our prescription for $\Delta \logsfr$.
+$\Delta \logsfr_i(t)$ dictates the SFH and $M_*$ evolution of SF central.
 
 One simple prescription for $\Delta \logsfr(t)$ would be to keep $\Delta \logsfr$ 
 fixed throughout $z < 1$ to the offsets from the $\logsfrsfs$ in the 
@@ -495,26 +488,25 @@ hydrodynamic simulations such as Illustris~\citep{vogelsberger2014,genel2014}.
 In Figure~\ref{fig:illsfh}, we plot $\Delta \logsfr_i$ of star-forming 
 galaxies in the Illustris simulation as a function of cosmic time. These 
 galaxies have stellar masses within $10^{10.5}-10^{10.6}M_\odot$ at $z=0$. 
-At each simulation output, we calculate $\Delta \logsfr$ using Eq.~\ref{eq:logsfr_sf}
-with $\logsfrsfs$ derived from the SFS identified using the same \cite{hahn2018a}
-method as in Section~\ref{sec:sfcen}. As the highlighted $\Delta \logsfr_i$
-illustrate, star-forming galaxies in Illustris evolve along the SFS, with
+At each simulation output, we calculate $\Delta \logsfr_i$ using Eq.~\ref{eq:logsfr_sf}
+with $\logsfrsfs$ derived from the SFS identified using the \cite{hahn2018a}
+method, same as in Section~\ref{sec:sfcen}. As the highlighted $\Delta \logsfr_i$
+illustrate, SF galaxies in Illustris evolve along the SFS, with
 their SFRs fluctuating about $\logsfrsfs$.
 
 Motivated by the SFHs of Illustris SF galaxies, we introduce variability 
 to the SFHs of our SF centrals in the form of a ``\emph{star formation duty cycle}''. 
 Within the Eq.~\ref{eq:logsfr_sf} SFH, we parameterize $\Delta \logsfr_i$ to 
 fluctuate about the $\logsfrsfs$ on timescale, $t_\mathrm{duty}$, with 
-amplitude sampled to reproduce the observed log-normal distribution with 
-$0.3\,\mathrm{dex}$ scatter at every timestep. For our fiducial star 
-formation duty cycle prescription, we randomly sample $\Delta \logsfr_i$ 
-from a log-normal distribution with $\sigma = 0.3\,\mathrm{dex}$. We 
+amplitude sampled from a log-normal distribution with $0.3\,\mathrm{dex}$ 
+scatter. For our fiducial star formation duty cycle prescription, we randomly 
+sample $\Delta \logsfr_i$ from a log-normal distribution with $\sigma = 0.3\,\mathrm{dex}$. We 
 illustrate $\Delta \logsfr_i(t)$ of SF centrals with our star formation 
 duty cycle prescription on $t_\mathrm{duty}=1$ Gyr (blue) and $5$ Gyr (orange) 
 timescales in the left panel of Figure~\ref{fig:sfh_model}. 
-The shaded region represents the observed $0.3\,\mathrm{dex}$ $1\sigma$ 
-scatter of $\logsfr$ in the SFS. This $\Delta \logsfr$ prescription by 
-construction reproduces the observed log-normal SFR distribution of the SFS 
+The shaded region represents the observed $0.3\,\mathrm{dex}$ scatter of 
+$\logsfr$ in the SFS. This $\Delta \logsfr$ prescription by construction 
+reproduces the observed log-normal SFR distribution of the SFS 
 at any point in the model. Although, we do not expect this simplified 
 prescription to reflect the individual SFHs of SF centrals, 
 we seek to statistically capture the stochasticity from gas accretion, 
@@ -526,7 +518,7 @@ physics of galaxy formation.
 
 Using our fiducial SFH prescription, we evolve both the SFR and $M_*$ 
 of our SF centrals along the SFS. Based on Eq.~\ref{eq:logsfr_sf},
-the SFRs of our SF centrals are functions of $M_*$. Meanwhile, $M_*$ 
+the SFRs of our SF centrals are functions of $M_*$, while $M_*$ 
 is the integral of the SFR over time: 
 \beq \label{eq:integ_mass} 
 M_*(t) = f_\mathrm{retain} \int\limits_{t_0}^{t} \mathrm{SFR(M_*, t)}\,\mathrm{d}t + M_0. 
@@ -535,7 +527,7 @@ $t_0$ and $M_0$ are the initial cosmic time and stellar mass at $z \sim 1$,
 respectively. $f_\mathrm{retain}$ here is the fraction of stellar mass 
 that is retained after supernovae and stellar winds; we use 
 $f_\mathrm{retain} = 0.6$~\citep{wetzel2013}. We can now evolve the SFR and 
-$M_*$ of our star-forming centrals until the final $z=0.05$ snapshot by 
+$M_*$ of our SF centrals until the final $z=0.05$ snapshot by 
 solving the differential equation of Eqs.~\ref{eq:logsfr_sf} and~\ref{eq:integ_mass}. 
 On the right panel of Figure~\ref{fig:sfh_model}, we present the 
 $\mathrm{SFR}$ and $M_*$ evolutions of two SF centrals with 
@@ -544,15 +536,13 @@ as the left panel. For reference, we include the mean $\logsfr$ of the SFS
 that the galaxies' SFR and $M_*$ evolve along, $\logsfrsfs(M_{*,i}(t), t)$ 
 (black solid). We also include $\logsfrsfs(M_*)$ (dotted lines) at various 
 redshifts between $z = 1$ to $0.05$. Based on the SFH prescription in our 
-model, star-forming centrals evolve their SFRs and $M_*$ along the SFS 
+model, SF centrals evolve their SFRs and $M_*$ along the SFS 
 with their SFRs fluctuate about $\logsfrsfs$.
 
 With the evolved SFRs and $M_*$ of SF centrals, we can compare our model 
-to observed galaxy population scatistics such as the quiescent fraction 
-and SMF to constrain its free parameters. Our model, run with these 
-inferred parameters, then reproduces observations of galaxy properties 
-and has host halo properties from the $\mathtt{TreePM}$ $N$-body simulation. 
-This allows us to compare our models to observations of the galaxy-halo 
+to observed galaxy population statistics (quiescent fraction 
+and SMF) to constrain its free parameters. Our model, run with these 
+inferred parameters, can then be compared to observations of the galaxy-halo 
 connection such as the SHMR. In the following section, we present this 
 comparison and the constraints we derive on the role and timescale of 
 star formation variability in SF central galaxies.
@@ -581,13 +571,11 @@ star formation variability in SF central galaxies.
 Our model takes $\mathtt{TreePM}$ central subhalos and tracks their SFR 
 and $M_*$ evolution using a flexible parameterization of the SFS and 
 SFHs that incorporate variability through a star formation duty cycle.
-At $z = 0.05$, its final timestep, our model predicts properties such 
-as SFR, $M_*$, and host halo mass, $M_h$, of central galaxies it 
-classifies as star-forming. We now use these resulting properties to compare our 
+At $z = 0.05$, its final timestep, our model predicts SFR and $M_*$ of SF 
+centrals, along with their host halo properties. We now use these resulting properties to compare our 
 model to observations and constrain its free parameters--- the 
-SFS parameters of Eq.~\ref{eq:logsfr_ms}. Since the focus of our model 
-and this paper is SF centrals, the main observable we use is the SMF of 
-SF centrals in SDSS, which we estimate as 
+SFS parameters of Eq.~\ref{eq:logsfr_ms}. Since we focus on SF centrals, 
+the main observable we use is the SMF of SF centrals in SDSS, which we estimate as 
 \beq \label{eq:smf_sf_cen} 
 \Phi^\mathrm{SDSS}_\mathrm{SF,cen} = f^\mathrm{cen}_\mathrm{SFS} \times f_\mathrm{cen} \times \Phi^\mathrm{Li\&White(2009)}.
 \eeq
@@ -602,8 +590,8 @@ For the comparison between our model to observation, we use the likelihood-free 
 inference framework of Approximate Bayesian Computation (ABC). ABC has the 
 advantage over standard approaches to parameter inference in that it does not 
 require evaluating the likelihood. For observables with likelihoods that are 
-difficult or intractable to write down, assuming some likelihood can significantly 
-bias the inferred posterior distributions~\citep[\emph{e.g.}][]{hahn2018}. Instead, 
+difficult or intractable, incorrect assumptions in the likelihood can significantly 
+bias the posterior distributions~\citep[\emph{e.g.}][]{hahn2018}. Instead, 
 ABC relies only on a simulation of the observed data and a distance metric to 
 quantify the ``closeness'' between the observed data and simulation. Many variations 
 of ABC has been used in astronomy and 
@@ -613,9 +601,8 @@ importance sampling as in~\citep{hahn2017b, hahn2017a}. For initial sampling
 of our ABC particles, \emph{i.e.} the priors of our parameters 
 $m^\mathrm{low}_{M_*}$, $m^\mathrm{high}_{M_*}$, and $m_z$, we use uniform 
 distributions over the ranges $[0.0, 0.8]$, $[0.0, 0.8]$, and 
-$[0.5, 2.]$, respectively. As we mention earlier in Section~\ref{sec:sfcen}, 
-the range of the prior were conservatively chosen to encompass the best-fit 
-SFS from~\cite{speagle2014} 
+$[0.5, 2.]$, respectively. The range of the prior were conservatively chosen 
+to encompass the best-fit SFS from~\cite{speagle2014} 
 and measurements from~\cite{moustakas2013} and~\cite{lee2015} at $z \sim 1$. 
 Finally, for our distance metric we use the following distance between 
 the SMF of the star-forming centrals in our model to the observed 
@@ -661,8 +648,8 @@ further details.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Timescale of the Star Formation Duty Cycle} \label{sec:sfdutycycle}
-We present the SMFs (left), SFSs (center), and the scatter in $\log M_*$ at a 
-given $\log M_h$, $\sigma_{\log\,M_*}$, (right) of our model run using SFHs with 
+We present the SMFs (left), SFSs (center), and the scatter in $\log M_*$ at $M_h$, 
+$\sigma_{\log\,M_*}(M_h)$, (right) of our model run using SFHs with 
 two different duty cycle timescales, $t_\mathrm{duty} = 10\,\mathrm{Gyr}$ (red) 
 and $1\,\mathrm{Gyr}$ (blue), in Figure~\ref{fig:abc_demo}. For each 
 $t_\mathrm{duty}$, we evaluate our model at the median parameter values of the respective posterior distributions derived 
@@ -694,14 +681,14 @@ Figure~\ref{fig:sigMstar_duty}, we include $\sigma_{\log M_*}$ constraints
 from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} and 
 Cao et al. (in preparation). \cite{more2011}, \cite{reddick2013}, and \cite{zu2015} 
 fit SDSS DR7 measurements of satellite kinematics, projected galaxy clustering and 
-conditional stellar mass function, and, galaxy clustering and galaxy-galaxy 
+conditional SMF, and, galaxy clustering and galaxy-galaxy 
 lensing, repsectively. Meanwhile, \cite{leauthaud2012, tinker2013} 
 use COSMOS to fit the SMF, galaxy clustering, and galaxy-galaxy lensing. 
 Finally, Cao et al. (in preparation) fit the kurtosis of the line-of-sight 
 pairwise velocity dispersion between central galaxies and all neighboring 
 galaxies to constrain the scatter in SHMR at low halo masses. We note that 
 \cite{leauthaud2012, reddick2013, zu2015} measure $\sigma_{\log M_*}$ for 
-all central galaxies, not only star-forming. Both \cite{more2011, tinker2013}, 
+all central galaxies, not only SF. Both \cite{more2011, tinker2013}, 
 however, find a $< 1\sigma$ difference in $\sigma_{\log M_*}$ between SF 
 and quiescent centrals, so we include these constraints in our comparison. 
 We also include the \cite{lange2018a} constraint from fitting color-dependent 
@@ -717,29 +704,28 @@ in the literature are consistent: $\sigma_{\log\,M_*} \sim 0.2$ dex. However,
 it's important to note that most of these constraints are derived using halo
 models that fix $\sigma_{\log\,M_*}$, independent of $M_h$. As constraining 
 power comes from a wide range of halo masses, such analyses are not ideal 
-for measuring $\sigma_{\log\,M_*}$ at a specific $M_h\sim 10^{12}M_\odot$. 
-On the other hand, \cite{reddick2013} constrain $\sigma_{\log\,M_*}$ for 
-different bins of $M_h$ over the range $10^{12} - 10^{14} M_\odot$ and find 
-little $M_h$ dependence in $\sigma_{\log\,M_*}$. Their constraints, however,
-mainly come from the conditional stellar mass function and therefore relies on 
+for measuring $\sigma_{\log\,M_*}$ at $M_h=10^{12}M_\odot$. While \cite{reddick2013} 
+constrain $\sigma_{\log\,M_*}$ for different bins of $M_h$ over the range 
+$10^{12} - 10^{14} M_\odot$ and find little $M_h$ dependence in $\sigma_{\log\,M_*}$, 
+their constraints mainly come from the conditional SMF and therefore relies on 
 the accuracy of the \cite{tinker2011} group finder in identifying halo masses. 
-The constraint from \cite{lange2018a} is also derived from a halo model 
+Group finder based halo masses can over- or under-estiamte halo masses by an 
+order of magnitude~\citep{old2014}. The constraint from \cite{lange2018a} is also derived from a halo model 
 with $M_h$ dependence. However, as mentioned above, they constrain $\sigma_{\log\,L}$. 
-In \cite{more2011}, where they derive constraints for both $\sigma_{\log\,L}$ 
-and $\sigma_{\log\,M_*}$ from the same data, they find 
+In \cite{more2011}, where they constrain both $\sigma_{\log\,L}$ and $\sigma_{\log\,M_*}$ 
+from the same data, they find 
 $\sigma_{\log\,M_*} = 0.15\substack{+0.08\\ -0.11} < \sigma_{\log\,L} = 0.21\substack{+0.06\\ -0.04}$
 for blue centrals. However, translating from $\sigma_{\log\,L}$ to 
-$\sigma_{\log\,M_*}$ is difficult for an analysis that uses different data 
-set and model. Overlooking the varoius caveats of the analyses, 
+$\sigma_{\log\,M_*}$ is tenuous for different data sets and models. Overlooking the varoius caveats of the analyses, 
 $\sigma_{\log\,M_*}$ from Cao et al. (in preparation) is in tension with 
 the other constraints. {\ch @JLT: sentence on the Cao et al. discrepancy?}. 
-We also note that these observational constraints include significant measurement 
+We also note that all of these observational constraints include significant measurement 
 uncertainties in $M_*$. The intrinsic $\sigma_{\log\,M_*}$ of these constraints, 
 which is the scatter predicted by our model, will thus be reduced. For example, 
 if we consider $0.1 - 0.2$ dex uncertainties in $M_*$~\citep{roediger2015}, 
 the Cao et al. (in preparation) constraint will be reduced from 
 $\sigma_{\log\,M_*} = 0.33$ dex to $0.31 - 0.26$ dex. Taking this into account,  
-observational constraints overall favor a shorter duty cycle timescale. 
+observational constraints overall favor a shorter duty cycle timescale: $< 2$ Gyr. 
 
 In addition to the observational constraints, we also compare the $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot)$ 
 predicted by our model to predictions from modern galaxy formation models 
@@ -751,18 +737,16 @@ and Illustris TNG~\citep{pillepich2018}, as compiled in Figure 8 of \cite{wechsl
 For the SAMs, the hatched region, $\sigma_{\log\,M_*} = 0.3 - 0.37$ dex,
 includes predictions from~\cite{lu2014, somerville2012}, and the SAGE 
 model\footnote{\url{https://tao.asvo.org.au/tao/}}. We also include the 
-prediction from the empirical model in \cite{behroozi2018} ({\sc UniverseMachine}). 
+prediction from the empirical model in \cite{behroozi2018}, the {\sc UniverseMachine}. 
 $\sigma_{\log\,M_*}$ from SAMs are consistent with our model with 
 $t_{\rm duty} \gtrsim 5$ Gyr. The {\sc UniverseMachine}, which predicts a 
 lower $\sigma_{\log\,M_*}$, is consistent with $t_{\rm duty} = 1 - 5$ Gyr. 
 Lastly, hydrodynamic simulations predict the lowest $\sigma_{\log\,M_*}$ among 
 the models $\sim 0.2$ dex, which cannot be reproduced by our model even with the 
-shortest $t_{\rm duty}$ timescale that we consider. 
-
-Although there is no clear consensus among the observational 
-$\sigma_{\log\,M_*}$ constraints at $M_h \sim 10^{12} M_\odot$ (Figure~\ref{fig:sigMstar_duty} left panel), 
-at $M_h > 10^{12} M_\odot$ observations are in better agreement and 
-{\em only} hydrodynamic simulations predict $\sigma_{\log\,M_*}$ low 
+shortest $t_{\rm duty}$ timescale that we consider. Although there is no clear 
+consensus among the observational $\sigma_{\log\,M_*}$ constraints at $M_h \sim 10^{12} M_\odot$, 
+at $M_h > 10^{12} M_\odot$ observations are in better agreement and {\em only} 
+hydrodynamic simulations predict $\sigma_{\log\,M_*}$ low 
 enough to be consistent~\citep{wechsler2018}. Thus, focusing the comparison 
 to observational constraints and predictions from hydrodynamic simulations, 
 we conclude that SF central galaxies have star formation varability on short 
@@ -830,11 +814,11 @@ SHMR of our model. This dependence on the duty cycle timescale, allows us to
 compare our model with measurements of $\sigma_{\log M_*}$ and predictions 
 from galaxy formation models to constrain $t_\mathrm{duty}$, which reflect 
 the star formation variability timescale. Such comparisons in the previous 
-section, demonstrate that $t_\mathrm{duty} \lesssim 1\,\mathrm{Gyr}$ is 
+section, demonstrate that $t_\mathrm{duty} \lesssim 2\,\mathrm{Gyr}$ is 
 favored by observational constraints. Meanwhile a short duty cycle 
 timescale alone is not enough to conservatively reproduce the $\sigma_{\log\,M_*}$ 
 constraints predicted by hydrodynamic simulations. In our fiducial model, 
-the SFR and $M_*$ evolution of star-forming centrals are independent from the
+the SFR and $M_*$ evolution of SF centrals are independent from the
 host halo properties. There is, however, growing evidence that star formation in  
 galaxies correlate with their host halo accretion histories~\citep[\emph{e.g.}][]{lim2016, tojeiro2017, tinker2018b}. 
 Therefore, in this section, we introduce \emph{assembly bias} into the SFH 
@@ -848,18 +832,17 @@ mass~\citep{gao2005,wechsler2006,gao2007,wetzel2007,li2008,sunayama2016}.
 At low halo mass, older and more concentrated halos form in high density environments. 
 While at high halo mass, the effect is the opposite --- younger, less concentrated 
 halos form in high-density regions. However, both 
-simulations~\citep[\emph{e.g.}][]{croton2007, artale2018, zehavi2018} as well as  
+simulations~\citep{croton2007, artale2018, zehavi2018} as well as  
 observations~\citep{yang2006,wang2008,tinker2011,wang2013,lacerna2014,tinker2018},
 find that this assembly bias propagates beyond spatial clustering and correlates
 with various galaxy properties such as formation histories and star formation 
 properties, an effect more specifically referred to as {\em galaxy} assembly bias. 
 In our model, we incorporate galaxy assembly bias by correlating the SFHs 
-of our star-forming central galaxies and their host halo accretion histories 
+of our SF central galaxies and their host halo accretion histories 
 with a correlation coefficient $r$. 
 
-Motivated by the correlation between in log SSFR and halo accretion rate found 
-in \cite{tinker2018}, we correlate a galaxy's SFR with respect to the mean SFS 
-SFR (\emph{i.e.} $\Delta\log\,\mathrm{SFR}$ in Eq.~\ref{eq:logsfr_sf}) to the 
+We correlate a galaxy's SFR with respect to the mean SFS SFR 
+(\emph{i.e.} $\Delta\log\,\mathrm{SFR}$ in Eq.~\ref{eq:logsfr_sf}) to the 
 halo mass accretion over dynamical time. At every $t_\mathrm{duty}$ timestep, 
 $t$, $\Delta\logsfr(t)$ is assigned based on 
 $\Delta M_h(t) = M_h(t) - M_h(t - t_\mathrm{dyn})$ in $M_\mathrm{max}$ bins 
@@ -879,8 +862,8 @@ assembly bias in our model. We plot the relative halo accretion histories
 $M_h(t)/M_h(z{=}0.05)$ of two arbitrarily chosen SF centrals with 
 $M_h(z{=}0.05)\sim10^{12}M_\odot$ in the top panel (orange and blue). Below, we plot 
 $\Delta\logsfr$, SFH with respect to the SFS, of these galaxies for our model with 
-correlation coefficients $r=0.5$ and $0.99$ (middle and bottom). At some $t$, we 
-choose a random $\mathtt{TreePM}$ snapshot (dotted), and label the period 
+correlation coefficients $r=0.5$ and $0.99$ (middle and bottom). We choose a
+random $\mathtt{TreePM}$ snapshot, $t$ (dotted), and label the period 
 [$t$, $t - t_\mathrm{dyn}$]. Halo accretion over this period, 
 $\Delta M_h = M_h(t) - M_h(t-t_\mathrm{dyn})$, correlates with $\Delta\logsfr(t)$. 
 The SFHs in the middle and bottom panels illustrate this correlation and how 
@@ -911,14 +894,13 @@ constraints (left panel of Figure~\ref{fig:sigMstar_duty_abias}). In fact,
 with a short star formation duty cycle ($t_\mathrm{duty} \leq 1\,\mathrm{Gyr}$) 
 and galaxy assembly bias with $r \ge 0.5$, our model is in agreement with 
 these $\sigma_{\log\,M_*} \sim 0.2$ dex constraints. On the other hand, 
-for our model with shorter $t_{\rm duty} < 2$ Gyr, assembly bias increases 
-the tension with the Cao et al. (in preparation) constraint. 
+assembly bias increases the tension with the Cao et al. (in preparation) constraint. 
 In addition to the observations, on the right panel, we compare our updated 
 model to predictions from galaxy formation models included in Figure~\ref{fig:sigMstar_duty}.
 By varying $r$ and $t_\mathrm{duty}$, $\sigma_{\log\,M_*}$ of our model 
 can reproduce all of the model predictions. Focusing again on hydrodynamic
 simulations, which are the only models that reproduce $\sigma_{\log\,M_*}$ 
-constraints at high $M_h$, we find that galaxy assembly bias 
+observations at high $M_h$, we find that galaxy assembly bias 
 improves the tension with our model. With a short duty cycle timescale, 
 $t_\mathrm{duty} < 1$ Gyr and $r > 0.5$, our model produces the tight
 scatter in SHMR found in hydrodynamic simulations. 
@@ -974,7 +956,7 @@ correlations into our abundance matching may reduce $\sigma_{\log\,M_*}$.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 The $\sigma_{\log\,M_*}$ values in Figure~\ref{fig:sigMstar_duty_abias} 
-also reveal degeneracy between $t_\mathrm{duty}$ and $r$. A shorter
+reveal degeneracy between $t_\mathrm{duty}$ and $r$. A shorter
 $t_{\rm duty}$ or higher $r$ both produce smaller $\sigma_{\log\,M_*}$. 
 We further highlight this degeneracy in Figure~\ref{fig:r_tduty}, where 
 we plot $\sigma_{\log\,M_*}$ (contour and color map) as a function of 
@@ -992,7 +974,7 @@ and hydrodynamic simulations. We note that this timescale is shorter than
 the timescale $\sim 0.5$ Gyr that \cite{sparre2015} find in Illustris galaxies 
 using a Principal Component Analysis of the SFHs. However, it is consistent with 
 the shorter $\sim 0.1$ Gyr timescales found in the FIRE simulations~\citep{hopkins2014, sparre2017}. 
-However, the $\sigma_{\log\,M_*}$ constraint of Cao et al. (in preparation) and 
+However, the conflicting $\sigma_{\log\,M_*}$ constraint of Cao et al. (in preparation) and 
 predictions from SAMs and {\sc UniverseMachine} relax the restriction on 
 $t_\mathrm{duty}$: $< 5$ Gyr. 
 
@@ -1001,9 +983,8 @@ SFH with halo assembly history --- \emph{i.e.} $\Delta\logsfr$ with $\Delta M_h$
 Overall, stronger correlation between SFH with halo assembly history reduces
 the $\sigma_{\log\,M_*}$ predicted by our model. With assembly bias added, our 
 model can flexibly produce $\sigma_{\log\,M_*}$ constraints from observations 
-as well as modern galaxy formation models ranging $0.2 - 0.35$ dex. Although 
-the lack of conensus among observational constraints remains the main bottleneck, 
-to reproduce $\sigma_{\log\,M_*}\sim 0.2$ dex from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} 
+as well as modern galaxy formation models ranging $0.2 - 0.35$ dex. To reproduce 
+$\sigma_{\log\,M_*}\sim 0.2$ dex from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} 
 and hydrodynamic simulations both $t_{\rm duty} \leq 1$ Gyr and $r > 0.5$. If
 we use $r\sim0.6$ constraints from the literature, $t_{\rm duty} < 0.5$ Gyr is 
 necessary. Such a short timescale, however, is not necessary to reproduce 
@@ -1016,102 +997,6 @@ which will observe $\sim$10 million galaxies down to the magnitude limit
 $r \sim 20$, will likely play a key role in further constraining $\sigma_{\log\,M_*}$ 
 and, thus, constraining the timescale of SF variability. 
 
-%However, even with assembly bias a short duty 
-%cycle is \emph{necessary} to produce tight scatter in the SHMR. This further 
-%confirms our conclusion from the previous section that the SFRs of star-forming 
-%central galaxies have variations on $\lesssim 0.5\,\mathrm{Gyr}$ timescales.
-%Furthermore, with a short star formation duty cycle timescale and strong 
-%assembly bias $r > 0.5$, our model conservatively agrees with observational 
-%constraints and produces tight scatter in the SHMR, unlike predictions from
-%semi-analytic models and {\sc UniverseMachine}. Our comparison not only provides 
-%constraints on the timescale of star formation variability, but it also confirms
-%the role of assembly bias in the SFH of star-forming galaxies.
-
-%\bitem
-%    \item \cite{yang2009} uses a galaxy group catalog constructed from SDSS DR4 to 
-%        directly measure the log-normal distribution of $M_*$ at a given $M_h$.
-%        For blue centrals they find $\sigma_{\log\,M_*}(M_h \sim 10^{12.16}M_\odot) = 0.122 \pm 0.03$ 
-%        averaged over two SDSS samples and two group mass difference.
-%
-%    \item \cite{more2011} uses a halo occupation based model to fit the stacked 
-%        velocity dispersion of satellite galaxies as a function of $M_*$ in SDSS VAGC.  
-%        One of the free parameters in their model is $\sigma_{\log\,M*}$, constant
-%        across $M_h$, for blue centrals. The best-fit model also predicts 
-%        $\sigma_{\log\,M_h}$ as a function $M_*$ for blue centrals. 
-%        
-%    \item \cite{leauthaud2012} joint analysis of galaxy–galaxy weak lensing, galaxy 
-%        spatial clustering, and galaxy number densities of the COSMOS data. 
-%        $\sigma_{\log\,M*}$ is constant. They get the constraint 
-%        $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.206 \pm 0.031$ at 
-%        $0.2 < z < 0.48$ for all galaxies.
-%
-%    \item \cite{tinker2013} uses the stellar mass function, galaxy clustering, and 
-%        galaxy–galaxy lensing within the COSMOS survey to constrain the stellar-to-halo 
-%        mass relation (SHMR) of star forming and quiescent galaxies over the redshift 
-%        range $z = [0.2, 1.0]$. They constrain the constant 
-%        $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.21 \pm 0.06$ at 
-%        $0.22 < z < 0.48$ for star-forming galaxies.
-%
-%    %\item \cite{reddick2013} constrain a model that abundance matches galaxies with the 
-%    %    peak circular velocity of their halos with the SDSS NYU-VAGC projected two-point 
-%    %    galaxy clustering and the observed conditional stellar mass functions. The model
-%    %    that best reproduces the data has a scatter of $0.20 \pm 0.03$ dex for all 
-%    %    galaxies.
-%
-%    \item \cite{zu2015} 
-%        $\mathtt{iHOD}$: an exteded HOD model, to fit the galaxy clustering and 
-%        the galaxy-galaxy lensing measured from SDSS main galaxy sample and NYU-VAGC. 
-%        The best-fit model has $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot) = 0.22 \pm 0.02$ 
-%        for all galaxies. 
-%\eitem
-
-%On the right panel, we include $\sigma_{\log\,M_h}$ constraints from \cite{more2011}
-%along with constraints from \cite{mandelbaum2006a, conroy2007, velander2014, han2015}. 
-%\cite{mandelbaum2006a} and \cite{velander2014} use halo occupation models to 
-%analyze galaxy-galaxy weak lensing measurements of SDSS and the 
-%Canada-France-Hawaii Telescope Lensing Survey~\citep[CFHTLenS;][]{heymans2012}, 
-%respectively. \cite{conroy2007}, similar to \cite{more2011}, use a halo model 
-%to fit the stacked satellite velocity dispersions for SDSS VAGC. Lastly, 
-%\cite{han2015} use a maximum likelihood weak lensing analysis to fit shapes 
-%of SDSS source galaxies individually (unlike the other stacked weak lensing
-%analyses) for the G3Cv5 GAMA group catalog~\citep{robotham2011}. From these 
-%works, we use $\sigma_{\log M_h}$ from the uncertainties in their $M_h$ 
-%measurements at $M_*{\sim}10^{10}M_\odot$. From 
-%\cite{mandelbaum2006a, more2011, velander2014} we have $\sigma_{\log\,M_h}$ 
-%for blue/late-type/star forming centrals while we have $\sigma_{\log\,M_h}$ 
-%for all centrals from \cite{conroy2007, han2015}. 
-
-%\begin{comment}
-%    \bitem
-%        \item \cite{mandelbaum2006a} use halo occupation based model to fit SDSS galaxy-galaxy 
-%            weak lensing in $M_*$ bins in order to constrain the distribution of $M_h$ of 
-%            early/late-type centrals. 
-%
-%        \item \cite{conroy2007} use halo occupation based model to fit the stacked satellite velocity
-%            disperions for SDSS VAGC in bins of $M_*$. For each $M_*$ bin they measure $M_h$ for 
-%            all central galaxies. We can convert this measurement to an upper limit on 
-%            $\sigma_{\log\,M_h}$.  
-%
-%        %\item \cite{vanuiter2011}: weak lensing from imaging data from the $\sim 300\,\mathrm{deg}^2$ 
-%        %    overalp between the second Red Sequence Cluster Survey (RCS2) and SDSS DR7 using halo model 
-%        %    that accounts for the clustering of the lenses and distinguishes between satellite
-%        %    and centrals.  At $\log\,M_* = [10.0-10.5]$ $M_\mathrm{halo} = 0.56\substack{+1.66\\ -0.55}\times 10^{11}h^{-1} M_\odot$. 
-%
-%        \item \cite{velander2014} conducts a stacked galaxy-galaxy weak lensing analysis
-%            using a HOD model on CFHTLenS data. They measure $M_h$ in bins of $M_*$ for blue/red 
-%            centrals at $z \sim 0.3$. We note that they correct for the scatter added from 
-%            the $M_*$ binning due to $M_*$ uncertainties using simulated lens and source 
-%            catalogs. At $< M_*> = 0.54 \times 10^10 M_\odot/h^2$ 
-%            $M_\mathrm{halo} = 2\substack{+0.64\\ -0.62}\times 10^{11}h^{-1} M_\odot$. 
-%
-%        \item \cite{han2015} uses a maximum likelihood weak lensing analysis to fits
-%            shape of SDSS source galaxies individually and derive $M_h$ measurements 
-%            of the G3Cv5 GAMA group catalog in bins of central galaxy $M_*$. Unlike 
-%            the other weak lensing measurements, they do not use stacked lensing 
-%            measurements or a HOD model to derive the SHMR.
-%    \eitem
-%\end{comment}
-
 \section{Summary and Conclusion} \label{sec:summary}
 %Star forming galaxies are observed to have a tight relationship between their star  formation rates and stellar masses. This so-called ``star-forming sequence'' (SFS),  observed out to $z{\sim}2$, characterizes both the star formation history and stellar  mass growth of star forming galaxies. Based on observed constraints on the stellar-to-halo mass relation (SHMR), halo accretion history also likely plays  a role in the evolution of star forming galaxies. 
 Despite our progress in understanding how galaxies form and evolve in 
@@ -1119,9 +1004,9 @@ the $\Lambda$CDM  hierarchical universe, our understanding of the
 detailed star formation histories of galaxies and their connection to host
 halo assembly histories have been limited. This is in part due to the 
 challenges in directly measuring SFHs in both observations and galaxy 
-formation simulations. Empirical models, with their flexible prescriptions 
+formation models. Empirical models, with their flexible prescriptions 
 have made significant progress in better quantifying the SFHs of galaxies. 
-These models, however, have yet to exmaine and constrain the timescale of 
+These models, however, have yet to examine and constrain the timescale of 
 star formation variability, which has the potential to constrain physical 
 processes involved in star formation and galaxy feedback models. In this 
 paper, we therefore focus on  measuring the timescale timescale of star 
@@ -1133,45 +1018,45 @@ with SFHs that evolve the SF central galaxies along the SFS and present a model
 that tracks the SFR, $M_*$, and host halo accretion histories of SF centrals from $z \sim 1$
 to $z=0.05$. More specifically, we characterize the SFHs to evolve with respect to 
 the mean $\log\,\mathrm{SFR}$ of the SFS with a ``star formation duty cycle'' that 
-introduces variability on some specific timescale, $t_\mathrm{duty}$. We parameterize 
+introduces star formation variability on some specific timescale, $t_\mathrm{duty}$. We parameterize 
 the SFS using parameters that dictate the low $M_*$ and high $M_*$ slopes and redshift 
 evolution. We then compare this model to the observed SMF of the SF centrals in the 
 SDSS DR7 group catalog using ABC-PMC likelihood-free parameter inference framework. 
 When we examine the SHMR predicted by the model and inferred parameters we find: 
 \bitem
 \item A shorter star formation duty cycle in our model produces significantly 
-    tighter scatter in the SHMR, $\sigma_{\log\,M_*}$, at $M_h = 10^{12} M_\odot$. 
-    For $t_\mathrm{duty}$ from $10$ to $0.5\,\mathrm{Gyr}$, our model predicts 
-    $\sigma_{\log\,M_*}{=}\,0.32\substack{+0.019\\ -0.021}$ to $0.26\substack{+0.010\\-0.012}$.
+    tighter scatter in the SHMR at $M_h = 10^{12} M_\odot$. For 
+    $t_\mathrm{duty}$ from $10$ to $0.5\,\mathrm{Gyr}$, our model predicts 
+    $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot){=}\,0.32\substack{+0.019\\ -0.021}$ to $0.26\substack{+0.010\\-0.012}$.
     The dependence of $\sigma_{\log\,M_*}$ on $t_\mathrm{duty}$ demonstrates that 
-    the scatter in SHMR can constrain $t_\mathrm{duty}$, which represents the timescale 
+    the scatter in SHMR can be used to constrain $t_\mathrm{duty}$, which represents the timescale 
     of star formation variability. 
 
 \item We compare the $\sigma_{\log\,M_*}(M_h\sim10^{12}M_\odot)$ predicted by our 
-    model to constraints from halo occupation modeling of galaxy clustering, SMF, 
-    satellite kinematics, and galaxy-galaxy weak lensing observations. Although 
-    there is tension among the constraints, observations generally favor a shorter 
-    timescale with $t_\mathrm{duty} \lesssim 1$ Gyr. There is also tension among 
+    model to observed constraints from halo occupation modeling of galaxy clustering, SMF, 
+    satellite kinematics, and galaxy-galaxy weak lensing. Although 
+    there is tension among the constraints, comparison to observations generally favor a shorter 
+    timescale with $t_\mathrm{duty} \lesssim 2$ Gyr. There is also tension among 
     prediction from galaxy formation models. To produce the $\sigma_{\log\,M_*}\sim 0.2$ dex
     predicted in hydrodynamic simulations, which best reproduce the observed 
-    $\sigma_{\log\,M_*}$ at $M_h>10^{12}M_\odot$, short $t_\mathrm{duty} \lesssim 0.5$ Gyr 
-    variations in SFH is necessary.
+    $\sigma_{\log\,M_*}$ at $M_h>10^{12}M_\odot$, variations on $t_\mathrm{duty} \lesssim 0.5$ Gyr 
+    are necessary.
 
 \item We next incorporate assembly bias in our model by correlating the star 
     formation histories to host halo accretion histories with correlation 
     coefficient, $r$. With stronger correlation, higher $r$, our model predict 
     tighter scatter in the SHMR down to $\sigma_{\log M_*}(M_h=10^{12}M_\odot){=}0.17$. 
     For $\sigma_{\log M_*}(M_h=10^{12}M_\odot)\sim 0.2$ dex, both $r > 0.5$ and 
-    $t_\mathrm{duty} < 1$ Gyr are necssary. For correlation of $r \sim 0.6$ found
+    $t_\mathrm{duty} < 1$ Gyr are necssary; for correlation of $r \sim 0.6$ found
     in the literature, $t_\mathrm{duty} < 0.5$ Gyr is necssary.
 \eitem 
 
 Our work demonstrates that constraints on the scatter in the SHMR can be 
 used to constrain both the timescale of star formation variability and 
 the correlation between SFH and halo accretion history. The main 
-bottleneck in deriving constraints for star formation variability 
-remains the lack of consensus among observed $\sigma_{\log M_*}(M_h=10^{12}M_\odot)$
-constraints, which currently span $0.18$ dex. Upcoming surveys, such as 
+bottleneck in deriving precise constraints on the timescale of star formation 
+variability remains the lack of consensus among $\sigma_{\log M_*}(M_h=10^{12}M_\odot)$
+observations, which currently span $0.18$ dex. Upcoming surveys, such as 
 the DESI BGS, will have the capability to more precisely constrain
 $\sigma_{\log M_*}$ and resolve current tensions in observations. With 
 such measurements, our model will be able to constrain $t_\mathrm{duty}$ 
