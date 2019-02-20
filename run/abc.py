@@ -48,7 +48,7 @@ def AbiasABC_z1sigma(tduty, rcorr=0.5, sfs='flex', sigma_z1=0.35, Niter=14, Npar
     '''
     if tduty not in ['0.5', '1', '2', '5', '10']: 
         raise ValueError 
-    run = ''.join(['rSFH_abias', str(rcorr), '_', tduty, 'gyr.sfsmf.sfs', sfs, '.sigma_z1_%.2f' % sigma_z1]) 
+    run = ''.join(['rSFH_abias', str(rcorr), '_', tduty, 'gyr.sfsmf.sigma_z1_%.2f' % sigma_z1, '.sfs', sfs]) 
     print(run)
     prior = ABC.Prior(sfs, shape='tophat') 
     ABC.runABC(run, Niter, [1.e5], prior, N_p=Npart, sumstat=['sfsmf'], nsnap0=15, sigma_smhm=sigma_z1, downsampled='20') 
@@ -100,7 +100,6 @@ if __name__=="__main__":
         npart = int(sys.argv[6]) 
         AbiasABC(tduty, rcorr=rcorr, sfs=sfs, Niter=niter, Npart=npart) # test 
     elif name == 'abias_z1sigma': # tduty, assembly bias, and sigma_logM* at zinit 
-        print('abias z1sigma different') 
         rcorr = float(sys.argv[2])
         tduty = sys.argv[3]
         sfs = sys.argv[4]
