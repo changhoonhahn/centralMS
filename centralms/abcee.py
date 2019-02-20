@@ -188,7 +188,7 @@ def modelSum(cencat, sumstat=['smf']):
     return sums
 
 
-def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart=None, nsnap0=15, downsampled='20'): 
+def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart=None, nsnap0=15, sigma_smhm=0.2, downsampled='20'):
     ''' Main code for running ABC 
 
     Parameters
@@ -227,7 +227,7 @@ def runABC(run, T, eps0, prior, N_p=1000, sumstat=None, restart=False, t_restart
 
     # summary statistics of simulation 
     def Sim(tt): 
-        cencat = model(run, tt, nsnap0=nsnap0, downsampled=downsampled)
+        cencat = model(run, tt, nsnap0=nsnap0, sigma_smhm=sigma_smhm, downsampled=downsampled)
         sums = modelSum(cencat, sumstat=sumstat)
         return sums 
 
