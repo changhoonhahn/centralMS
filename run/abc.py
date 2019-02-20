@@ -100,10 +100,11 @@ if __name__=="__main__":
         npart = int(sys.argv[6]) 
         AbiasABC(tduty, rcorr=rcorr, sfs=sfs, Niter=niter, Npart=npart) # test 
     elif name == 'abias_z1sigma': # tduty, assembly bias, and sigma_logM* at zinit 
+        print('abias z1sigma different') 
         rcorr = float(sys.argv[2])
         tduty = sys.argv[3]
         sfs = sys.argv[4]
-        sigmaz1 = sys.argv[5]
+        sigmaz1 = float(sys.argv[5])
         niter = int(sys.argv[6]) 
         npart = int(sys.argv[7]) 
         AbiasABC_z1sigma(tduty, rcorr=rcorr, sfs=sfs, sigma_z1=sigmaz1, Niter=niter, Npart=npart)
