@@ -42,6 +42,18 @@ def AbiasABC(tduty, rcorr=0.5, sfs='flex', Niter=14, Npart=1000):
     return None 
 
 
+def noAbiasABC_z1sigma(tduty, sfs='flex', sigma_z1=0.35, Niter=14, Npart=1000): 
+    ''' ABC run without assembly bias 
+    '''
+    if tduty not in ['0.5', '1', '2', '5', '10']: 
+        raise ValueError 
+    run = ''.join(['randomSFH', tduty, 'gyr.sfsmf.sigma_z1_%.2f' % sigma_z1, '.sfs', sfs]) 
+    print(run)
+    prior = ABC.Prior(sfs, shape='tophat') 
+    ABC.runABC(run, Niter, [1.e5], prior, N_p=Npart, sumstat=['sfsmf'], nsnap0=15, sigma_smhm=sigma_z1, downsampled='20') 
+    return None 
+
+
 def AbiasABC_z1sigma(tduty, rcorr=0.5, sfs='flex', sigma_z1=0.35, Niter=14, Npart=1000): 
     ''' ABC run with assembly bias specified by correlation coefficient r with 
     sigma_logM* at z_init given by sigma_z1. 
@@ -99,6 +111,13 @@ if __name__=="__main__":
         niter = int(sys.argv[5]) 
         npart = int(sys.argv[6]) 
         AbiasABC(tduty, rcorr=rcorr, sfs=sfs, Niter=niter, Npart=npart) # test 
+    elif name == 'noabias_z1sigma': 
+        tduty = sys.argv[2]
+        sfs = sys.argv[3]
+        sigmaz1 = float(sys.argv[4])
+        niter = int(sys.argv[5]) 
+        npart = int(sys.argv[6]) 
+        noAbiasABC_z1sigma(tduty, sfs=sfs, sigma_z1=sigmaz1, Niter=niter, Npart=npart) # test 
     elif name == 'abias_z1sigma': # tduty, assembly bias, and sigma_logM* at zinit 
         rcorr = float(sys.argv[2])
         tduty = sys.argv[3]
