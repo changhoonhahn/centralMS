@@ -9,9 +9,13 @@ export PATH="/home/users/hahn/anaconda2/bin:$PATH"
 source /home/users/hahn/.bashrc
 
 niter=14
-for rcorr in 0.5; do #0.99 0.
-    for tduty in "10"; do #"0.5" "1" "2" "5"; do # "10"; do 
-        run="rSFH_abias"$rcorr)"_"$tduty"gyr.sfsmf.sigma_z1_0.35.sfsbroken"
+for rcorr in 0.; do #0.5 0.99; do #
+    for tduty in "0.5" "1" "2" "5" "10"; do 
+        if (( $(echo "$rcorr > 0." |bc -l) )); then 
+            run="rSFH_abias"$rcorr"_"$tduty"gyr.sfsmf.sigma_z1_0.35.sfsbroken"
+        else
+            run="randomSFH"$tduty"gyr.sfsmf.sigma_z1_0.35.sfsbroken"
+        fi 
         echo $run
         mpirun -np $NPROCS python /home/users/hahn/projects/centralMS/run/modelabc_sigmaz1.py $run 0.35 $niter > "/home/users/hahn/projects/centralMS/run/"$run"."$niter".modelabc.log"
     done 
