@@ -360,7 +360,8 @@ SHAM, in its simplest form, assumes a one-to-one mapping between subhalo
 $M_\mathrm{peak}$ and galaxy stellar mass, $M_*$, that preserves rank 
 order: $n({>}M_\mathrm{peak}) > n({>}M_*)$. In practice, we apply a $0.2$ 
 dex log-normal scatter in $M_*$ at fixed $M_\mathrm{peak}$ based on the 
-observed SHMR. For $n({>}M_*)$, we use observed stellar mass function (SMF) 
+observed SHMR~\citep[\emph{e.g.}][]{mandelbaum2006a, more2011, velander2014, zu2015, gu2016, lange2018a}. 
+For $n({>}M_*)$, we use observed stellar mass function (SMF) 
 from \cite{li2009}, which is based on the same SDSS NYU-VAGC sample as our 
 group catalog. Then using the SHAM $M_*$, we randomly select subhalos as
 SF based on based on the probabilities of being on the SFS using Eq.~\ref{eq:f_cen_sfms}. 
@@ -374,19 +375,21 @@ the SF centrals we select at $z \sim 0$ are also on the SFS at the intial
 redshift of our model: $z \sim 1$. 
 
 We next initialize the SF centrals at $z\sim1$ using the observed SFR-$M_*$ 
-relation of the SFS with $M_*$ assigned using SHAM with a SMF interpolated
-between the \cite{li2009} SMF and the SMF from \cite{marchesini2009} at 
-$z = 1.6$. We choose the \cite{marchesini2009} SMF, among others, because it 
+relation of the SFS with $M_*$ assigned using SHAM with a $z\sim1$ SMF 
+interpolated between the \cite{li2009} SMF and the SMF from \cite{marchesini2009} 
+at $z = 1.6$. We choose the \cite{marchesini2009} SMF, among others, because it 
 produces interpolated SMFs that monotonically increase over $z < 1$. As noted 
 in \cite{hahn2017b}, at $z \approx 1$, the SMF interpolated between the 
 \cite{li2009} and \cite{marchesini2009} SMFs is consistent with more recent 
-measurements from \cite{muzzin2013} and \cite{ilbert2013}. Observations in 
-the literature at $z \sim 1$, however, not only use galaxy properties 
-derived differently from the SDSS VAGC but they also find SFS with significant 
-discrepancies from one another. \cite{speagle2014} compiles the SFR-$M_*$ 
-relation of the SFS from 25 studies in the literature, each with different 
-methods of deriving galaxy properties. Even \emph{after} their calibration, 
-for a fixed $M_* = 10^{10.5}\, M_\odot$, the SFRs of the SFSs at $z \sim 1$ 
+measurements from \cite{muzzin2013} and \cite{ilbert2013}. We again apply a 
+$0.2$ dex log-normal scatter in the SHAM based on observations~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}
+We next assign SFRs based on $z \sim 1$ observations in the literature. 
+However, observations, not only use galaxy properties derived differently 
+from the SDSS VAGC but they also find SFS with significant discrepancies 
+from one another. \cite{speagle2014} compiles the SFR-$M_*$ relation of the 
+SFS from 25 studies in the literature, each with different methods of deriving 
+galaxy properties. Even \emph{after} their calibration, for a fixed 
+$M_* = 10^{10.5}\, M_\odot$, the SFRs of the SFSs at $z \sim 1$ 
 vary by more than a factor of 2~\citep[see Figure 2 of][]{speagle2014}. 
 With little consensus on the SFS at $z\sim1$, and consequently its redshift
 evolution, we flexibly parameterize the SFS SFR, 
@@ -977,6 +980,31 @@ the shorter $\sim 0.1$ Gyr timescales found in the FIRE simulations~\citep{hopki
 However, the conflicting $\sigma_{\log\,M_*}$ constraint of Cao et al. (in preparation) and 
 predictions from SAMs and {\sc UniverseMachine} relax the restriction on 
 $t_\mathrm{duty}$: $< 5$ Gyr. 
+
+So far in our model, we use $\sigma_{\log\,M_*}(z\sim1) = 0.2$ dex based on observations~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}
+to determine the initial SHAM $M_*$ at $z\sim1$ (Section~\ref{sec:sfcen}).
+However, much like the $z\sim0$ observational $\sigma_{\log\,M_*}$ constraints 
+above, the $z\sim1$ constraints are derived from some halo model where much of 
+the constraining power come from massive halos. Hence, the $0.2$ dex is not 
+{\em necessarily} an accurate measurement of $\sigma_{\log\,M_*}(z\sim1)$ at low 
+$M_h < 10^{12}M_\odot$ and we examine how $\sigma_{\log\,M_*}(z\sim1)$ impacts 
+$\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$ predicted by our model. Motivated by 
+the $z=1$ SHMR in the Illustris TNG, which has $\sigma_{\log\,M_*}(z\sim1) = 0.4$ 
+to $0.2$ dex for $M_h = 10^{10.5}M_\odot$ to $10^{11.5}M_\odot$, we repeat our 
+analysis using $\sigma_{\log\,M_*}(z\sim1) = 0.35$ dex. For the $r=0$ no assembly bias model, 
+$\sigma_{\log\,M_*} = $ for $t_{\rm duty} = 0.5$ and $10$ Gyr, respectively;
+for $r = 0.99$, 
+$\sigma_{\log\,M_*} = $ for $t_{\rm duty} = 0.5$ and $10$ Gyr, respectively.
+Increasing $\sigma_{\log\,M_*}(z\sim1)$ to 0.35 dex increases the $z=0$ 
+$\sigma_{\log\,M_*}(M_h=10^{12}M_\odot)$ predicted by our model for all values of 
+$t_{\rm duty}$ and $r$. With $\sigma_{\log\,M_*}(z\sim1) = 0.35$ dex, our model 
+can predict $\sigma_{\log\,M_*}$ in agreement with the Cao et al. (in prepation) 
+constraint and predictions from SAMs over a larger region of the $r$--$t_{\rm duty}$ 
+plane. On the other hand, with $\sigma_{\log\,M_*}(z\sim1) = 0.35$ dex, our model 
+struggles to reproduce constraints from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} 
+and hydrodynamical simulations, even with $r=0.99$. Regardless of our choice of 
+$\sigma_{\log\,M_*}(z\sim1)$, our model with shorter duty cycle and stronger assembly bias predict tighter 
+$\sigma_{\log\,M_*}(z\sim0)$. 
 
 In this section, we incorporate galaxy assembly into our model by correlating 
 SFH with halo assembly history --- \emph{i.e.} $\Delta\logsfr$ with $\Delta M_h$. 
