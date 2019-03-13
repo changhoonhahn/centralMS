@@ -1609,6 +1609,9 @@ def SHMRscatter_tduty_abias_z1sigma(Mhalo=12, dMhalo=0.5):
         # ABC posteriors 
         sub1.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C'+str(i_a), alpha=0.5, linewidth=0) 
         sub2.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C'+str(i_a), alpha=0.5, linewidth=0, zorder=2) 
+        print('r=%.2f' % abias) 
+        print('tduty=0.5, sigma_logM*=%f +/- %f, %f' % (sigMs[0,0], sigMs[2,0]-sigMs[0,0], sigMs[0,0]-sigMs[1,0]))
+        print('tduty=10, sigma_logM*=%f +/- %f, %f' % (sigMs[0,-1], sigMs[2,-1]-sigMs[0,-1], sigMs[0,-1]-sigMs[1,-1])) 
 
     # literature 
     subplts = [] 
