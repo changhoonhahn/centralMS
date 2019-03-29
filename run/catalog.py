@@ -54,6 +54,10 @@ if __name__=="__main__":
     #buildCentralSubhalosDown(nsnap0=15, sigma_smhm=0.2, smf_source='li-march', silent=False)
     #buildSDSSgroupcat()
 
-    buildSubhalos(nsnap0=15, sigma_smhm=0.35, smf_source='li-march', silent=False)
-    buildCentralSubhalos(nsnap0=15, sigma_smhm=0.35, smf_source='li-march', silent=False)
-    buildCentralSubhalosDown(nsnap0=15, sigma_smhm=0.35, smf_source='li-march', silent=False)
+    #buildSubhalos(nsnap0=15, sigma_smhm=0.35, smf_source='li-march', silent=False)
+    #buildCentralSubhalos(nsnap0=15, sigma_smhm=0.35, smf_source='li-march', silent=False)
+    #buildCentralSubhalosDown(nsnap0=15, sigma_smhm=0.35, smf_source='li-march', silent=False)
+
+    buildSubhalos(nsnap0=15, sigma_smhm=0.45, smf_source='li-march', silent=False)
+    buildCentralSubhalos(nsnap0=15, sigma_smhm=0.45, smf_source='li-march', silent=False)
+    buildCentralSubhalosDown(nsnap0=15, sigma_smhm=0.45, smf_source='li-march', silent=False)
