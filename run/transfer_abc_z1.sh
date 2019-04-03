@@ -1,11 +1,12 @@
 # !/bin/bash/
 rcorr=$1
 tduty=$2
+sigz1=$3
 
 if (( $(echo "$rcorr > 0." |bc -l) )); then 
-    run="rSFH_abias"$rcorr"_"$tduty"gyr.sfsmf.sigma_z1_0.35.sfsbroken"
+    run="rSFH_abias"$rcorr"_"$tduty"gyr.sfsmf.sigma_z1_"$sigz1".sfsbroken"
 else
-    run="randomSFH"$tduty"gyr.sfsmf.sigma_z1_0.35.sfsbroken"
+    run="randomSFH"$tduty"gyr.sfsmf.sigma_z1_"$sigz1".sfsbroken"
 fi 
 remote="sirocco"
 remote_dir="/mount/sirocco1/hahn/centralms/abc/"
