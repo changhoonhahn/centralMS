@@ -375,12 +375,13 @@ def Illustris_SFH():
 
     fig = plt.figure()
     sub = fig.add_subplot(111)
+    iarr = [0, 12, 17, 19]+range(22,42)
     for i in np.arange(len(z0sf))[z0sf]: 
-        sub.plot(t_bins[-1] - t_skip, np.array(dlogsfrs)[:,i], c='k', alpha=0.1, lw=0.1) 
+        sub.plot((t_bins[-1] - t_skip)[iarr], np.array(dlogsfrs)[:,i][iarr], c='k', alpha=0.1, lw=0.1) 
     z0sf = ((np.log10(sfhs[:,0]) > sfms_fit(np.log10(galpop['M*']))-0.6) & 
             (np.log10(galpop['M*']) > 10.5) &  (np.log10(galpop['M*']) < 10.6)) 
     for ii, i in enumerate(np.random.choice(np.arange(len(z0sf))[z0sf], 10)): 
-        sub.plot(t_bins[-1] - t_skip, np.array(dlogsfrs)[:,i], lw=1, c='C'+str(ii)) 
+        sub.plot((t_bins[-1] - t_skip)[iarr], np.array(dlogsfrs)[:,i][iarr], lw=1, c='C'+str(ii)) 
     sub.set_xlim([11., 13.75]) 
     sub.set_xlabel('$t_\mathrm{cosmic}$ [Gyr]', fontsize=25) 
     sub.set_ylim([-.6, .6]) 
@@ -2031,10 +2032,10 @@ if __name__=="__main__":
     #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
     #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
-    SHMRscatter_tduty_abias_z1sigma(Mhalo=12, dMhalo=0.1)
+    #SHMRscatter_tduty_abias_z1sigma(Mhalo=12, dMhalo=0.1)
     #fQ_fSFMS()
     #SFHmodel()
-    #Illustris_SFH()
+    Illustris_SFH()
     #_lAbramson2016SHMR(nsnap0=15, n_boot=100)
     #_lAbramson2016SHMR_assignHalo(nsnap0=15, n_boot=100)
     #_SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
