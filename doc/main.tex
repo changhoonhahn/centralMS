@@ -23,7 +23,8 @@
 \definecolor{orange}{rgb}{1,0.5,0}
 
 \newcommand\tab[1][1cm]{\hspace*{#1}}
-\newcommand{\ch}[1]{\color{orange}{\bf CH:} #1}
+\newcommand{\ch}[1]{{\color{orange}{\bf CH:} #1}}
+\newcommand{\edt}[1]{{\color{orange}{\bf} #1}}
 \newcommand{\beq}{\begin{equation}}
 \newcommand{\eeq}{\end{equation}}
 \newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
@@ -96,15 +97,20 @@ Observations from large surveys such as the Sloan Digital Sky Survey~\citep[SDSS
 have been critical for establishing the global trends of galaxies in 
 the local universe. Broadly speaking, galaxies fall into two categories: 
 quiescent and star-forming (hereafter SF) galaxies. Quiescent galaxies 
-have little to no star formation, are red in color, and have ellipitical 
-morphologies. Meanwhile, SF galaxies have significant star formation, are blue 
-in color, and have disk-like morphologies (\citealt{kauffmann2003, blanton2003, baldry2006, taylor2009, moustakas2013}; 
+have little to no star formation, are red in color 
+\edt{due to old stellar populations}, 
+and have ellipitical 
+morphologies. Meanwhile, SF galaxies have significant star formation, 
+\edt{thus} 
+are blue in color, and have disk-like morphologies (\citealt{kauffmann2003, blanton2003, baldry2006, taylor2009, moustakas2013}; 
 see~\citealt{blanton2009} and references therein). 
 SF galaxies, furthermore, are found on the so-called ``star-forming sequence'' 
 (hereafter SFS), a tight relationship between their star formation rates (SFR) 
 and stellar masses~\citep[][see also Figure~\ref{fig:groupcat}]{noeske2007, daddi2007, salim2007, speagle2014, lee2015}.
 This sequence, which is observed out to $z > 2$~\citep{wang2013, leja2015} 
-plays a crucial role in characterizing galaxy evolution over the past ${\sim}10\,\mathrm{Gyr}$~\citep[see][for an alternative point of view]{kelson2014,abramson2016}. 
+plays a crucial role in 
+\edt{determining}
+galaxy evolution over the past ${\sim}10\,\mathrm{Gyr}$~\citep[see][for an alternative point of view]{kelson2014,abramson2016}. 
 The significant fraction of SF galaxies that quench their 
 star formation and migrate off of the SFS reflects the growth in the 
 fraction of quiescent galaxies~\citep{blanton2006, borch2006, bundy2006, moustakas2013}. 
@@ -235,7 +241,7 @@ Finally, we conclude and summarize the results in Section~\ref{sec:summary}.
 \section{Central Galaxies of SDSS DR7} \label{sec:sdss}
 We construct our galaxy sample following the sample selection of \cite{tinker2011}. 
 We select a volume-limited sample of galaxies at $z \approx 0.04$ with 
-$M_r - 5 \log(h) < -18$ and complete above $M_* > 10^{9.4} M_\odot$ from 
+$M_r - 5 \log(h) < -18$ and complete above $M_* > 10^{9.4} h^{-2}M_\odot$ from 
 the NYU Value-Added Galaxy Catalog \citep[VAGC;][]{blanton2005} of the 
 Sloan Digital Sky Survey Data Release 7~\citep[SDSS DR7;][]{abazajian2009}. 
 The stellar masses of these galaxies are estimated using the
@@ -252,8 +258,9 @@ to the actual galaxy SSFR~\citep{salim2007}.
 
 From this galaxy sample, we identify central galaxies using the 
 \cite{tinker2011} group finder, a halo-based algorithm that uses 
-the abundance matching ansatz to iteratively assign halo masses to groups. 
-It initially assigns a tentative halo mass to each galaxy by matching their 
+the abundance matching ansatz to iteratively assign halo masses to 
+groups~\edt{\citep[see also][]{yang2005}}. 
+It assigns an initial halo mass to each galaxy by matching their 
 abundances. Then starting with the most massive galaxy, nearby lower
 mass galaxies are assigned a probability of being a satellite. Once all 
 the galaxies are assigned to a group, the halo masses of the central galaxies 
@@ -275,7 +282,7 @@ star-forming centrals lying on the so-call ``star-forming sequence'' (SFS).
 % In the left panel of Figure~\ref{fig:groupcat}, we plot the SFR-$M_*$ distribution of the SDSS DR7 central galaxies. In the right panel, we plot the distribution of SSFR,  $p(\log \mathrm{SSFR})$, for galaxies with $10.6 < \log \,M_* < 10.8$ (stellar mass range  highlighted on the left panel). Both panels of Figure~\ref{fig:groupcat} illustrate the  bimodality in the galaxy sample. The SFR-$M_*$ distribution also illustrate the correlation between SFR and $M_*$ in star-forming galaxies \emph{i.e.} the star-formation main sequence  (SFS).
 
 \section{Model: Simulated Central Galaxies} \label{sec:sim}
-We're interesting in constructing a model that tracks central galaxies and 
+\edt{We are} interesting in constructing a model that tracks central galaxies and 
 their star formation within the heirarchical growth of their host halos. This 
 requires a cosmological $N$-body simulation that accounts for the complex 
 dynamical processes that govern the host halos of galaxies. In this paper 
@@ -284,8 +291,8 @@ using the \cite{white2002} $\mathtt{TreePM}$ code with flat $\Lambda$CDM cosmolo
 ($\Omega_m =0.274, \Omega_b = 0.0457, h = 0.7, n=0.95$, and $\sigma_8 = 0.8$).
 From initial conditions at $z = 150$, generated from second-order Lagrangian 
 Perturbation Theory, $2048^3$ particles with mass of $1.98 \times 10^8\,M_\odot$ are 
-evolved in a $250\,\mathrm{Mpc}/h$ box with a Plummer equivalent smoothing of 
-$2.5\,\mathrm{kpc}/h$~\citep{wetzel2013, wetzel2014}. `Host halos' are then 
+evolved in a \edt{$250\,h^{-1}\mathrm{Mpc}$} box with a Plummer equivalent smoothing of 
+\edt{$2.5\,h^{-1}{\rm kpc}$}~\citep{wetzel2013, wetzel2014}. `Host halos' are then 
 identified using the Friends-of-Friends algorithm~\citep[FoF;][]{davis1985} with 
 linking length of $b{=}0.168$ times the mean inter-partcile spacing. Within 
 these host halos, \cite{wetzel2013} identifies `subhalos' as overdensities 
@@ -294,8 +301,8 @@ The host halos and subhalos are then tracked across the simulation outputs
 from $z = 10$ to $0$ to build merger trees~\citep{wetzel2009,wetzel2010}. 
 The most massive subhalos in newly-formed host halos at a given simulation 
 output are defined as the `central' subhalo. A central subhalo retains its 
-`central' definition until it falls into a more massive host halo, at which 
-point it becomes a `satellite' subhalo. 
+`central' definition until it falls into a more massive host halo 
+\edt{(FoF halo mass)}, at which point it becomes a `satellite' subhalo. 
 
 Throughout its $45$ snapshot outs, $\mathtt{TreePM}$ simulation tracks 
 the evolution of subhalos back to $z \sim 10$. We restrict ourselves to $15$ 
@@ -400,12 +407,14 @@ below and above $10^{10} M_\sun$ and the redshift dependence, respectively.
 
 We parameterize the $\log\mathrm{SFR}$ of the SFS as, 
 \beq \label{eq:logsfr_ms}
-\logsfr_{\rm SFS}(M_*, z) =  \begin{cases}
-m^\mathrm{low}_{M_*}\,(\log M_* - 10.)  & \text{for}\,M_* < 10^{10}M_\sun \\
-m^\mathrm{high}_{M_*}\,(\log M_* - 10.)  & \text{for}\,M_* \geq 10^{10}M_\sun.
-\end{cases}
-+ m_z (z - 0.05) - 0.19.
+\logsfr_{\rm SFS}(M_*, z) =  m_{M_*}\,(\log M_* - 10.) + m_z (z - 0.05) - 0.19
 \eeq
+\begin{equation*}
+{\rm where}~m_{M_*} = \begin{cases}
+m^\mathrm{low}_{M_*} & \text{for}\,M_* < 10^{10}M_\sun \\
+m^\mathrm{high}_{M_*} & \text{for}\,M_* \geq 10^{10}M_\sun.
+\end{cases}
+\end{equation*}
 We assign SFRs to our SF centrals at $z\sim1$ by sampling a log-normal 
 distribution centered about $\log\,\mathrm{SFR}_\mathrm{SFS}(M_*, z=1)$ 
 with a constant scatter of $0.3\,\mathrm{dex}$ from observations~\citep{daddi2007, noeske2007, magdis2012, whitaker2012}.
@@ -426,9 +435,10 @@ at $z \sim 1$, next, we describe how we evolve their SFR and $M_*$.
     We highlight $\Delta \logsfr$, SFR with respect to $\logsfrsfs$ (Eq.~\ref{eq:logsfr_sf}), 
     for a handful of galaxies with $10^{10.5}< M_* < 10^{10.6}M_\odot$ at $z\sim0$. 
     We calculate $\Delta \logsfr$ with $\logsfrsfs$ identified using the \cite{hahn2018a} 
-    method, same as in Section~\ref{sec:sfcen}. The implementation of $\mathrm{SFR}$
-    variability in the SFHs of star-forming centrals in our model 
-    (Section~\ref{sec:modelevol}) is motivated by the SFHs of Illustris galaxies above.}
+    method, same as in Section~\ref{sec:sfcen}. The implementation of $\mathrm{SFR}$ 
+    variability in the SFHs of star-forming centrals in our model (Section~\ref{sec:modelevol}) 
+    is motivated by the SFHs of Illustris galaxies above.
+    }
 \label{fig:illsfh}
 \end{center}
 \end{figure}
@@ -492,10 +502,11 @@ In Figure~\ref{fig:illsfh}, we plot $\Delta \logsfr_i$ of star-forming
 galaxies in the Illustris simulation as a function of cosmic time. These 
 galaxies have stellar masses within $10^{10.5}-10^{10.6}M_\odot$ at $z=0$. 
 At each simulation output, we calculate $\Delta \logsfr_i$ using Eq.~\ref{eq:logsfr_sf}
-with $\logsfrsfs$ derived from the SFS identified using the \cite{hahn2018a}
-method, same as in Section~\ref{sec:sfcen}. As the highlighted $\Delta \logsfr_i$
-illustrate, SF galaxies in Illustris evolve along the SFS, with
-their SFRs fluctuating about $\logsfrsfs$.
+with $\logsfrsfs$ derived from the SFS identified 
+\edt{in the simulation} 
+using the \cite{hahn2018a} method, same as in Section~\ref{sec:sfcen}. As the 
+highlighted $\Delta \logsfr_i$ illustrate, SF galaxies in Illustris evolve 
+along the SFS, with their SFRs fluctuating about $\logsfrsfs$.
 
 Motivated by the SFHs of Illustris SF galaxies, we introduce variability 
 to the SFHs of our SF centrals in the form of a ``\emph{star formation duty cycle}''. 
@@ -503,8 +514,9 @@ Within the Eq.~\ref{eq:logsfr_sf} SFH, we parameterize $\Delta \logsfr_i$ to
 fluctuate about the $\logsfrsfs$ on timescale, $t_\mathrm{duty}$, with 
 amplitude sampled from a log-normal distribution with $0.3\,\mathrm{dex}$ 
 scatter. For our fiducial star formation duty cycle prescription, we randomly 
-sample $\Delta \logsfr_i$ from a log-normal distribution with $\sigma = 0.3\,\mathrm{dex}$. We 
-illustrate $\Delta \logsfr_i(t)$ of SF centrals with our star formation 
+sample $\Delta \logsfr_i$ from a log-normal distribution with 
+\edt{$0.3\,\mathrm{dex}$ scatter}. 
+We illustrate $\Delta \logsfr_i(t)$ of SF centrals with our star formation 
 duty cycle prescription on $t_\mathrm{duty}=1$ Gyr (blue) and $5$ Gyr (orange) 
 timescales in the left panel of Figure~\ref{fig:sfh_model}. 
 The shaded region represents the observed $0.3\,\mathrm{dex}$ scatter of 
@@ -524,7 +536,7 @@ of our SF centrals along the SFS. Based on Eq.~\ref{eq:logsfr_sf},
 the SFRs of our SF centrals are functions of $M_*$, while $M_*$ 
 is the integral of the SFR over time: 
 \beq \label{eq:integ_mass} 
-M_*(t) = f_\mathrm{retain} \int\limits_{t_0}^{t} \mathrm{SFR(M_*, t)}\,\mathrm{d}t + M_0. 
+M_*(t) = f_\mathrm{retain} \int\limits_{t_0}^{t} \mathrm{SFR(M_*, t')}\,\mathrm{d}t' + M_0. 
 \eeq
 $t_0$ and $M_0$ are the initial cosmic time and stellar mass at $z \sim 1$, 
 respectively. $f_\mathrm{retain}$ here is the fraction of stellar mass 
@@ -541,6 +553,86 @@ that the galaxies' SFR and $M_*$ evolve along, $\logsfrsfs(M_{*,i}(t), t)$
 redshifts between $z = 1$ to $0.05$. Based on the SFH prescription in our 
 model, SF centrals evolve their SFRs and $M_*$ along the SFS 
 with their SFRs fluctuate about $\logsfrsfs$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figure
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.5\textwidth]{figs/Mhacc_dSFR.pdf}
+\caption{We incorporate assembly bias into the SF centrals of our model by 
+    correlating their host halo accretion history with their SFH with respect 
+    to the SFS. We plot the relative halo accretion history, $M_h(t)/M_h(z{=}0.05)$ 
+    for two randomly chosen SF centrals with $M_h(z{=}0.05)\sim10^{12}M_\odot$, 
+    in the top panel. In the two panels below we present $\Delta\log\,\mathrm{SFR}$, 
+    SFH with respect to the SFS, of these galaxies for our model with correlation 
+    coefficients $r=0.5$ and $0.99$ (middle and bottom). The shaded region in these
+    panels mark the $0.3$ dex 1-sigma width of the SFS. At some $t$ (dotted), 
+    $\Delta\log\,\mathrm{SFR}(t)$ is correlated with halo accretion over the 
+    period $t - t_\mathrm{dyn}$ to $t_\mathrm{dyn}$ labeled in top panel. The 
+    SFHs illustrate how $\Delta\log\,\mathrm{SFR}(t)$ correlates with 
+    $\Delta M_h = M_h(t) - M_h(t-t_\mathrm{dyn})$ and how $\Delta\logsfr(t)$ 
+    correlates more strongly with $\Delta M_h(t)$ with higher $r$.}
+\label{fig:mhacc_dsfr}
+\end{center}
+\end{figure}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\subsection{Adding Assembly Bias} 
+\edt{In our fiducial SFH precription, we sample $\Delta \logsfr_i$ randomly 
+from a log-normal distribution with $0.3$dex scatter.} 
+There is, however, growing evidence that star formation in galaxies correlate with their host 
+halo accretion histories~\citep[\emph{e.g.}][]{lim2016, tojeiro2017, tinker2018b}. 
+Therefore, in this section, we describe how we introduce \emph{assembly bias} 
+into the SFH prescription of our model.% and investigate its impact on $\sigma_{\log M_*}$.
+Assembly bias, most commonly in the literature, refers to the dependence of the 
+spatial distribution of dark matter halos on halo properties besides 
+mass~\citep{gao2005,wechsler2006,gao2007,wetzel2007,li2008,sunayama2016}.
+At low halo mass, older and more concentrated halos form in high density environments. 
+While at high halo mass, the effect is the opposite --- younger, less concentrated 
+halos form in high-density regions. However, both 
+simulations~\citep{croton2007, artale2018, zehavi2018} as well as  
+observations~\citep{yang2006,wang2008,tinker2011,wang2013,lacerna2014,calderon2018,tinker2018},
+\ch{remove citations that refer to conformity.} 
+find that this assembly bias propagates beyond spatial clustering and correlates
+with \edt{certain} galaxy properties such as formation histories and star formation 
+properties, an effect more specifically referred to as {\em galaxy} assembly bias. 
+In our model, we incorporate galaxy assembly bias by correlating the SFHs 
+of our SF central galaxies and their host halo accretion histories 
+with a correlation coefficient $r$. 
+
+We correlate a galaxy's SFR with respect to the mean SFS SFR 
+(\emph{i.e.} $\Delta\log\,\mathrm{SFR}$ in Eq.~\ref{eq:logsfr_sf}) to the 
+halo mass accretion over dynamical time. At every $t_\mathrm{duty}$ timestep, 
+$t$, $\Delta\logsfr(t)$ is assigned based on 
+$\Delta M_h(t) = M_h(t) - M_h(t - t_\mathrm{dyn})$ in $M_\mathrm{max}$ bins 
+with a correlation coefficient $r$, a parameter added to our model. This 
+prescription for correlating $\Delta\log\,\mathrm{SFR}$ to $\Delta M_h$ is 
+similar to other empirical models that also correlate $\Delta\log\,\mathrm{SFR}$ 
+to $\Delta M_h$ over $t_\mathrm{dyn}$~\citep{rodriguez-puebla2016a, behroozi2018}.
+In \cite{rodriguez-puebla2016a}, however, they assume perfect ($r=1$) correlation 
+between SFH and halo accretion. In the \cite{behroozi2018} {\sc UniverseMachine} 
+(hereafter UM), $r$ is free parameter and their SFH includes SF variability, 
+similar to our model. As we mention in the introduction, their prescription, 
+however, does not not focus on a star formation variation on specific timescales as our model does through 
+the star formation duty cycle. 
+
+In Figure~\ref{fig:mhacc_dsfr} we illustrate this prescription for galaxy
+assembly bias in our model. We plot the relative halo accretion histories 
+$M_h(t)/M_h(z{=}0.05)$ of two arbitrarily chosen SF centrals with 
+$M_h(z{=}0.05)\sim10^{12}M_\odot$ in the top panel (orange and blue). Below, we plot 
+$\Delta\logsfr$, SFH with respect to the SFS, of these galaxies for our model with 
+correlation coefficients $r=0.5$ and $0.99$ (middle and bottom). We choose a
+random $\mathtt{TreePM}$ snapshot, $t$ (dotted), and label the period 
+[$t$, $t - t_\mathrm{dyn}$]. Halo accretion over this period, 
+$\Delta M_h = M_h(t) - M_h(t-t_\mathrm{dyn})$, correlates with $\Delta\logsfr(t)$. 
+The SFHs in the middle and bottom panels illustrate this correlation and how 
+$\Delta\logsfr(t)$ correlates more strongly with $\Delta M_h(t)$ for our model 
+with higher $r$. 
+
+\subsection{$\sigma_{\log\,M_*}$ at $z=1$} 
+
 
 With the evolved SFRs and $M_*$ of SF centrals, we can compare our model 
 to observed galaxy population statistics (quiescent fraction 
@@ -760,30 +852,6 @@ observations and hydrodynamic simulations.
 %All considered, despite the overall tension, {\em the observational constraints of $\sigma_{\log\,M_*}$ favor our model with a shorter duty cycle timescale.} %\emph{A short duty cycle timescale--- $t_\mathrm{duty} \lesssim 0.5\,\mathrm{Gyr}$--- is necessary for our model to ameliorate the tension with $\sigma_{\log\,M_*}$ constraints in the literature}. 
 %This $t_\mathrm{duty}$ constraint implies that SF galaxies have star formation variations on short timescales. 
 %However, even with the shortest duty cycle timescale we probe  {\color{red} ($\sigma_{\log\,M_*}{=}\,0.26\substack{+0.010\\ -0.012}$) } our model predicts $\sigma_{\log M_*}$ larger than in observations. 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Figure 6 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{figure}
-\begin{center}
-\includegraphics[width=0.5\textwidth]{figs/Mhacc_dSFR.pdf}
-\caption{We incorporate assembly bias into the SF centrals of our model by 
-    correlating their host halo accretion history with their SFH with respect 
-    to the SFS. We plot the relative halo accretion history, $M_h(t)/M_h(z{=}0.05)$ 
-    for two randomly chosen SF centrals with $M_h(z{=}0.05)\sim10^{12}M_\odot$, 
-    in the top panel. In the two panels below we present $\Delta\log\,\mathrm{SFR}$, 
-    SFH with respect to the SFS, of these galaxies for our model with correlation 
-    coefficients $r=0.5$ and $0.99$ (middle and bottom). The shaded region in these
-    panels mark the $0.3$ dex 1-sigma width of the SFS. At some $t$ (dotted), 
-    $\Delta\log\,\mathrm{SFR}(t)$ is correlated with halo accretion over the 
-    period $t - t_\mathrm{dyn}$ to $t_\mathrm{dyn}$ labeled in top panel. The 
-    SFHs illustrate how $\Delta\log\,\mathrm{SFR}(t)$ correlates with 
-    $\Delta M_h = M_h(t) - M_h(t-t_\mathrm{dyn})$ and how $\Delta\logsfr(t)$ 
-    correlates more strongly with $\Delta M_h(t)$ with higher $r$.}
-\label{fig:mhacc_dsfr}
-\end{center}
-\end{figure}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 7 
