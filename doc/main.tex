@@ -577,8 +577,6 @@ with their SFRs fluctuate about $\logsfrsfs$.
 \end{center}
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
 \subsection{Adding Assembly Bias} 
 \edt{In our fiducial SFH precription, we sample $\Delta \logsfr_i$ randomly 
 from a log-normal distribution with $0.3$dex scatter.} 
@@ -594,7 +592,7 @@ While at high halo mass, the effect is the opposite --- younger, less concentrat
 halos form in high-density regions. However, both 
 simulations~\citep{croton2007, artale2018, zehavi2018} as well as  
 observations~\citep{yang2006,wang2008,tinker2011,wang2013,lacerna2014,calderon2018,tinker2018},
-\ch{remove citations that refer to conformity.} 
+\ch{@JLT I'm not sure which citations you're referring to.} 
 find that this assembly bias propagates beyond spatial clustering and correlates
 with \edt{certain} galaxy properties such as formation histories and star formation 
 properties, an effect more specifically referred to as {\em galaxy} assembly bias. 
@@ -631,16 +629,35 @@ The SFHs in the middle and bottom panels illustrate this correlation and how
 $\Delta\logsfr(t)$ correlates more strongly with $\Delta M_h(t)$ for our model 
 with higher $r$. 
 
-\subsection{$\sigma_{\log\,M_*}$ at $z=1$} 
+\subsection{\edt{$\sigma_{\log\,M_*}$ at $z=1$}} 
+\edt{So far in both our fiducial and assembly bias added models above, we make the 
+assumption that the log-normal scatter in $M_*$ at fixed $M_h$ at $z\sim1$, 
+$\sigma_{\log\,M_*}(M_h; z=1) = 0.2$ dex. This initial condition determines
+the initial SHAM $M_*$ at $z\sim1$ that initializes our models and is motivated
+by constraints on the observed 
+SHMR~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}. However, 
+these $\sigma_{\log\,M_*}(M_h; z=1)$ constraints are derived using halo models 
+in which $\sigma_{\log\,M_*}(z = 1)$ is a constant, independent of $M_h$. 
+For these models, the constraining power mainly come from massive halos. 
+Hence, the $0.2$ dex constraint does not accurately reflect $\sigma_{\log\,M_*}(z\sim1)$ 
+for less massive halos ($M_h < 10^{12}M_\odot$). 
+Later in this paper we focus on $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$ 
+predicted by our models. We therefore examine the impact of varying 
+$\sigma_{\log\,M_*}(z\sim1)$ on $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$ 
+by introducing models with $\sigma_{\log\,M_*}(M_h; z=1) = 0.35$ and 0.45 dex. 
+Our choice is based on the $z=1$ SHMR in the Illustris TNG~\citep{pillepich2018} 
+cosmological hydrodynamic simulation, which has $\sigma_{\log\,M_*}(z\sim1)$ 
+spanning $0.4$ to $0.2$ dex for $M_h = 10^{10.5}M_\odot$ to $10^{11.5}M_\odot$.}
 
-
-With the evolved SFRs and $M_*$ of SF centrals, we can compare our model 
-to observed galaxy population statistics (quiescent fraction 
-and SMF) to constrain its free parameters. Our model, run with these 
-inferred parameters, can then be compared to observations of the galaxy-halo 
-connection such as the SHMR. In the following section, we present this 
-comparison and the constraints we derive on the role and timescale of 
-star formation variability in SF central galaxies.
+\edt{All of the models we present in this section track the SFRs and $M_*$ of SF 
+central galaxies. We can compare these properties of our model galaxies 
+to observed galaxy population statistics (quiescent fraction and SMF) to 
+constrain the model free parameters.} 
+Our models, run with these inferred 
+parameters, can then be compared to observations of the galaxy-halo connection 
+such as the SHMR. In the following section, we present this comparison and 
+the constraints we derive on the role and timescale of star formation 
+variability in SF central galaxies.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Figure 4 
