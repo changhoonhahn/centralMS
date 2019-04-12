@@ -117,6 +117,10 @@ Brinchmann, J., Charlot, S., White, S. D.~M., {et~al.} 2004, Monthly Notices of
 Bundy, K., Ellis, R.~S., Conselice, C.~J., {et~al.} 2006, The Astrophysical
   Journal, 651, 120, \dodoi{10.1086/507456}
 
+\bibitem[{Calderon {et~al.}(2018)Calderon, Berlind, \& Sinha}]{calderon2018}
+Calderon, V.~F., Berlind, A.~A., \& Sinha, M. 2018, Monthly Notices of the
+  Royal Astronomical Society, 480, 2031, \dodoi{10.1093/mnras/sty2000}
+
 \bibitem[{Cameron \& Pettitt(2012)}]{cameron2012}
 Cameron, E., \& Pettitt, A.~N. 2012, Monthly Notices of the Royal Astronomical
   Society, 425, 44, \dodoi{10.1111/j.1365-2966.2012.21371.x}
@@ -197,6 +201,11 @@ Conroy, C., Prada, F., Newman, J.~A., {et~al.} 2007, The Astrophysical Journal,
 \bibitem[{Croton {et~al.}(2007)Croton, Gao, \& White}]{croton2007}
 Croton, D.~J., Gao, L., \& White, S. D.~M. 2007, Monthly Notices of the Royal
   Astronomical Society, 374, 1303, \dodoi{10.1111/j.1365-2966.2006.11230.x}
+
+\bibitem[{Croton {et~al.}(2016)Croton, Stevens, Tonini, Garel, Bernyk, Bibiano,
+  Hodkinson, Mutch, Poole, \& Shattow}]{croton2016}
+Croton, D.~J., Stevens, A. R.~H., Tonini, C., {et~al.} 2016, The Astrophysical
+  Journal Supplement Series, 222, 22, \dodoi{10.3847/0067-0049/222/2/22}
 
 \bibitem[{Daddi {et~al.}(2007)Daddi, Dickinson, Morrison, Chary, Cimatti,
   Elbaz, Frayer, Renzini, Pope, Alexander, Bauer, Giavalisco, Huynh, Kurk, \&
@@ -420,11 +429,10 @@ Mandelbaum, R., Seljak, U., Kauffmann, G., Hirata, C.~M., \& Brinkmann, J.
 Marchesini, D., {van Dokkum}, P.~G., F\"orster~Schreiber, N.~M., {et~al.} 2009,
   The Astrophysical Journal, 701, 1765, \dodoi{10.1088/0004-637X/701/2/1765}
 
-\bibitem[{McAlpine {et~al.}(2016)McAlpine, Helly, Schaller, Trayford, Qu,
-  Furlong, Bower, Crain, Schaye, Theuns, Dalla~Vecchia, Frenk, McCarthy,
-  Jenkins, {Rosas-Guevara}, White, Baes, Camps, \& Lemson}]{mcalpine2016}
-McAlpine, S., Helly, J.~C., Schaller, M., {et~al.} 2016, Astronomy and
-  Computing, 15, 72, \dodoi{10.1016/j.ascom.2016.02.004}
+\bibitem[{Matthee {et~al.}(2017)Matthee, Schaye, Crain, Schaller, Bower, \&
+  Theuns}]{matthee2017}
+Matthee, J., Schaye, J., Crain, R.~A., {et~al.} 2017, Monthly Notices of the
+  Royal Astronomical Society, 465, 2381, \dodoi{10.1093/mnras/stw2884}
 
 \bibitem[{Mitra {et~al.}(2015)Mitra, Dav\'e, \& Finlator}]{mitra2015}
 Mitra, S., Dav\'e, R., \& Finlator, K. 2015, Monthly Notices of the Royal

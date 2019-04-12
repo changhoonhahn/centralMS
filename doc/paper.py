@@ -840,10 +840,11 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     iters = [14 for i in range(len(tduties))] # iterations of ABC
     nparticles = [1000, 1000, 1000, 1000, 1000]
     # sigma_logM* constraints from literature 
-    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2013)', 'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
-    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.21, 0.22, 0.2275, 0.33][::-1]
-    lit_siglogMs_upper = [0.26, 0.206+0.031, 0.235, 0.27, 0.24, 0.21, 0.30][::-1]
-    lit_siglogMs_lower = [0.07, 0.206-0.031, 0.185, 0.15, 0.20, 0.245, 0.36][::-1]
+    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2013)', 
+            'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
+    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.18, 0.22, 0.2275,0.33][::-1]
+    lit_siglogMs_upper =  [0.26, 0.206+0.031, 0.235, 0.19, 0.24, 0.21, 0.30][::-1]
+    lit_siglogMs_lower =  [0.07, 0.206-0.031, 0.185, 0.16, 0.20, 0.245, 0.36][::-1]
 
     # calculate the scatters from the ABC posteriors 
     smhmr = Obvs.Smhmr()
@@ -903,7 +904,7 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     # abc posteriors 
     abs_post = sub2.fill_between(tduties, sigMs[3,:], sigMs[4,:], color='C0', alpha=0.1, linewidth=0)
     sub2.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C0', alpha=0.5, linewidth=0,
-            label='Hahn+(2018) posteriors') 
+            label='Hahn+(2019) posteriors') 
     sim_plts = [] 
     # hydro sims
     sim_plt = sub2.fill_between(np.linspace(0., 10., 100), np.repeat(0.16, 100), np.repeat(0.22, 100), 
@@ -915,13 +916,19 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     sim_plts.append(sim_plt) 
     # universe machine
     sub2.plot(np.linspace(0., 10., 100), np.repeat(0.28, 100), c='k', ls='--')
-    sub2.text(0.975, 0.59, 'Universe Machine', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
-    
+    sub2.text(0.975, 0.59, 'UniverseMachine', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
+    # Abramson+(2016)
+    sim_plt = sub2.plot(np.linspace(0., 10., 100), np.repeat(0.33, 100), c='k', ls=':')
+    #sim_plts.append(sim_plt) 
+    r = Rectangle((0.55, 0.315), 2.2, 0.0125, linewidth=0., fc='white') 
+    plt.gca().add_patch(r)
+    sub2.text(0.025, 0.76, 'Abramson+(2016)w/AM', ha='left', va='top', transform=sub2.transAxes, fontsize=12)
+
     sub2.text(0.5, 0.3, 'hydro. sims', ha='center', va='center', transform=sub2.transAxes, fontsize=15)
     r = Rectangle((1.4, 0.183), 2.125, 0.017, linewidth=0., fc='white') 
     plt.gca().add_patch(r)
-    sub2.text(0.5, 0.78, 'semi-analytic models', ha='center', va='center', transform=sub2.transAxes, fontsize=15)
-    r = Rectangle((1., 0.325), 3.9, 0.018, linewidth=0., fc='white') 
+    sub2.text(0.5, 0.825, 'semi-analytic models', ha='center', va='center', transform=sub2.transAxes, fontsize=15)
+    r = Rectangle((1., 0.34), 3.9, 0.018, linewidth=0., fc='white') 
     plt.gca().add_patch(r)
     sub2.legend(loc=(0.2, 0.025), handletextpad=0.4, frameon=False, fontsize=15) 
     sub2.set_xlim([0.5, 10.]) # x-axis
@@ -1190,10 +1197,11 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     # Leauthaud et al. (2012) all galaxies 0.2 < z < 0.48 (COSMOS)
     # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
     # Zu & Mandelbaum (2015) SDSS constraints on iHOD parameters
-    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2013)', 'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
-    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.21, 0.22, 0.2275, 0.33][::-1]
-    lit_siglogMs_upper = [0.26, 0.206+0.031, 0.235, 0.27, 0.24, 0.21, 0.30][::-1]
-    lit_siglogMs_lower = [0.07, 0.206-0.031, 0.185, 0.15, 0.20, 0.245, 0.36][::-1]
+    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2017)', 
+            'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
+    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.18, 0.22, 0.2275,0.33][::-1]
+    lit_siglogMs_upper =  [0.26, 0.206+0.031, 0.235, 0.19, 0.24, 0.21, 0.30][::-1]
+    lit_siglogMs_lower =  [0.07, 0.206-0.031, 0.185, 0.16, 0.20, 0.245, 0.36][::-1]
 
     # make figure 
     fig = plt.figure(figsize=(10,5)) 
@@ -1296,13 +1304,12 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sim_plts.append(sim_plt) 
     # universe machine
     sub2.plot(np.linspace(0., 10., 100), np.repeat(0.28, 100), c='k', ls='--')
-    sub2.text(0.975, 0.59, 'Universe Machine', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
+    sub2.text(0.975, 0.59, 'UniverseMachine', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
     # Abramson+(2016)
-    sim_plt = sub2.plot(np.linspace(0., 10., 100), np.repeat(0.33, 100), c='k', ls=':')
-    #sim_plts.append(sim_plt) 
-    r = Rectangle((2.08, 0.335), 7.5, 0.0125, linewidth=0., fc='white') 
-    plt.gca().add_patch(r)
-    sub2.text(0.975, 0.825, 'Abramson+(2016)w/AM', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
+    #sim_plt = sub2.plot(np.linspace(0., 10., 100), np.repeat(0.33, 100), c='k', ls=':')
+    #r = Rectangle((2.08, 0.335), 7.5, 0.0125, linewidth=0., fc='white') 
+    #plt.gca().add_patch(r)
+    #sub2.text(0.975, 0.825, 'Abramson+(2016)w/AM', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
 
     leg1 = sub2.legend(sim_plts, ['hydro. sims', 'semi-analytic'], 
             loc='lower right', handletextpad=0.5, prop={'size': 15})
@@ -1597,27 +1604,35 @@ def SHMRscatter_tduty_abias_z1sigma(Mhalo=12, dMhalo=0.5):
 
             if siglogM == 0.35: 
                 sub1.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C'+str(i_a), alpha=0.5, linewidth=0) 
-                sub1.fill_between([0.1, 11.], [0.3, 0.3], [0.36, 0.36], facecolor='none', hatch='...', edgecolor='k', linewidth=0.)
+                sim_plt = sub1.fill_between([0.1, 11.], [0.3, 0.3], [0.36, 0.36], facecolor='none', hatch='...', edgecolor='k', linewidth=0.)
             elif siglogM == 0.45: 
                 sub2.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C'+str(i_a), alpha=0.5, linewidth=0) 
                 sub2.fill_between([0.1, 11.], [0.3, 0.3], [0.36, 0.36], facecolor='none', hatch='...', edgecolor='k', linewidth=0.)
             print('sigma_logM*=%.2f; r=%.2f' % (siglogM, abias))  
             print('tduty=0.5, sigma_logM*=%f +/- %f, %f' % (sigMs[0,0], sigMs[2,0]-sigMs[0,0], sigMs[0,0]-sigMs[1,0]))
             print('tduty=10, sigma_logM*=%f +/- %f, %f' % (sigMs[0,-1], sigMs[2,-1]-sigMs[0,-1], sigMs[0,-1]-sigMs[1,-1])) 
-    sub1.text(0.95, 0.05, r'$\sigma_{\log~M_*}(z\sim1) = 0.35$ dex', ha='right', va='bottom', 
-            transform=sub1.transAxes, fontsize=15)
+    sub1.text(0.95, 0.05, r'$\sigma_{\log M_*}(z\sim1) = 0.35$ dex', ha='right', va='bottom', 
+            transform=sub1.transAxes, fontsize=20)
     sub1.set_xlim(0.5, 10.) # x-axis
     sub1.set_xscale('log') 
     sub1.set_ylabel(r'$\sigma_{\log M_*} \Big(M_{h} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=25) # y-axis
     sub1.set_ylim(0.1, 0.4) 
     sub1.set_yticks([0.1, 0.2, 0.3, 0.4])#, 0.6]) 
+    sub1.legend([sim_plt], ['Cao+(2019)'], loc=(0.425, 0.15), handletextpad=0.4, prop={'size': 18})
     
-    sub2.text(0.95, 0.05, r'$\sigma_{\log M_*}(z\sim1) = 0.45$ dex', ha='right', va='bottom',
-            transform=sub2.transAxes, fontsize=15)
-    sub2.set_xlim(0.5, 10.) # x-axis
+    # right panel: x,y axis
+    sub2.set_xlim(0.5, 10.) 
     sub2.set_xscale('log') 
     sub2.set_ylim(0.1, 0.4) 
-    sub2.set_yticks([0.1, 0.2, 0.3, 0.4])#, 0.6]) 
+    sub2.set_yticks([0.1, 0.2, 0.3, 0.4])
+    # right panel: legends  
+    abc_post1 = sub2.fill_between([0], [0], [0.1], color='C0', label='$r=0$')
+    abc_post2 = sub2.fill_between([0], [0], [0.1], color='C1', label='$r=0.5$') 
+    abc_post3 = sub2.fill_between([0], [0], [0.1], color='C2', label='$r=0.99$') 
+    leg2 = sub2.legend(loc=(0.52, 0.15), handletextpad=0.4, frameon=False, fontsize=18) 
+   
+    sub2.text(0.95, 0.05, r'$\sigma_{\log M_*}(z\sim1) = 0.45$ dex', ha='right', va='bottom', 
+            transform=sub2.transAxes, fontsize=20)
 
     bkgd = fig.add_subplot(111, frameon=False)
     bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
