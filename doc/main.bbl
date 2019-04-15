@@ -590,6 +590,23 @@ Sunayama, T., Hearin, A.~P., Padmanabhan, N., \& Leauthaud, A. 2016, Monthly
 {Taghizadeh-Popp}, M., Fall, S.~M., White, R.~L., \& Szalay, A.~S. 2015, The
   Astrophysical Journal, 801, 14, \dodoi{10.1088/0004-637X/801/1/14}
 
+\bibitem[{Tamura {et~al.}(2016)Tamura, Takato, Shimono, Moritani, Yabe,
+  Ishizuka, Ueda, Kamata, Aghazarian, Arnouts, Barban, Barkhouser, Borges,
+  Braun, Carr, Chabaud, Chang, Chen, Chiba, Chou, Chu, Cohen, {de Almeida}, {de
+  Oliveira}, {de Oliveira}, Dekany, Dohlen, {dos Santos}, {dos Santos}, Ellis,
+  Fabricius, Ferrand, Ferreira, Golebiowski, Greene, Gross, Gunn, Hammond,
+  Harding, Hart, Heckman, Hirata, Ho, Hope, Hovland, Hsu, Hu, Huang, Jaquet,
+  Jing, Karr, Kimura, King, Komatsu, Le~Brun, Le~F\`evre, Le~Fur, Le~Mignant,
+  Ling, Loomis, Lupton, Madec, Mao, Marrara, {Mendes de Oliveira}, Minowa,
+  Morantz, Murayama, Murray, Ohyama, Orndorff, Pascal, Pereira, Reiley,
+  Reinecke, Ritter, Roberts, Schwochert, Seiffert, Smee, Sodre, Spergel,
+  Steinkraus, Strauss, Surace, Suto, Suzuki, Swinbank, Tait, Takada, Tamura,
+  Tanaka, Tresse, Verducci, Vibert, Vidal, Wang, Wen, Yan, \&
+  Yasuda}]{tamura2016}
+Tamura, N., Takato, N., Shimono, A., {et~al.} 2016, in Ground-Based and
+  {{Airborne Instrumentation}} for {{Astronomy VI}}, Vol. 9908, eprint:
+  arXiv:1608.01075, 99081M
+
 \bibitem[{Taylor {et~al.}(2009)Taylor, Franx, {van Dokkum}, Bell, Brammer,
   Rudnick, Wuyts, Gawiser, Lira, Urry, \& Rix}]{taylor2009}
 Taylor, E.~N., Franx, M., {van Dokkum}, P.~G., {et~al.} 2009, The Astrophysical
@@ -616,9 +633,17 @@ Tinker, J.~L., Hahn, C., Mao, Y.-Y., Wetzel, A.~R., \& Conroy, C.
 Tinker, J.~L., Leauthaud, A., Bundy, K., {et~al.} 2013, The Astrophysical
   Journal, 778, 93, \dodoi{10.1088/0004-637X/778/2/93}
 
-\bibitem[{Tinker {et~al.}(2017)Tinker, Wetzel, Conroy, \& Mao}]{tinker2017b}
-Tinker, J.~L., Wetzel, A.~R., Conroy, C., \& Mao, Y.-Y. 2017, Monthly Notices
-  of the Royal Astronomical Society, 472, 2504, \dodoi{10.1093/mnras/stx2066}
+\bibitem[{Tinker {et~al.}(2017{\natexlab{a}})Tinker, Wetzel, Conroy, \&
+  Mao}]{tinker2017b}
+Tinker, J.~L., Wetzel, A.~R., Conroy, C., \& Mao, Y.-Y. 2017{\natexlab{a}},
+  Monthly Notices of the Royal Astronomical Society, 472, 2504,
+  \dodoi{10.1093/mnras/stx2066}
+
+\bibitem[{Tinker {et~al.}(2017{\natexlab{b}})Tinker, Brownstein, Guo,
+  Leauthaud, Maraston, Masters, {Montero-Dorta}, Thomas, Tojeiro, Weiner,
+  Zehavi, \& Olmstead}]{tinker2017}
+Tinker, J.~L., Brownstein, J.~R., Guo, H., {et~al.} 2017{\natexlab{b}}, The
+  Astrophysical Journal, 839, 121, \dodoi{10.3847/1538-4357/aa6845}
 
 \bibitem[{Tojeiro {et~al.}(2009)Tojeiro, Wilkins, Heavens, Panter, \&
   Jimenez}]{tojeiro2009}
