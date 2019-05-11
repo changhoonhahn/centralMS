@@ -61,30 +61,33 @@
 \affil{Department of Physics, University of California, Davis, CA USA}
 
 \begin{abstract}
-    We measure the timescale of star formation variability and the connection
-    between star formation and host halo accretion histories of star-forming
+    We present constraints on the timescale of star formation variability and the 
+    correlation between star formation and host halo accretion histories of star-forming
     central galaxies. Star-forming galaxies are found to have a tight relationship
     between their star formation rates and stellar masses on the so-called ``star-forming
     sequence'' (SFS), which characterizes both their star formation histories and
     stellar mass growths. Meanwhile, observed constraints on the stellar-to-halo
     mass relation (SHMR) connect stellar mass growth to host halo halo accretion
     history. Combining these observed trends with a high-resolution cosmological
-    $N$-body simulation, we present a flexible model that tracks the star formation,
+    $N$-body simulation, we present flexible models that track the star formation,
     stellar mass, and host halo accretion histories of star-forming central galaxies
     over $z < 1$. We then compare this model to the observed stellar mass function
     and SFS of central galaxies in SDSS Data Release 7 to find that the scatter
     in SHMR at $M_h{=}10^{12}M_\odot$, $\sigma_{\log M_*}$, is sensitive to the
-    timescale of star formation variability, $t_{\rm duty}$. Variations on shorter
-    timescales produce tighter $\sigma_{\log M_*}$. Stronger correlation between
-    star formation and host halo accretion histories (higher correlation coefficient $r$) also
-    produce tighter scatter in the SHMR. To reproduce $\sigma_{\log M_*}(M_h=10^{12}M_\odot) \sim 0.2$ dex
-    from many halo model based observational constraints and hydrodynamic simulations,
-    we find that a correlation of $r > 0.5$ and $t_{\rm duty} \leq 1$ Gyr is necessary.
-    For $r \sim 0.6$ constraints found in the literature, $t_{\rm duty} < 0.5$ Gyr
-    is necessary. The lack of consensus among observations and galaxy formation model,
+    timescale of star formation variability, $t_{\rm duty}$, and the correlation 
+    coefficient, $r$, between star formation and host halo accretion histories. 
+    Variations on shorter timescales produce tighter $\sigma_{\log M_*}$; higher 
+    $r$ also produce tighter scatter in the SHMR. We find that a correlation of 
+    $r > 0.5$ and $t_{\rm duty} \leq 1$ Gyr is necessary to reproduce the constant 
+    $\sigma_{\log M_*} \sim 0.2$ dex over $z=1$ to 0, as found in halo model based 
+    observational constraints and hydrodynamic simulations. For $r \sim 0.6$ 
+    constraints found in the literature, $t_{\rm duty} < 0.5$ Gyr is necessary. 
+    \ch{need a sentence on the higher and decreasing $\siglogm(z\sim1)$ and what 
+    that tells us.}
+    The lack of consensus among observations and galaxy formation model,
     however, remains the primary bottleneck in precisely constraining $r$ and
-    $t_\mathrm{duty}$. Nevertheless, we demonstrate that SHMR constraints can be used
-    to constrain the timescale of star formation variability and the correlation
+    $t_\mathrm{duty}$. Nevertheless, we demonstrate that SHMR can be used to 
+/bin/bash: x: command not found
     between star formation and halo accretion history.
 \end{abstract}
 \keywords{methods: numerical -- galaxies: evolution -- galaxies: haloes --
@@ -201,24 +204,53 @@ Type II supernova feedback can change the burstiness of SFHs.
 early feedback from young stars would also produce small scale star
 formation variability.
 
-\ch{paragraph on sigma measurements and how empirical models can help probe that at low halo masses} 
+\edt{In this paper, we construct empirical models to investigate the timescale
+of star formation varability and the connection between SFH and host halo
+accretion history of SF central galaxies. 
+Central galaxies constitute the majority of massive galaxies ($M_*>10^{9.5}M_\sun$) 
+at $z\sim0$~\citep{wetzel2013} and their SFHs are not influenced by 
+environmentally-driven external mechanisms such as ram pressure 
+stripping~\citep{gunn1972,bekki2009}, strangulation~\citep{larson1980, peng2015}, or 
+harassment~\citep{moore1998} that impact SFHs of satellites. 
+}
+Using a similar approach as \cite{wetzel2013, hahn2017b}, we present models
+that combine a high resolution cosmological $N$-body simulation with
+observed evolutionary trends of the SFS. They statistically track the 
+star formation, stellar mass, and host halo assembly histories of SF central 
+galaxies over $z\sim1$ to $0$. Comparing predictions of our empirical models 
+to properties of observed galaxies and observational constraints on the SHMR 
+allows us to constrain the timescale of star formation variability and the 
+correlation between SFH and host halo assembly history. 
+\edt{More specifically, we present the constraints derived from the observed 
+tight scatter of the SHMR, $\siglogm\sim0.2$ dex, and its lack of evolution 
+over $z\sim1$ to $0$ as found in halo model analyses mentioned earlier. These 
+halo model analyses, however, mainly constrain $\siglogm$ at high halo masses 
+($M_h > 10^{12}M_\odot$). At lower halo masses, there is no clear consensus 
+among observational constraints. However, in the recent \cao analysis, they find, 
+using a more direct measurement, larger scatter $\siglogm(M_h\sim 10^{12} M_\odot) \sim 0.3$ 
+dex from observations. They also find that in the Illustris TNG~\citep{pillepich2018} 
+hydrodynamic simulation, $\siglogm(M_h\sim 10^{12} M_\odot)$ decreases from 
+$z=1$ to $0$. We, therefore, also present the timescale of star formation variability 
+and the correlation between SFH and host halo assembly history for larger 
+$\siglogm$ that decreases over cosmic time. 
+}
 
-In this paper, we construct an empirical model of SF central galaxies,
-the timescale of star formation variability in their
-SFH, and the connection between their SFH and host halo accretion history.
-We focus on central galaxies since the SFHs of satellites are influenced
-by environmentally-driven external mechanisms such as ram pressure
-stripping~\citep{gunn1972,bekki2009}, strangulation~\citep{larson1980, peng2015},
-or harassment~\citep{moore1998}. Moreover, centrals constitute the majority
-of massive galaxies ($M_*>10^{9.5}M_\sun$) at $z\sim0$~\citep{wetzel2013}.
-Using a similar approach as \cite{wetzel2013, hahn2017b}, we present a model
-that combines a high resolution cosmological $N$-body simulation with
-observed evolutionary trends of the SFS. Our model statistically tracks
-the star formation, stellar mass, and host halo assembly histories of SF
-central galaxies over $z\sim1$ to $0$. By comparing predictions of this empirical
-model to observations, in particular measurements of the scatter in the
-SHMR, we constrain the timescale of star formation variability and also
-the correlation between SFH and host halo assembly history.
+%In this paper, we construct an empirical model of SF central galaxies,
+%the timescale of star formation variability in their
+%SFH, and the connection between their SFH and host halo accretion history.
+%We focus on central galaxies since the SFHs of satellites are influenced
+%by environmentally-driven external mechanisms such as ram pressure
+%stripping~\citep{gunn1972,bekki2009}, strangulation~\citep{larson1980, peng2015},
+%or harassment~\citep{moore1998}. Moreover, centrals constitute the majority
+%of massive galaxies ($M_*>10^{9.5}M_\sun$) at $z\sim0$~\citep{wetzel2013}.
+%Using a similar approach as \cite{wetzel2013, hahn2017b}, we present a model
+%that combines a high resolution cosmological $N$-body simulation with
+%observed evolutionary trends of the SFS. Our model statistically tracks
+%the star formation, stellar mass, and host halo assembly histories of SF
+%central galaxies over $z\sim1$ to $0$. By comparing predictions of this empirical
+%model to observations, in particular measurements of the scatter in the
+%SHMR, we constrain the timescale of star formation variability and also
+%the correlation between SFH and host halo assembly history.
 
 In Section~\ref{sec:sdss} we describe the $z\approx0$ central galaxy
 sample that we construct from SDSS Data Release 7. Then in
@@ -1158,9 +1190,10 @@ $\sigma_{\log\,M_*}(z\sim1)$ a shorter duty cycle timescale and stronger
 assembly bias produce tighter $\sigma_{\log\,M_*}(z\sim0)$. In our
 $\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex models, a short $\tduty$ alone can
 significantly decrease the scatter in the SHMR from $z=1$ to 0. For
-$\tduty=0.5$ Gyr $\sigma_{\log\,M_*}$ decreases by 0.5 dex. With
+$\tduty=0.5$ Gyr, $\sigma_{\log\,M_*}$ decreases by 0.5 dex. With
 $\tduty=0.5$ Gyr and $r > 0.5$, $\sigma_{\log\,M_*}$ decreases by 1 dex.
 }
+\ch{say something more quantitative using Illustris TNG values} 
 
 % For the $r=0$ model with no assembly bias, $\sigma_{\log\,M_*} = \substack{+0.013\\-0.005}$ for $t_{\rm duty} = 0.5$ and $10$ Gyr, respectively.  Meanwhile, for $r = 0.99$ our models predict $\sigma_{\log\,M_*} =\substack{+0.013\\-0.005}$ for $t_{\rm duty} = 0.5$ and $10$ Gyr, respectively.
 \edt{
