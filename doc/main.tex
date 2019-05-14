@@ -84,11 +84,10 @@
     constraints found in the literature, $t_{\rm duty} < 0.5$ Gyr is necessary. 
     \ch{need a sentence on the higher and decreasing $\siglogm(z\sim1)$ and what 
     that tells us.}
-    The lack of consensus among observations and galaxy formation model,
+    The lack of consensus among the SHMRs of observations and galaxy formation models,
     however, remains the primary bottleneck in precisely constraining $r$ and
     $t_\mathrm{duty}$. Nevertheless, we demonstrate that SHMR can be used to 
-/bin/bash: x: command not found
-    between star formation and halo accretion history.
+    constrain star formation and halo accretion histories.
 \end{abstract}
 \keywords{methods: numerical -- galaxies: evolution -- galaxies: haloes --
 galaxies: star formation -- galaxies: groups: general -- cosmology: observations.}
@@ -1157,43 +1156,39 @@ predictions for the scatter in SHMR at $z=0$.
 
 \subsection{\edt{Models with  $\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex}}
 \edt{
-The SHMR scatter at $z\sim1$, $\sigma_{\log\,M_*}(z\sim1) = 0.2$ dex, we
-use to determine the initial SHAM $M_*$ at $z\sim1$ (Section~\ref{sec:sfcen})
-is based on observations~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}.
-However, these $z\sim1$ constraints are derived from some halo model where
-much of the constraining power come from massive halos. Hence, the $0.2$ dex
-does not {\em necessarily} reflect $\sigma_{\log\,M_*}(z\sim1)$ at low
-$M_h < 10^{12}M_\odot$. We therefore use models with
-$\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex and examine their predicted
-$\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$.
-Motivated by the $z=1$ SHMR in the Illustris TNG, which has
-$\sigma_{\log\,M_*}(z\sim1)$ spanning $0.4$ to $0.2$ dex for $M_h = 10^{10.5}M_\odot$
-to $10^{11.5}M_\odot$, we repeat our analysis using models with
-$\sigma_{\log\,M_*}(z\sim1) = 0.35$ and 0.45 dex and $r=0$, 0.5,
-and 0.99.
+The SHMR scatter at $z\sim1$ we use to determine the initial SHAM $M_*$ of our models 
+at $z\sim1$ ($\sigma_{\log\,M_*}(z\sim1) = 0.2$ dex, Section~\ref{sec:sfcen}) is based on 
+observations~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}. These $z\sim1$ 
+constraints, however, like the $z\sim0$ ones, are derived from some halo model where 
+much of the constraining power come from massive halos. $0.2$ dex does not {\em necessarily} 
+reflect $\sigma_{\log\,M_*}(z\sim1)$ at low $M_h < 10^{12}M_\odot$. Hence, we explore 
+below the impact of this initial condition on our results using models with 
+$\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex and examining their predicted $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$. 
+Motivated by the $z=1$ SHMR of the Illustris TNG, which has $\sigma_{\log\,M_*}(z\sim1)$ 
+spanning $0.44$ to $0.3$ dex for $M_h = 10^{11.5}M_\odot$ to $10^{12}M_\odot$ (Cao et al. 
+in preperation), we repeat our analysis using models with $\sigma_{\log\,M_*}(z\sim1) = 0.35$ 
+and 0.45 dex and $r=0$, 0.5, and 0.99.
 }
 
 \edt{
-We present the $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$
-predictions made by these models as a function of $\tduty$ in
-Figure~\ref{fig:sM_duty_abias_z1}. Increasing $\sigma_{\log\,M_*}(z\sim1)$
-to 0.35 and 0.45 dex significantly increases $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$
-for all $\tduty$ and $r$.
-With $\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex, our models can reproduce
-the \cao~$\sigma_{\log\,M_*}\sim 0.3$ dex constraint (dotted) and predictions
-from SAMs for a broad range of $r$ and $\tduty$ values. Meanwhile, our
-$\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex models even with $\tduty = 0.5$ Gyr
-and $r=0.99$ struggle to reproduce the 0.2 dex constraints from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015}
+We present the $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$ predictions made by 
+the $\sigma_{\log\,M_*}(z\sim1) = 0.35$ (left) and 0.45 dex (right) models as a 
+function of $\tduty$ in Figure~\ref{fig:sM_duty_abias_z1}. Increasing 
+$\sigma_{\log\,M_*}(z\sim1)$ significantly increases $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$ 
+for all $\tduty$ and $r$. With $\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex, our models 
+can reproduce the \cao~$\sigma_{\log\,M_*}\sim 0.3$ dex constraint (dotted) and 
+predictions from SAMs for a broad range of $r$ and $\tduty$ values. Regardless of 
+$\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex, a shorter duty cycle timescale and stronger
+assembly bias produce tighter $\sigma_{\log\,M_*}(z\sim0)$. In fact, with shorter 
+$\tduty$, the SHMR scatter in our models significantly decrease from $z=1$ to 0. 
+For $\tduty=0.5$ Gyr, $\sigma_{\log\,M_*}$ 
+decreases by $\sim0.05$ dex. With $\tduty=0.5$ Gyr and $r > 0.5$, $\sigma_{\log\,M_*}$ 
+decreases by $\sim0.1$ dex --- comparable to the decrease in $\siglogm(M_h=10^{12}M_\odot)$
+found in Illustris TNG (Cao et al. in preparation). However, even with 
+$\tduty = 0.5$ Gyr and $r=0.99$, our $\sigma_{\log\,M_*}(z\sim1) = 0.35$ and 0.45 dex
+models struggle to reproduce the 0.2 dex scatter at $z=0$ from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} 
 and hydrodynamical simulations.
-Figure~\ref{fig:sM_duty_abias_z1} also demonstrate that regardless of
-$\sigma_{\log\,M_*}(z\sim1)$ a shorter duty cycle timescale and stronger
-assembly bias produce tighter $\sigma_{\log\,M_*}(z\sim0)$. In our
-$\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex models, a short $\tduty$ alone can
-significantly decrease the scatter in the SHMR from $z=1$ to 0. For
-$\tduty=0.5$ Gyr, $\sigma_{\log\,M_*}$ decreases by 0.5 dex. With
-$\tduty=0.5$ Gyr and $r > 0.5$, $\sigma_{\log\,M_*}$ decreases by 1 dex.
 }
-\ch{say something more quantitative using Illustris TNG values} 
 
 % For the $r=0$ model with no assembly bias, $\sigma_{\log\,M_*} = \substack{+0.013\\-0.005}$ for $t_{\rm duty} = 0.5$ and $10$ Gyr, respectively.  Meanwhile, for $r = 0.99$ our models predict $\sigma_{\log\,M_*} =\substack{+0.013\\-0.005}$ for $t_{\rm duty} = 0.5$ and $10$ Gyr, respectively.
 \edt{
@@ -1206,10 +1201,8 @@ scatter in SHMR. Furthermore, this $\tduty$ and $r$ dependnece is independent of
 $\sigma_{\log~M_*}(z\sim1)$. The response of $\sigma_{\log~M_*}(M_h\sim10^{12}M_\odot; z=0)$
 to changes in $\tduty$ and $r$ illustrate the potential for the SHMR relation
 and it scatters in better understanding the SFH and assembly bias of SF central
-galaxies. The main obstacle is the lack of consensus among observations as well
-as simulations in the scatter of SHMR both at $z=0$ and $1$.
-A better consensus among observations will enable better constraints
-on $t_\mathrm{duty}$. \ch{fix this; clunky} 
+galaxies. The main obstacle is the lack of consensus among the SHMRs of observations 
+as well as simulations, both at $z=0$ and $1$. %A better consensus among observations will enable better constraints on $t_\mathrm{duty}$. \ch{fix this; clunky} 
 Upcoming surveys such as the Bright Galaxy Survey of the Dark
 Energy Spectroscopic Instrument~\citep[DESI;][]{desicollaboration2016}, which will
 observe $\sim$10 million galaxies down to the magnitude limit $r \sim 20$, will
