@@ -429,7 +429,7 @@ produces interpolated SMFs that monotonically increase over $z < 1$. As noted
 in \cite{hahn2017b}, at $z \approx 1$, the SMF interpolated between the
 \cite{li2009} and \cite{marchesini2009} SMFs is consistent with more recent
 measurements from \cite{muzzin2013} and \cite{ilbert2013}. We again apply a
-$0.2$ dex log-normal scatter in the SHAM based on observations~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}
+$\siglogm^{\rm init} = 0.2$ dex log-normal scatter in the SHAM based on observations~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}
 We next assign SFRs based on $z \sim 1$ observations in the literature.
 However, observations, not only use galaxy properties derived differently
 from the SDSS VAGC but they also find SFS with significant discrepancies
@@ -669,22 +669,21 @@ The SFHs in the middle and bottom panels illustrate this correlation and how
 $\Delta\logsfr(t)$ correlates more strongly with $\Delta M_h(t)$ for our model
 with higher $r$.
 
-\subsection{\edt{$\sigma_{\log\,M_*}$ at $z=1$}}
+\subsection{\edt{$\sigma_{\log\,M_*}$ at $z=1$}} \label{sec:siglogminit}
 \edt{So far in both our fiducial and assembly bias added models above, we make the
 assumption that the log-normal scatter in $M_*$ at fixed $M_h$ at $z\sim1$,
-$\sigma_{\log\,M_*}(M_h; z=1) = 0.2$ dex. This initial condition determines
+$\siglogm^{\rm init}(M_h) = 0.2$ dex. This initial condition determines
 the initial SHAM $M_*$ at $z\sim1$ that initializes our models and is motivated
-by constraints on the observed
-SHMR~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}. However,
-these $\sigma_{\log\,M_*}(M_h; z=1)$ constraints are derived using halo models
-in which $\sigma_{\log\,M_*}(z = 1)$ is a constant, independent of $M_h$.
+by constraints on the observed SHMR~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}. 
+However, these $\siglogm$ constraints are derived using halo models
+in which $\siglogm(M_h; z = 1)$ is a constant, independent of $M_h$.
 For these models, the constraining power mainly come from massive halos.
-Hence, the $0.2$ dex constraint does not accurately reflect $\sigma_{\log\,M_*}(z\sim1)$
+Hence, the $0.2$ dex constraint does not accurately reflect $\siglogm(z\sim1)$
 for less massive halos ($M_h < 10^{12}M_\odot$).
 Later in this paper we focus on $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$
 predicted by our models. We therefore examine the impact of varying
-$\sigma_{\log\,M_*}(z\sim1)$ on $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$
-by introducing models with $\sigma_{\log\,M_*}(M_h; z=1) = 0.35$ and 0.45 dex.
+$\siglogm^{\rm init}$ on $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$
+by introducing models with $\siglogm^{\rm init} = 0.35$ and 0.45 dex.
 Our choice is based on the $z=1$ SHMR in the Illustris TNG~\citep{pillepich2018}
 cosmological hydrodynamic simulation, which has $\sigma_{\log\,M_*}(z\sim1)$
 spanning $0.4$ to $0.2$ dex for $M_h = 10^{10.5}M_\odot$ to $10^{11.5}M_\odot$.}
@@ -806,109 +805,123 @@ further details.
 
 %\subsection{Timescale of the Star Formation Duty Cycle} \label{sec:sfdutycycle}
 \subsection{\edt{The Fiducial Model}} \label{sec:sfdutycycle}
-We present the SMFs (left), SFSs (center), and the scatter in $\log M_*$ at $M_h$,
-$\sigma_{\log\,M_*}(M_h)$, (right) of our
-\edt{fiducial}
-model run using SFHs with two different duty cycle timescales, $t_\mathrm{duty} = 10$ (red)
-and $1\,\mathrm{Gyr}$ (blue), in Figure~\ref{fig:abc_demo}. For each $\tduty$,
-we evaluate our fiducial model at the median parameter values of the respective
-posterior distributions derived using ABC. For both $\tduty$, our model
-successfully produces SMFs, $\Phi^{\rm SDSS}_{\rm SF,cen}$, and SFSs consistent
-with observations, as expected (left and center panels). Despite their consistency
-with observations, however, different $t_{\rm duty}$ of the models predict i
-significantly different $\sigma_{\log\,M_*}$, particularly below $M_h < 10^{12.5}M_\odot$.
-We further illustrate the sensitivity of $\sigma_{\log\,M_*}$ of our model to
-$\tduty$ in Figure~\ref{fig:sigMstar_duty}, where we present $\sigma_{\log\,M_*}$ at
-fixed halo mass $M_h = 10^{12} M_\odot$ for our model with $t_{\rm duty} = 0.5, 1, 2, 5$,
-and $10$ Gyr. As in Figure~\ref{fig:abc_demo}, $\sigma_{\log\,M_*}$ at each $t_{\rm duty}$
-is predicted from our model with parameters from the corresponding ABC posterior
-distribution. The dark and light blue shaded regions represents the $68\%$ and $95\%$
-confidence intervals. For $t_\mathrm{duty}$ ranging from $10$ to $0.5\,\mathrm{Gyr}$,
-$\sigma_{\log\,M_*}$ ranges from
-$0.32\substack{+0.02\\ -0.02}$ to $0.26\substack{+0.01\\-0.01}$
+We present the SMFs (left), SFSs (center), and 
+\edt{$\siglogm(M_h)$ (right) of our fiducial model run using SFHs with 
+$t_\mathrm{duty} = 10$ (red) and $1\,\mathrm{Gyr}$ (blue) duty cycle timescales 
+in Figure~\ref{fig:abc_demo}. $\siglogm(M_h)$ is the scatter in $\log M_*$ for 
+halos of a given $M_h$ --- \emph{i.e.} scatter in the SHMR.} For each $\tduty$,
+we evaluate our fiducial model using the median values of the posterior parameter 
+distributions derived from ABC. For both $\tduty$, our model successfully produces 
+SMFs, $\Phi^{\rm SDSS}_{\rm SF,cen}$, and SFSs consistent with observations (left 
+and center panels). Despite reproducing observations, however, with different 
+$t_{\rm duty}$ the fiducial model predicts significantly different $\siglogm$, 
+particularly below $M_h < 10^{12.5}M_\odot$. We further illustrate the sensitivity 
+of $\siglogm$ predicted by our model to $\tduty$ in Figure~\ref{fig:sigMstar_duty}, 
+where we present $\siglogm$ at fixed halo mass $M_h = 10^{12} M_\odot$ for our 
+model with $t_{\rm duty} = 0.5, 1, 2, 5$, and $10$ Gyr. $\siglogm$ at each $t_{\rm duty}$
+is the prediction from our model run using parameters from the corresponding ABC 
+posterior distributions. The dark and light blue shaded regions represents the 
+$68\%$ and $95\%$ confidence intervals. For $t_{\rm duty} = 10$ to $0.5\,\mathrm{Gyr}$,
+$\siglogm$ ranges from $0.32\substack{+0.02\\ -0.02}$ to $0.26\substack{+0.01\\-0.01}$
 --- a shorter star formation duty cycle timescale produces significantly
-smaller scatter in the SHMR. \emph{Observational constraints on the SHMR
-can therefore be used to constrain the timescale of star formation
-variability and SFH of SF central galaxies.}
+smaller scatter in the SHMR. 
+\edt{Hence, \emph{the SHMR, in particular $\siglogm$, can be used to probe the 
+star formation variability timescale and SFH of SF central galaxies.}}
+%\emph{Observational constraints on the SHMR can therefore be used to constrain the timescale of star formation variability and SFH of SF central galaxies.}
 
-On the left panel of Figure~\ref{fig:sigMstar_duty}, we compare
-$\sigma_{\log M_*}$ predicted from our fiducial model to observational
-constraints in the literature. These constraints are mainly derived from
-fitting halo-occupation based models to observations of galaxy
-clustering, SMF, satellite kinematics, or galaxy-galaxy weak lensing. In
-Figure~\ref{fig:sigMstar_duty}, we include $\sigma_{\log M_*}$ constraints
-from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} and
-Cao et al. (in preparation). \cite{more2011}, \cite{reddick2013}, and \cite{zu2015}
-fit SDSS DR7 measurements of satellite kinematics, projected galaxy clustering and
-conditional SMF, and, galaxy clustering and galaxy-galaxy
-lensing, repsectively. Meanwhile, \cite{leauthaud2012, tinker2013}
+On the left panel of Figure~\ref{fig:sigMstar_duty}, we compare $\siglogm$
+predictions from our fiducial model to observational constraints in the 
+literature. These constraints are mainly derived from fitting halo-occupation 
+based models to observations of galaxy clustering, SMF, satellite kinematics, 
+or galaxy-galaxy weak lensing. We include $\siglogm$ constraints 
+from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} and \cao. 
+\cite{more2011}, \cite{reddick2013}, and \cite{zu2015} fit SDSS DR7 measurements 
+of satellite kinematics, projected galaxy clustering and conditional SMF, and 
+galaxy clustering and galaxy-galaxy lensing, repsectively. Meanwhile,~\cite{leauthaud2012, tinker2013}
 use COSMOS to fit the SMF, galaxy clustering, and galaxy-galaxy lensing.
-Finally, Cao et al. (in preparation) fit the kurtosis of the line-of-sight
-pairwise velocity dispersion between central galaxies and all neighboring
-galaxies to constrain the scatter in SHMR at low halo masses. We note that
-\cite{leauthaud2012, reddick2013, zu2015} measure $\sigma_{\log M_*}$ for
-all central galaxies, not only SF. Both \cite{more2011, tinker2013},
-however, find a $< 1\sigma$ difference in $\sigma_{\log M_*}$ between SF
-and quiescent centrals, so we include these constraints in our comparison.
-We also include the \cite{lange2018a} constraint from fitting color-dependent
-conditional luminosity function and radial profile of satellite galaxies
-of SDSS DR7. We note that this constraint is on the scatter in luminosity,
-$\log L$, not $\log M_*$ at a given $M_h$.
+Finally, \cao fit the kurtosis of the line-of-sight pairwise velocity 
+dispersion between central galaxies and all neighboring galaxies to constrain 
+the scatter in SHMR at low halo masses. We also note that
+\cite{leauthaud2012, reddick2013, zu2015} measure $\siglogm$ for all central 
+galaxies, not only SF. Both \cite{more2011, tinker2013},
+however, find a $< 1\sigma$ difference in $\siglogm$ between SF and quiescent 
+centrals, so we include these constraints in our comparison. We also include 
+the \cite{lange2018a} constraint from fitting color-dependent conditional 
+luminosity function and radial profile of satellite galaxies of SDSS DR7. This 
+constraint, however, is on the scatter in luminosity, $\log L$, not $\log M_*$ 
+at a given $M_h$.
 
 %We find that by decreasing the timescale of stochasticity on a simple SFH model that traces the overall
 %SFS evolution does in fact decrease the scatter seen in the SMHMR.
 %The $\sigma_{\log\,M_h}$ constraints from the literature are significantly scatter from $0.12$ to $0.6\,\mathrm{dex}$, right panel of Figure~\ref{fig:sigMstar_duty}.  $\sigma_{\log\,M_h}$ from our model, regardless of $t_\mathrm{duty}$ is well within this range, so the comparison does not provide much constraint on $t_\mathrm{duty}$. On the other hand,
-\edt{Besides Cao et al. (in preparation), the $\sigma_{\log\,M_*}$ constraints
-in the literature are loosely consistent with $\sigma_{\log\,M_*} \sim 0.2$ dex.
-These constraints, however, are mostly derived using halo models that assume
-$\sigma_{\log\,M_*}$ is constant independent of $M_h$. The constraining power for
-these constraints mainly come from high mass halos and, thus, do not reflect
-$\sigma_{\log\,M_*}$ at $M_h=10^{12}M_\odot$}.
-While \cite{reddick2013} constrain $\sigma_{\log\,M_*}$ for different bins of
+
+\edt{Overall, observational constraints are more consistent with $\siglogm$ 
+predictions of our fiducial model with a short, $< 1$ Gyr, duty cycle timescale. 
+However, there is no clear consensus among the observed $\siglogm$ constraints. 
+Besides \cao, the $\siglogm$ constraints in the literature are loosely 
+consistent with $\sim 0.2$ dex. These constraints, however, are mostly derived 
+using halo models that assume $\siglogm$ is a constant, independent of $M_h$. 
+The constraining power for these constraints mainly come from high mass halos 
+and, thus, do not reflect $\siglogm$ at $M_h=10^{12}M_\odot$}.
+While \cite{reddick2013} constrain $\siglogm$ for different bins of
 $M_h$ over the range $10^{12} - 10^{14} M_\odot$, %and find little $M_h$ dependence in $\sigma_{\log\,M_*}$,
 their constraints mainly come from the conditional SMF and therefore relies on
 the accuracy of the \cite{tinker2011} group finder in identifying halo masses.
 \ch{JLT: Why does Reddick come from $10^{13} M_\odot$?} %Group finder based halo masses can over- or under-estiamte halo masses by an order of magnitude~\citep{old2014}.
 The constraint from \cite{lange2018a} is also derived from a halo model
-with $M_h$ dependence. However, as mentioned above, they constrain $\sigma_{\log\,L}$.
+with $M_h$ dependence. However, as mentioned above, they constrain $\sigma_{\log L}$.
 In \cite{more2011}, where they constrain both $\sigma_{\log\,L}$ and $\sigma_{\log\,M_*}$
-from the same data, they find
-$\sigma_{\log\,M_*} = 0.15\substack{+0.08\\ -0.11} < \sigma_{\log\,L} = 0.21\substack{+0.06\\ -0.04}$
-for blue centrals. However, translating from $\sigma_{\log\,L}$ to
-$\sigma_{\log\,M_*}$ is tenuous for different data sets and models. %Overlooking the varoius caveats of the analyses, $\sigma_{\log\,M_*}$ from Cao et al. (in preparation) is in tension with the other constraints.  \ch{JLT: sentence on the Cao et al. discrepancy?}.
+from the same sample, they find
+$\siglogm = 0.15\substack{+0.08\\ -0.11} < \sigma_{\log\,L} = 0.21\substack{+0.06\\ -0.04}$
+for blue centrals. Translating $\sigma_{\log\,L}$ to $\sigma_{\log\,M_*}$, however, 
+is tenuous for different data sets and models. %Overlooking the varoius caveats of the analyses, $\sigma_{\log\,M_*}$ from Cao et al. (in preparation) is in tension with the other constraints.  \ch{JLT: sentence on the Cao et al. discrepancy?}.
+\ch{sentence on why Cao et al constraint is better in this regard} 
 \edt{We also note observational constraints include significant measurement
 uncertainties in $M_*$. The intrinsic $\sigma_{\log\,M_*}$ of these constraints,
 \emph{i.e.} the scatter predicted by our model, will be lower. If we consider
 $0.1 - 0.2$ dex uncertainties in $M_*$~\citep{roediger2015}, the
 Cao et al. (in preparation) constraint, for instance, will be reduced from
-$\sigma_{\log\,M_*} = 0.33$ dex to $0.31 - 0.26$ dex. Overall, observational
-constraints favor a shorter, $< 2$ Gyr, duty cycle timescale for our fiducial
-model.}
+$\sigma_{\log\,M_*} = 0.33$ dex to $0.31 - 0.26$ dex. }
 
-In addition to the observational constraints, we also compare the $\sigma_{\log\,M_*}(M_h \sim 10^{12}M_\odot)$
+In addition to the observational constraints, we also compare the $\siglogm(M_h \sim 10^{12}M_\odot)$
 predicted by our model to predictions from modern galaxy formation models
 on the right panel: hydrodynamic simulations (dot filled), semi-analytic models
-(SAM; hatched), and an empirical model (dashed line). For the hydrodynamic simulations,
-the dotted region, $\sigma_{\log\,M_*} = 0.16 - 0.22$ dex, encompasses
+(SAM; hatched), and an empirical model (dashed line). For the hydrodynamic 
+simulations, the dotted region, $\siglogm = 0.16 - 0.22$ dex, encompasses
 predictions from EAGLE~\citep{matthee2017}, Massive Black II~\citep{khandai2015},
 and Illustris TNG, as compiled in Figure 8 of \cite{wechsler2018}.
-For the SAMs, the hatched region, $\sigma_{\log\,M_*} = 0.3 - 0.37$ dex,
-includes predictions from~\cite{lu2014, somerville2012}, and the SAGE\footnote{\url{https://tao.asvo.org.au/tao/}}
+For the SAMs, the hatched region, $\siglogm = 0.3 - 0.37$ dex, includes predictions 
+from~\cite{lu2014, somerville2012} and the SAGE\footnote{\url{https://tao.asvo.org.au/tao/}}
 model~\edt{\citep{croton2016}}. We also include the prediction from the
-\cite{behroozi2018} UM empirical model. $\sigma_{\log\,M_*}$ from SAMs are
-consistent with our model with $t_{\rm duty} \gtrsim 5$ Gyr. UM, which predicts
-a lower $\sigma_{\log\,M_*}$, is consistent with $t_{\rm duty} = 1 - 5$ Gyr.
-Lastly, hydrodynamic simulations predict the lowest $\sigma_{\log\,M_*}$ among
-the models
+\cite{behroozi2018} UM empirical model. 
+\edt{Similar to observations, there is little consensus among the $\siglogm$ 
+predictions of the galaxy formation models.} 
+$\siglogm$ from SAMs are consistent with our model with $t_{\rm duty} \gtrsim 5$ Gyr. 
+UM, which predicts a lower $\siglogm$, is consistent with $t_{\rm duty} = 1 - 5$ Gyr.
+Lastly, hydrodynamic simulations predict the lowest $\siglogm$ among the models
 \edt{with $\sim 0.2$ dex, which our fiducial model struggles to reproduce
-even with the shortest $t_{\rm duty}$ timescale that we consider.
-There is no consensus among the observational $\sigma_{\log\,M_*}$ constraints
-at $M_h \sim 10^{12} M_\odot$. However, at $M_h > 10^{12} M_\odot$ observations
-are in better agreement and {\em only} hydrodynamic simulations predict $\sigma_{\log\,M_*}$
-low enough to be consistent~\citep{wechsler2018}. To reproduce observational
+even with $t_{\rm duty} = 0.5$ Gyr}. 
+\edt{We note that while there is yet no consensus among the observational 
+$\siglogm$ constraints at $M_h \sim 10^{12} M_\odot$, at higher $M_h$ observations 
+are in better agreement and {\em only} hydrodynamic simulations predict $\siglogm$
+consistent with these observations~\citep{wechsler2018}. To reproduce observational
 constraints and predictions from hydrodynamic simulations, SF central galaxies
 in our fiducial model require star formation varability on short timescales,
 $\lesssim 1$ Gyr.}
+
+\edt{Given the little consensus among the actual $\siglogm$ values at $z=0$ from both
+observations and simulations, we examine the redshift evolution trend of $\siglogm$
+from $z=1$ to 0. For our model $\siglogm$ at $z=1$ is an input initial condition we
+use to determine the initial SHAM $M_*$ of our model that we set to 0.2 dex, based 
+on halo model observations~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}. 
+According to our $\siglogm(z=0)$ predictions, $\siglogm$ increases by $0.06 - 0.12$ dex 
+for $t_{\rm duty} = 1-10$ Gyr. In comparison, halo model observational constraints find 
+constant $\siglogm=0.2$ dex evolution. Meanwhile in Illustris TNG, \cao find that $\siglogm$ 
+actually decreases over the redshift range from $\sim 0.4$ dex at $z=1$ to $\sim 0.2$ dex 
+at $z=0$. Both of these $\siglogm$ evolution trends, despite their difference, favor 
+favor a short duty cycle. However, even with the shortest duty cycle, we find an 
+increasing $\siglogm$ from $z=1$. 
+} 
 
 A key element of our models is the SFH prescription for SF central galaxies where
 the SFH evolves about the SFS. Contrary to our SFH prescription, \cite{kelson2014},
@@ -928,23 +941,28 @@ on a $\log\,\mathrm{SSFR} > -11.$ cut. Afterwards we measure $\sigma_{\log\,M_*}
 at the lowest $M_h$ where it can be reliably measured given the \cite{abramson2016}
 sample's $M_*{>}10^{10}M_\odot$ limit.
 \edt{We find that the \cite{abramson2016} based empirical model predicts a scatter
-of $\sigma_{\log\,M_*}(M_h=10^{12.4}) = 0.33\pm0.04$ (dotted; right panel of Figure~\ref{fig:sigMstar_duty}).
+of $\siglogm(M_h=10^{12.4}M_\odot) = 0.33\pm0.04$ (dotted; right panel of Figure~\ref{fig:sigMstar_duty}).
 Although the \cite{abramson2016} SFHs can reproduce a number of galaxy observations,
 without star formation varability on short timescales the empirical model struggles
-to produce $\sigma_{\log\,M_*}$ comparable to observational constraints and predictions
+to produce $\siglogm$ comparable to observational constraints and predictions
 from UM and hydrodynamic simulations.}
-
 \edt{The \cite{abramson2016} based empirical model that we explore utilizes a simple
 abundance matching scheme. \cite{diemer2017} find that their their log-normal fits
 to the SFHs of Illustris galaxies correlate with halo formation histories. Incorporating
-such correlations into the abundance matching may reduce $\sigma_{\log\,M_*}$.
-In fact, although we demonstrate in this section that star formation variability
-in the SFH on short timescales significantly reduces $\sigma_{\log\,M_*}(M_h=10^{12})$,
-this alone is insufficient to produce the tight scatter in SHMR found in
-observations and hydrodynamic simulations. In the next section, we explore how
-correlation between SFH and halo formation histories impacts $\sigma_{\log\,M_*}(M_h=10^{12})$
+such correlations into the abundance matching may reduce $\siglogm$.}
+
+\edt{In this section we demonstrate that star formation variability in the SFH impacts
+$\siglogm(M_h=10^{12}M_\odot)$: star formation variability on shorter timescales significantly 
+reduces $\siglogm$. Given this dependence, $\siglogm$ can conversely be used to constrain
+the timescale of star formation variability. Although there is no clear consensus in 
+the $\siglogm$ of observations or simulations, overall they favor our model with short 
+variability timescales $\sim0.5$ Gyr. However, we find that star formation variability 
+alone is insufficient in producing the tight SHMR scatter and $\siglogm$ redshift evolution 
+trend found in halo model observations and hydrodynamic simulations. In the next section, 
+we explore how correlation between SFH and halo formation histories impacts $\siglogm(M_h=10^{12}M_\odot)$
 using our models with assembly bias.
 }
+%In fact, although we demonstrate in this section that star formation variability in the SFH on short timescales significantly reduces $\siglogm(M_h=10^{12})$, this alone is insufficient to produce the tight scatter in SHMR found in observations and hydrodynamic simulations. 
 %All considered, despite the overall tension, {\em the observational constraints of $\sigma_{\log\,M_*}$ favor our model with a shorter duty cycle timescale.} %\emph{A short duty cycle timescale--- $t_\mathrm{duty} \lesssim 0.5\,\mathrm{Gyr}$--- is necessary for our model to ameliorate the tension with $\sigma_{\log\,M_*}$ constraints in the literature}.
 %This $t_\mathrm{duty}$ constraint implies that SF galaxies have star formation variations on short timescales.
 %However, even with the shortest duty cycle timescale we probe  {\color{red} ($\sigma_{\log\,M_*}{=}\,0.26\substack{+0.010\\ -0.012}$) } our model predicts $\sigma_{\log M_*}$ larger than in observations.
@@ -977,14 +995,14 @@ using our models with assembly bias.
 \subsection{\edt{Models with Assembly Bias: $r > 0$}}
 A shorter star formation duty cycle timescale produces tighter scatter in the
 SHMR of our \edt{fiducial} model. This dependence on the duty cycle timescale,
-allows us to compare the model with measurements of $\sigma_{\log M_*}$ and
+allows us to compare the model with measurements of $\siglogm$ and
 predictions from galaxy formation models to constrain $t_\mathrm{duty}$, which
 reflect the star formation variability timescale. Such comparisons in the previous
-section, demonstrate that $t_\mathrm{duty} \lesssim 2\,\mathrm{Gyr}$ is
-favored by observational constraints. However, a short duty cycle
-timescale alone is not enough to conservatively reproduce the $\sigma_{\log\,M_*}$
-\edt{constraints from some obsevations and predicted by hydrodynamic simulations.
-Therefore, in this section, we examine how assembly bias impacts $\sigma_{\log M_*}$
+section, demonstrate that $t_{\rm duty} \lesssim 1$ Gyr is favored by 
+observational constraints. However, a short duty cycle timescale alone is not 
+enough to reproduce $\siglogm$ constraints and its evolutionary trend 
+\edt{from halo model obsevations and predicted by hydrodynamic simulations.
+In this section, we examine how assembly bias impacts $\siglogm$
 using our models that correlate SFH with host halo accretion history ($r > 0$).}
 
 We repeat our analysis of inferring model parameters by comparing to observations
@@ -1006,24 +1024,21 @@ for $r = 0.0, 0.5$, and $0.99$, respectively.
 
 \edt{Comparing our $r > 0$ models to the observational constraints in
 Figure~\ref{fig:sigMstar_duty}, we find that assembly bias significantly
-reduces the tensions with observations (left panel of
+reduces the tensions with halo model observations (left panel of
 Figure~\ref{fig:sigMstar_duty_abias})}.
 With a short star formation duty cycle ($t_\mathrm{duty} \leq 1\,\mathrm{Gyr}$)
 and galaxy assembly bias with $r \ge 0.5$, our model is in agreement with
 these $\sigma_{\log\,M_*} \sim 0.2$ dex constraints. On the other hand,
 assembly bias increases the tension with
-\edt{Cao et al. (in preparation), which specifically constrains $\sigma_{\log\,M_*}$
-for $M_h\sim 10^{12}M_\odot$. We also compare our $r > 0$ models to
+\edt{Cao et al. (in preparation), which as mentioned above more specifically 
+constrains $\siglogm$ at $M_h\sim 10^{12}M_\odot$. We also compare our $r > 0$ models to
 predictions from galaxy formation models on the right panel.}
 By varying $r$ and $t_\mathrm{duty}$, $\sigma_{\log\,M_*}$ of our model
-can reproduce all of the model predictions.
+can reproduce all of the widely varying model predictions.
 \edt{Focusing on hydrodynamic simulations, which best reproduce $\sigma_{\log\,M_*}$
 observations at high $M_h$, we find that with a short duty cycle timescale,
 $t_\mathrm{duty} < 1$ Gyr, and $r > 0.5$ our models produces the predicted tight
-scatter in SHMR. We also note that with a short $\tduty$ and high $r$, our
-models can produce $\sigma_{\log\,M_*}$ at $z=0$ that have lower than the input
-$\sigma_{\log\,M_*} = 0.2$ dex at $z=1$.
-}
+scatter in SHMR.}
 
 A shorter $t_{\rm duty}$ or higher $r$ both produce smaller $\sigma_{\log\,M_*}$
 (Figure~\ref{fig:sigMstar_duty_abias}). We highlight this degeneracy in
@@ -1042,6 +1057,55 @@ the timescale $\sim 0.5$ Gyr that \cite{sparre2015} find in Illustris galaxies
 using a Principal Component Analysis of the SFHs. However, it is consistent with
 the shorter $\sim 0.1$ Gyr timescales found in the FIRE simulations~\citep{hopkins2014, sparre2017}.
 
+
+\edt{We again examine the evolutionary trend of $\siglogm$ from $z=1$ to 0 for our 
+$r > 0$ models. We find that for a range of shorter $\tduty$ and higher $r$, our
+models predict $\siglogm \approx 0.2$ dex --- a constant $\siglogm$ evolution 
+consistent with halo model observations. With $\tduty < 2$ Gyr and $r=0.99$, our 
+models predict slightly tighter scatter of $\siglogm=0.17$ dex at $z=0$ than the 
+$z=1$ 0.2 dex input. With both star formation variability and assembly bias, our 
+models can predict a constant or even decreasing $\siglogm$ evolution. To see 
+whether we can reproduce the $\siglogm$ evolution in Illustris TNG and also to test the 
+impact of $\siglogm^{\rm init}$ on our analysis, we repeat our analysis using models
+with $\siglogm^{\rm init} = 0.35$ and 0.45 dex (Section~\ref{sec:sigloginit}).
+We present the $\siglogm(M_h=10^{12}M_\odot; z=0)$ predictions made by 
+the $\siglogm^{\rm init} = 0.35$ (left) and 0.45 dex (right) models as a 
+function of $\tduty$ in Figure~\ref{fig:sM_duty_abias_z1}. Increasing 
+$\siglogm^{\rm init}$ significantly increases $\siglogm$ for all $\tduty$ and $r$.  %With $\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex, our models can reproduce the \cao~$\sigma_{\log\,M_*}\sim 0.3$ dex constraint (dotted) and predictions from SAMs for a broad range of $r$ and $\tduty$ values. 
+Yet a shorter duty cycle timescale and stronger assembly bias produce tighter 
+$\siglogm$, independent of $\siglogm^{\rm init}$. This demonstrates that our analysis 
+is not impacted by our assumption of $\siglogm^{\rm init}$
+}
+
+\edt{
+In fact, we find that our models with $\siglogm^{\rm init} > 0.2$ dex are more 
+sensitive to $\tduty$ and $r$. For $\tduty < 5$ Gyr, the SHMR scatter in our models 
+significantly decreases over $z=1$ to 0 even without assembly bias, for both 
+$\siglogm^{\rm init} = 0.35$ and 0.45 dex. For the most extreme models, 
+$\tduty=0.5$ Gyr and $r = 0.99$, $\siglogm$ decreases by $\sim0.1$ and $0.15$ dex, 
+respectively for $\siglogm^{\rm init} = 0.35$ and 0.45 dex. Despite the increased
+sensitivity of $\siglogm$ to $\tduty$ and $r$ in these models, they struggle to 
+reproduce the dramatic $\sim 0.2$ dex $\siglogm$ decline \cao find in Illustris TNG. 
+Consequently, we see in Figure~\ref{fig:sM_duty_abias_z1} that our models cannot
+reproduce the $0.2$ dex scatter from halo model observations and hydrodyanmical
+simulations. 
+}
+%\edt{
+%The SHMR scatter at $z\sim1$ we use to determine the initial SHAM $M_*$ of our models 
+%at $z\sim1$ ($\sigma_{\log\,M_*}(z\sim1) = 0.2$ dex, Section~\ref{sec:sfcen}) is based on 
+%observations~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}. These $z\sim1$ 
+%constraints, however, like the $z\sim0$ ones, are derived from some halo model where 
+%much of the constraining power come from massive halos. $0.2$ dex does not {\em necessarily} 
+%reflect $\sigma_{\log\,M_*}(z\sim1)$ at low $M_h < 10^{12}M_\odot$. Hence, we explore 
+%below the impact of this initial condition on our results using models with 
+%$\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex and examining their predicted $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$. 
+%Motivated by the $z=1$ SHMR of the Illustris TNG, which has $\sigma_{\log\,M_*}(z\sim1)$ 
+%spanning $0.44$ to $0.3$ dex for $M_h = 10^{11.5}M_\odot$ to $10^{12}M_\odot$ (Cao et al. 
+%in preperation), we repeat our analysis using models with $\sigma_{\log\,M_*}(z\sim1) = 0.35$ 
+%and 0.45 dex and $r=0$, 0.5, and 0.99.
+%}
+
+
 \edt{In this section, we use our $r > 0$ models to find that correlation between
 SFH and halo assembly history reduces the predicted $\sigma_{\log\,M_*}$.
 With assembly bias added, our models can flexibly produce $\sigma_{\log\,M_*}$
@@ -1058,12 +1122,32 @@ Though hydrodynamic simulations consistently find $\sigma_{\log~M_*}$ at
 $M_h = 10^{12}M_\odot$, right below this $M_h$ they predict significantly
 higher scatter --- $\sigma_{\log~M_*}(M_h\sim 10^{11.5}) = 0.22 - 0.32$
 dex~\citep{wechsler2018}. Relaxing the $\sigma_{\log~M_*} \sim 0.2$ constraint
-relaxes our constraints on $\tduty$ to $< 5$ Gyr. Similar to the $\sigma_{\log~M_*}$
-constraint at $z=0$, $\sigma_{\log~M_*}(z\sim1) = 0.2$ dex, which we use to initialize
-$M_*$ at $z\sim1$, is also based on halo model observational constraints.
-Next, we explore models with $\sigma_{\log~M_*}(z\sim1) > 0.2$ and their
-predictions for the scatter in SHMR at $z=0$.
+relaxes our constraints on $\tduty$ to $< 5$ Gyr.
 }
+
+\edt{Throughout this section, we use our models with different $\tduty$, $r$, and
+$\siglogm^{\rm init}$ to explore how these parameters impact 
+$\siglogm(M_h\sim10^{12}M_\odot)$ at $z=0$. A shorter timescale of
+star formation variability, $\tduty$, produces a tighter scatter in SHMR. Similarly,
+higher correlation between SFH and halo assembly history also produces a tighter
+scatter in SHMR. Furthermore, this $\tduty$ and $r$ dependnece is independent of
+$\sigma_{\log~M_*}(z\sim1)$. The response of $\sigma_{\log~M_*}(M_h\sim10^{12}M_\odot; z=0)$
+to changes in $\tduty$ and $r$ illustrate the potential for the SHMR relation
+and it scatter to probe the SFH and assembly bias of SF central galaxies. 
+By varying $\tduty$ and $r$, our models can flexibly produce the 
+$\siglogm$ constraints from observations and modern galaxy formation models
+that vary over $0.2 - 0.35$ dex. To reproduce the tighest $0.2$ dex 
+constraints, from halo model observations and hydrodynamic simulations, 
+our models require $\tduty \leq 1$ Gyr and $r > 0.5$; if we fix $r = 0.6$, 
+constraints from the literature, $t_{\rm duty} < 0.5$ Gyr is necessary. 
+These constraints, however, are not consistent with other observations,
+namely \cao, and galaxy formation models, which find significantly higher 
+$\siglogm$. Although we demonstrate that the SHMR and $\siglogm$ can be used to 
+probe $\tduty$ and $r$, the main obstacle preventing precise constraints, 
+is the lack of consensus among the SHMRs derived observations as well as simulations.
+}
+
+%Similar to the $\sigma_{\log~M_*}$ constraint at $z=0$, $\sigma_{\log~M_*}(z\sim1) = 0.2$ dex, which we use to initialize $M_*$ at $z\sim1$, is also based on halo model observational constraints.  Next, we explore models with $\sigma_{\log~M_*}(z\sim1) > 0.2$ and their predictions for the scatter in SHMR at $z=0$.
 
 %However, the conflicting $\sigma_{\log\,M_*}$ constraint of Cao et al. (in preparation) and predictions from SAMs and UM relax the restriction on $t_\mathrm{duty}$: $< 5$ Gyr.
 
@@ -1154,63 +1238,9 @@ predictions for the scatter in SHMR at $z=0$.
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{\edt{Models with  $\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex}}
-\edt{
-The SHMR scatter at $z\sim1$ we use to determine the initial SHAM $M_*$ of our models 
-at $z\sim1$ ($\sigma_{\log\,M_*}(z\sim1) = 0.2$ dex, Section~\ref{sec:sfcen}) is based on 
-observations~\citep[\emph{e.g.}][]{leauthaud2012, tinker2013, patel2015}. These $z\sim1$ 
-constraints, however, like the $z\sim0$ ones, are derived from some halo model where 
-much of the constraining power come from massive halos. $0.2$ dex does not {\em necessarily} 
-reflect $\sigma_{\log\,M_*}(z\sim1)$ at low $M_h < 10^{12}M_\odot$. Hence, we explore 
-below the impact of this initial condition on our results using models with 
-$\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex and examining their predicted $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$. 
-Motivated by the $z=1$ SHMR of the Illustris TNG, which has $\sigma_{\log\,M_*}(z\sim1)$ 
-spanning $0.44$ to $0.3$ dex for $M_h = 10^{11.5}M_\odot$ to $10^{12}M_\odot$ (Cao et al. 
-in preperation), we repeat our analysis using models with $\sigma_{\log\,M_*}(z\sim1) = 0.35$ 
-and 0.45 dex and $r=0$, 0.5, and 0.99.
-}
-
-\edt{
-We present the $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$ predictions made by 
-the $\sigma_{\log\,M_*}(z\sim1) = 0.35$ (left) and 0.45 dex (right) models as a 
-function of $\tduty$ in Figure~\ref{fig:sM_duty_abias_z1}. Increasing 
-$\sigma_{\log\,M_*}(z\sim1)$ significantly increases $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot; z=0)$ 
-for all $\tduty$ and $r$. With $\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex, our models 
-can reproduce the \cao~$\sigma_{\log\,M_*}\sim 0.3$ dex constraint (dotted) and 
-predictions from SAMs for a broad range of $r$ and $\tduty$ values. Regardless of 
-$\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex, a shorter duty cycle timescale and stronger
-assembly bias produce tighter $\sigma_{\log\,M_*}(z\sim0)$. In fact, with shorter 
-$\tduty$, the SHMR scatter in our models significantly decrease from $z=1$ to 0. 
-For $\tduty=0.5$ Gyr, $\sigma_{\log\,M_*}$ 
-decreases by $\sim0.05$ dex. With $\tduty=0.5$ Gyr and $r > 0.5$, $\sigma_{\log\,M_*}$ 
-decreases by $\sim0.1$ dex --- comparable to the decrease in $\siglogm(M_h=10^{12}M_\odot)$
-found in Illustris TNG (Cao et al. in preparation). However, even with 
-$\tduty = 0.5$ Gyr and $r=0.99$, our $\sigma_{\log\,M_*}(z\sim1) = 0.35$ and 0.45 dex
-models struggle to reproduce the 0.2 dex scatter at $z=0$ from~\cite{more2011, leauthaud2012, reddick2013, tinker2013, zu2015} 
-and hydrodynamical simulations.
-}
+%\subsection{\edt{Models with  $\sigma_{\log\,M_*}(z\sim1) > 0.2$ dex}}
 
 % For the $r=0$ model with no assembly bias, $\sigma_{\log\,M_*} = \substack{+0.013\\-0.005}$ for $t_{\rm duty} = 0.5$ and $10$ Gyr, respectively.  Meanwhile, for $r = 0.99$ our models predict $\sigma_{\log\,M_*} =\substack{+0.013\\-0.005}$ for $t_{\rm duty} = 0.5$ and $10$ Gyr, respectively.
-\edt{
-    Throughout this section, we use our models with different $\tduty$, $r$, and
-$\sigma_{\log~M_*}(z\sim1)$ to explore how these parameters impact
-$\sigma_{\log~M_*}(M_h\sim10^{12}M_\odot)$ at $z=0$. A shorter timescale of
-star formation variation, $\tduty$, produces a tighter scatter in SHMR. Similarly,
-higher correlation between SFH and halo assembly history also produces a tighter
-scatter in SHMR. Furthermore, this $\tduty$ and $r$ dependnece is independent of
-$\sigma_{\log~M_*}(z\sim1)$. The response of $\sigma_{\log~M_*}(M_h\sim10^{12}M_\odot; z=0)$
-to changes in $\tduty$ and $r$ illustrate the potential for the SHMR relation
-and it scatters in better understanding the SFH and assembly bias of SF central
-galaxies. The main obstacle is the lack of consensus among the SHMRs of observations 
-as well as simulations, both at $z=0$ and $1$. %A better consensus among observations will enable better constraints on $t_\mathrm{duty}$. \ch{fix this; clunky} 
-Upcoming surveys such as the Bright Galaxy Survey of the Dark
-Energy Spectroscopic Instrument~\citep[DESI;][]{desicollaboration2016}, which will
-observe $\sim$10 million galaxies down to the magnitude limit $r \sim 20$, will
-allow the most precise constraints of $\sigma_{\log\,M_*}$ at $z\sim0$. The Galaxy
-Evolution Survey of the Prime Focus Spectrograph~\citep{takada2014,tamura2016}, 
-which will observe $\sim500,000$ galaxies between $0.5 < z < 2.$ and will allow
-precise constraints of $\sigma_{\log\,M_*}$ at $z\sim1$.
-}
 %In this section, we incorporate galaxy assembly into our model by correlating
 %SFH with halo assembly history --- \emph{i.e.} $\Delta\logsfr$ with $\Delta M_h$.
 %Overall, stronger correlation between SFH with halo assembly history reduces
@@ -1241,41 +1271,41 @@ formation variability and the connection between star formation and host
 halo accretion histories of star-forming central galaxies.
 
 We combine the high-resolution cosmological $N$-body $\mathtt{TreePM}$ simulation
-with SFHs that evolve the SF central galaxies along the SFS and present a model
-that tracks the SFR, $M_*$, and host halo accretion histories of SF centrals from $z \sim 1$
-to $z=0.05$. More specifically, we characterize the SFHs to evolve with respect to
-the mean $\log\,\mathrm{SFR}$ of the SFS with a ``star formation duty cycle'' that
-introduces star formation variability on some specific timescale, $t_\mathrm{duty}$. We parameterize
-the SFS using parameters that dictate the low $M_*$ and high $M_*$ slopes and redshift
-evolution. We then compare this model to the observed SMF of the SF centrals in the
-SDSS DR7 group catalog using ABC-PMC likelihood-free parameter inference framework.
-When we examine the SHMR predicted by the model and inferred parameters we find:
+with SFHs that evolve the SF central galaxies along the SFS and present models
+that tracks the SFR, $M_*$, and host halo accretion histories of SF centrals from 
+$z \sim 1$ to $z=0.05$. More specifically, we characterize the SFHs to evolve with
+respect to the mean $\log\,\mathrm{SFR}$ of the SFS with a ``star formation duty cycle'' 
+that introduces star formation variability on a specific timescale, $t_\mathrm{duty}$. 
+We parameterize the SFS using parameters that dictate the low $M_*$ and high $M_*$ 
+slopes and redshift evolution. We then compare this model to the observed SMF of the 
+SF centrals in the SDSS DR7 group catalog using ABC-PMC likelihood-free parameter 
+inference framework. When we examine the SHMR predicted by the model and inferred 
+parameters we find:
 \bitem
 \item A shorter star formation duty cycle in our model produces significantly
     tighter scatter in the SHMR at $M_h = 10^{12} M_\odot$. For
     $t_\mathrm{duty}$ from $10$ to $0.5\,\mathrm{Gyr}$, our model predicts
     $\sigma_{\log\,M_*}(M_h=10^{12}M_\odot){=}\,0.32\substack{+0.019\\ -0.021}$ to $0.26\substack{+0.010\\-0.012}$.
     The dependence of $\sigma_{\log\,M_*}$ on $t_\mathrm{duty}$ demonstrates that
-    the scatter in SHMR can be used to constrain $t_\mathrm{duty}$, which represents the timescale
-    of star formation variability.
+    the scatter in SHMR can be used to constrain $t_\mathrm{duty}$, and thus  
+    the timescale of star formation variability.
 
 \item We compare the $\sigma_{\log\,M_*}(M_h\sim10^{12}M_\odot)$ predicted by our
-    model to observed constraints from halo occupation modeling of galaxy clustering, SMF,
-    satellite kinematics, and galaxy-galaxy weak lensing. Although
-    there is tension among the constraints, comparison to observations generally favor a shorter
-    timescale with $t_\mathrm{duty} \lesssim 2$ Gyr. There is also tension among
+    model to observed constraints from halo occupation modeling of galaxy clustering, 
+    SMF, satellite kinematics, and galaxy-galaxy weak lensing. Although there is tension 
+    among the observational constraints, the comparison generally favors a shorter
+    timescale with $t_\mathrm{duty} \lesssim 1$ Gyr. There is also tension among
     prediction from galaxy formation models. To produce the $\sigma_{\log\,M_*}\sim 0.2$ dex
     predicted in hydrodynamic simulations, which best reproduce the observed
-    $\sigma_{\log\,M_*}$ at $M_h>10^{12}M_\odot$, variations on $t_\mathrm{duty} \lesssim 0.5$ Gyr
-    are necessary.
+    $\sigma_{\log\,M_*}$ at $M_h>10^{12}M_\odot$, variations on 
+    $t_\mathrm{duty} \lesssim 0.5$ Gyr are necessary.
 
-\item We next incorporate assembly bias in our model by correlating the star
-    formation histories to host halo accretion histories with correlation
-    coefficient, $r$. With stronger correlation, higher $r$, our model predict
-    tighter scatter in the SHMR down to $\sigma_{\log M_*}(M_h=10^{12}M_\odot){=}0.17$.
-    For $\sigma_{\log M_*}(M_h=10^{12}M_\odot)\sim 0.2$ dex, both $r > 0.5$ and
-    $t_\mathrm{duty} < 1$ Gyr are necssary; for correlation of $r \sim 0.6$ found
-    in the literature, $t_\mathrm{duty} < 0.5$ Gyr is necssary.
+\item We next examine models with assembly bias that correlate SFHs to host halo 
+    accretion histories with correlation coefficient, $r$. With stronger correlation, 
+    higher $r$, our models predict tighter scatter in the SHMR down to $\sigma_{\log M_*}(M_h=10^{12}M_\odot){=}0.17$.
+    To produce $\sigma_{\log M_*}(M_h=10^{12}M_\odot)\sim 0.2$ dex, both $r > 0.5$ 
+    and $t_\mathrm{duty} < 1$ Gyr are necssary; for $r \sim 0.6$, as found in the 
+    literature, $t_\mathrm{duty} < 0.5$ Gyr is necssary.
 \eitem
 
 Our work demonstrates that constraints on the scatter in the SHMR can be
@@ -1288,6 +1318,15 @@ the DESI BGS, will have the capability to more precisely constrain
 $\sigma_{\log M_*}$ and resolve current tensions in observations. With
 such measurements, our model will be able to constrain $t_\mathrm{duty}$
 and the physical processes that dictate star formation in galaxies.
+
+Upcoming surveys such as the Bright Galaxy Survey of the Dark
+Energy Spectroscopic Instrument~\citep[DESI;][]{desicollaboration2016}, which will
+observe $\sim$10 million galaxies down to the magnitude limit $r \sim 20$, will
+allow the most precise constraints of $\sigma_{\log\,M_*}$ at $z\sim0$. The Galaxy
+Evolution Survey of the Prime Focus Spectrograph~\citep{takada2014,tamura2016}, 
+which will observe $\sim500,000$ galaxies between $0.5 < z < 2.$ and will allow
+precise constraints of $\sigma_{\log\,M_*}$ at $z\sim1$.
+
 
 %By combining a high-resolution  cosmological $N$-body simulation with observed evolutionary trends of the SFS,  we present a model that tracks the star formation, stellar mass, and host halo  mass histories of star forming central galaxies over $z < 1$ and reproduces the observed stellar mass
 %function and SFS of central galaxies in the SDSS Data Release 7. We characterize
