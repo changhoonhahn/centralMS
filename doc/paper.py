@@ -1644,6 +1644,66 @@ def SHMRscatter_tduty_abias_z1sigma(Mhalo=12, dMhalo=0.5):
     return None 
 
 
+def siglogM_zevo(Mhalo=12, dMhalo=0.5):
+    ''' redshift evolution of the sigma_logM*(M_h = 10^12), the scatter in the Stellar to
+    Halo Mass Relation,  
+    '''
+    # calculate the scatters from the ABC posteriors 
+    smhmr = Obvs.Smhmr()
+    tscales = ['0.5']
+    tduties = [0.5, 1., 2., 5., 9.75]  #hardcoded
+
+    fig = plt.figure(figsize=(15,5)) 
+    for i_sig, siglogM in enumerate([0.2, 0.35, 0.45]):
+        sub = fig.add_subplot(1,3,i_sig+1)
+        for tt in ['0.5']:  
+            for i_a, abias in enumerate([0., 0.5, 0.99]): 
+                if abias > 0.:
+                    if siglogM == 0.2: run = 'rSFH_abias%s_%sgyr.sfsmf.sfsbroken' % (str(abias), tt) 
+                    else: run = 'rSFH_abias%s_%sgyr.sfsmf.sigma_z1_%.2f.sfsbroken' % (str(abias), tt, siglogM)
+                else: 
+                    if siglogM == 0.2: run = 'randomSFH%sgyr.sfsmf.sfsbroken' % tt
+                    else: run = 'randomSFH%sgyr.sfsmf.sigma_z1_%.2f.sfsbroken' % (tt, siglogM) 
+
+                abc_dir = os.path.join(UT.dat_dir(), 'abc', run, 'model') # ABC directory 
+                sig_Mss = [] 
+                for i in range(100): 
+                    fabc = os.path.join(abc_dir, 'model.theta%i.t%i.p' % (i, 14))
+
+                    f = pickle.load(open(fabc, 'rb'))
+                    subcat_sim_i = {} 
+                    for key in f.keys(): 
+                        subcat_sim_i[key] = f[key]
+                    
+                    isSF = np.where(subcat_sim_i['galtype'] == 'sf') # only SF galaxies 
+
+                    sig_ms_i = smhmr.sigma_logMstar(
+                            subcat_sim_i['halo.m'][isSF], subcat_sim_i['m.star'][isSF], 
+                            weights=subcat_sim_i['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
+                    sig_Mss.append(sig_ms_i)  
+                sig_ms_low, sig_ms_med, sig_ms_high, sig_ms_lowlow, sig_ms_hihi = np.percentile(np.array(sig_Mss), [16, 50, 84, 2.5, 97.5])
+                sub.fill_between([1., 0.], [siglogM, sig_ms_low], [siglogM, sig_ms_high], color='C'+str(i_a), alpha=1, linewidth=0) 
+        sub.plot([1., 0.], [siglogM, siglogM], ls='--', c='k') 
+        sub.set_xlim(1., 0.) # x-axis
+        sub.set_ylim(0.2, 0.5) 
+        sub.set_yticks([0.1, 0.2, 0.3, 0.4, 0.5]) 
+        if i_sig == 0: 
+            sub.set_ylabel(r'$\sigma_{\log M_*} \Big(M_{h} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=25) # y-axis
+            sub.text(0.05, 0.95, r'$t_{\rm duty} = 0.5$ Gyr', ha='left', va='top', transform=sub.transAxes, fontsize=25)
+        elif i_sig == 2: # right panel: legends  
+            abc_post1 = sub.fill_between([0], [0], [0.1], color='C0', label='$r=0$')
+            abc_post2 = sub.fill_between([0], [0], [0.1], color='C1', label='$r=0.5$') 
+            abc_post3 = sub.fill_between([0], [0], [0.1], color='C2', label='$r=0.99$') 
+            leg2 = sub.legend(loc=(0.52, 0.025), handletextpad=0.4, frameon=False, fontsize=18) 
+    bkgd = fig.add_subplot(111, frameon=False)
+    bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
+    bkgd.set_xlabel('Redshift ($z$)', labelpad=10, fontsize=22) 
+    fig.subplots_adjust(wspace=0.2)
+    fig.savefig(''.join([UT.tex_dir(), 'figs/siglogM_zevo.pdf']), bbox_inches='tight', dpi=150) 
+    plt.close()
+    return None 
+
+
 def _SHMRscatter_tduty_SFSflexVSanchored(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     ''' Comparison of the SHMR(t_duty) for flexible SFS versus anchored SFS prescriptions.
     '''
@@ -2001,7 +2061,8 @@ if __name__=="__main__":
     #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
     #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
-    SHMRscatter_tduty_abias_z1sigma(Mhalo=12, dMhalo=0.1)
+    #SHMRscatter_tduty_abias_z1sigma(Mhalo=12, dMhalo=0.1)
+    siglogM_zevo(Mhalo=12, dMhalo=0.1)
     #fQ_fSFMS()
     #SFHmodel()
     #Illustris_SFH()
