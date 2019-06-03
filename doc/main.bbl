@@ -5,33 +5,33 @@
 \providecommand{\doeprint}[1]{\href{http://ascl.net/#1}{\nolinkurl{http://ascl.net/#1}}}
 \providecommand{\doarXiv}[1]{\href{https://arxiv.org/abs/#1}{\nolinkurl{https://arxiv.org/abs/#1}}}
 
-\bibitem[{Abazajian {et~al.}(2009)Abazajian, {Adelman-McCarthy}, Ag\"ueros,
+\bibitem[{Abazajian {et~al.}(2009)Abazajian, {Adelman-McCarthy}, Ag{\"u}eros,
   Allam, Allende~Prieto, An, Anderson, Anderson, Annis, Bahcall,
   {Bailer-Jones}, Barentine, Bassett, Becker, Beers, Bell, Belokurov, Berlind,
   Berman, Bernardi, Bickerton, Bizyaev, Blakeslee, Blanton, Bochanski, Boroski,
-  Brewington, Brinchmann, Brinkmann, Brunner, Budav\'ari, Carey, Carliles,
+  Brewington, Brinchmann, Brinkmann, Brunner, Budav{\'a}ri, Carey, Carliles,
   Carr, Castander, Cinabro, Connolly, Csabai, Cunha, Czarapata, Davenport, {de
   Haas}, Dilday, Doi, Eisenstein, Evans, Evans, Fan, Friedman, Frieman,
-  Fukugita, G\"ansicke, Gates, Gillespie, Gilmore, Gonzalez, Gonzalez, Grebel,
-  Gunn, Gy\"ory, Hall, Harding, Harris, Harvanek, Hawley, Hayes, Heckman,
-  Hendry, Hennessy, Hindsley, Hoblitt, Hogan, Hogg, Holtzman, Hyde, Ichikawa,
-  Ichikawa, Im, Ivezi\'c, Jester, Jiang, Johnson, Jorgensen, Juri\'c, Kent,
-  Kessler, Kleinman, Knapp, Konishi, Kron, Krzesinski, Kuropatkin, Lampeitl,
-  Lebedeva, Lee, Lee, French~Leger, L\'epine, Li, Lima, Lin, Long, Loomis,
-  Loveday, Lupton, Magnier, Malanushenko, Malanushenko, Mandelbaum, Margon,
-  Marriner, {Mart\'inez-Delgado}, Matsubara, McGehee, McKay, Meiksin, Morrison,
-  Mullally, Munn, Murphy, Nash, Nebot, Neilsen, Newberg, Newman, Nichol,
-  Nicinski, {Nieto-Santisteban}, Nitta, Okamura, Oravetz, Ostriker, Owen,
-  Padmanabhan, Pan, Park, Pauls, Peoples, Percival, Pier, Pope, Pourbaix,
-  Price, Purger, Quinn, Raddick, Re~Fiorentin, Richards, Richmond, Riess, Rix,
-  Rockosi, Sako, Schlegel, Schneider, Scholz, Schreiber, Schwope, Seljak,
-  Sesar, Sheldon, Shimasaku, Sibley, Simmons, Sivarani, Allyn~Smith, Smith,
-  Smol{\v c}i\'c, Snedden, Stebbins, Steinmetz, Stoughton, Strauss, SubbaRao,
-  Suto, Szalay, Szapudi, Szkody, Tanaka, Tegmark, Teodoro, Thakar, Tremonti,
-  Tucker, Uomoto, Vanden~Berk, Vandenberg, Vidrih, Vogeley, Voges, Vogt,
-  Wadadekar, Watters, Weinberg, West, White, Wilhite, Wonders, Yanny, Yocum,
-  York, Zehavi, Zibetti, \& Zucker}]{abazajian2009}
-Abazajian, K.~N., {Adelman-McCarthy}, J.~K., Ag\"ueros, M.~A., {et~al.} 2009,
+  Fukugita, G{\"a}nsicke, Gates, Gillespie, Gilmore, Gonzalez, Gonzalez,
+  Grebel, Gunn, Gy{\"o}ry, Hall, Harding, Harris, Harvanek, Hawley, Hayes,
+  Heckman, Hendry, Hennessy, Hindsley, Hoblitt, Hogan, Hogg, Holtzman, Hyde,
+  Ichikawa, Ichikawa, Im, Ivezi{\'c}, Jester, Jiang, Johnson, Jorgensen,
+  Juri{\'c}, Kent, Kessler, Kleinman, Knapp, Konishi, Kron, Krzesinski,
+  Kuropatkin, Lampeitl, Lebedeva, Lee, Lee, French~Leger, L{\'e}pine, Li, Lima,
+  Lin, Long, Loomis, Loveday, Lupton, Magnier, Malanushenko, Malanushenko,
+  Mandelbaum, Margon, Marriner, {Mart{\'i}nez-Delgado}, Matsubara, McGehee,
+  McKay, Meiksin, Morrison, Mullally, Munn, Murphy, Nash, Nebot, Neilsen,
+  Newberg, Newman, Nichol, Nicinski, {Nieto-Santisteban}, Nitta, Okamura,
+  Oravetz, Ostriker, Owen, Padmanabhan, Pan, Park, Pauls, Peoples, Percival,
+  Pier, Pope, Pourbaix, Price, Purger, Quinn, Raddick, Re~Fiorentin, Richards,
+  Richmond, Riess, Rix, Rockosi, Sako, Schlegel, Schneider, Scholz, Schreiber,
+  Schwope, Seljak, Sesar, Sheldon, Shimasaku, Sibley, Simmons, Sivarani,
+  Allyn~Smith, Smith, Smol{\v c}i{\'c}, Snedden, Stebbins, Steinmetz,
+  Stoughton, Strauss, SubbaRao, Suto, Szalay, Szapudi, Szkody, Tanaka, Tegmark,
+  Teodoro, Thakar, Tremonti, Tucker, Uomoto, Vanden~Berk, Vandenberg, Vidrih,
+  Vogeley, Voges, Vogt, Wadadekar, Watters, Weinberg, West, White, Wilhite,
+  Wonders, Yanny, Yocum, York, Zehavi, Zibetti, \& Zucker}]{abazajian2009}
+Abazajian, K.~N., {Adelman-McCarthy}, J.~K., Ag{\"u}eros, M.~A., {et~al.} 2009,
   The Astrophysical Journal Supplement Series, 182, 543,
   \dodoi{10.1088/0067-0049/182/2/543}
 
@@ -63,10 +63,11 @@ Baldry, I.~K., Balogh, M.~L., Bower, R.~G., {et~al.} 2006, Monthly Notices of
 \bibitem[{Becker(2015)}]{becker2015}
 Becker, M.~R. 2015, arXiv e-prints, 1507, arXiv:1507.03605
 
-\bibitem[{Behroozi {et~al.}(2018)Behroozi, Wechsler, Hearin, \&
-  Conroy}]{behroozi2018}
-Behroozi, P., Wechsler, R., Hearin, A., \& Conroy, C. 2018, ArXiv e-prints,
-  1806, arXiv:1806.07893
+\bibitem[{Behroozi {et~al.}(2019)Behroozi, Wechsler, Hearin, \&
+  Conroy}]{behroozi2019}
+Behroozi, P., Wechsler, R.~H., Hearin, A.~P., \& Conroy, C. 2019, Monthly
+  Notices of the Royal Astronomical Society, 1134,
+  \dodoi{10.1093/mnras/stz1182}
 
 \bibitem[{Behroozi {et~al.}(2013)Behroozi, Wechsler, \& Conroy}]{behroozi2013}
 Behroozi, P.~S., Wechsler, R.~H., \& Conroy, C. 2013, The Astrophysical
@@ -89,14 +90,14 @@ Blanton, M.~R., \& Roweis, S. 2007, The Astronomical Journal, 133, 734,
   \dodoi{10.1086/510127}
 
 \bibitem[{Blanton {et~al.}(2003)Blanton, Hogg, Bahcall, Baldry, Brinkmann,
-  Csabai, Eisenstein, Fukugita, Gunn, Ivezi\'c, Lamb, Lupton, Loveday, Munn,
+  Csabai, Eisenstein, Fukugita, Gunn, Ivezi{\'c}, Lamb, Lupton, Loveday, Munn,
   Nichol, Okamura, Schlegel, Shimasaku, Strauss, Vogeley, \&
   Weinberg}]{blanton2003}
 Blanton, M.~R., Hogg, D.~W., Bahcall, N.~A., {et~al.} 2003, The Astrophysical
   Journal, 594, 186, \dodoi{10.1086/375528}
 
 \bibitem[{Blanton {et~al.}(2005)Blanton, Schlegel, Strauss, Brinkmann,
-  Finkbeiner, Fukugita, Gunn, Hogg, Ivezi\'c, Knapp, Lupton, Munn, Schneider,
+  Finkbeiner, Fukugita, Gunn, Hogg, Ivezi{\'c}, Knapp, Lupton, Munn, Schneider,
   Tegmark, \& Zehavi}]{blanton2005}
 Blanton, M.~R., Schlegel, D.~J., Strauss, M.~A., {et~al.} 2005, The
   Astronomical Journal, 129, 2562, \dodoi{10.1086/429803}
@@ -165,22 +166,22 @@ Cohn, J.~D. 2017, Monthly Notices of the Royal Astronomical Society, 466, 2718,
   Kennamer, Kent, Kilbinger, Kim, Kirkby, Kisner, Kitanidis, Kneib, Koposov,
   Kovacs, Koyama, Kremin, Kron, Kronig, {Kueter-Young}, Lacey, Lafever, Lahav,
   Lambert, Lampton, Landriau, Lang, Lauer, Goff, Guillou, Van~Suu, Lee, Lee,
-  Leitner, Lesser, Levi, L'Huillier, Li, Liang, Lin, Linder, Loebman, Luki\'c,
-  Ma, MacCrann, Magneville, Makarem, Manera, Manser, Marshall, Martini, Massey,
-  Matheson, McCauley, McDonald, McGreer, Meisner, Metcalfe, Miller, Miquel,
-  Moustakas, Myers, Naik, Newman, Nichol, Nicola, {da Costa}, Nie, Niz,
-  Norberg, Nord, Norman, Nugent, O'Brien, Oh, Olsen, Padilla, Padmanabhan,
-  Padmanabhan, {Palanque-Delabrouille}, Palmese, Pappalardo, P\^aris, Park,
-  Patej, Peacock, Peiris, Peng, Percival, Perruchot, Pieri, Pogge, Pollack,
-  Poppett, Prada, Prakash, Probst, Rabinowitz, Raichoor, Ree, Refregier, Regal,
-  Reid, Reil, Rezaie, Rockosi, Roe, Ronayette, Roodman, Ross, Ross, Rossi,
-  Rozo, {Ruhlmann-Kleider}, Rykoff, Sabiu, Samushia, Sanchez, Sanchez,
-  Schlegel, Schneider, Schubnell, Secroun, Seljak, Seo, Serrano, Shafieloo,
-  Shan, Sharples, Sholl, Shourt, Silber, Silva, Sirk, Slosar, Smith, Smoot,
-  Som, Song, Sprayberry, Staten, Stefanik, Tarle, Tie, Tinker, Tojeiro, Valdes,
-  Valenzuela, Valluri, {Vargas-Magana}, Verde, Walker, Wang, Wang, Weaver,
-  Weaverdyck, Wechsler, Weinberg, White, Yang, Yeche, Zhang, Zhao, Zheng, Zhou,
-  Zhou, Zhu, Zou, \& Zu}]{desicollaboration2016}
+  Leitner, Lesser, Levi, L'Huillier, Li, Liang, Lin, Linder, Loebman,
+  Luki{\'c}, Ma, MacCrann, Magneville, Makarem, Manera, Manser, Marshall,
+  Martini, Massey, Matheson, McCauley, McDonald, McGreer, Meisner, Metcalfe,
+  Miller, Miquel, Moustakas, Myers, Naik, Newman, Nichol, Nicola, {da Costa},
+  Nie, Niz, Norberg, Nord, Norman, Nugent, O'Brien, Oh, Olsen, Padilla,
+  Padmanabhan, Padmanabhan, {Palanque-Delabrouille}, Palmese, Pappalardo,
+  P{\^a}ris, Park, Patej, Peacock, Peiris, Peng, Percival, Perruchot, Pieri,
+  Pogge, Pollack, Poppett, Prada, Prakash, Probst, Rabinowitz, Raichoor, Ree,
+  Refregier, Regal, Reid, Reil, Rezaie, Rockosi, Roe, Ronayette, Roodman, Ross,
+  Ross, Rossi, Rozo, {Ruhlmann-Kleider}, Rykoff, Sabiu, Samushia, Sanchez,
+  Sanchez, Schlegel, Schneider, Schubnell, Secroun, Seljak, Seo, Serrano,
+  Shafieloo, Shan, Sharples, Sholl, Shourt, Silber, Silva, Sirk, Slosar, Smith,
+  Smoot, Som, Song, Sprayberry, Staten, Stefanik, Tarle, Tie, Tinker, Tojeiro,
+  Valdes, Valenzuela, Valluri, {Vargas-Magana}, Verde, Walker, Wang, Wang,
+  Weaver, Weaverdyck, Wechsler, Weinberg, White, Yang, Yeche, Zhang, Zhao,
+  Zheng, Zhou, Zhou, Zhu, Zou, \& Zu}]{desicollaboration2016}
 Collaboration, D., Aghamousa, A., Aguilar, J., {et~al.} 2016, arXiv:1611.00036
   [astro-ph].
 \newblock \doarXiv{1611.00036}
@@ -217,10 +218,46 @@ Daddi, E., Dickinson, M., Morrison, G., {et~al.} 2007, The Astrophysical
 Davis, M., Efstathiou, G., Frenk, C.~S., \& White, S. D.~M. 1985, The
   Astrophysical Journal, 292, 371, \dodoi{10.1086/163168}
 
+\bibitem[{Dawson {et~al.}(2013)Dawson, Schlegel, Ahn, Anderson, Aubourg,
+  Bailey, Barkhouser, Bautista, Beifiori, Berlind, Bhardwaj, Bizyaev, Blake,
+  Blanton, Blomqvist, Bolton, Borde, Bovy, Brandt, Brewington, Brinkmann,
+  Brown, Brownstein, Bundy, Busca, Carithers, Carnero, Carr, Chen, Comparat,
+  Connolly, Cope, Croft, Cuesta, {da Costa}, Davenport, Delubac, {de Putter},
+  Dhital, Ealet, Ebelke, Eisenstein, Escoffier, Fan, Filiz~Ak, Finley,
+  {Font-Ribera}, {G{\'e}nova-Santos}, Gunn, Guo, Haggard, Hall, Hamilton,
+  Harris, Harris, Ho, Hogg, Holder, Honscheid, Huehnerhoff, Jordan, Jordan,
+  Kauffmann, Kazin, Kirkby, Klaene, Kneib, Le~Goff, Lee, Long, Loomis,
+  Lundgren, Lupton, Maia, Makler, Malanushenko, Malanushenko, Mandelbaum,
+  Manera, Maraston, Margala, Masters, McBride, McDonald, McGreer, McMahon,
+  Mena, {Miralda-Escud{\'e}}, {Montero-Dorta}, Montesano, Muna, Myers, Naugle,
+  Nichol, Noterdaeme, Nuza, Olmstead, Oravetz, Oravetz, Owen, Padmanabhan,
+  {Palanque-Delabrouille}, Pan, Parejko, P{\^a}ris, Percival,
+  {P{\'e}rez-Fournon}, {P{\'e}rez-R{\`a}fols}, Petitjean, Pfaffenberger, Pforr,
+  Pieri, Prada, {Price-Whelan}, Raddick, Rebolo, Rich, Richards, Rockosi, Roe,
+  Ross, Ross, Rossi, {Rubi{\~n}o-Martin}, Samushia, S{\'a}nchez, Sayres,
+  Schmidt, Schneider, Sc{\'o}ccola, Seo, Shelden, Sheldon, Shen, Shu, Slosar,
+  Smee, Snedden, Stauffer, Steele, Strauss, Streblyanska, Suzuki, Swanson, Tal,
+  Tanaka, Thomas, Tinker, Tojeiro, Tremonti, Vargas~Maga{\~n}a, Verde, Viel,
+  Wake, Watson, Weaver, Weinberg, Weiner, West, White, {Wood-Vasey}, Yeche,
+  Zehavi, Zhao, \& Zheng}]{dawson2013}
+Dawson, K.~S., Schlegel, D.~J., Ahn, C.~P., {et~al.} 2013, The Astronomical
+  Journal, 145, 10, \dodoi{10.1088/0004-6256/145/1/10}
+
 \bibitem[{Diemer {et~al.}(2017)Diemer, Sparre, Abramson, \&
   Torrey}]{diemer2017}
 Diemer, B., Sparre, M., Abramson, L.~E., \& Torrey, P. 2017, The Astrophysical
   Journal, 839, 26, \dodoi{10.3847/1538-4357/aa68e5}
+
+\bibitem[{Driver {et~al.}(2016)Driver, Davies, Meyer, Power, Robotham, Baldry,
+  Liske, \& Norberg}]{driver2016}
+Driver, S.~P., Davies, L.~J., Meyer, M., {et~al.} 2016, The Universe of Digital
+  Sky Surveys, 42, 205, \dodoi{10.1007/978-3-319-19330-4_32}
+
+\bibitem[{Driver {et~al.}(2019)Driver, Liske, Davies, Robotham, Baldry, Brown,
+  Cluver, Kuijken, Loveday, McMahon, Meyer, Norberg, Owers, Power, Taylor, \&
+  {WAVES Team}}]{driver2019}
+Driver, S.~P., Liske, J., Davies, L. J.~M., {et~al.} 2019, The Messenger, 175,
+  46, \dodoi{10.18727/0722-6691/5126}
 
 \bibitem[{Drory {et~al.}(2009)Drory, Bundy, Leauthaud, Scoville, Capak, Ilbert,
   Kartaltepe, Kneib, McCracken, Salvato, Sanders, Thompson, \&
@@ -285,7 +322,7 @@ Hahn, C., Vakili, M., Walsh, K., {et~al.} 2017{\natexlab{b}}, Monthly Notices
 Hahn, C., Blanton, M.~R., Moustakas, J., {et~al.} 2015, The Astrophysical
   Journal, 806, 162, \dodoi{10.1088/0004-637X/806/2/162}
 
-\bibitem[{Hahn {et~al.}(2018{\natexlab{b}})Hahn, Starkenburg, Choi, Dav\'e,
+\bibitem[{Hahn {et~al.}(2018{\natexlab{b}})Hahn, Starkenburg, Choi, Dav{\'e},
   Dickey, Geha, Genel, Hayward, Maller, Mandyam, Pandya, Popping,
   Rafieferantsoa, Somerville, \& Tinker}]{hahn2018a}
 Hahn, C., Starkenburg, T.~K., Choi, E., {et~al.} 2018{\natexlab{b}}
@@ -300,17 +337,17 @@ Han, J., Eke, V.~R., Frenk, C.~S., {et~al.} 2015, Monthly Notices of the Royal
 Hopkins, A.~M., \& Beacom, J.~F. 2006, The Astrophysical Journal, 651, 142,
   \dodoi{10.1086/506610}
 
-\bibitem[{Hopkins {et~al.}(2014)Hopkins, Kere{\v s}, O\~norbe,
-  {Faucher-Gigu\`ere}, Quataert, Murray, \& Bullock}]{hopkins2014}
-Hopkins, P.~F., Kere{\v s}, D., O\~norbe, J., {et~al.} 2014, Monthly Notices of
-  the Royal Astronomical Society, 445, 581, \dodoi{10.1093/mnras/stu1738}
+\bibitem[{Hopkins {et~al.}(2014)Hopkins, Kere{\v s}, O{\~n}orbe,
+  {Faucher-Gigu{\`e}re}, Quataert, Murray, \& Bullock}]{hopkins2014}
+Hopkins, P.~F., Kere{\v s}, D., O{\~n}orbe, J., {et~al.} 2014, Monthly Notices
+  of the Royal Astronomical Society, 445, 581, \dodoi{10.1093/mnras/stu1738}
 
-\bibitem[{Ilbert {et~al.}(2013)Ilbert, McCracken, Le~F\`evre, Capak, Dunlop,
+\bibitem[{Ilbert {et~al.}(2013)Ilbert, McCracken, Le~F{\`e}vre, Capak, Dunlop,
   Karim, Renzini, Caputi, Boissier, Arnouts, Aussel, Comparat, Guo, Hudelot,
   Kartaltepe, Kneib, Krogager, Le~Floc'h, Lilly, Mellier, {Milvang-Jensen},
   Moutard, Onodera, Richard, Salvato, Sanders, Scoville, Silverman, Taniguchi,
   Tasca, Thomas, Toft, Tresse, Vergani, Wolk, \& Zirm}]{ilbert2013}
-Ilbert, O., McCracken, H.~J., Le~F\`evre, O., {et~al.} 2013, Astronomy and
+Ilbert, O., McCracken, H.~J., Le~F{\`e}vre, O., {et~al.} 2013, Astronomy and
   Astrophysics, 556, A55, \dodoi{10.1051/0004-6361/201321100}
 
 \bibitem[{Ishida {et~al.}(2015)Ishida, Vitenti, {Penna-Lima}, Cisewski, {de
@@ -318,10 +355,10 @@ Ilbert, O., McCracken, H.~J., Le~F\`evre, O., {et~al.} 2013, Astronomy and
 Ishida, E. E.~O., Vitenti, S. D.~P., {Penna-Lima}, M., {et~al.} 2015, Astronomy
   and Computing, 13, 1, \dodoi{10.1016/j.ascom.2015.09.001}
 
-\bibitem[{Karim {et~al.}(2011)Karim, Schinnerer, {Mart\'inez-Sansigre},
-  Sargent, {van der Wel}, Rix, Ilbert, Smol{\v c}i\'c, Carilli, Pannella,
+\bibitem[{Karim {et~al.}(2011)Karim, Schinnerer, {Mart{\'i}nez-Sansigre},
+  Sargent, {van der Wel}, Rix, Ilbert, Smol{\v c}i{\'c}, Carilli, Pannella,
   Koekemoer, Bell, \& Salvato}]{karim2011}
-Karim, A., Schinnerer, E., {Mart\'inez-Sansigre}, A., {et~al.} 2011, The
+Karim, A., Schinnerer, E., {Mart{\'i}nez-Sansigre}, A., {et~al.} 2011, The
   Astrophysical Journal, 730, 61, \dodoi{10.1088/0004-637X/730/2/61}
 
 \bibitem[{Kauffmann {et~al.}(2003)Kauffmann, Heckman, White, Charlot, Tremonti,
@@ -340,7 +377,7 @@ Khandai, N., Di~Matteo, T., Croft, R., {et~al.} 2015, Monthly Notices of the
   Royal Astronomical Society, 450, 1349, \dodoi{10.1093/mnras/stv627}
 
 \bibitem[{Kravtsov {et~al.}(2004)Kravtsov, Berlind, Wechsler, Klypin,
-  Gottl\"ober, Allgood, \& Primack}]{kravtsov2004}
+  Gottl{\"o}ber, Allgood, \& Primack}]{kravtsov2004}
 Kravtsov, A.~V., Berlind, A.~A., Wechsler, R.~H., {et~al.} 2004, The
   Astrophysical Journal, 609, 35, \dodoi{10.1086/420959}
 
@@ -359,8 +396,8 @@ Larson, R.~B., Tinsley, B.~M., \& Caldwell, C.~N. 1980, The Astrophysical
   Journal, 237, 692, \dodoi{10.1086/157917}
 
 \bibitem[{Leauthaud {et~al.}(2012)Leauthaud, Tinker, Bundy, Behroozi, Massey,
-  Rhodes, George, Kneib, Benson, Wechsler, Busha, Capak, Cort\^es, Ilbert,
-  Koekemoer, Le~F\`evre, Lilly, McCracken, Salvato, Schrabback, Scoville,
+  Rhodes, George, Kneib, Benson, Wechsler, Busha, Capak, Cort{\^e}s, Ilbert,
+  Koekemoer, Le~F{\`e}vre, Lilly, McCracken, Salvato, Schrabback, Scoville,
   Smith, \& Taylor}]{leauthaud2012}
 Leauthaud, A., Tinker, J., Bundy, K., {et~al.} 2012, The Astrophysical Journal,
   744, 159, \dodoi{10.1088/0004-637X/744/2/159}
@@ -407,15 +444,15 @@ Lu, Y., Wechsler, R.~H., Somerville, R.~S., {et~al.} 2014, The Astrophysical
 Madau, P., \& Dickinson, M. 2014, Annual Review of Astronomy and Astrophysics,
   52, 415, \dodoi{10.1146/annurev-astro-081811-125615}
 
-\bibitem[{Magdis {et~al.}(2012)Magdis, Daddi, B\'ethermin, Sargent, Elbaz,
+\bibitem[{Magdis {et~al.}(2012)Magdis, Daddi, B{\'e}thermin, Sargent, Elbaz,
   Pannella, Dickinson, Dannerbauer, {da Cunha}, Walter, Rigopoulou,
   Charmandaris, Hwang, \& Kartaltepe}]{magdis2012}
-Magdis, G.~E., Daddi, E., B\'ethermin, M., {et~al.} 2012, The Astrophysical
+Magdis, G.~E., Daddi, E., B{\'e}thermin, M., {et~al.} 2012, The Astrophysical
   Journal, 760, 6, \dodoi{10.1088/0004-637X/760/1/6}
 
-\bibitem[{Mamon {et~al.}(2004)Mamon, Sanchis, {Salvador-Sol\'e}, \&
+\bibitem[{Mamon {et~al.}(2004)Mamon, Sanchis, {Salvador-Sol{\'e}}, \&
   Solanes}]{mamon2004}
-Mamon, G.~A., Sanchis, T., {Salvador-Sol\'e}, E., \& Solanes, J.~M. 2004,
+Mamon, G.~A., Sanchis, T., {Salvador-Sol{\'e}}, E., \& Solanes, J.~M. 2004,
   Astronomy and Astrophysics, 414, 445, \dodoi{10.1051/0004-6361:20034155}
 
 \bibitem[{Mandelbaum {et~al.}(2006)Mandelbaum, Seljak, Kauffmann, Hirata, \&
@@ -425,22 +462,23 @@ Mandelbaum, R., Seljak, U., Kauffmann, G., Hirata, C.~M., \& Brinkmann, J.
   \dodoi{10.1111/j.1365-2966.2006.10156.x}
 
 \bibitem[{Marchesini {et~al.}(2009)Marchesini, {van Dokkum},
-  F\"orster~Schreiber, Franx, Labb\'e, \& Wuyts}]{marchesini2009}
-Marchesini, D., {van Dokkum}, P.~G., F\"orster~Schreiber, N.~M., {et~al.} 2009,
-  The Astrophysical Journal, 701, 1765, \dodoi{10.1088/0004-637X/701/2/1765}
+  F{\"o}rster~Schreiber, Franx, Labb{\'e}, \& Wuyts}]{marchesini2009}
+Marchesini, D., {van Dokkum}, P.~G., F{\"o}rster~Schreiber, N.~M., {et~al.}
+  2009, The Astrophysical Journal, 701, 1765,
+  \dodoi{10.1088/0004-637X/701/2/1765}
 
 \bibitem[{Matthee {et~al.}(2017)Matthee, Schaye, Crain, Schaller, Bower, \&
   Theuns}]{matthee2017}
 Matthee, J., Schaye, J., Crain, R.~A., {et~al.} 2017, Monthly Notices of the
   Royal Astronomical Society, 465, 2381, \dodoi{10.1093/mnras/stw2884}
 
-\bibitem[{Mitra {et~al.}(2015)Mitra, Dav\'e, \& Finlator}]{mitra2015}
-Mitra, S., Dav\'e, R., \& Finlator, K. 2015, Monthly Notices of the Royal
+\bibitem[{Mitra {et~al.}(2015)Mitra, Dav{\'e}, \& Finlator}]{mitra2015}
+Mitra, S., Dav{\'e}, R., \& Finlator, K. 2015, Monthly Notices of the Royal
   Astronomical Society, 452, 1184, \dodoi{10.1093/mnras/stv1387}
 
-\bibitem[{Mitra {et~al.}(2017)Mitra, Dav\'e, Simha, \& Finlator}]{mitra2017}
-Mitra, S., Dav\'e, R., Simha, V., \& Finlator, K. 2017, Monthly Notices of the
-  Royal Astronomical Society, 464, 2766, \dodoi{10.1093/mnras/stw2527}
+\bibitem[{Mitra {et~al.}(2017)Mitra, Dav{\'e}, Simha, \& Finlator}]{mitra2017}
+Mitra, S., Dav{\'e}, R., Simha, V., \& Finlator, K. 2017, Monthly Notices of
+  the Royal Astronomical Society, 464, 2766, \dodoi{10.1093/mnras/stw2527}
 
 \bibitem[{Moore {et~al.}(1998)Moore, Lake, \& Katz}]{moore1998}
 Moore, B., Lake, G., \& Katz, N. 1998, The Astrophysical Journal, 495, 139,
@@ -466,7 +504,7 @@ Moustakas, J., Coil, A.~L., Aird, J., {et~al.} 2013, The Astrophysical Journal,
   767, 50, \dodoi{10.1088/0004-637X/767/1/50}
 
 \bibitem[{Muzzin {et~al.}(2013)Muzzin, Marchesini, Stefanon, Franx, McCracken,
-  {Milvang-Jensen}, Dunlop, Fynbo, Brammer, Labb\'e, \& {van
+  {Milvang-Jensen}, Dunlop, Fynbo, Brammer, Labb{\'e}, \& {van
   Dokkum}}]{muzzin2013}
 Muzzin, A., Marchesini, D., Stefanon, M., {et~al.} 2013, The Astrophysical
   Journal, 777, 18, \dodoi{10.1088/0004-637X/777/1/18}
@@ -499,7 +537,7 @@ Peng, Y., Maiolino, R., \& Cochrane, R. 2015, Nature, 521, 192,
 \bibitem[{Peng {et~al.}(2010)Peng, Lilly, Kova{\v c}, Bolzonella, Pozzetti,
   Renzini, Zamorani, Ilbert, Knobel, Iovino, Maier, Cucciati, Tasca, Carollo,
   Silverman, Kampczyk, {de Ravel}, Sanders, Scoville, Contini, Mainieri,
-  Scodeggio, Kneib, Le~F\`evre, Bardelli, Bongiorno, Caputi, Coppa, {de la
+  Scodeggio, Kneib, Le~F{\`e}vre, Bardelli, Bongiorno, Caputi, Coppa, {de la
   Torre}, Franzetti, Garilli, Lamareille, Le~Borgne, Le~Brun, Mignoli,
   Perez~Montero, Pello, Ricciardelli, Tanaka, Tresse, Vergani, Welikala, Zucca,
   Oesch, Abbas, Barnes, Bordoloi, Bottini, Cappi, Cassata, Cimatti, Fumana,
@@ -519,9 +557,9 @@ Pillepich, A., Springel, V., Nelson, D., {et~al.} 2018, Monthly Notices of the
 Reddick, R.~M., Wechsler, R.~H., Tinker, J.~L., \& Behroozi, P.~S. 2013, The
   Astrophysical Journal, 771, 30, \dodoi{10.1088/0004-637X/771/1/30}
 
-\bibitem[{{Rodr\'iguez-Puebla} {et~al.}(2016){Rodr\'iguez-Puebla}, Primack,
+\bibitem[{{Rodr{\'i}guez-Puebla} {et~al.}(2016){Rodr{\'i}guez-Puebla}, Primack,
   Behroozi, \& Faber}]{rodriguez-puebla2016a}
-{Rodr\'iguez-Puebla}, A., Primack, J.~R., Behroozi, P., \& Faber, S.~M. 2016,
+{Rodr{\'i}guez-Puebla}, A., Primack, J.~R., Behroozi, P., \& Faber, S.~M. 2016,
   Monthly Notices of the Royal Astronomical Society, 455, 2592,
   \dodoi{10.1093/mnras/stv2513}
 
@@ -542,7 +580,7 @@ Salim, S., Rich, R.~M., Charlot, S., {et~al.} 2007, The Astrophysical Journal
 Santini, P., Fontana, A., Grazian, A., {et~al.} 2009, Astronomy and
   Astrophysics, 504, 751, \dodoi{10.1051/0004-6361/200811434}
 
-\bibitem[{Schreiber {et~al.}(2015)Schreiber, Pannella, Elbaz, B\'ethermin,
+\bibitem[{Schreiber {et~al.}(2015)Schreiber, Pannella, Elbaz, B{\'e}thermin,
   Inami, Dickinson, Magnelli, Wang, Aussel, Daddi, Juneau, Shu, Sargent, Buat,
   Faber, Ferguson, Giavalisco, Koekemoer, Magdis, Morrison, Papovich, Santini,
   \& Scott}]{schreiber2015}
@@ -553,18 +591,18 @@ Schreiber, C., Pannella, M., Elbaz, D., {et~al.} 2015, Astronomy and
 Silk, J., \& Mamon, G.~A. 2012, Research in Astronomy and Astrophysics, 12,
   917, \dodoi{10.1088/1674-4527/12/8/004}
 
-\bibitem[{Somerville \& Dav\'e(2015)}]{somerville2015}
-Somerville, R.~S., \& Dav\'e, R. 2015, Annual Review of Astronomy and
+\bibitem[{Somerville \& Dav{\'e}(2015)}]{somerville2015}
+Somerville, R.~S., \& Dav{\'e}, R. 2015, Annual Review of Astronomy and
   Astrophysics, 53, 51, \dodoi{10.1146/annurev-astro-082812-140951}
 
 \bibitem[{Somerville {et~al.}(2012)Somerville, Gilmore, Primack, \&
-  Dom\'inguez}]{somerville2012}
-Somerville, R.~S., Gilmore, R.~C., Primack, J.~R., \& Dom\'inguez, A. 2012,
+  Dom{\'i}nguez}]{somerville2012}
+Somerville, R.~S., Gilmore, R.~C., Primack, J.~R., \& Dom{\'i}nguez, A. 2012,
   Monthly Notices of the Royal Astronomical Society, 423, 1992,
   \dodoi{10.1111/j.1365-2966.2012.20490.x}
 
-\bibitem[{Sparre {et~al.}(2017)Sparre, Hayward, Feldmann, {Faucher-Gigu\`ere},
-  Muratov, Kere{\v s}, \& Hopkins}]{sparre2017}
+\bibitem[{Sparre {et~al.}(2017)Sparre, Hayward, Feldmann,
+  {Faucher-Gigu{\`e}re}, Muratov, Kere{\v s}, \& Hopkins}]{sparre2017}
 Sparre, M., Hayward, C.~C., Feldmann, R., {et~al.} 2017, Monthly Notices of the
   Royal Astronomical Society, 466, 88, \dodoi{10.1093/mnras/stw3011}
 
@@ -590,13 +628,20 @@ Sunayama, T., Hearin, A.~P., Padmanabhan, N., \& Leauthaud, A. 2016, Monthly
 {Taghizadeh-Popp}, M., Fall, S.~M., White, R.~L., \& Szalay, A.~S. 2015, The
   Astrophysical Journal, 801, 14, \dodoi{10.1088/0004-637X/801/1/14}
 
+\bibitem[{Takada {et~al.}(2014)Takada, Ellis, Chiba, Greene, Aihara, Arimoto,
+  Bundy, Cohen, Dor{\'e}, Graves, Gunn, Heckman, Hirata, Ho, Kneib,
+  Le~F{\`e}vre, Lin, More, Murayama, Nagao, Ouchi, Seiffert, Silverman,
+  Sodr{\'e}, Spergel, Strauss, Sugai, Suto, Takami, \& Wyse}]{takada2014}
+Takada, M., Ellis, R.~S., Chiba, M., {et~al.} 2014, Publications of the
+  Astronomical Society of Japan, 66, R1, \dodoi{10.1093/pasj/pst019}
+
 \bibitem[{Tamura {et~al.}(2016)Tamura, Takato, Shimono, Moritani, Yabe,
   Ishizuka, Ueda, Kamata, Aghazarian, Arnouts, Barban, Barkhouser, Borges,
   Braun, Carr, Chabaud, Chang, Chen, Chiba, Chou, Chu, Cohen, {de Almeida}, {de
   Oliveira}, {de Oliveira}, Dekany, Dohlen, {dos Santos}, {dos Santos}, Ellis,
   Fabricius, Ferrand, Ferreira, Golebiowski, Greene, Gross, Gunn, Hammond,
   Harding, Hart, Heckman, Hirata, Ho, Hope, Hovland, Hsu, Hu, Huang, Jaquet,
-  Jing, Karr, Kimura, King, Komatsu, Le~Brun, Le~F\`evre, Le~Fur, Le~Mignant,
+  Jing, Karr, Kimura, King, Komatsu, Le~Brun, Le~F{\`e}vre, Le~Fur, Le~Mignant,
   Ling, Loomis, Lupton, Madec, Mao, Marrara, {Mendes de Oliveira}, Minowa,
   Morantz, Murayama, Murray, Ohyama, Orndorff, Pascal, Pereira, Reiley,
   Reinecke, Ritter, Roberts, Schwochert, Seiffert, Smee, Sodre, Spergel,
@@ -604,8 +649,8 @@ Sunayama, T., Hearin, A.~P., Padmanabhan, N., \& Leauthaud, A. 2016, Monthly
   Tanaka, Tresse, Verducci, Vibert, Vidal, Wang, Wen, Yan, \&
   Yasuda}]{tamura2016}
 Tamura, N., Takato, N., Shimono, A., {et~al.} 2016, in Ground-Based and
-  {{Airborne Instrumentation}} for {{Astronomy VI}}, Vol. 9908, eprint:
-  arXiv:1608.01075, 99081M
+  {{Airborne Instrumentation}} for {{Astronomy VI}}, Vol. 9908, {eprint:
+  arXiv:1608.01075}, 99081M
 
 \bibitem[{Taylor {et~al.}(2009)Taylor, Franx, {van Dokkum}, Bell, Brammer,
   Rudnick, Wuyts, Gawiser, Lira, Urry, \& Rix}]{taylor2009}
@@ -673,9 +718,9 @@ Velander, M., {van Uitert}, E., Hoekstra, H., {et~al.} 2014, Monthly Notices of
 Vogelsberger, M., Genel, S., Springel, V., {et~al.} 2014, Monthly Notices of
   the Royal Astronomical Society, 444, 1518, \dodoi{10.1093/mnras/stu1536}
 
-\bibitem[{Wang {et~al.}(2013)Wang, Farrah, Oliver, Amblard, B\'ethermin, Bock,
-  Conley, Cooray, Halpern, Heinis, Ibar, Ilbert, Ivison, Marsden, Roseboom,
-  {Rowan-Robinson}, Schulz, Smith, Viero, \& Zemcov}]{wang2013}
+\bibitem[{Wang {et~al.}(2013)Wang, Farrah, Oliver, Amblard, B{\'e}thermin,
+  Bock, Conley, Cooray, Halpern, Heinis, Ibar, Ilbert, Ivison, Marsden,
+  Roseboom, {Rowan-Robinson}, Schulz, Smith, Viero, \& Zemcov}]{wang2013}
 Wang, L., Farrah, D., Oliver, S.~J., {et~al.} 2013, Monthly Notices of the
   Royal Astronomical Society, 431, 648, \dodoi{10.1093/mnras/stt190}
 
@@ -763,7 +808,7 @@ Yang, X., Mo, H.~J., {van den Bosch}, F.~C., \& Jing, Y.~P. 2005, Monthly
   Ellman, Elms, Evans, Fan, Federwitz, Fiscelli, Friedman, Frieman, Fukugita,
   Gillespie, Gunn, Gurbani, {de Haas}, Haldeman, Harris, Hayes, Heckman,
   Hennessy, Hindsley, Holm, Holmgren, Huang, Hull, Husby, Ichikawa, Ichikawa,
-  Ivezi\'c, Kent, Kim, Kinney, Klaene, Kleinman, Kleinman, Knapp, Korienek,
+  Ivezi{\'c}, Kent, Kim, Kinney, Klaene, Kleinman, Kleinman, Knapp, Korienek,
   Kron, Kunszt, Lamb, Lee, Leger, Limmongkol, Lindenmeyer, Long, Loomis,
   Loveday, Lucinio, Lupton, MacKinnon, Mannery, Mantsch, Margon, McGehee,
   McKay, Meiksin, Merelli, Monet, Munn, Narayanan, Nash, Neilsen, Neswold,
