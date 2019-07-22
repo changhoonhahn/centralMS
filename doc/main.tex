@@ -57,9 +57,7 @@
 \affil{Center for Cosmology and Particle Physics, Department of Physics, New York University, 4 Washington Place, New York, NY 10003}
 \author{Jeremy L.~Tinker}
 \affil{Center for Cosmology and Particle Physics, Department of Physics, New York University, 4 Washington Place, New York, NY 10003}
-\author{Andrew R.~Wetzel}
-\affil{TAPIR, California Institute of Technology, Pasadena, CA USA}
-\affil{Carnegie Observatories, Pasadena, CA USA}
+\author{Andrew Wetzel}
 \affil{Department of Physics, University of California, Davis, CA USA}
 
 \begin{abstract}
@@ -71,12 +69,12 @@
     sequence'' (SFS), which characterizes both their star formation histories and
     stellar mass growths. Meanwhile, observed constraints on the SHMR connect 
     stellar mass growth to host halo halo accretion history. Combining these observed 
-    trends with a high-resolution cosmological $N$-body simulation, we present 
-    flexible models that track the star formation, stellar mass, and host halo 
-    accretion histories of star-forming central galaxies over $z < 1$ while 
-    reproducing the observed stellar mass function and SFS of central galaxies 
-    in SDSS Data Release 7. Using these models, we find that the scatter in SHMR at 
-    $M_h{=}10^{12}M_\odot$, $\sigtwe$, is sensitive to the timescale of star 
+    trends with a cosmological $N$-body simulation, we present flexible models that 
+    track the star formation, stellar mass, and host halo accretion histories of 
+    star-forming central galaxies at $z < 1$ while reproducing the observed stellar 
+    mass function and SFS of central galaxies in SDSS Data Release 7. Using these 
+    models, we find that the scatter in SHMR at $M_h{=}10^{12}M_\odot$, $\sigtwe$, 
+    is sensitive to the timescale of star 
     formation variability, $t_{\rm duty}$, and the correlation coefficient, $r$, 
     between star formation and host halo accretion histories: shorter $\tduty$ and 
     higher $r$ both result in tighter $\sigtwe$. To reproduce a constant 
@@ -151,7 +149,7 @@ While simulations provide another means for understanding SFHs,
 they are also subject to their specific time and mass resolutions that
 suppress the variability of their star formation, especially in
 analytic models, semi-analytic models, and large-volume cosmological
-hydrodynamic simulations~\citep[][see also Figure~\ref{fig:illsfh}]{sparre2015, sparre2017}.
+hydrodynamic simulations~\citep[][see also Figure~\ref{fig:illsfh}]{sparre2017}. %sparre2015, 
 
 Empirical models, through their flexibility, provide an effective 
 method for examining the connection between SFH and host halo assembly 
@@ -198,8 +196,8 @@ and their SFHs are not influenced by environmentally-driven external
 mechanisms that impact SFHs of satellites such as ram pressure 
 stripping~\citep{gunn1972,bekki2009}, strangulation~\citep{larson1980, peng2015}, 
 or harassment~\citep{moore1998}. Using a similar approach as \cite{wetzel2013, hahn2017b}, 
-we present models that combine a high resolution cosmological $N$-body 
-simulation with observed evolutionary trends of the SFS. They statistically 
+we present models that combine a cosmological $N$-body simulation with observed 
+evolutionary trends of the SFS. They statistically 
 track the star formation, stellar mass, and host halo assembly histories of 
 SF central galaxies from $z\sim1$ to $0$. After fitting our models to reproduce 
 the properties of observed SF central galaxies, we compare the predicted 
@@ -283,11 +281,12 @@ using the \cite{white2002} $\mathtt{TreePM}$ code with flat $\Lambda$CDM cosmolo
 ($\Omega_m =0.274, \Omega_b = 0.0457, h = 0.7, n=0.95$, and $\sigma_8 = 0.8$).
 From initial conditions at $z = 150$, generated from second-order Lagrangian
 Perturbation Theory, $2048^3$ particles with mass of $1.98 \times 10^8\,M_\odot$ are
-evolved in a $250\,h^{-1}\mathrm{Mpc}$ box with a Plummer equivalent smoothing of
-$2.5\,h^{-1}{\rm kpc}$~\citep{wetzel2013, wetzel2014}. `Host halos' are then
-identified using the Friends-of-Friends algorithm~\citep[FoF;][]{davis1985} with
-linking length of $b{=}0.168$ times the mean inter-partcile spacing. Within
-these host halos, \cite{wetzel2013} identifies `subhalos' as overdensities
+evolved in a $250\,h^{-1}\mathrm{Mpc}$ ($357.12~{\rm Mpc}$) box with a Plummer 
+equivalent smoothing of $2.5\,h^{-1}{\rm kpc}$~\citep{wetzel2013, wetzel2014}. 
+`Host halos' are then identified using the Friends-of-Friends algorithm~\citep[FoF;][]{davis1985} with
+linking length of $b{=}0.168$ times the mean inter-partcile spacing,
+\edt{which links particles with local density $>\sim100\times$ the mean matter density.}
+Within these host halos, \cite{wetzel2013} identifies `subhalos' as overdensities
 in phase space through a six-dimensional FoF algorithm~\citep[FoF6D;][]{white2010}.
 The host halos and subhalos are then tracked across the simulation outputs
 from $z = 10$ to $0$ to build merger trees~\citep{wetzel2009,wetzel2010}.
@@ -304,8 +303,8 @@ keep subhalos that are classified as centrals throughout the redshift
 range. This criterion removes ``black splash'' or ``ejected'' satellite
 galaxies~\citep[\emph{e.g.}][]{mamon2004,wetzel2014} misclassified as
 centrals. Next, we describe how we select and initialize the SF central
-galaxies from the central subhalos of the $\mathtt{TreePM}$
-simulation in our model.
+galaxies in our model from the central subhalos of the $\mathtt{TreePM}$
+simulation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Section
@@ -361,7 +360,7 @@ order: $n({>}M_\mathrm{peak}) > n({>}M_*)$. In practice, we apply a $0.2$
 dex log-normal scatter in $M_*$ at fixed $M_\mathrm{peak}$ based on the
 observed SHMR~\citep[\emph{e.g.}][]{mandelbaum2006a, more2011, velander2014, zu2015, gu2016, lange2018a}.
 For $n({>}M_*)$, we use observed stellar mass function (SMF)
-from \cite{li2009}, which is based on the same SDSS NYU-VAGC sample as our
+from \cite{li2009} at $z\sim 0$, which is based on the same SDSS NYU-VAGC sample as our
 group catalog. Then using the abundance matching $M_*$, we randomly select subhalos as
 SF based on the probabilities of being on the SFS using Eq.~\ref{eq:f_cen_sfms}.
 \cite{tinker2017b,tinker2018} found that quenching is
@@ -497,7 +496,9 @@ highlighted $\Delta \logsfr_i$ illustrate, SF galaxies in Illustris evolve
 along the SFS, with their SFRs fluctuating about $\logsfrsfs$.
 
 Motivated by the SFHs of Illustris SF galaxies, we introduce variability
-to the SFHs of our SF centrals in the form of a ``\emph{star formation duty cycle}''.
+to the SFHs of our SF centrals in the form of a ``\emph{star formation duty cycle}''. 
+\edt{More specifically, we set the SFRs of SF centrals to fluctulate about 
+$\logsfrsfs$ on some timescale $t_{\rm duty}$.}
 Within the SFH of Eq.~\ref{eq:logsfr_sf}, we parameterize $\Delta \logsfr_i$ to
 fluctuate about the $\logsfrsfs$ on timescale, $t_\mathrm{duty}$, with
 amplitude sampled from a log-normal distribution with $0.3\,\mathrm{dex}$
@@ -526,7 +527,9 @@ M_*(t) = f_\mathrm{retain} \int\limits_{t_0}^{t} \mathrm{SFR(M_*, t')}\,\mathrm{
 $t_0$ and $M_0$ are the initial cosmic time and stellar mass at $z \sim 1$,
 respectively. $f_\mathrm{retain}$ here is the fraction of stellar mass
 that is retained after supernovae and stellar winds; we use
-$f_\mathrm{retain} = 0.6$~\citep{wetzel2013}. We can now evolve the SFR and
+$f_\mathrm{retain} = 0.6$~\citep{wetzel2013} 
+\edt{and assume instantaneous recycling such that $f_{\rm retain}$ is applied at all times.}
+We can now evolve the SFR and
 $M_*$ of our SF centrals until the final $z=0.05$ snapshot by
 solving the differential equation of Eqs.~\ref{eq:logsfr_sf} and~\ref{eq:integ_mass}.
 On the right panel of Figure~\ref{fig:sfh_model}, we present the
@@ -586,11 +589,12 @@ of our SF central galaxies and their host halo accretion histories
 with a correlation coefficient $r$.
 
 We correlate $\Delta\log\,\mathrm{SFR}$ (Eq.~\ref{eq:logsfr_sf}) to the halo 
-mass accretion over dynamical time. At every $t_\mathrm{duty}$ timestep, $t$, $
-\Delta\logsfr(t)$ is assigned based on 
+mass accretion over dynamical time, 
+\edt{which we define as $t_{\rm dyn} = (\frac{4}{3}\pi G 200\rho_m(t))^{-\frac{1}{2}}$}.
+At every $t_\mathrm{duty}$ timestep, $t$, $\Delta\logsfr(t)$ is assigned based on 
 $\Delta M_h(t) = M_h(t) - M_h(t - t_\mathrm{dyn})$ in $M_\mathrm{max}$ bins
-with a correlation coefficient $r$, a parameter added to our model. This
-prescription for correlating $\Delta\log\mathrm{SFR}$ to $\Delta M_h$ is
+with a correlation coefficient $r$, a parameter added to our model. 
+This prescription for correlating $\Delta\log\mathrm{SFR}$ to $\Delta M_h$ is
 similar to other empirical models that also correlate $\Delta\log\mathrm{SFR}$
 to $\Delta M_h$ over $t_\mathrm{dyn}$~\citep{rodriguez-puebla2016a, behroozi2019}.
 In \cite{rodriguez-puebla2016a}, however, they assume perfect ($r=1$) correlation
@@ -650,7 +654,7 @@ galaxies.
     (blue: $t_\mathrm{duty}{=}1\,\mathrm{Gyr}$; red: $t_\mathrm{duty}{=}10\,\mathrm{Gyr}$)
     run with median values of their ABC posterior distribution produce SMFs and SFSs consistent
     with observations (left and middle). \emph{They however predict significantly different
-    scatter in $\log\,M_*$ at fixed $\log\,M_\mathrm{halo}$ --- $\siglogm$ (right)}.
+    scatter in $\log\,M_*$ at fixed $\log\,M_\mathrm{halo}$ for star-forming centrals --- $\siglogm$ (right)}.
     By comparing the scatter in SHMR of our models to observational constraints on the SHMR,
     we can constrain the timescale of the star formation duty cycle and thereby the SFHs of star
     forming galaxies.
@@ -728,7 +732,7 @@ further details.
     and Cao et al. (in preparation), described in Section~\ref{sec:sfdutycycle}.
     %\edt{\cite{lange2018a} constrains the scatter in $\log L$ at $M_h = 10^{12} M_\odot$}.  \edt{$\sigma_{\log\,M_*}$ constraints from the literature, besides Cao et al. (in preparation),  are derived using halo models where the constraining power mainly come from massive halos.}
     In the right panel, we include compiled predictions from hydrodyanmic simulations
-    (dotted region), semi-analytic models (hatched), and
+    (dotted region; EAGLE, Massive Black II, Illustris TNG), semi-analytic models (hatched), and
     the~\cite{behroozi2019} {\sc UM} empirical model. We also include 
     $\siglogm(M_h = 10^{12.4} M_\odot)$ from a simple empirical model with \cite{abramson2016} 
     SFHs assigned to halos via abundance matching (dotted).
@@ -815,7 +819,7 @@ $\siglogm = 0.33$ dex to $0.31 - 0.26$ dex.
 In addition to the observational constraints, we also compare the $\sigtwe$
 predicted by our model to predictions from modern galaxy formation models
 on the right panel: hydrodynamic simulations (dot filled), semi-analytic models
-(SAM; hatched), and an empirical model (dashed line). For the hydrodynamic 
+(SAM; hatched), and an empirical model (dashed line). For the large-volume hydrodynamic 
 simulations, the dotted region, $\sigtwe = 0.16 - 0.22$ dex, encompasses
 predictions from EAGLE~\citep{matthee2017}, Massive Black II~\citep{khandai2015},
 and Illustris TNG, as compiled in Figure 8 of \cite{wechsler2018}.
@@ -826,7 +830,7 @@ model~\edt{\citep{croton2016}}. We also include the prediction from the
 little consensus among the $\siglogm$ predictions of the galaxy formation models.
 $\siglogm$ from SAMs are consistent with our model with $t_{\rm duty} \gtrsim 5$ Gyr. 
 UM, which predicts a lower $\siglogm$, is consistent with $t_{\rm duty} = 1 - 5$ Gyr.
-Lastly, hydrodynamic simulations predict the lowest $\siglogm$ among the models
+Lastly, large-volume hydrodynamic simulations predict the lowest $\siglogm$ among the models
 with $\sim 0.2$ dex, which our fiducial model struggles to reproduce even with 
 $t_{\rm duty} = 0.5$ Gyr. We note that while there is yet no consensus among the 
 observational $\siglogm$ constraints at $M_h=10^{12} M_\odot$, at higher $M_h$ 
@@ -1083,7 +1087,6 @@ thus, demonstrate that measurements of the SHMR relation can be used to constrai
 the detailed star formation histories of SF central galaxies and their connection 
 to host halo assembly histories.
 
-
 \section{Summary and Conclusion} \label{sec:summary}
 Despite our progress in understanding how galaxies form and evolve in
 the $\Lambda$CDM  hierarchical universe, our understanding of the
@@ -1099,12 +1102,14 @@ paper, we therefore focus on measuring the timescale of star formation
 variability and the connection between star formation and host
 halo accretion histories of star-forming central galaxies.
 
-We combine the high-resolution cosmological $N$-body $\mathtt{TreePM}$ simulation
+We combine the cosmological $N$-body $\mathtt{TreePM}$ simulation
 with SFHs that evolve the SF central galaxies along the SFS and present models
 that tracks the SFR, $M_*$, and host halo accretion histories of SF centrals from 
 $z \sim 1$ to $z=0.05$. More specifically, we characterize the SFHs to evolve with
-respect to the mean $\log\,\mathrm{SFR}$ of the SFS with a ``star formation duty cycle'' 
-that introduces star formation variability on a specific timescale, $t_\mathrm{duty}$. 
+respect to the mean $\log\,\mathrm{SFR}$ of the SFS 
+\edt{and introduce star formation 
+variability using a ``star formation duty cycle'', where the SFRs of the SF centrals 
+fluctuate about $\logsfrsfs$ on some timescale, $t_\mathrm{duty}$.}
 We parameterize the SFS using parameters that dictate the low $M_*$ and high $M_*$ 
 slopes and redshift evolution. We then compare this model to the observed SMF of the 
 SF centrals in the SDSS DR7 group catalog using ABC-PMC likelihood-free parameter 
@@ -1173,7 +1178,8 @@ for valuable discussions and feedback. We also thank Louis E. Abramson,
 Junzhi Cao, Shy Genel, and Cheng Li for providing us with data used in
 the analysis. This material is based upon work supported by the U.S.
 Department of Energy, Office of Science, Office of High Energy Physics,
-under contract No. DE-AC02-05CH11231.
+under contract No. DE-AC02-05CH11231. AW was supported by NASA, through 
+ATP grant 80NSSC18K1097 and HST grants GO-14734 and AR-15057 from STScI.
 
 \bibliographystyle{aasjournal}
 \bibliography{centralMS}
