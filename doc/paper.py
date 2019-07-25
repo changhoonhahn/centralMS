@@ -831,22 +831,17 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     sigma_logM*(M_h = 10^12) as a function of duty cycle timescale (t_duty) from 
     the ABC posteriors to observations and different simulations. 
     '''
-    runs = ['randomSFH0.5gyr.sfsmf.sfsbroken', 
+    # calculate the scatters from the ABC posteriors 
+    runs = ['randomSFH0.1gyr.sfsmf.sfsbroken', 
+            'randomSFH0.5gyr.sfsmf.sfsbroken', 
             'randomSFH1gyr.sfsmf.sfsbroken', 
             'randomSFH2gyr.sfsmf.sfsbroken', 
             'randomSFH5gyr.sfsmf.sfsbroken', 
             'randomSFH10gyr.sfsmf.sfsbroken']
-    tduties = [0.5, 1., 2., 5., 10.]  #hardcoded
+    tduties = [0.1, 0.5, 1., 2., 5., 10.]  #hardcoded
     iters = [14 for i in range(len(tduties))] # iterations of ABC
-    nparticles = [1000, 1000, 1000, 1000, 1000]
-    # sigma_logM* constraints from literature 
-    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2013)', 
-            'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
-    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.18, 0.22, 0.2275,0.33][::-1]
-    lit_siglogMs_upper =  [0.26, 0.206+0.031, 0.235, 0.19, 0.24, 0.21, 0.30][::-1]
-    lit_siglogMs_lower =  [0.07, 0.206-0.031, 0.185, 0.16, 0.20, 0.245, 0.36][::-1]
+    nparticles = [1000, 1000, 1000, 1000, 1000, 1000]
 
-    # calculate the scatters from the ABC posteriors 
     smhmr = Obvs.Smhmr()
     sigMs = np.zeros((5, len(tduties)))
     for i_t, tduty in enumerate(tduties): 
@@ -880,17 +875,29 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     # abc posteriors 
     sub.fill_between(tduties, sigMs[3,:], sigMs[4,:], color='C0', alpha=0.1, linewidth=0) 
     sub.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C0', alpha=0.5, linewidth=0) 
-    # literature 
-    subplts = [] 
-    marks = ['^', 's', 'o', 'v', 'x', 'D', 'H']
-    for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), 
-            lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
-        subplt = sub.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.k', marker=marks[ii], markersize=8)
-        subplts.append(subplt) 
-    legend1 = sub.legend(subplts[:4], lit_siglogMs[:4], handletextpad=-0.5, loc=(-0.02, 0.00), prop={'size': 15})
-    sub.legend(subplts[4:], lit_siglogMs[4:], loc=(0.4, 0.72), handletextpad=-0.5, prop={'size': 15})
-    plt.gca().add_artist(legend1)
-    sub.set_xlim([0.5, 10.]) # x-axis
+
+    # sigma_logM* constraints from literature 
+    # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 (COSMOS)
+    # More et al. (2011) SMHMR of starforming centrals (SDSS)
+    # Leauthaud et al. (2012) all galaxies 0.2 < z < 0.48 (COSMOS)
+    # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
+    # Zu & Mandelbaum (2015) SDSS constraints on iHOD parameters
+    slm_cao2019 = [0.30, 0.33, 0.36] 
+    plt_cao = sub.fill_between(np.linspace(0., 10., 100), np.repeat(slm_cao2019[0], 100), np.repeat(slm_cao2019[2], 100), 
+            facecolor='none', hatch='///', edgecolor='k', linewidth=0., zorder=1)
+    sub.text(1., slm_cao2019[1], 'Cao et al.(2019)', ha='center', va='center', fontsize=15)
+    
+    lit_names       = ['Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2017)', 'Zu+(2015)', 'Lange+(2018)*']
+    slm_lit         = np.zeros((len(lit_names), 3)) 
+    slm_lit[:,0]    = np.array([0.206-0.031, 0.185, 0.16, 0.20, 0.245]) 
+    slm_lit[:,1]    = np.array([0.206, 0.21, 0.18, 0.22, 0.2275]) 
+    slm_lit[:,2]    = np.array([0.206+0.031, 0.235, 0.19, 0.24, 0.21]) 
+    slm_lit_tot     = np.array([slm_lit[:,0].min(), 0, slm_lit[:,2].max()]) 
+    plt_lit = sub.fill_between(np.linspace(0., 10., 100), 
+            np.repeat(slm_lit_tot[0], 100), np.repeat(slm_lit_tot[2], 100), 
+            facecolor='k', alpha=0.25, linewidth=0., zorder=1)
+    sub.text(1., 0.5*(slm_lit_tot[0] + slm_lit_tot[2]), 'literature (see Table 1)', ha='center', va='center', fontsize=15) 
+    sub.set_xlim([0.1, 10.]) # x-axis
     sub.set_xscale('log') 
     sub.set_ylabel(r'$\sigma_{\log\,M_*} \Big(M_h = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=25) # y-axis
     sub.set_ylim([0.1, 0.4]) 
@@ -920,18 +927,18 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     # Abramson+(2016)
     sim_plt = sub2.plot(np.linspace(0., 10., 100), np.repeat(0.33, 100), c='k', ls=':')
     #sim_plts.append(sim_plt) 
-    r = Rectangle((0.55, 0.315), 2.2, 0.0125, linewidth=0., fc='white') 
+    r = Rectangle((0.11, 0.315), 0.9, 0.0125, linewidth=0., fc='white') 
     plt.gca().add_patch(r)
     sub2.text(0.025, 0.76, 'Abramson+(2016)w/AM', ha='left', va='top', transform=sub2.transAxes, fontsize=12)
 
     sub2.text(0.5, 0.3, 'hydro. sims', ha='center', va='center', transform=sub2.transAxes, fontsize=15)
-    r = Rectangle((1.4, 0.183), 2.125, 0.017, linewidth=0., fc='white') 
+    r = Rectangle((0.5, 0.183), 1.5, 0.017, linewidth=0., fc='white') 
     plt.gca().add_patch(r)
     sub2.text(0.5, 0.825, 'semi-analytic models', ha='center', va='center', transform=sub2.transAxes, fontsize=15)
-    r = Rectangle((1., 0.34), 3.9, 0.018, linewidth=0., fc='white') 
+    r = Rectangle((0.29, 0.34), 3., 0.018, linewidth=0., fc='white') 
     plt.gca().add_patch(r)
     sub2.legend(loc=(0.2, 0.025), handletextpad=0.4, frameon=False, fontsize=15) 
-    sub2.set_xlim([0.5, 10.]) # x-axis
+    sub2.set_xlim([0.1, 10.]) # x-axis
     sub2.set_xscale('log') 
     sub2.set_ylim([0.1, 0.4]) 
     sub2.set_yticks([0.1, 0.2, 0.3, 0.4])#, 0.6]) 
@@ -1191,26 +1198,13 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sigma_logM*(M_h = 10^12) and sigma_logMhalo(M* = 10^10.5)) as a function of duty 
     cycle timescale (t_duty) from the ABC posteriors. 
     '''
-    # sigma_logM* constraints from literature 
-    # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 (COSMOS)
-    # More et al. (2011) SMHMR of starforming centrals (SDSS)
-    # Leauthaud et al. (2012) all galaxies 0.2 < z < 0.48 (COSMOS)
-    # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
-    # Zu & Mandelbaum (2015) SDSS constraints on iHOD parameters
-    lit_siglogMs = ['More+(2011)', 'Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2017)', 
-            'Zu+(2015)', 'Lange+(2018)*', 'Cao+(2019)'][::-1]
-    lit_siglogMs_median = [0.15, 0.206, 0.21, 0.18, 0.22, 0.2275,0.33][::-1]
-    lit_siglogMs_upper =  [0.26, 0.206+0.031, 0.235, 0.19, 0.24, 0.21, 0.30][::-1]
-    lit_siglogMs_lower =  [0.07, 0.206-0.031, 0.185, 0.16, 0.20, 0.245, 0.36][::-1]
-
-    # make figure 
     fig = plt.figure(figsize=(10,5)) 
     bkgd = fig.add_subplot(111, frameon=False)
     sub1 = fig.add_subplot(121)
     sub2 = fig.add_subplot(122) 
     # calculate the scatters from the ABC posteriors 
     smhmr = Obvs.Smhmr()
-    tscales = ['0.5', '1', '2', '5', '10']
+    tscales = ['0.1', '0.5', '1', '2', '5', '10']
     for i_a, abias in enumerate([0., 0.5, 0.99]): 
         if abias > 0.:
             #runs = ['rSFH_r'+str(abias)+'_tdyn_'+str(tt)+'gyr' for tt in [0.5, 1, 2, 5]]
@@ -1222,9 +1216,9 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
             runs = ['randomSFH'+tt+'gyr.sfsmf.sfsbroken' for tt in tscales]
             mark=None
             ms=None
-        tduties = [0.5, 1., 2., 5., 9.75]  #hardcoded
-        iters = [14, 14, 14, 14, 14] # iterations of ABC
-        nparticles = [1000, 1000, 1000, 1000, 1000]
+        tduties = [0.1, 0.5, 1., 2., 5., 9.75]  #hardcoded
+        iters = [14, 14, 14, 14, 14, 14] # iterations of ABC
+        nparticles = [1000, 1000, 1000, 1000, 1000, 1000]
 
         sigMs = np.zeros((5, len(tduties)))
         sigMh = np.zeros((5, len(tduties)))
@@ -1261,74 +1255,71 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
             sigMh[3, i_t] = sig_mh_lowlow
             sigMh[4, i_t] = sig_mh_hihi
         # ABC posteriors 
-        #abc_post1 = sub1.errorbar(10**(np.log10(tduties)+0.01*i_a), sigMs[0,:], 
-        #        yerr=[sigMs[0,:]-sigMs[1,:], sigMs[2,:]-sigMs[0,:]], 
-        #        fmt='.k', marker=mark, markersize=ms) 
-        #sub1.fill_between(tduties, sigMs[3,:], sigMs[4,:], color='C'+str(i_a), alpha=0.1, linewidth=0) 
         sub1.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C'+str(i_a), alpha=0.5, linewidth=0) 
-        #abc_post2 = sub2.errorbar(10**(np.log10(tduties)+0.01*i_a), sigMh[0,:], 
-        #        yerr=[sigMh[0,:]-sigMh[1,:], sigMh[2,:]-sigMh[0,:]], 
-        #        fmt='.k', marker=mark, markersize=ms) 
-        #sub2.fill_between(tduties, sigMh[3,:], sigMh[4,:], color='C'+str(i_a), alpha=0.1, linewidth=0) 
-        #sub2.fill_between(tduties, sigMh[1,:], sigMh[2,:], color='C'+str(i_a), alpha=0.5, linewidth=0) 
         sub2.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C'+str(i_a), alpha=0.5, linewidth=0, zorder=2) 
-
-    # literature 
-    subplts = [] 
-    marks = ['^', 's', 'o', 'v', 'x', 'D', 'H']
-    for ii, tt, sig, siglow, sigup in zip(range(len(lit_siglogMs)), np.logspace(np.log10(0.7), np.log10(7), len(lit_siglogMs)), 
-            lit_siglogMs_median, lit_siglogMs_lower, lit_siglogMs_upper):
-        subplt = sub1.errorbar([tt], [sig], yerr=[[sig-siglow], [sigup-sig]], fmt='.k', marker=marks[ii], markersize=5) #fmt='.C'+str(ii), markersize=10)
-        subplts.append(subplt) 
-    legend1 = sub1.legend(subplts[:3], lit_siglogMs[:3], handletextpad=-0.5, loc=(-0.02, 0.00), prop={'size': 15})
-    sub1.legend(subplts[3:], lit_siglogMs[3:], loc=(0.325, 0.66), handletextpad=-0.5, prop={'size': 15})
-    sub1.add_artist(legend1)
-    sub1.set_xlim([0.5, 10.]) # x-axis
+    
+    # sigma_logM* constraints from literature 
+    # Tinker et al. (2013) for star-forming galaxies 0.2 < z < 0.48 (COSMOS)
+    # More et al. (2011) SMHMR of starforming centrals (SDSS)
+    # Leauthaud et al. (2012) all galaxies 0.2 < z < 0.48 (COSMOS)
+    # Reddick et al. (2013) Figure 7. (constraints from conditional SMF)
+    # Zu & Mandelbaum (2015) SDSS constraints on iHOD parameters
+    slm_cao2019 = [0.30, 0.33, 0.36] 
+    plt_cao = sub1.fill_between(np.linspace(0., 10., 100), np.repeat(slm_cao2019[0], 100), np.repeat(slm_cao2019[2], 100), 
+            facecolor='none', hatch='///', edgecolor='k', linewidth=0., zorder=1)
+    sub1.text(1., slm_cao2019[1], 'Cao et al.(2019)', ha='center', va='center', fontsize=15)
+    
+    lit_names       = ['Leauthaud+(2012)', 'Reddick+(2013)', 'Tinker+(2017)', 'Zu+(2015)', 'Lange+(2018)*']
+    slm_lit         = np.zeros((len(lit_names), 3)) 
+    slm_lit[:,0]    = np.array([0.206-0.031, 0.185, 0.16, 0.20, 0.245]) 
+    slm_lit[:,1]    = np.array([0.206, 0.21, 0.18, 0.22, 0.2275]) 
+    slm_lit[:,2]    = np.array([0.206+0.031, 0.235, 0.19, 0.24, 0.21]) 
+    slm_lit_tot     = np.array([slm_lit[:,0].min(), 0, slm_lit[:,2].max()]) 
+    plt_lit = sub1.fill_between(np.linspace(0., 10., 100), 
+            np.repeat(slm_lit_tot[0], 100), np.repeat(slm_lit_tot[2], 100), 
+            facecolor='k', alpha=0.25, linewidth=0., zorder=1)
+    leg1 = sub1.legend([plt_lit], ['literature (see Table 1)'], loc='lower left', handletextpad=0.5, prop={'size': 15})
+    sub1.add_artist(leg1)
+    sub1.set_xlim([0.1, 10.]) # x-axis
     sub1.set_xscale('log') 
     sub1.set_ylabel(r'$\sigma_{\log\,M_*} \Big(M_{h} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=25) # y-axis
     sub1.set_ylim([0.1, 0.4]) 
     sub1.set_yticks([0.1, 0.2, 0.3, 0.4])#, 0.6]) 
 
     ################################################
-    # sigma_logM* for siulations 
+    # sigma_logM* for simulations 
     ################################################
     # constraints for sigma_logMh
-    sim_plts = [] 
     # hydro sims
-    sim_plt = sub2.fill_between(np.linspace(0., 10., 100), np.repeat(0.16, 100), np.repeat(0.22, 100), 
+    plt_hyd = sub2.fill_between(np.linspace(0., 10., 100), np.repeat(0.16, 100), np.repeat(0.22, 100), 
             facecolor='none', hatch='...', edgecolor='k', linewidth=0., zorder=1)
-    sim_plts.append(sim_plt) 
     # SAMs
-    sim_plt = sub2.fill_between(np.linspace(0., 10., 100), np.repeat(0.30, 100), np.repeat(0.37, 100), 
+    sub2.fill_between(np.linspace(0., 10., 100), np.repeat(0.30, 100), np.repeat(0.37, 100), 
             facecolor='none', hatch='X', edgecolor='k', linewidth=0.)
-    sim_plts.append(sim_plt) 
+    plt_sam = sub2.fill_between(np.linspace(0., 10., 100), np.repeat(0., 100), np.repeat(0., 100), 
+            facecolor='none', hatch='XX', edgecolor='k', linewidth=0.)
     # universe machine
     sub2.plot(np.linspace(0., 10., 100), np.repeat(0.28, 100), c='k', ls='--')
     sub2.text(0.975, 0.59, 'UniverseMachine', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
-    # Abramson+(2016)
-    #sim_plt = sub2.plot(np.linspace(0., 10., 100), np.repeat(0.33, 100), c='k', ls=':')
-    #r = Rectangle((2.08, 0.335), 7.5, 0.0125, linewidth=0., fc='white') 
-    #plt.gca().add_patch(r)
-    #sub2.text(0.975, 0.825, 'Abramson+(2016)w/AM', ha='right', va='top', transform=sub2.transAxes, fontsize=12)
 
-    leg1 = sub2.legend(sim_plts, ['hydro. sims', 'semi-analytic'], 
+    leg1 = sub2.legend([plt_hyd, plt_sam], ['hydro. sims', 'semi-analytic'], 
             loc='lower right', handletextpad=0.5, prop={'size': 15})
 
     abc_post1 = sub2.fill_between([0], [0], [0.1], color='C0', label='$r=0$')#'no assembly bias') 
     abc_post2 = sub2.fill_between([0], [0], [0.1], color='C1', label='$r=0.5$') 
     abc_post3 = sub2.fill_between([0], [0], [0.1], color='C2', label='$r=0.99$') 
     sub2.text(0.04, 0.965, 'Hahn+(2018) posteriors', ha='left', va='top', transform=sub2.transAxes, fontsize=16)
-    r = Rectangle((0.8, 0.308), 0.82, 0.014, linewidth=0., fc='white') 
+    r = Rectangle((0.2, 0.308), 0.5, 0.014, linewidth=0., fc='white') 
     plt.gca().add_patch(r)
-    r = Rectangle((0.8, 0.33), 0.76, 0.014, linewidth=0., fc='white') 
+    r = Rectangle((0.2, 0.33), 0.44, 0.014, linewidth=0., fc='white') 
     plt.gca().add_patch(r)
     #r = Rectangle((0.8, 0.35), 2.3, 0.02, linewidth=0., fc='white') 
-    r = Rectangle((0.8, 0.352), 0.61, 0.014, linewidth=0., fc='white') 
+    r = Rectangle((0.2, 0.352), 0.3, 0.014, linewidth=0., fc='white') 
     plt.gca().add_patch(r)
     leg2 = sub2.legend(loc=(0.02, 0.67), handletextpad=0.4, frameon=False, fontsize=15) 
     sub2.add_artist(leg1)
     sub2.add_artist(leg2)
-    sub2.set_xlim([0.5, 10.]) # x-axis
+    sub2.set_xlim([0.1, 10.]) # x-axis
     sub2.set_xscale('log') 
     #sub2.set_ylabel(r'$\sigma_{M_\mathrm{halo}} \Big(M_* = 10^{'+str(Mstar)+r'} M_\odot \Big)$', fontsize=20) # y-axis
     sub2.set_ylim([0.1, 0.4]) 
@@ -1695,9 +1686,7 @@ def siglogM_zevo(Mhalo=12, dMhalo=0.5):
             abc_post2 = sub.fill_between([0], [0], [0.1], color='C1', label='$r=0.5$') 
             abc_post3 = sub.fill_between([0], [0], [0.1], color='C2', label='$r=0.99$') 
             leg2 = sub.legend(loc=(0.52, 0.025), handletextpad=0.4, frameon=False, fontsize=18) 
-    bkgd = fig.add_subplot(111, frameon=False)
-    bkgd.tick_params(labelcolor='none', top='off', bottom='off', left='off', right='off')
-    bkgd.set_xlabel('Redshift ($z$)', labelpad=10, fontsize=22) 
+        sub.set_xlabel('Redshift ($z$)', fontsize=22) 
     fig.subplots_adjust(wspace=0.2)
     fig.savefig(''.join([UT.tex_dir(), 'figs/siglogM_zevo.pdf']), bbox_inches='tight', dpi=150) 
     plt.close()
@@ -2056,13 +2045,13 @@ if __name__=="__main__":
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14], dMhalo=0.1)
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
-    #SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1)
+    SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
     #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
     #SHMRscatter_tduty_abias_z1sigma(Mhalo=12, dMhalo=0.1)
-    siglogM_zevo(Mhalo=12, dMhalo=0.1)
+    #siglogM_zevo(Mhalo=12, dMhalo=0.1)
     #fQ_fSFMS()
     #SFHmodel()
     #Illustris_SFH()
