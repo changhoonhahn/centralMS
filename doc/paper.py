@@ -847,7 +847,7 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     for i_t, tduty in enumerate(tduties): 
         abc_dir = ''.join([UT.dat_dir(), 'abc/', runs[i_t], '/model/']) # ABC directory 
         sig_Mss, sig_Mhs = [], [] 
-        for i in range(10): 
+        for i in range(100): 
             f = pickle.load(open(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.p']), 'rb'))
             subcat_sim_i = {} 
             for key in f.keys(): 
@@ -866,6 +866,8 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
         sigMs[2, i_t] = sig_ms_high
         sigMs[3, i_t] = sig_ms_lowlow
         sigMs[4, i_t] = sig_ms_hihi
+        print('t_duty = %.1f --- sigma_{M*|Mh=10^%.1f Msun} = %f (+/- %f, %f)' % 
+                (tduty, Mhalo, sig_ms_med, sig_ms_high-sig_ms_med, sig_ms_med - sig_ms_low))
         
     ##############################
     # sigma_logM* vs observaitons 
@@ -899,7 +901,7 @@ def SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1):
     sub.text(1., 0.5*(slm_lit_tot[0] + slm_lit_tot[2]), 'literature (see Table 1)', ha='center', va='center', fontsize=15) 
     sub.set_xlim([0.1, 10.]) # x-axis
     sub.set_xscale('log') 
-    sub.set_ylabel(r'$\sigma_{\log\,M_*} \Big(M_h = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=25) # y-axis
+    sub.set_ylabel(r'$\sigma_{M_*|M_h}$ at $M_h = 10^{'+str(Mhalo)+r'} M_\odot$', fontsize=25) # y-axis
     sub.set_ylim([0.1, 0.4]) 
     sub.set_yticks([0.1, 0.2, 0.3, 0.4]) 
     #sub.set_xlabel('$t_\mathrm{duty}$ [Gyr]', labelpad=5, fontsize=22) 
@@ -1221,11 +1223,10 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
         nparticles = [1000, 1000, 1000, 1000, 1000, 1000]
 
         sigMs = np.zeros((5, len(tduties)))
-        sigMh = np.zeros((5, len(tduties)))
         for i_t, tduty in enumerate(tduties): 
             abc_dir = UT.dat_dir()+'abc/'+runs[i_t]+'/model/' # ABC directory 
             sig_Mss, sig_Mhs = [], [] 
-            for i in range(10): 
+            for i in range(100): 
                 f = pickle.load(open(''.join([abc_dir, 'model.theta', str(i), '.t', str(iters[i_t]), '.p']), 'rb'))
                 subcat_sim_i = {} 
                 for key in f.keys(): 
@@ -1242,18 +1243,13 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
                 sig_Mss.append(sig_ms_i)  
                 sig_Mhs.append(sig_mh_i) 
             sig_ms_low, sig_ms_med, sig_ms_high, sig_ms_lowlow, sig_ms_hihi = np.percentile(np.array(sig_Mss), [16, 50, 84, 2.5, 97.5])
-            sig_mh_low, sig_mh_med, sig_mh_high, sig_mh_lowlow, sig_mh_hihi = np.percentile(np.array(sig_Mhs), [16, 50, 84, 2.5, 97.5]) 
             sigMs[0, i_t] = sig_ms_med
             sigMs[1, i_t] = sig_ms_low
             sigMs[2, i_t] = sig_ms_high
             sigMs[3, i_t] = sig_ms_lowlow
             sigMs[4, i_t] = sig_ms_hihi
-            
-            sigMh[0, i_t] = sig_mh_med
-            sigMh[1, i_t] = sig_mh_low
-            sigMh[2, i_t] = sig_mh_high
-            sigMh[3, i_t] = sig_mh_lowlow
-            sigMh[4, i_t] = sig_mh_hihi
+            print('t_duty = %.1f, r = %.1f --- sigma_M*|Mh = %f (+/- %f, %f)' % 
+                    (tduty, abias, sig_ms_med, sig_ms_high-sig_ms_med, sig_ms_med - sig_ms_low))
         # ABC posteriors 
         sub1.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C'+str(i_a), alpha=0.5, linewidth=0) 
         sub2.fill_between(tduties, sigMs[1,:], sigMs[2,:], color='C'+str(i_a), alpha=0.5, linewidth=0, zorder=2) 
@@ -1282,7 +1278,7 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
     sub1.add_artist(leg1)
     sub1.set_xlim([0.1, 10.]) # x-axis
     sub1.set_xscale('log') 
-    sub1.set_ylabel(r'$\sigma_{\log\,M_*} \Big(M_{h} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=25) # y-axis
+    sub1.set_ylabel(r'$\sigma_{M_*|M_h}$ at $M_{h} = 10^{'+str(Mhalo)+r'} M_\odot$', fontsize=25) # y-axis
     sub1.set_ylim([0.1, 0.4]) 
     sub1.set_yticks([0.1, 0.2, 0.3, 0.4])#, 0.6]) 
 
@@ -1336,7 +1332,7 @@ def SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.5, Mstar=10.5, dMstar=0.5):
 def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14): 
     '''     
     '''
-    tduties = [0.5, 1, 2, 5, 10]
+    tduties = [0.1, 0.5, 1, 2, 5, 10]
     r_abias = [0., 0.5, 0.99]
     
     smhmr = Obvs.Smhmr()
@@ -1354,7 +1350,7 @@ def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14):
 
             abc_dir = UT.dat_dir()+'abc/'+run+'/model/' # ABC directory 
             sig_Mss, sig_Mhs = [], [] 
-            for ii in range(10): 
+            for ii in range(100): 
                 f = pickle.load(open(''.join([abc_dir, 'model.theta', str(ii), '.t', str(niter), '.p']), 'rb'))
                 subcat_sim_i = {} 
                 for key in f.keys(): 
@@ -1379,9 +1375,11 @@ def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14):
     origin = 'lower'
     _CS = sub.contourf(X, Y, sigma_grid.T, origin=origin, cmap='viridis_r')
     CS = sub.contour(X, Y, sigma_grid.T, levels=_CS.levels, colors=('k',), linewidths=(0,), origin=origin) 
-    sub.clabel(CS, inline=1, colors='k', fontsize=15)
-    sub.plot([0.5, 10.], [0.63, 0.63], c='k', ls='--', linewidth=2, label='Tinker+(2018)') 
-    sub.plot([0.5, 10.], [0.58, 0.58], c='k', ls=':', linewidth=2, label='Behroozi+(2018)') 
+    manual_locations = [(0.4, 0.9), (0.45, 0.7), (0.55, 0.5), (0.9, 0.5), (2., 0.5), (3.5, 0.5), 
+            (5.5, 0.5), (9, 0.5)]
+    sub.clabel(CS, colors='k', fontsize=15, manual=manual_locations) #inline=1, 
+    sub.plot([0.1, 10.], [0.63, 0.63], c='k', ls='--', linewidth=2, label='Tinker+(2018)') 
+    sub.plot([0.1, 10.], [0.58, 0.58], c='k', ls=':', linewidth=2, label='Behroozi+(2019)') 
     #sub.fill_between([0.5, 10.], [0.57, 0.57], [0.69, 0.69], color='k', alpha=0.15, linewidth=0)
     #sub.plot([0.5, 10.], [0.57, 0.57], c='k', ls='--', linewidth=1) 
     #sub.plot([0.5, 10.], [0.69, 0.69], c='k', ls='--', linewidth=1) 
@@ -1391,7 +1389,7 @@ def SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14):
     #sub.text(0.75, 0.6, 'Behroozi+(2018)', ha='center', va='top', transform=sub.transAxes, fontsize=15)
     sub.legend(loc='lower left', frameon=True, fontsize=18) 
     sub.set_xlabel(r'$t_\mathrm{duty}$ [Gyr]', fontsize=20)  
-    sub.set_xlim([0.5, 10.]) 
+    sub.set_xlim([0.1, 10.]) 
     sub.set_xscale("log") 
     sub.set_ylabel(r'$r$ correlation coefficient', fontsize=20)  
     sub.set_ylim([0., 0.99]) 
@@ -1641,13 +1639,11 @@ def siglogM_zevo(Mhalo=12, dMhalo=0.5):
     '''
     # calculate the scatters from the ABC posteriors 
     smhmr = Obvs.Smhmr()
-    tscales = ['0.5']
-    tduties = [0.5, 1., 2., 5., 9.75]  #hardcoded
 
     fig = plt.figure(figsize=(15,5)) 
     for i_sig, siglogM in enumerate([0.2, 0.35, 0.45]):
         sub = fig.add_subplot(1,3,i_sig+1)
-        for tt in ['0.5']:  
+        for tt in ['0.1']:  
             for i_a, abias in enumerate([0., 0.5, 0.99]): 
                 if abias > 0.:
                     if siglogM == 0.2: run = 'rSFH_abias%s_%sgyr.sfsmf.sfsbroken' % (str(abias), tt) 
@@ -1673,14 +1669,15 @@ def siglogM_zevo(Mhalo=12, dMhalo=0.5):
                             weights=subcat_sim_i['weights'][isSF], Mhalo=Mhalo, dmhalo=dMhalo)
                     sig_Mss.append(sig_ms_i)  
                 sig_ms_low, sig_ms_med, sig_ms_high, sig_ms_lowlow, sig_ms_hihi = np.percentile(np.array(sig_Mss), [16, 50, 84, 2.5, 97.5])
-                sub.fill_between([1., 0.], [siglogM, sig_ms_low], [siglogM, sig_ms_high], color='C'+str(i_a), alpha=1, linewidth=0) 
+                sub.fill_between([1., 0.], [siglogM, sig_ms_low], [siglogM, sig_ms_high], color='C'+str(i_a), alpha=1, linewidth=0)
+                print('sigma_M*|Mh(z=1) = %.2f, r = %.1f --- sigma_M*|Mh = %f' % (siglogM, abias, sig_ms_med))
         sub.plot([1., 0.], [siglogM, siglogM], ls='--', c='k') 
         sub.set_xlim(1., 0.) # x-axis
         sub.set_ylim(0.2, 0.5) 
         sub.set_yticks([0.1, 0.2, 0.3, 0.4, 0.5]) 
         if i_sig == 0: 
             sub.set_ylabel(r'$\sigma_{\log M_*} \Big(M_{h} = 10^{'+str(Mhalo)+r'} M_\odot \Big)$', fontsize=25) # y-axis
-            sub.text(0.05, 0.95, r'$t_{\rm duty} = 0.5$ Gyr', ha='left', va='top', transform=sub.transAxes, fontsize=25)
+            sub.text(0.05, 0.95, r'$t_{\rm duty} = 0.1$ Gyr', ha='left', va='top', transform=sub.transAxes, fontsize=25)
         elif i_sig == 2: # right panel: legends  
             abc_post1 = sub.fill_between([0], [0], [0.1], color='C0', label='$r=0$')
             abc_post2 = sub.fill_between([0], [0], [0.1], color='C1', label='$r=0.5$') 
@@ -2045,13 +2042,14 @@ if __name__=="__main__":
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #qaplotABC(runs=['randomSFH10gyr.sfsmf.sfsbroken', 'randomSFH1gyr.sfsmf.sfsbroken'], Ts=[14, 14], dMhalo=0.1)
     #SHMRscatter_tduty(Mhalo=12, dMhalo=0.1, Mstar=10., dMstar=0.1)
-    SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1)
+    #SHMRscatter_tduty_v2(Mhalo=12, dMhalo=0.1)
+    #SHMRscatter_tduty_v2(Mhalo=11.5, dMhalo=0.1)
     #SHMRscatter_tduty_abias(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.2)
     #SHMRscatter_tduty_abias_v2(Mhalo=12, dMhalo=0.1, Mstar=10.5, dMstar=0.1)
     #SHMRscatter_tduty_abias_contour(Mhalo=12, dMhalo=0.1, niter=14)
     #Mhacc_dSFR(['rSFH_abias0.5_0.5gyr.sfsmf.sfsbroken', 'rSFH_abias0.99_0.5gyr.sfsmf.sfsbroken'], 14)
     #SHMRscatter_tduty_abias_z1sigma(Mhalo=12, dMhalo=0.1)
-    #siglogM_zevo(Mhalo=12, dMhalo=0.1)
+    siglogM_zevo(Mhalo=12, dMhalo=0.1)
     #fQ_fSFMS()
     #SFHmodel()
     #Illustris_SFH()
