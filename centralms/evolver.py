@@ -187,6 +187,104 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
     return logM_integ, logSFRs
 
 
+def _MassSFR_tarr(SHcat, tarr, isSF=None, logSFR_logM_z=None, sfr_kwargs=None, **theta): 
+    ''' Evolve galaxies that remain star-forming throughout the snapshots. 
+    '''
+    # parse theta 
+    theta_mass = theta['theta_mass']
+    theta_sfh = theta['theta_sfh']
+    theta_sfms = theta['theta_sfms']
+
+    # precompute z(t_cosmic) 
+    z_table, t_table = UT.zt_table()     
+    z_of_t = lambda tt: UT.z_of_t(tt, deg=6)
+    
+    # now solve M*, SFR ODE 
+    dlogmdt_kwargs = {}
+    dlogmdt_kwargs['logsfr_M_z'] = logSFR_logM_z 
+    dlogmdt_kwargs['f_retain'] = theta_mass['f_retain']
+    dlogmdt_kwargs['zoft'] = z_of_t
+    
+    # choose ODE solver
+    if theta_mass['solver'] == 'euler': # Forward euler
+        f_ode = SFH.ODE_Euler
+    elif theta_mass['solver'] == 'scipy':  # scipy ODE solver
+        f_ode = odeint
+    else: 
+        raise ValueError
+
+    logM_integ = np.tile(-999., (len(SHcat['galtype']), len(tarr)))
+    
+    dlogmdt_kwarg_list = []
+    for nn in range(nsnapf+1, nsnap0+1)[::-1]: 
+        # starts at n_snap = nn 
+        isStart = np.where(SHcat['nsnap_start'][isSF] == nn)  
+    
+        if theta_mass['solver'] != 'scipy':  
+            dlogmdt_kwarg = dlogmdt_kwargs.copy()
+            
+            for k in sfr_kwargs.keys(): 
+                if isinstance(sfr_kwargs[k], np.ndarray): 
+                    dlogmdt_kwarg[k] = sfr_kwargs[k][isStart]
+                else: 
+                    dlogmdt_kwarg[k] = sfr_kwargs[k]
+
+            dlogmdt_kwarg_list.append(dlogmdt_kwarg)
+            del dlogmdt_kwarg
+        else:
+            sfr_kwarg = {}
+            for k in sfr_kwargs.keys(): 
+                if isinstance(sfr_kwargs[k], np.ndarray): 
+                    sfr_kwarg[k] = sfr_kwargs[k][isStart]
+                else: 
+                    sfr_kwarg[k] = sfr_kwargs[k]
+            
+            dlogmdt_arg = (
+                    dlogmdt_kwargs['logsfr_M_z'],
+                    dlogmdt_kwargs['f_retain'],
+                    dlogmdt_kwargs['zoft'],
+                    sfr_kwarg
+                    )
+            dlogmdt_kwarg_list.append(dlogmdt_arg)
+            del dlogmdt_arg
+
+    #t_s = time.time() 
+    for i_n, nn in enumerate(range(nsnapf+1, nsnap0+1)[::-1]): 
+        # starts at n_snap = nn 
+        isStart = np.where(SHcat['nsnap_start'][isSF] == nn)  
+
+        tsnap = UT.t_nsnap(nn) 
+        
+        if theta_mass['solver'] != 'scipy': 
+            tmp_logM_integ = f_ode(
+                    SFH.dlogMdt,                            # dy/dt
+                    SHcat['m.star0'][isSF[isStart]],        # logM0
+                    tarr[tarr > tsnap][::-1],               # t_final 
+                    theta_mass['t_step'],                   # time step
+                    **dlogmdt_kwarg_list[i_n]) 
+        else: 
+            print '=================================='
+            print '===========SCIPY ODEINT==========='
+            tmp_logM_integ = f_ode(
+                    SFH.dlogMdt_scipy,                      # dy/dt
+                    SHcat['m.star0'][isSF[isStart]],        # logM0
+                    t_table[nsnapf:nn+1][::-1],             # t_final 
+                    tarr[tarr > tsnap][::-1],               # t_final 
+                    args=dlogmdt_kwarg_list[i_n]) 
+
+        logM_integ[isSF[isStart],:][:,tarr > tsnap] = tmp_logM_integ.T[:,1:]
+
+    isStart = np.where(SHcat['nsnap_start'][isSF] == 1)  
+    logM_integ[isSF[isStart], -1] = SHcat['m.star0'][isSF[isStart]]
+    #print time.time() - t_s
+    
+    # log(SFR) @ nsnapf
+    logSFRs = np.repeat(-999., len(SHcat['galtype']))
+    logSFRs[isSF] = logSFR_logM_z(logM_integ[isSF, -1], UT.z_nsnap(nsnapf), **sfr_kwargs) 
+    
+    return logM_integ, logSFRs
+
+
 def defaultTheta(sfh): 
     ''' Return generic default parameter values
     '''
