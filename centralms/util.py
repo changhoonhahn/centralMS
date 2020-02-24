@@ -232,7 +232,7 @@ def replicate(arr, n):
             leng = str(np.ceil(len(val)/16)*16)
             return np.tile(val, n).astype('|S'+leng)
     else: 
-        print val, type(val) 
+        print(val, type(val))
         raise ValueError
 
 
@@ -276,7 +276,6 @@ def GrabLocalFile(string, machine='harmattan'):
 
     if machine == 'harmattan': 
         scp_cmd = "scp harmattan:/data1/hahn/centralMS/"+string+" "+dat_dir()+sub_dir
-        print scp_cmd
         os.system(scp_cmd)
     else: 
         raise NotImplementedError

@@ -9,7 +9,7 @@ The main observables are:
 '''
 import numpy as np 
 # --- centralms --- 
-from sham_hack import SMFClass 
+from .sham_hack import SMFClass 
 from . import util as UT 
 
 
@@ -552,4 +552,4 @@ def SSFR_SFMS_obvs(mstar, z_in, lit='lee'):
 
 
 if __name__=="__main__": 
-    print MF_data(source='li-white', m_arr=np.linspace(9., 12., 20))
+    print(MF_data(source='li-white', m_arr=np.linspace(9., 12., 20))) 

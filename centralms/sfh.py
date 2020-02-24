@@ -4,7 +4,7 @@ from scipy.special import erfinv
 from scipy.interpolate import interp1d
 
 # --- local --- 
-import util as UT
+from . import util as UT
 import corner as DFM 
 import matplotlib.pyplot as plt
 

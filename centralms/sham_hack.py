@@ -34,8 +34,8 @@ def assign(sub, m_kind='m.star', scat=0, dis_mf=0.007, source='', sham_prop='m.m
         zis = [0]
     subz = sub[zis[0]]
     vol = subz.info['box.length'] ** 3
-    print 'Box Length', subz.info['box.length']
-    print 'Box Hubble', subz.Cosmo['hubble']
+    print('Box Length', subz.info['box.length'])
+    print('Box Hubble', subz.Cosmo['hubble'])
     zis = ut.array.arrayize(zis)
     if m_kind == 'm.star':
         if not source:
@@ -612,11 +612,11 @@ def test_sham(sub, zi, m_kind, m_min, m_max, scat=0.2, mfracmin=0, m_wid=0.1, so
     gal_nums = np.zeros(m_bins.size)
     for mi in xrange(m_bins.size):
         gal_nums[mi] = ims[ims == mi].size
-    print 'bin count min %d' % np.min(gal_nums)
+    print('bin count min %d' % np.min(gal_nums))
     dndm_sham = gal_nums / sub.info['box.length'] ** 3 / m_wid
-    print 'assign ratio ave %.3f' % np.mean(abs(dndm_sham / dndm_anal))
+    print('assign ratio ave %.3f' % np.mean(abs(dndm_sham / dndm_anal)))
     if scat:
-        print 'recov ratio ave %.3f' % np.mean(abs(dndm_anal_recov / dndm_anal))
+        print('recov ratio ave %.3f' % np.mean(abs(dndm_anal_recov / dndm_anal)))
 
     # plot ----------
     Plot = plot_sm.PlotClass()

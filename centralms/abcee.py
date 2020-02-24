@@ -107,7 +107,7 @@ def _model_theta(run, args):
     '''
     theta = {}
     # parameters for stellar mass integration  
-    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.05} 
+    theta['mass'] = {'solver': 'euler', 'f_retain': 0.6, 't_step': 0.005} 
     # SFMS slopes can change 
     if run.split('.sfs')[-1] == 'flex': 
         theta['sfms'] = {'name': 'flex', 'zslope': args[0], 'mslope': args[1], 'sigma': 0.3}
@@ -331,7 +331,6 @@ def minimize(run, sumstat=None, **run_kwargs):
         for m_z in [-0.5, -0.25, 0., 0.25, 0.5]: 
             print('[%f, %f] -- chi2 = %f' % (m_m, m_z, chi2((m_m, m_z))))
     theta_opt = sp.optimize.minimize(chi2, [1.5, 0.1], method='L-BFGS-B', bounds=[[0.5, 2.5], [-0.5, 0.5]]) 
-    print theta_opt
     return None 
 
 

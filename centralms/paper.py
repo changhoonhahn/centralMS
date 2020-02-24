@@ -50,8 +50,8 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     _fSFMS = fstarforms() 
     _fit_logm, _fit_logsfr = _fSFMS.fit(gc_cat['mass'], gc_cat['sfr'], method='gaussmix', fit_range=None)
     logsfr_ms = _fSFMS.powerlaw(logMfid=10.5) 
-    print _fSFMS._powerlaw_m
-    print _fSFMS._powerlaw_c
+    print(_fSFMS._powerlaw_m)
+    print(_fSFMS._powerlaw_c)
 
     fSFMS = fstarforms() 
     fit_logm, _ = fSFMS.fit(gc_cat['mass'], gc_cat['sfr'], method='gaussmix', fit_range=mrange)
@@ -69,7 +69,7 @@ def groupcatSFMS(mrange=[10.6,10.8]):
     #sub1.vlines(mrange[1], -5., 2., color='k', linewidth=2, linestyle='--')
     #sub1.fill_between(mrange, [2.,2.], [-5.,-5], color='#1F77B4', alpha=0.25)
     sub1.fill_between(mrange, [2.,2.], [-5.,-5], color='k', linewidth=0, alpha=0.25)
-    print _fit_logm, _fit_logsfr
+    print(_fit_logm, _fit_logsfr)
     sub1.plot(np.linspace(9.8, 11., 10), logsfr_ms(np.linspace(9.8, 11., 10)), c='k', linestyle='--') 
     sub1.set_xticks([9., 10., 11., 12.])
     sub1.set_xlabel('log$(\; M_*\; [M_\odot]\;)$', fontsize=20)

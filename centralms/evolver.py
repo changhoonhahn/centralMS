@@ -166,8 +166,8 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
                     theta_mass['t_step'],                   # time step
                     **dlogmdt_kwarg_list[i_n]) 
         else: 
-            print '=================================='
-            print '===========SCIPY ODEINT==========='
+            print('==================================')
+            print('===========SCIPY ODEINT===========')
             tmp_logM_integ = f_ode(
                     SFH.dlogMdt_scipy,                      # dy/dt
                     SHcat['m.star0'][isSF[isStart]],        # logM0
@@ -187,7 +187,7 @@ def _MassSFR_Wrapper(SHcat, nsnap0, nsnapf, isSF=None, logSFR_logM_z=None, sfr_k
     return logM_integ, logSFRs
 
 
-def _MassSFR_tarr(SHcat, tarr, isSF=None, logSFR_logM_z=None, sfr_kwargs=None, **theta): 
+def _MassSFR_tarr(SHcat, nsnap0, tarr, isSF=None, logSFR_logM_z=None, sfr_kwargs=None, **theta): 
     ''' Evolve galaxies that remain star-forming throughout the snapshots. 
     '''
     # parse theta 
@@ -198,6 +198,7 @@ def _MassSFR_tarr(SHcat, tarr, isSF=None, logSFR_logM_z=None, sfr_kwargs=None, *
     # precompute z(t_cosmic) 
     z_table, t_table = UT.zt_table()     
     z_of_t = lambda tt: UT.z_of_t(tt, deg=6)
+    nsnapf = 1
     
     # now solve M*, SFR ODE 
     dlogmdt_kwargs = {}
@@ -259,20 +260,20 @@ def _MassSFR_tarr(SHcat, tarr, isSF=None, logSFR_logM_z=None, sfr_kwargs=None, *
             tmp_logM_integ = f_ode(
                     SFH.dlogMdt,                            # dy/dt
                     SHcat['m.star0'][isSF[isStart]],        # logM0
-                    tarr[tarr > tsnap][::-1],               # t_final 
+                    tarr[tarr > tsnap],               # t_final 
                     theta_mass['t_step'],                   # time step
                     **dlogmdt_kwarg_list[i_n]) 
         else: 
-            print '=================================='
-            print '===========SCIPY ODEINT==========='
+            print('==================================')
+            print('===========SCIPY ODEINT===========')
             tmp_logM_integ = f_ode(
                     SFH.dlogMdt_scipy,                      # dy/dt
                     SHcat['m.star0'][isSF[isStart]],        # logM0
-                    t_table[nsnapf:nn+1][::-1],             # t_final 
-                    tarr[tarr > tsnap][::-1],               # t_final 
+                    tarr[tarr > tsnap],               # t_final 
                     args=dlogmdt_kwarg_list[i_n]) 
 
-        logM_integ[isSF[isStart],:][:,tarr > tsnap] = tmp_logM_integ.T[:,1:]
+        ii = np.arange(len(tarr))[tarr > tsnap].min() 
+        logM_integ[isSF[isStart],ii+1:] = tmp_logM_integ.T[:,1:].copy() 
 
     isStart = np.where(SHcat['nsnap_start'][isSF] == 1)  
     logM_integ[isSF[isStart], -1] = SHcat['m.star0'][isSF[isStart]]
